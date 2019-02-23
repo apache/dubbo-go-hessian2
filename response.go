@@ -1,12 +1,16 @@
-/******************************************************
-# DESC    : decode hessian response
-# AUTHOR  : Alex Stocks
-# VERSION : 1.0
-# LICENCE : Apache License 2.0
-# EMAIL   : alexstocks@foxmail.com
-# MOD     : 2017-10-17 11:12
-# FILE    : response.go
-******************************************************/
+// Copyright (c) 2016 ~ 2018, Alex Stocks.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package hessian
 
@@ -16,90 +20,108 @@ import (
 )
 
 import (
-	"fmt"
 	jerrors "github.com/juju/errors"
 )
 
+import (
+	"github.com/AlexStocks/dubbogo/codec"
+)
+
 const (
-	RESPONSE_OK                byte = 20
-	RESPONSE_CLIENT_TIMEOUT    byte = 30
-	RESPONSE_SERVER_TIMEOUT    byte = 31
-	RESPONSE_BAD_REQUEST       byte = 40
-	RESPONSE_BAD_RESPONSE      byte = 50
-	RESPONSE_SERVICE_NOT_FOUND byte = 60
-	RESPONSE_SERVICE_ERROR     byte = 70
-	RESPONSE_SERVER_ERROR      byte = 80
-	RESPONSE_CLIENT_ERROR      byte = 90
+	Response_OK                byte = 20
+	Response_CLIENT_TIMEOUT    byte = 30
+	Response_SERVER_TIMEOUT    byte = 31
+	Response_BAD_REQUEST       byte = 40
+	Response_BAD_RESPONSE      byte = 50
+	Response_SERVICE_NOT_FOUND byte = 60
+	Response_SERVICE_ERROR     byte = 70
+	Response_SERVER_ERROR      byte = 80
+	Response_CLIENT_ERROR      byte = 90
 
 	RESPONSE_WITH_EXCEPTION int32 = 0
 	RESPONSE_VALUE          int32 = 1
 	RESPONSE_NULL_VALUE     int32 = 2
-
-	HEARTBEAT_RESPONSE = "dubbo_hearbeat"
-)
-
-var (
-	ErrIllegalPackage = jerrors.Errorf("illegal pacakge!")
 )
 
 // hessian decode respone
-func UnpackResponse(buf []byte) (interface{}, error) {
-	length := len(buf)
-	if length < HEADER_LENGTH || (buf[0] != byte(MAGIC_HIGH) && buf[1] != byte(MAGIC_LOW)) {
-		return nil, ErrIllegalPackage
+func unpackResponseHeaer(buf []byte, m *codec.Message) error {
+	// length := len(buf)
+	// hessianCodec.ReadHeader has check the header length
+	//if length < HEADER_LENGTH {
+	//	return codec.ErrHeaderNotEnough
+	//}
+
+	if buf[0] != byte(MAGIC_HIGH) && buf[1] != byte(MAGIC_LOW) {
+		return codec.ErrIllegalPackage
 	}
 
 	// Header{serialization id(5 bit), event, two way, req/response}
-	var serialID = buf[2] & SERIAL_MASK
+	serialID := buf[2] & SERIAL_MASK
 	if serialID == byte(0x00) {
-		return nil, jerrors.Errorf("serialization ID:%v", serialID)
+		return jerrors.Errorf("serialization ID:%v", serialID)
 	}
-	// check heartbeat response
-	fmt.Println("hearbeat value:", (buf[2]&FLAG_EVENT)>>5)
-	if (buf[2]&FLAG_EVENT)>>5 == byte(0x01) && len(buf) == 17 && buf[16] == byte('N') {
-		return HEARTBEAT_RESPONSE, nil
+
+	flag := buf[2] & FLAG_EVENT
+	if flag != byte(0x00) {
+		m.Type |= codec.Heartbeat
 	}
-	var eventFlag = buf[2] & FLAG_EVENT
-	if eventFlag == byte(0x00) {
-		return nil, jerrors.Errorf("event flag:%v", eventFlag)
+	flag = buf[2] & FLAG_TWOWAY
+	if flag != byte(0x00) {
+		m.Type |= codec.Response
 	}
-	var twoWayFlag = buf[2] & FLAG_TWOWAY
-	if twoWayFlag == byte(0x00) {
-		return nil, jerrors.Errorf("twoway flag:%v", twoWayFlag)
-	}
-	var rspFlag = buf[2] & FLAG_REQUEST
-	if rspFlag != byte(0x00) {
-		return nil, jerrors.Errorf("response flag:%v", rspFlag)
+	flag = buf[2] & FLAG_REQUEST
+	if flag != byte(0x00) {
+		return jerrors.Errorf("response flag:%v", flag)
 	}
 
 	// Header{status}
-	if buf[3] != RESPONSE_OK {
-		return nil, jerrors.Errorf("Response not OK, java exception:%s", string(buf[18:length-1]))
+	var err error
+	if buf[3] != Response_OK {
+		err = codec.ErrJavaException
+		// return jerrors.Errorf("Response not OK, java exception:%s", string(buf[18:length-1]))
 	}
 
 	// Header{req id}
-	//var ID int64 = int64(binary.BigEndian.Uint64(buf[4:]))
-	//fmt.Printf("response package id:%#X\n", ID)
+	m.ID = int64(binary.BigEndian.Uint64(buf[4:]))
 
 	// Header{body len}
-	var bodyLen = int32(binary.BigEndian.Uint32(buf[12:]))
-	if int(bodyLen+HEADER_LENGTH) != length {
-		return nil, ErrIllegalPackage
+	m.BodyLen = int(binary.BigEndian.Uint32(buf[12:]))
+	if m.BodyLen < 0 {
+		return codec.ErrIllegalPackage
 	}
 
+	return err
+}
+
+// hessian decode response body
+func unpackResponseBody(buf []byte, ret interface{}) error {
 	// body
-	decoder := NewDecoder(buf[16:length])
-	rspObj, _ := decoder.Decode()
-	switch rspObj {
-	case RESPONSE_WITH_EXCEPTION:
-		return decoder.Decode()
-	case RESPONSE_VALUE:
-		return decoder.Decode()
-	case RESPONSE_NULL_VALUE:
-		return nil, jerrors.New("Received null")
+	decoder := NewDecoder(buf[:])
+	rspType, err := decoder.Decode()
+	if err != nil {
+		return jerrors.Trace(err)
 	}
 
-	return nil, nil
+	switch rspType {
+	case RESPONSE_WITH_EXCEPTION:
+		expt, err := decoder.Decode()
+		if err != nil {
+			return jerrors.Trace(err)
+		}
+		return jerrors.Errorf("got exception: %+v", expt)
+
+	case RESPONSE_VALUE:
+		rsp, err := decoder.Decode()
+		if err != nil {
+			return jerrors.Trace(err)
+		}
+		return jerrors.Trace(ReflectResponse(rsp, ret))
+
+	case RESPONSE_NULL_VALUE:
+		return jerrors.New("Received null")
+	}
+
+	return nil
 }
 
 func cpSlice(in, out interface{}) error {
@@ -156,7 +178,7 @@ func cpMap(in, out interface{}) error {
 	outValueType := outMap.Type().Elem()
 	outValueKind := outValueType.Kind()
 	var inKey, inValue reflect.Value
-	for k, _ := range inMap {
+	for k := range inMap {
 		if outKeyKind != reflect.Struct {
 			inKey = reflect.ValueOf(k)
 		} else {
@@ -192,6 +214,10 @@ func ReflectResponse(in interface{}, out interface{}) error {
 	}
 	if reflect.TypeOf(out).Kind() != reflect.Ptr {
 		return jerrors.Errorf("@out should be a pointer")
+	}
+
+	if inV, ok := in.(reflect.Value); ok {
+		in = inV.Interface()
 	}
 
 	inType := reflect.TypeOf(in)

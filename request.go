@@ -1,15 +1,22 @@
-/******************************************************
-# DESC    : dubbo request
-# AUTHOR  : Alex Stocks
-# EMAIL   : alexstocks@foxmail.com
-# MOD     : 2017-10-15 22:42
-# FILE    : request.go
-******************************************************/
+// Copyright (c) 2016 ~ 2018, Alex Stocks.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package hessian
 
 import (
 	"encoding/binary"
+	"io"
 	"reflect"
 	"strconv"
 	"strings"
@@ -17,8 +24,11 @@ import (
 )
 
 import (
-	"fmt"
 	jerrors "github.com/juju/errors"
+)
+
+import (
+	"github.com/AlexStocks/dubbogo/codec"
 )
 
 /////////////////////////////////////////
@@ -37,7 +47,7 @@ const (
 	// header length.
 	HEADER_LENGTH = 16
 
-	// magic header.
+	// magic header
 	MAGIC      = uint16(0xdabb)
 	MAGIC_HIGH = byte(0xda)
 	MAGIC_LOW  = byte(0xbb)
@@ -46,16 +56,15 @@ const (
 	FLAG_REQUEST = byte(0x80)
 	FLAG_TWOWAY  = byte(0x40)
 	FLAG_EVENT   = byte(0x20) // for heartbeat
-	SERIAL_MASK  = byte(0x1f)
+	SERIAL_MASK  = 0x1f
 
 	DUBBO_VERSION = "2.5.4"
 	DEFAULT_LEN   = 8388608 // 8 * 1024 * 1024 default body max length
 )
 
 var (
-	DubboHeader = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, FLAG_REQUEST | FLAG_TWOWAY}
-	// DubboHeartbeatHeader = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, FLAG_REQUEST | FLAG_TWOWAY | FLAG_EVENT | 0x0F}
-	DubboHeartbeatHeader = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, FLAG_REQUEST | FLAG_TWOWAY | FLAG_EVENT}
+	DubboHeader          = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, FLAG_REQUEST | FLAG_TWOWAY}
+	DubboHeartbeatHeader = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, FLAG_REQUEST | FLAG_TWOWAY | FLAG_EVENT | 0x0F}
 )
 
 // com.alibaba.dubbo.common.utils.ReflectUtils.ReflectUtils.java line245 getDesc
@@ -144,33 +153,43 @@ func getArgsTypeList(args []interface{}) (string, error) {
 	return types, nil
 }
 
-// create request buffer body
-func PackRequest(hb bool, reqID int64, path, dubboInterface, version, method string, args []interface{},
-	timeout int) ([]byte, error) {
-	var serializationID = byte(reqID) // java 中标识一个class的ID
-	fmt.Printf("reqID %d, seialID %d\n", reqID, serializationID)
+// dubbo-remoting/dubbo-remoting-api/src/main/java/com/alibaba/dubbo/remoting/exchange/codec/ExchangeCodec.java
+// v2.5.4 line 204 encodeRequest
+func packRequest(m *codec.Message, a interface{}, w io.Writer) error {
+	var (
+		err           error
+		hb            bool
+		types         string
+		byteArray     []byte
+		encoder       Encoder
+		version       string
+		ok            bool
+		args          []interface{}
+		pkgLen        int
+		serviceParams map[string]string
+	)
+
+	if args, ok = a.([]interface{}); !ok {
+		return jerrors.Errorf("@b is not of type: []interface{}")
+	}
+
+	hb = m.Type == codec.Heartbeat
 
 	//////////////////////////////////////////
-	// header
+	// byteArray
 	//////////////////////////////////////////
-	var header []byte
-
 	// magic
 	if hb {
-		header = append(header, DubboHeartbeatHeader[:]...)
+		byteArray = append(byteArray, DubboHeartbeatHeader[:]...)
 	} else {
-		header = append(header, DubboHeader[:]...)
+		byteArray = append(byteArray, DubboHeader[:]...)
 	}
 	// serialization id, two way flag, event, request/response flag
-	fmt.Printf("pre header[2]:%#X \n", header[2])
-	header[2] |= byte(serializationID & SERIAL_MASK)
-	fmt.Printf("post header[2]:%#X \n", header[2])
+	// java 中标识一个class的ID
+	byteArray[2] |= byte(m.ID & SERIAL_MASK)
 	// request id
-	binary.BigEndian.PutUint64(header[4:], uint64(reqID))
-
-	//模拟dubbo的请求
-	var encoder Encoder
-	encoder.Append(header[:HEADER_LENGTH])
+	binary.BigEndian.PutUint64(byteArray[4:], uint64(m.ID))
+	encoder.Append(byteArray[:HEADER_LENGTH])
 
 	// com.alibaba.dubbo.rpc.protocol.dubbo.DubboCodec.DubboCodec.java line144 encodeRequestData
 	//////////////////////////////////////////
@@ -178,48 +197,53 @@ func PackRequest(hb bool, reqID int64, path, dubboInterface, version, method str
 	//////////////////////////////////////////
 	if hb {
 		encoder.Encode(nil)
-		encBuf := encoder.Buffer()
-		binary.BigEndian.PutUint32(encBuf[12:], uint32(1))
-		return encBuf, nil
+		goto END
 	}
 
 	// dubbo version + path + version + method
 	encoder.Encode(DUBBO_VERSION)
-	encoder.Encode(dubboInterface)
-	encoder.Encode(version)
-	encoder.Encode(method)
+	encoder.Encode(m.Target)
+	encoder.Encode(m.Version)
+	encoder.Encode(m.Method)
 
 	// args = args type list + args value list
-	var types string
-	var err error
 	types, err = getArgsTypeList(args)
 	if err != nil {
-		return nil, jerrors.Annotatef(err, " PackRequest(args:%+v)", args)
+		return jerrors.Annotatef(err, " PackRequest(args:%+v)", args)
 	}
-	encoder.Encode(types) //"Ljava/lang/Integer;"
+	encoder.Encode(types)
 	for _, v := range args {
 		encoder.Encode(v)
 	}
 
-	serviceParams := make(map[string]string)
-	serviceParams["path"] = path
-	serviceParams["interface"] = dubboInterface
+	serviceParams = make(map[string]string)
+	serviceParams[PATH_KEY] = m.ServicePath
+	serviceParams[INTERFACE_KEY] = m.Target
 	if len(version) != 0 {
-		serviceParams["version"] = version
+		serviceParams[VERSION_KEY] = version
 	}
-	if timeout != 0 {
-		serviceParams["timeout"] = strconv.Itoa(timeout)
+	if m.Timeout != 0 {
+		serviceParams[TIMEOUT_KEY] = strconv.Itoa(int(m.Timeout / time.Millisecond))
 	}
 
 	encoder.Encode(serviceParams)
 
-	encBuf := encoder.Buffer()
-	encBufLen := len(encBuf)
-	// header{body length}
-	if encBufLen > int(DEFAULT_LEN) { // 8M
-		return nil, jerrors.Errorf("Data length %d too large, max payload %d", encBufLen, DEFAULT_LEN)
+END:
+	byteArray = encoder.Buffer()
+	pkgLen = len(byteArray)
+	if pkgLen > int(DEFAULT_LEN) { // 8M
+		return jerrors.Errorf("Data length %d too large, max payload %d", pkgLen, DEFAULT_LEN)
 	}
-	binary.BigEndian.PutUint32(encBuf[12:], uint32(encBufLen-HEADER_LENGTH))
+	// byteArray{body length}
+	binary.BigEndian.PutUint32(byteArray[12:], uint32(pkgLen-HEADER_LENGTH))
 
-	return encBuf, nil
+	pkgLen, err = w.Write(encoder.Buffer())
+	if err != nil {
+		return jerrors.Trace(err)
+	}
+	if pkgLen != len(byteArray) {
+		return jerrors.Errorf("@w.Write(buflen:%d) = %d, nil", len(byteArray), pkgLen)
+	}
+
+	return nil
 }

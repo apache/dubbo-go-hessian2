@@ -1,10 +1,46 @@
-/******************************************************
-# DESC    : hessian decode
-# AUTHOR  : Alex Stocks
-# EMAIL   : alexstocks@foxmail.com
-# MOD     : 2016-10-22 20:25
-# FILE    : decode.go
-******************************************************/
+/*
+ *
+ *  * Copyright 2012-2016 Viant.
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ *  * use this file except in compliance with the License. You may obtain a copy of
+ *  * the License at
+ *  *
+ *  * http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ *  * License for the specific language governing permissions and limitations under
+ *  * the License.
+ *
+ */
+
+/*
+decoder implement hessian 2 protocol, It follows java hessian package standard.
+It assume that you using the java name convention
+baisca difference between java and go
+fully qualify java class name is composed of package + class name
+Go assume upper case of field name is exportable and java did not have that constrain
+but in general java using camo camlecase. So it did conversion of field name from
+the first letter of from upper to lower case
+typMap{string]reflect.Type contain full java package+class name and go relfect.Type
+must provide in order to correctly decode to galang interface
+*/
+
+// Copyright (c) 2016 ~ 2018, Alex Stocks.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package hessian
 
@@ -1119,18 +1155,13 @@ func findField(name string, typ reflect.Type) (int, error) {
 }
 
 func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, error) {
-	var (
-		i int
-		j int
-	)
-
 	if typ.Kind() != reflect.Struct {
 		return nil, jerrors.Errorf("wrong type expect Struct but get:%s", typ.String())
 	}
 
 	vRef := reflect.New(typ).Elem()
 	d.appendRefs(vRef)
-	for i = 0; i < len(cls.fieldNameList); i++ {
+	for i := 0; i < len(cls.fieldNameList); i++ {
 		fieldName := cls.fieldNameList[i]
 		index, err := findField(fieldName, typ)
 		if err != nil {
@@ -1208,13 +1239,29 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 		case kind == reflect.Slice || kind == reflect.Array:
 			m, e := d.decList(TAG_READ)
 			if e != nil {
+				if err == io.EOF {
+					break
+				}
 				return nil, jerrors.Trace(err)
 			}
 			v := reflect.ValueOf(m)
-			if v.Len() > 0 {
+			if m != nil && v.Len() > 0 {
+				// fmt.Printf("fldValue type %s\n", fldValue.Type().String())
+				// ref note: the following codes is related to
+				// [issue 6](https://github.com/AlexStocks/dubbogo/issues/6).
+				// It is fixed by [wongoo](https://github.com/wongoo).
+				elemPtrType := fldValue.Type().Elem().Kind() == reflect.Ptr
 				sl := reflect.MakeSlice(fldValue.Type(), v.Len(), v.Len())
-				for j = 0; j < v.Len(); j++ {
-					sl.Index(j).Set(reflect.ValueOf(v.Index(j).Interface()))
+				for i = 0; i < v.Len(); i++ {
+					item := v.Index(i).Interface()
+					itemValue := reflect.ValueOf(item)
+					if iv, ok := itemValue.Interface().(reflect.Value); ok {
+						itemValue = iv
+					}
+					if !elemPtrType && itemValue.Kind() == reflect.Ptr {
+						itemValue = itemValue.Elem()
+					}
+					sl.Index(i).Set(itemValue)
 				}
 				fldValue.Set(sl)
 			}
