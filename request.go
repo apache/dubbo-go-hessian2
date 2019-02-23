@@ -1,4 +1,4 @@
-// Copyright (c) 2016 ~ 2018, Alex Stocks.
+// Copyright (c) 2016 ~ 2019, Alex Stocks.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,10 +25,6 @@ import (
 
 import (
 	jerrors "github.com/juju/errors"
-)
-
-import (
-	"github.com/AlexStocks/dubbogo/codec"
 )
 
 /////////////////////////////////////////
@@ -155,7 +151,7 @@ func getArgsTypeList(args []interface{}) (string, error) {
 
 // dubbo-remoting/dubbo-remoting-api/src/main/java/com/alibaba/dubbo/remoting/exchange/codec/ExchangeCodec.java
 // v2.5.4 line 204 encodeRequest
-func packRequest(m *codec.Message, a interface{}, w io.Writer) error {
+func packRequest(m *Message, a interface{}, w io.Writer) error {
 	var (
 		err           error
 		hb            bool
@@ -173,7 +169,7 @@ func packRequest(m *codec.Message, a interface{}, w io.Writer) error {
 		return jerrors.Errorf("@b is not of type: []interface{}")
 	}
 
-	hb = m.Type == codec.Heartbeat
+	hb = m.Type == Heartbeat
 
 	//////////////////////////////////////////
 	// byteArray

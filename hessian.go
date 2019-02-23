@@ -1,4 +1,4 @@
-// Copyright (c) 2016 ~ 2018, Alex Stocks.
+// Copyright (c) 2016 ~ 2019, Alex Stocks.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,12 +24,8 @@ import (
 	jerrors "github.com/juju/errors"
 )
 
-import (
-	"github.com/AlexStocks/dubbogo/codec"
-)
-
 type hessianCodec struct {
-	mt         codec.MessageType
+	mt         MessageType
 	rwc        io.ReadWriteCloser
 	reader     *bufio.Reader
 	rspBodyLen int
@@ -43,11 +39,11 @@ func (h *hessianCodec) String() string {
 	return "hessian-codec"
 }
 
-func (h *hessianCodec) Write(m *codec.Message, a interface{}) error {
+func (h *hessianCodec) Write(m *Message, a interface{}) error {
 	switch m.Type {
-	case codec.Heartbeat, codec.Request:
+	case Heartbeat, Request:
 		return jerrors.Trace(packRequest(m, a, h.rwc))
-	case codec.Response:
+	case Response:
 		return nil
 	default:
 		return jerrors.Errorf("Unrecognised message type: %v", m.Type)
@@ -56,13 +52,13 @@ func (h *hessianCodec) Write(m *codec.Message, a interface{}) error {
 	return nil
 }
 
-func (h *hessianCodec) ReadHeader(m *codec.Message, mt codec.MessageType) error {
+func (h *hessianCodec) ReadHeader(m *Message, mt MessageType) error {
 	h.mt = mt
 
 	switch mt {
-	case codec.Request:
+	case Request:
 		return nil
-	case codec.Heartbeat, codec.Response:
+	case Heartbeat, Response:
 		buf, err := h.reader.Peek(HEADER_LENGTH)
 		if err != nil { // this is impossible
 			return jerrors.Trace(err)
@@ -73,7 +69,7 @@ func (h *hessianCodec) ReadHeader(m *codec.Message, mt codec.MessageType) error 
 		}
 
 		err = unpackResponseHeaer(buf[:], m)
-		if err == codec.ErrJavaException {
+		if err == ErrJavaException {
 			log.Warn("got java exception")
 			bufSize := h.reader.Buffered()
 			if bufSize > 2 {
@@ -99,10 +95,10 @@ func (h *hessianCodec) ReadHeader(m *codec.Message, mt codec.MessageType) error 
 
 func (h *hessianCodec) ReadBody(ret interface{}) error {
 	switch h.mt {
-	case codec.Request:
+	case Request:
 		return nil
 
-	case codec.Heartbeat, codec.Response:
+	case Heartbeat, Response:
 		// remark on 20180611: the heartbeat return is nil
 		//if ret == nil {
 		//	return jerrors.Errorf("@ret is nil")
@@ -110,7 +106,7 @@ func (h *hessianCodec) ReadBody(ret interface{}) error {
 
 		buf, err := h.reader.Peek(h.rspBodyLen)
 		if err == bufio.ErrBufferFull {
-			return codec.ErrBodyNotEnough
+			return ErrBodyNotEnough
 		}
 		if err != nil {
 			return jerrors.Trace(err)
@@ -130,9 +126,9 @@ func (h *hessianCodec) ReadBody(ret interface{}) error {
 	return nil
 }
 
-func NewCodec(rwc io.ReadWriteCloser) codec.Codec {
-	return &hessianCodec{
-		rwc:    rwc,
-		reader: bufio.NewReader(rwc),
-	}
-}
+// func NewCodec(rwc io.ReadWriteCloser) Codec {
+// 	return &hessianCodec{
+// 		rwc:    rwc,
+// 		reader: bufio.NewReader(rwc),
+// 	}
+// }

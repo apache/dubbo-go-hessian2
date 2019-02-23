@@ -16,7 +16,7 @@
  *
  */
 
-// Copyright (c) 2016 ~ 2018, Alex Stocks.
+// Copyright (c) 2016 ~ 2019, Alex Stocks.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.

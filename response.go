@@ -1,4 +1,4 @@
-// Copyright (c) 2016 ~ 2018, Alex Stocks.
+// Copyright (c) 2016 ~ 2019, Alex Stocks.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,14 +17,33 @@ package hessian
 import (
 	"encoding/binary"
 	"reflect"
+	"time"
 )
 
 import (
 	jerrors "github.com/juju/errors"
 )
 
-import (
-	"github.com/AlexStocks/dubbogo/codec"
+type MessageType int
+
+type Message struct {
+	ID          int64
+	Version     string
+	Type        MessageType
+	ServicePath string // service path
+	Target      string // Service
+	Method      string
+	Timeout     time.Duration // request timeout
+	Error       string
+	Header      map[string]string
+	BodyLen     int
+}
+
+const (
+	Error     MessageType = 0x01
+	Request               = 0x02
+	Response              = 0x04
+	Heartbeat             = 0x08
 )
 
 const (
@@ -43,16 +62,23 @@ const (
 	RESPONSE_NULL_VALUE     int32 = 2
 )
 
+var (
+	ErrHeaderNotEnough = jerrors.New("header buffer too short")
+	ErrBodyNotEnough   = jerrors.New("body buffer too short")
+	ErrJavaException   = jerrors.New("got java exception")
+	ErrIllegalPackage  = jerrors.New("illegal package!")
+)
+
 // hessian decode respone
-func unpackResponseHeaer(buf []byte, m *codec.Message) error {
+func unpackResponseHeaer(buf []byte, m *Message) error {
 	// length := len(buf)
 	// hessianCodec.ReadHeader has check the header length
 	//if length < HEADER_LENGTH {
-	//	return codec.ErrHeaderNotEnough
+	//	return ErrHeaderNotEnough
 	//}
 
 	if buf[0] != byte(MAGIC_HIGH) && buf[1] != byte(MAGIC_LOW) {
-		return codec.ErrIllegalPackage
+		return ErrIllegalPackage
 	}
 
 	// Header{serialization id(5 bit), event, two way, req/response}
@@ -63,11 +89,11 @@ func unpackResponseHeaer(buf []byte, m *codec.Message) error {
 
 	flag := buf[2] & FLAG_EVENT
 	if flag != byte(0x00) {
-		m.Type |= codec.Heartbeat
+		m.Type |= Heartbeat
 	}
 	flag = buf[2] & FLAG_TWOWAY
 	if flag != byte(0x00) {
-		m.Type |= codec.Response
+		m.Type |= Response
 	}
 	flag = buf[2] & FLAG_REQUEST
 	if flag != byte(0x00) {
@@ -77,7 +103,7 @@ func unpackResponseHeaer(buf []byte, m *codec.Message) error {
 	// Header{status}
 	var err error
 	if buf[3] != Response_OK {
-		err = codec.ErrJavaException
+		err = ErrJavaException
 		// return jerrors.Errorf("Response not OK, java exception:%s", string(buf[18:length-1]))
 	}
 
@@ -87,7 +113,7 @@ func unpackResponseHeaer(buf []byte, m *codec.Message) error {
 	// Header{body len}
 	m.BodyLen = int(binary.BigEndian.Uint32(buf[12:]))
 	if m.BodyLen < 0 {
-		return codec.ErrIllegalPackage
+		return ErrIllegalPackage
 	}
 
 	return err
