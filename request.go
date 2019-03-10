@@ -151,7 +151,8 @@ func getArgsTypeList(args []interface{}) (string, error) {
 
 // dubbo-remoting/dubbo-remoting-api/src/main/java/com/alibaba/dubbo/remoting/exchange/codec/ExchangeCodec.java
 // v2.5.4 line 204 encodeRequest
-func packRequest(m *Message, a interface{}, w io.Writer) error {
+func packRequest(msgType MessageType, pathKey, interfaceKey string, m *Message, a interface{},
+	w io.Writer) error {
 	var (
 		err           error
 		hb            bool
@@ -169,7 +170,7 @@ func packRequest(m *Message, a interface{}, w io.Writer) error {
 		return jerrors.Errorf("@b is not of type: []interface{}")
 	}
 
-	hb = m.Type == Heartbeat
+	hb = msgType == Heartbeat
 
 	//////////////////////////////////////////
 	// byteArray
@@ -213,8 +214,8 @@ func packRequest(m *Message, a interface{}, w io.Writer) error {
 	}
 
 	serviceParams = make(map[string]string)
-	serviceParams[PATH_KEY] = m.ServicePath
-	serviceParams[INTERFACE_KEY] = m.Target
+	serviceParams[PATH_KEY] = pathKey
+	serviceParams[INTERFACE_KEY] = interfaceKey
 	if len(version) != 0 {
 		serviceParams[VERSION_KEY] = version
 	}

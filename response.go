@@ -17,65 +17,19 @@ package hessian
 import (
 	"encoding/binary"
 	"reflect"
-	"time"
 )
 
 import (
 	jerrors "github.com/juju/errors"
 )
 
-type MessageType int
-
-type Message struct {
-	ID          int64
-	Version     string
-	Type        MessageType
-	ServicePath string // service path
-	Target      string // Service
-	Method      string
-	Timeout     time.Duration // request timeout
-	Error       string
-	Header      map[string]string
-	BodyLen     int
-}
-
-const (
-	Error     MessageType = 0x01
-	Request               = 0x02
-	Response              = 0x04
-	Heartbeat             = 0x08
-)
-
-const (
-	Response_OK                byte = 20
-	Response_CLIENT_TIMEOUT    byte = 30
-	Response_SERVER_TIMEOUT    byte = 31
-	Response_BAD_REQUEST       byte = 40
-	Response_BAD_RESPONSE      byte = 50
-	Response_SERVICE_NOT_FOUND byte = 60
-	Response_SERVICE_ERROR     byte = 70
-	Response_SERVER_ERROR      byte = 80
-	Response_CLIENT_ERROR      byte = 90
-
-	RESPONSE_WITH_EXCEPTION int32 = 0
-	RESPONSE_VALUE          int32 = 1
-	RESPONSE_NULL_VALUE     int32 = 2
-)
-
-var (
-	ErrHeaderNotEnough = jerrors.New("header buffer too short")
-	ErrBodyNotEnough   = jerrors.New("body buffer too short")
-	ErrJavaException   = jerrors.New("got java exception")
-	ErrIllegalPackage  = jerrors.New("illegal package!")
-)
-
 // hessian decode respone
 func unpackResponseHeaer(buf []byte, m *Message) error {
-	// length := len(buf)
+	length := len(buf)
 	// hessianCodec.ReadHeader has check the header length
-	//if length < HEADER_LENGTH {
-	//	return ErrHeaderNotEnough
-	//}
+	if length < HEADER_LENGTH {
+		return ErrHeaderNotEnough
+	}
 
 	if buf[0] != byte(MAGIC_HIGH) && buf[1] != byte(MAGIC_LOW) {
 		return ErrIllegalPackage

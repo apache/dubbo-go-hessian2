@@ -19,6 +19,7 @@ import (
 	"reflect"
 	"strings"
 	"sync"
+	"time"
 )
 
 import (
@@ -29,7 +30,30 @@ const (
 	InvalidJavaEnum JavaEnum = -1
 )
 
-// Pls attention that Every field name should be upper case. Otherwise the app may panic.
+type MessageType int
+
+type Message struct {
+	ID          int64
+	Version     string
+	Type        MessageType
+	ServicePath string // service path
+	Target      string // Service
+	Method      string
+	Timeout     time.Duration // request timeout
+	Error       string
+	Header      map[string]string
+	BodyLen     int
+}
+
+const (
+	Error     MessageType = 0x01
+	Request               = 0x02
+	Response              = 0x04
+	Heartbeat             = 0x08
+)
+
+// !!! Pls attention that Every field name should be upper case.
+// Otherwise the app may panic.
 type POJO interface {
 	JavaClassName() string // 获取对应的java classs的package name
 }
