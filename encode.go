@@ -38,10 +38,10 @@ import (
 	"reflect"
 	"time"
 	"unicode/utf8"
+	"unsafe"
 )
 
 import (
-	"github.com/AlexStocks/goext/strings"
 	jerrors "github.com/juju/errors"
 )
 
@@ -286,6 +286,15 @@ END:
 // String
 /////////////////////////////////////////
 
+func Slice(s string) (b []byte) {
+	pbytes := (*reflect.SliceHeader)(unsafe.Pointer(&b))
+	pstring := (*reflect.StringHeader)(unsafe.Pointer(&s))
+	pbytes.Data = pstring.Data
+	pbytes.Len = pstring.Len
+	pbytes.Cap = pstring.Len
+	return
+}
+
 // # UTF-8 encoded character string split into 64k chunks
 // ::= x52 b1 b0 <utf8-data> string  # non-final chunk
 // ::= 'S' b1 b0 <utf8-data>         # string of length 0-65535
@@ -300,7 +309,7 @@ func encString(v string, b []byte) []byte {
 			for i := 0; i < length; i++ {
 				if r, s, err := vBuf.ReadRune(); s > 0 && err == nil {
 					// b = append(b, []byte(string(r))...)
-					b = append(b, gxstrings.Slice(string(r))...) // 直接基于r的内存空间把它转换为[]byte
+					b = append(b, Slice(string(r))...) // 直接基于r的内存空间把它转换为[]byte
 				}
 			}
 		}
