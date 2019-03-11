@@ -57,7 +57,6 @@ import (
 )
 
 import (
-	log "github.com/AlexStocks/log4go"
 	jerrors "github.com/juju/errors"
 )
 
@@ -1165,8 +1164,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 		fieldName := cls.fieldNameList[i]
 		index, err := findField(fieldName, typ)
 		if err != nil {
-			log.Warn("can not find field %s", fieldName)
-			continue
+			return nil, jerrors.Errorf("can not find field %s", fieldName)
 		}
 		fldValue := vRef.Field(index)
 		if !fldValue.CanSet() {

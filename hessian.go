@@ -20,7 +20,6 @@ import (
 )
 
 import (
-	log "github.com/AlexStocks/log4go"
 	jerrors "github.com/juju/errors"
 )
 
@@ -95,12 +94,11 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader, pkgType PackgeType) error
 
 		err = UnpackResponseHeaer(buf[:], header)
 		if err == ErrJavaException {
-			log.Warn("got java exception")
 			bufSize := h.reader.Buffered()
 			if bufSize > 2 {
 				expBuf, expErr := h.reader.Peek(bufSize)
 				if expErr == nil {
-					log.Warn("java exception:%s", string(expBuf[2:bufSize-1]))
+					err = jerrors.Errorf("java exception:%s", string(expBuf[2:bufSize-1]))
 				}
 			}
 		}
