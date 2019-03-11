@@ -24,30 +24,29 @@ import (
 )
 
 // hessian decode respone
-func unpackResponseHeaer(buf []byte, m *Message) error {
-	length := len(buf)
-	// hessianCodec.ReadHeader has check the header length
-	if length < HEADER_LENGTH {
-		return ErrHeaderNotEnough
-	}
+func UnpackResponseHeaer(buf []byte, header *DubboHeader) error {
+	// length := len(buf)
+	// // hessianCodec.ReadHeader has check the header length
+	// if length < HEADER_LENGTH {
+	// 	return ErrHeaderNotEnough
+	// }
 
 	if buf[0] != byte(MAGIC_HIGH) && buf[1] != byte(MAGIC_LOW) {
 		return ErrIllegalPackage
 	}
 
 	// Header{serialization id(5 bit), event, two way, req/response}
-	serialID := buf[2] & SERIAL_MASK
-	if serialID == byte(0x00) {
-		return jerrors.Errorf("serialization ID:%v", serialID)
+	if header.SerialID = buf[2] & SERIAL_MASK; header.SerialID == byte(0x00) {
+		return jerrors.Errorf("serialization ID:%v", header.SerialID)
 	}
 
 	flag := buf[2] & FLAG_EVENT
 	if flag != byte(0x00) {
-		m.Type |= Heartbeat
+		header.Type |= Heartbeat
 	}
 	flag = buf[2] & FLAG_TWOWAY
 	if flag != byte(0x00) {
-		m.Type |= Response
+		header.Type |= Response
 	}
 	flag = buf[2] & FLAG_REQUEST
 	if flag != byte(0x00) {
@@ -62,11 +61,11 @@ func unpackResponseHeaer(buf []byte, m *Message) error {
 	}
 
 	// Header{req id}
-	m.ID = int64(binary.BigEndian.Uint64(buf[4:]))
+	header.ID = int64(binary.BigEndian.Uint64(buf[4:]))
 
 	// Header{body len}
-	m.BodyLen = int(binary.BigEndian.Uint32(buf[12:]))
-	if m.BodyLen < 0 {
+	header.BodyLen = int(binary.BigEndian.Uint32(buf[12:]))
+	if header.BodyLen < 0 {
 		return ErrIllegalPackage
 	}
 
@@ -74,7 +73,7 @@ func unpackResponseHeaer(buf []byte, m *Message) error {
 }
 
 // hessian decode response body
-func unpackResponseBody(buf []byte, ret interface{}) error {
+func UnpackResponseBody(buf []byte, body interface{}) error {
 	// body
 	decoder := NewDecoder(buf[:])
 	rspType, err := decoder.Decode()
@@ -95,7 +94,7 @@ func unpackResponseBody(buf []byte, ret interface{}) error {
 		if err != nil {
 			return jerrors.Trace(err)
 		}
-		return jerrors.Trace(ReflectResponse(rsp, ret))
+		return jerrors.Trace(ReflectResponse(rsp, body))
 
 	case RESPONSE_NULL_VALUE:
 		return jerrors.New("Received null")

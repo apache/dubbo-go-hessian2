@@ -16,7 +16,6 @@ package hessian
 
 import (
 	"encoding/binary"
-	"io"
 	"reflect"
 	"strconv"
 	"strings"
@@ -59,7 +58,7 @@ const (
 )
 
 var (
-	DubboHeader          = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, FLAG_REQUEST | FLAG_TWOWAY}
+	DubboHeaderBytes     = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, FLAG_REQUEST | FLAG_TWOWAY}
 	DubboHeartbeatHeader = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, FLAG_REQUEST | FLAG_TWOWAY | FLAG_EVENT | 0x0F}
 )
 
@@ -151,26 +150,23 @@ func getArgsTypeList(args []interface{}) (string, error) {
 
 // dubbo-remoting/dubbo-remoting-api/src/main/java/com/alibaba/dubbo/remoting/exchange/codec/ExchangeCodec.java
 // v2.5.4 line 204 encodeRequest
-func packRequest(msgType MessageType, pathKey, interfaceKey string, m *Message, a interface{},
-	w io.Writer) error {
+func PackRequest(service Service, header DubboHeader, params interface{}) ([]byte, error) {
 	var (
 		err           error
-		hb            bool
 		types         string
 		byteArray     []byte
 		encoder       Encoder
 		version       string
-		ok            bool
-		args          []interface{}
 		pkgLen        int
 		serviceParams map[string]string
 	)
 
-	if args, ok = a.([]interface{}); !ok {
-		return jerrors.Errorf("@b is not of type: []interface{}")
+	args, ok := params.([]interface{})
+	if !ok {
+		return nil, jerrors.Errorf("@params is not of type: []interface{}")
 	}
 
-	hb = msgType == Heartbeat
+	hb := header.Type == Heartbeat
 
 	//////////////////////////////////////////
 	// byteArray
@@ -179,13 +175,13 @@ func packRequest(msgType MessageType, pathKey, interfaceKey string, m *Message, 
 	if hb {
 		byteArray = append(byteArray, DubboHeartbeatHeader[:]...)
 	} else {
-		byteArray = append(byteArray, DubboHeader[:]...)
+		byteArray = append(byteArray, DubboHeaderBytes[:]...)
 	}
 	// serialization id, two way flag, event, request/response flag
 	// java 中标识一个class的ID
-	byteArray[2] |= byte(m.ID & SERIAL_MASK)
+	byteArray[2] |= byte(header.ID & SERIAL_MASK)
 	// request id
-	binary.BigEndian.PutUint64(byteArray[4:], uint64(m.ID))
+	binary.BigEndian.PutUint64(byteArray[4:], uint64(header.ID))
 	encoder.Append(byteArray[:HEADER_LENGTH])
 
 	// com.alibaba.dubbo.rpc.protocol.dubbo.DubboCodec.DubboCodec.java line144 encodeRequestData
@@ -199,14 +195,13 @@ func packRequest(msgType MessageType, pathKey, interfaceKey string, m *Message, 
 
 	// dubbo version + path + version + method
 	encoder.Encode(DUBBO_VERSION)
-	encoder.Encode(m.Target)
-	encoder.Encode(m.Version)
-	encoder.Encode(m.Method)
+	encoder.Encode(service.Target)
+	encoder.Encode(service.Version)
+	encoder.Encode(service.Method)
 
 	// args = args type list + args value list
-	types, err = getArgsTypeList(args)
-	if err != nil {
-		return jerrors.Annotatef(err, " PackRequest(args:%+v)", args)
+	if types, err = getArgsTypeList(args); err != nil {
+		return nil, jerrors.Annotatef(err, " PackRequest(args:%+v)", args)
 	}
 	encoder.Encode(types)
 	for _, v := range args {
@@ -214,13 +209,13 @@ func packRequest(msgType MessageType, pathKey, interfaceKey string, m *Message, 
 	}
 
 	serviceParams = make(map[string]string)
-	serviceParams[PATH_KEY] = pathKey
-	serviceParams[INTERFACE_KEY] = interfaceKey
+	serviceParams[PATH_KEY] = service.Path
+	serviceParams[INTERFACE_KEY] = service.Interface
 	if len(version) != 0 {
 		serviceParams[VERSION_KEY] = version
 	}
-	if m.Timeout != 0 {
-		serviceParams[TIMEOUT_KEY] = strconv.Itoa(int(m.Timeout / time.Millisecond))
+	if service.Timeout != 0 {
+		serviceParams[TIMEOUT_KEY] = strconv.Itoa(int(service.Timeout / time.Millisecond))
 	}
 
 	encoder.Encode(serviceParams)
@@ -229,18 +224,10 @@ END:
 	byteArray = encoder.Buffer()
 	pkgLen = len(byteArray)
 	if pkgLen > int(DEFAULT_LEN) { // 8M
-		return jerrors.Errorf("Data length %d too large, max payload %d", pkgLen, DEFAULT_LEN)
+		return nil, jerrors.Errorf("Data length %d too large, max payload %d", pkgLen, DEFAULT_LEN)
 	}
 	// byteArray{body length}
 	binary.BigEndian.PutUint32(byteArray[12:], uint32(pkgLen-HEADER_LENGTH))
 
-	pkgLen, err = w.Write(encoder.Buffer())
-	if err != nil {
-		return jerrors.Trace(err)
-	}
-	if pkgLen != len(byteArray) {
-		return jerrors.Errorf("@w.Write(buflen:%d) = %d, nil", len(byteArray), pkgLen)
-	}
-
-	return nil
+	return byteArray, nil
 }

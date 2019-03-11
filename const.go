@@ -32,6 +32,8 @@
 
 package hessian
 
+import jerrors "github.com/juju/errors"
+
 const (
 	mask = byte(127)
 	flag = byte(128)

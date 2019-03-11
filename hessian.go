@@ -16,7 +16,7 @@ package hessian
 
 import (
 	"bufio"
-	"io"
+	"time"
 )
 
 import (
@@ -24,40 +24,65 @@ import (
 	jerrors "github.com/juju/errors"
 )
 
-type hessianCodec struct {
-	mt         MessageType
-	rwc        io.ReadWriteCloser
+const (
+	Error     PackgeType = 0x01
+	Request              = 0x02
+	Response             = 0x04
+	Heartbeat            = 0x08
+)
+
+type PackgeType int
+
+type DubboHeader struct {
+	SerialID byte
+	Type     PackgeType
+	ID       int64
+	BodyLen  int
+}
+
+type Service struct {
+	Path      string
+	Interface string
+	Version   string
+	Target    string // Service Name
+	Method    string
+	Timeout   time.Duration // request timeout
+}
+
+type HessianCodec struct {
+	pkgType    PackgeType
 	reader     *bufio.Reader
 	rspBodyLen int
 }
 
-func (h *hessianCodec) Close() error {
-	return h.rwc.Close()
+func NewHessianCodec(reader *bufio.Reader) *HessianCodec {
+	return &HessianCodec{
+		reader: reader,
+	}
 }
 
-func (h *hessianCodec) String() string {
-	return "hessian-codec"
-}
-
-func (h *hessianCodec) Write(m *Message, a interface{}) error {
-	switch m.Type {
+func (h *HessianCodec) Write(service Service, header DubboHeader, body interface{}) ([]byte, error) {
+	switch header.Type {
 	case Heartbeat, Request:
-		return jerrors.Trace(packRequest(m, a, h.rwc))
+		return PackRequest(service, header, body)
+
 	case Response:
-		return nil
+		return nil, nil
+
 	default:
-		return jerrors.Errorf("Unrecognised message type: %v", m.Type)
+		return nil, jerrors.Errorf("Unrecognised message type: %v", header.Type)
 	}
 
-	return nil
+	return nil, nil
 }
 
-func (h *hessianCodec) ReadHeader(m *Message, mt MessageType) error {
-	h.mt = mt
+func (h *HessianCodec) ReadHeader(header *DubboHeader, pkgType PackgeType) error {
+	h.pkgType = pkgType
 
-	switch mt {
+	switch pkgType {
 	case Request:
 		return nil
+
 	case Heartbeat, Response:
 		buf, err := h.reader.Peek(HEADER_LENGTH)
 		if err != nil { // this is impossible
@@ -68,7 +93,7 @@ func (h *hessianCodec) ReadHeader(m *Message, mt MessageType) error {
 			return jerrors.Trace(err)
 		}
 
-		err = unpackResponseHeaer(buf[:], m)
+		err = UnpackResponseHeaer(buf[:], header)
 		if err == ErrJavaException {
 			log.Warn("got java exception")
 			bufSize := h.reader.Buffered()
@@ -82,19 +107,19 @@ func (h *hessianCodec) ReadHeader(m *Message, mt MessageType) error {
 		if err != nil {
 			return jerrors.Trace(err)
 		}
-		h.rspBodyLen = m.BodyLen
+		h.rspBodyLen = header.BodyLen
 
 		return nil
 
 	default:
-		return jerrors.Errorf("Unrecognised message type: %v", mt)
+		return jerrors.Errorf("Unrecognised message type: %v", pkgType)
 	}
 
 	return nil
 }
 
-func (h *hessianCodec) ReadBody(ret interface{}) error {
-	switch h.mt {
+func (h *HessianCodec) ReadBody(body interface{}) error {
+	switch h.pkgType {
 	case Request:
 		return nil
 
@@ -116,8 +141,8 @@ func (h *hessianCodec) ReadBody(ret interface{}) error {
 			return jerrors.Trace(err)
 		}
 
-		if ret != nil {
-			if err = unpackResponseBody(buf, ret); err != nil {
+		if body != nil {
+			if err = UnpackResponseBody(buf, body); err != nil {
 				return jerrors.Trace(err)
 			}
 		}
@@ -125,10 +150,3 @@ func (h *hessianCodec) ReadBody(ret interface{}) error {
 
 	return nil
 }
-
-// func NewCodec(rwc io.ReadWriteCloser) Codec {
-// 	return &hessianCodec{
-// 		rwc:    rwc,
-// 		reader: bufio.NewReader(rwc),
-// 	}
-// }
