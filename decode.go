@@ -1250,8 +1250,8 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 				// It is fixed by [wongoo](https://github.com/wongoo).
 				elemPtrType := fldValue.Type().Elem().Kind() == reflect.Ptr
 				sl := reflect.MakeSlice(fldValue.Type(), v.Len(), v.Len())
-				for i = 0; i < v.Len(); i++ {
-					item := v.Index(i).Interface()
+				for j := 0; j < v.Len(); j++ {
+					item := v.Index(j).Interface()
 					itemValue := reflect.ValueOf(item)
 					if iv, ok := itemValue.Interface().(reflect.Value); ok {
 						itemValue = iv
@@ -1259,7 +1259,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 					if !elemPtrType && itemValue.Kind() == reflect.Ptr {
 						itemValue = itemValue.Elem()
 					}
-					sl.Index(i).Set(itemValue)
+					sl.Index(j).Set(itemValue)
 				}
 				fldValue.Set(sl)
 			}
