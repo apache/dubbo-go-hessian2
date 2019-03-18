@@ -594,9 +594,15 @@ func TestEncStruct(t *testing.T) {
 	}
 	t.Logf("decode(%v) = %v, %v\n", w, res, err)
 
-	//if !reflect.DeepEqual(w, res) {
-	//	t.Fatalf("w:%#v != res:%#v", w, res)
-	//}
+	res = res.(reflect.Value).Interface()
+	w2, ok := res.(WorkerInfo)
+	if !ok {
+		t.Fatalf("res:%T is not of type WorkerInfo", w2)
+	}
+
+	if !reflect.DeepEqual(w, w2) {
+		t.Fatalf("w:%#v != w2:%#v", w, w2)
+	}
 }
 
 type UserName struct {
@@ -682,3 +688,46 @@ func TestIssue6(t *testing.T) {
 		t.Fatalf("worker:%#v != worker2:%#v", worker, worker2)
 	}
 }
+
+/*
+type Element struct {
+	Num      int
+	Previous *Element
+	Next     *Element
+}
+
+func (Element) JavaClassName() string {
+	return "com.bdt.linkedlist.element"
+}
+
+func TestListElement(t *testing.T) {
+	elem := &Element{Num: 12345}
+	elem.Previous = elem
+	elem.Next = elem
+
+	e := NewEncoder()
+	err := e.Encode(elem)
+	if err != nil {
+		t.Fatalf("encode(elem:%#v) = error:%s", elem, err)
+	}
+	bytes := e.Buffer()
+
+	d := NewDecoder(bytes)
+	res, err := d.Decode()
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	t.Logf("type of decode object:%v", reflect.TypeOf(res))
+
+	//res = res.(reflect.Value).Interface()
+	//elem2, ok := res.(Worker)
+	//if !ok {
+	//	t.Fatalf("res:%#v is not of type Worker", res)
+	//}
+	//
+	//if !reflect.DeepEqual(elem, elem2) {
+	//	t.Fatalf("elem:%#v != elem2:%#v", elem, elem2)
+	//}
+}
+*/
