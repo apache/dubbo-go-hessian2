@@ -17,13 +17,14 @@ package hessian
 import (
 	"bytes"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
 	"time"
 )
 
 // go test -v encode_decode_test.go encode.go decode.go const.go codec.go pojo.go
-var assert = func(want, got []byte, t *testing.T) {
+var assertEqual = func(want, got []byte, t *testing.T) {
 	if !bytes.Equal(want, got) {
 		t.Fatalf("want %v , got %v", want, got)
 	}
@@ -54,7 +55,7 @@ func TestEncBool(t *testing.T) {
 		t.Fail()
 	}
 	want = []byte{0x54}
-	assert(want, e.Buffer(), t)
+	assertEqual(want, e.Buffer(), t)
 
 	e = NewEncoder()
 	e.Encode(false)
@@ -62,7 +63,7 @@ func TestEncBool(t *testing.T) {
 		t.Fail()
 	}
 	want = []byte{0x46}
-	assert(want, e.Buffer(), t)
+	assertEqual(want, e.Buffer(), t)
 }
 
 func TestEncInt32Len1B(t *testing.T) {
@@ -348,7 +349,7 @@ func TestEncRune(t *testing.T) {
 		t.Errorf("Decode() = %v", err)
 	}
 	// t.Logf("decode(%v) = %v, %v\n", v, res, err)
-	assert([]byte(res.(string)), []byte(v), t)
+	assertEqual([]byte(res.(string)), []byte(v), t)
 }
 
 func TestEncBinary(t *testing.T) {
@@ -380,7 +381,7 @@ func TestEncBinary(t *testing.T) {
 		t.Errorf("Decode() = %v", err)
 	}
 	t.Logf("decode(%v) = %v, %v, equal:%v\n", v, res, err, bytes.Equal(v, res.([]byte)))
-	assert(v, res.([]byte), t)
+	assertEqual(v, res.([]byte), t)
 }
 
 func TestEncBinaryShort(t *testing.T) {
@@ -403,7 +404,7 @@ func TestEncBinaryShort(t *testing.T) {
 	if err != nil {
 		t.Errorf("Decode() = %v", err)
 	}
-	assert(v[:], res.([]byte), t)
+	assertEqual(v[:], res.([]byte), t)
 }
 
 func TestEncBinaryChunk(t *testing.T) {
@@ -426,7 +427,7 @@ func TestEncBinaryChunk(t *testing.T) {
 	if err != nil {
 		t.Errorf("Decode() = %v", err)
 	}
-	assert(v[:], res.([]byte), t)
+	assertEqual(v[:], res.([]byte), t)
 }
 
 func TestEncList(t *testing.T) {
@@ -648,7 +649,7 @@ func TestIssue6(t *testing.T) {
 		Sex:      true,
 	}
 
-	worker := Worker{
+	worker := &Worker{
 		Person: person,
 		CurJob: JOB{Title: "cto", Company: "facebook"},
 		Jobs: []JOB{
@@ -673,7 +674,7 @@ func TestIssue6(t *testing.T) {
 	t.Logf("type of decode object:%v", reflect.TypeOf(res))
 
 	res = res.(reflect.Value).Interface()
-	worker2, ok := res.(Worker)
+	worker2, ok := res.(*Worker)
 	if !ok {
 		t.Fatalf("res:%#v is not of type Worker", res)
 	}
@@ -681,4 +682,171 @@ func TestIssue6(t *testing.T) {
 	if !reflect.DeepEqual(worker, worker2) {
 		t.Fatalf("worker:%#v != worker2:%#v", worker, worker2)
 	}
+}
+
+type circular struct {
+	Num      int
+	Previous *circular
+	Next     *circular
+}
+
+func (circular) JavaClassName() string {
+	return "circular"
+}
+
+func TestRef(t *testing.T) {
+	c := &circular{}
+	c.Num = 12345
+	c.Previous = c
+	c.Next = c
+
+	e := NewEncoder()
+	err := e.Encode(c)
+
+	if err != nil {
+		panic(err)
+	}
+
+	bytes := e.Buffer()
+	t.Logf("circular bytes hex: %x, string: %s", bytes, string(bytes))
+	decoded, err := NewDecoder(bytes).Decode()
+	if err != nil {
+		panic(err)
+	}
+	t.Log("decode object: ", decoded)
+}
+
+type personT struct {
+	Name      string
+	Relations []*personT
+	Parent    *personT
+	Marks     *map[string]*personT
+	Tags      map[string]*personT
+}
+
+func (personT) JavaClassName() string {
+	return "person"
+}
+
+func logRefObject(t *testing.T, n string, i interface{}) {
+	t.Logf("ref obj[%s]: %p, %v", n, i, i)
+}
+
+func doTestRef(t *testing.T, c interface{}, name string) interface{} {
+	e := NewEncoder()
+	err := e.Encode(c)
+	if err != nil {
+		assert.FailNowf(t, "failed to encode", "error: %v", err)
+	}
+	bytes := e.Buffer()
+
+	t.Logf("%s ref bytes: %s", name, string(bytes))
+	t.Logf("%s ref bytes: %x", name, bytes)
+
+	d := NewDecoder(bytes)
+	decoded, err := EnsureInterface(d.Decode())
+	if err != nil {
+		assert.FailNowf(t, "failed to encode", "error: %v", err)
+	}
+	t.Logf("%s ref decoded: %v", name, decoded)
+	return decoded
+}
+
+func buildComplexLevelPerson() *personT {
+	p1 := &personT{Name: "p1"}
+	p2 := &personT{Name: "p2"}
+	p3 := &personT{Name: "p3"}
+	p4 := &personT{Name: "p4"}
+	p5 := &personT{Name: "p5"}
+	p6 := &personT{Name: "p6"}
+
+	p1.Parent = p2
+	p2.Parent = p3
+	p3.Parent = p4
+
+	relations := []*personT{p5, p6}
+	p3.Relations = relations
+	p4.Relations = relations
+
+	marks := &map[string]*personT{
+		"beautiful": p1,
+		"tall":      p2,
+		"fat":       p3,
+	}
+	p4.Marks = marks
+	p5.Marks = marks
+
+	tags := map[string]*personT{
+		"man":   p3,
+		"woman": p4,
+	}
+	p5.Tags = tags
+	p6.Tags = tags
+
+	return p1
+}
+
+func TestComplexLevelRef(t *testing.T) {
+	p1 := buildComplexLevelPerson()
+	decoded := doTestRef(t, p1, "person")
+
+	t.Logf("decoded object type: %v", reflect.TypeOf(decoded))
+	d1, ok := decoded.(*personT)
+	if !ok {
+		assert.FailNow(t, "decode object is not a pointer of person")
+	}
+	logRefObject(t, "d1", d1)
+
+	d2 := d1.Parent
+	assert.NotNil(t, d2)
+	logRefObject(t, "d2", d2)
+
+	d3 := d2.Parent
+	assert.NotNil(t, d3)
+	logRefObject(t, "d3", d3)
+
+	d4 := d3.Parent
+	logRefObject(t, "d4", d4)
+
+	assert.Equal(t, 2, len(d3.Relations))
+	if len(d3.Relations) != 2 {
+		assert.FailNow(t, "the length of relation array should be 2")
+	}
+	d5 := d3.Relations[0]
+	logRefObject(t, "d5", d5)
+	d6 := d3.Relations[1]
+	logRefObject(t, "d6", d6)
+
+	assert.NotNil(t, d4)
+	assert.NotNil(t, d5)
+	assert.NotNil(t, d6)
+
+	assert.Equal(t, "p1", d1.Name)
+	assert.Equal(t, "p2", d2.Name)
+	assert.Equal(t, "p3", d3.Name)
+	assert.Equal(t, "p4", d4.Name)
+	assert.Equal(t, "p5", d5.Name)
+	assert.Equal(t, "p6", d6.Name)
+
+	//value equal
+	assert.True(t, reflect.DeepEqual(d3.Relations, d4.Relations))
+
+	if d4.Marks == nil {
+		assert.FailNow(t, "d4.Marks should not be nil")
+	}
+
+	assert.Equal(t, 3, len(*d4.Marks))
+	assert.True(t, AddrEqual(d4.Marks, d5.Marks))
+	assert.True(t, AddrEqual(d1, (*d4.Marks)["beautiful"]))
+	assert.True(t, AddrEqual(d2, (*d4.Marks)["tall"]))
+	assert.True(t, AddrEqual(d3, (*d4.Marks)["fat"]))
+
+	if d5.Tags == nil {
+		assert.FailNow(t, "d5.Tags should not be nil")
+	}
+	assert.Equal(t, 2, len(d5.Tags))
+	assert.True(t, reflect.DeepEqual(d5.Tags, d6.Tags))
+	assert.False(t, AddrEqual(d5.Tags, d6.Tags))
+	assert.True(t, AddrEqual(d3, d5.Tags["man"]))
+	assert.True(t, AddrEqual(d4, d5.Tags["woman"]))
 }
