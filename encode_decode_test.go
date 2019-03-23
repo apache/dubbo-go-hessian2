@@ -595,9 +595,15 @@ func TestEncStruct(t *testing.T) {
 	}
 	t.Logf("decode(%v) = %v, %v\n", w, res, err)
 
-	//if !reflect.DeepEqual(w, res) {
-	//	t.Fatalf("w:%#v != res:%#v", w, res)
-	//}
+	res = res.(reflect.Value).Interface()
+	w2, ok := res.(*WorkerInfo)
+	if !ok {
+		t.Fatalf("res:%T is not of type WorkerInfo", w2)
+	}
+
+	if !reflect.DeepEqual(w, *w2) {
+		t.Fatalf("w:%#v != w2:%#v", w, w2)
+	}
 }
 
 type UserName struct {
