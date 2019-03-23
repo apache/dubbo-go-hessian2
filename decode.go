@@ -60,6 +60,36 @@ import (
 	jerrors "github.com/juju/errors"
 )
 
+// _refHolder is used to record decode list, the address of which may change when appending more element.
+type _refHolder struct {
+	// destinations
+	destinations []reflect.Value
+
+	value reflect.Value
+}
+
+var _refHolderType = reflect.TypeOf(_refHolder{})
+
+// change ref value
+func (h *_refHolder) change(v reflect.Value) {
+	if h.value.CanAddr() && v.CanAddr() && h.value.Pointer() == v.Pointer() {
+		return
+	}
+	h.value = v
+}
+
+// notice all destinations ref to the value
+func (h *_refHolder) notify() {
+	for _, dest := range h.destinations {
+		SetValue(dest, h.value)
+	}
+}
+
+// add destination
+func (h *_refHolder) add(dest reflect.Value) {
+	h.destinations = append(h.destinations, dest)
+}
+
 type Decoder struct {
 	reader        *bufio.Reader
 	refs          []interface{}
@@ -85,9 +115,20 @@ func (d *Decoder) peekByte() byte {
 }
 
 // 添加引用
-func (d *Decoder) appendRefs(v interface{}) int {
+func (d *Decoder) appendRefs(v interface{}) *_refHolder {
+	var holder *_refHolder
+	vv := EnsurePackValue(v)
+	// only slice and array need ref holder , for its address changes when decoding
+	if vv.Kind() == reflect.Slice || vv.Kind() == reflect.Array {
+		holder = &_refHolder{
+			value: vv,
+		}
+		// pack holder value
+		v = reflect.ValueOf(holder)
+	}
+
 	d.refs = append(d.refs, v)
-	return len(d.refs) - 1
+	return holder
 }
 
 // 获取缓冲长度
@@ -120,17 +161,17 @@ func (d *Decoder) peek(n int) []byte {
 // 读取len(s)的 utf8 字符
 func (d *Decoder) nextRune(s []rune) []rune {
 	var (
-		n  int
-		i  int
-		r  rune
-		ri int
-		e  error
+		n   int
+		i   int
+		r   rune
+		ri  int
+		err error
 	)
 
 	n = len(s)
 	s = s[:0]
 	for i = 0; i < n; i++ {
-		if r, ri, e = d.reader.ReadRune(); e == nil && ri > 0 {
+		if r, ri, err = d.reader.ReadRune(); err == nil && ri > 0 {
 			s = append(s, r)
 		}
 	}
@@ -182,9 +223,11 @@ func (d *Decoder) Decode() (interface{}, error) {
 	if err == io.EOF {
 		return nil, err
 	}
+
 	switch {
 	case tag == BC_END:
-		return nil, nil
+		// return EOF error for end flag 'Z'
+		return nil, io.EOF
 
 	case tag == BC_NULL: // 'N': //null
 		return nil, nil
@@ -194,6 +237,9 @@ func (d *Decoder) Decode() (interface{}, error) {
 
 	case tag == BC_FALSE: //'F': //false
 		return false, nil
+
+	case tag == BC_REF: // 'R': //ref, 一个整数，用以指代前面的list 或者 map
+		return d.decRef(int32(tag))
 
 	case (0x80 <= tag && tag <= 0xbf) || (0xc0 <= tag && tag <= 0xcf) ||
 		(0xd0 <= tag && tag <= 0xd7) || tag == BC_INT: //'I': //int
@@ -233,9 +279,6 @@ func (d *Decoder) Decode() (interface{}, error) {
 	case (tag == BC_OBJECT_DEF) || (tag == BC_OBJECT) ||
 		(BC_OBJECT_DIRECT <= tag && tag <= (BC_OBJECT_DIRECT+OBJECT_DIRECT_MAX)):
 		return d.decObject(int32(tag))
-
-	case (tag == BC_REF): // 'R': //ref, 一个整数，用以指代前面的list 或者 map
-		return d.decRef(int32(tag))
 
 	default:
 		return nil, jerrors.Errorf("Invalid type: %v,>>%v<<<", string(tag), d.peek(d.len()))
@@ -317,13 +360,13 @@ func (d *Decoder) decInt64(flag int32) (int64, error) {
 	}
 
 	switch {
-	case tag == byte('N'):
+	case tag == BC_NULL:
 		return int64(0), nil
 
-	case tag == byte('F'):
+	case tag == BC_FALSE:
 		return int64(0), nil
 
-	case tag == byte('T'):
+	case tag == BC_TRUE:
 		return int64(1), nil
 
 		// direct integer
@@ -815,11 +858,35 @@ func (d *Decoder) readBufByte() (byte, error) {
 	return buf[0], nil
 }
 
+func listFixedTypedLenTag(tag byte) bool {
+	return tag >= _listFixedTypedLenTagMin && tag <= _listFixedTypedLenTagMax
+}
+
+// Include 3 formats:
+// list ::= x55 type value* 'Z'   # variable-length list
+//      ::= 'V' type int value*   # fixed-length list
+//      ::= [x70-77] type value*  # fixed-length typed list
+func typedListTag(tag byte) bool {
+	return tag == BC_LIST_FIXED || tag == BC_LIST_VARIABLE || listFixedTypedLenTag(tag)
+}
+
+func listFixedUntypedLenTag(tag byte) bool {
+	return tag >= _listFixedUntypedLenTagMin && tag <= _listFixedUntypedLenTagMax
+}
+
+// Include 3 formats:
+//      ::= x57 value* 'Z'        # variable-length untyped list
+//      ::= x58 int value*        # fixed-length untyped list
+//      ::= [x78-7f] value*       # fixed-length untyped list
+func untypedListTag(tag byte) bool {
+	return tag == BC_LIST_FIXED_UNTYPED || tag == BC_LIST_VARIABLE_UNTYPED || listFixedUntypedLenTag(tag)
+}
+
+//decList read list
 func (d *Decoder) decList(flag int32) (interface{}, error) {
 	var (
-		err  error
-		tag  byte
-		size int
+		err error
+		tag byte
 	)
 
 	if flag != TAG_READ {
@@ -832,62 +899,126 @@ func (d *Decoder) decList(flag int32) (interface{}, error) {
 	}
 
 	switch {
-	case (tag >= BC_LIST_DIRECT && tag <= 0x77) || (tag == BC_LIST_FIXED || tag == BC_LIST_VARIABLE):
-		d.decType() // 忽略
-		if tag >= BC_LIST_DIRECT && tag <= 0x77 {
-			size = int(tag - BC_LIST_DIRECT)
-		} else {
-			i32, err := d.decInt32(TAG_READ)
-			if err != nil {
-				return nil, jerrors.Trace(err)
-			}
-			size = int(i32)
-		}
-		arr := make([]interface{}, size)
-		d.appendRefs(arr)
-		for j := 0; j < size; j++ {
-			it, err := d.Decode()
-			if err != nil {
-				return nil, jerrors.Trace(err)
-			}
-			arr[j] = it
-		}
-
-		if tag == BC_LIST_VARIABLE {
-			d.readBufByte()
-		}
-
-		return arr, nil
-
-	case (tag >= BC_LIST_DIRECT_UNTYPED && tag <= 0x7f) || (tag == BC_LIST_FIXED_UNTYPED || tag == BC_LIST_VARIABLE_UNTYPED):
-		if tag >= BC_LIST_DIRECT_UNTYPED && tag <= 0x7f {
-			size = int(tag - BC_LIST_DIRECT_UNTYPED)
-		} else {
-			i32, err := d.decInt32(TAG_READ)
-			if err != nil {
-				return nil, jerrors.Trace(err)
-			}
-			size = int(i32)
-		}
-		arr := make([]interface{}, size)
-		d.appendRefs(arr)
-		for j := 0; j < size; j++ {
-			it, err := d.Decode()
-			if err != nil {
-				return nil, jerrors.Trace(err)
-			}
-			arr[j] = it
-		}
-		//read the endbyte of list
-		if tag == BC_LIST_VARIABLE_UNTYPED {
-			d.readBufByte()
-		}
-
-		return arr, nil
-
+	case tag == BC_NULL:
+		return nil, nil
+	case tag == BC_REF:
+		return d.decRef(int32(tag))
+	case typedListTag(tag):
+		return d.readTypedList(tag)
+	case untypedListTag(tag):
+		return d.readUntypedList(tag)
 	default:
-		return nil, jerrors.Errorf("illegal list type tag:%+v", tag)
+		return nil, jerrors.Errorf("error list tag: 0x%x", tag)
 	}
+}
+
+// readTypedList read typed list
+// Include 3 formats:
+// list ::= x55 type value* 'Z'   # variable-length list
+//      ::= 'V' type int value*   # fixed-length list
+//      ::= [x70-77] type value*  # fixed-length typed list
+func (d *Decoder) readTypedList(tag byte) (interface{}, error) {
+	listTyp, err := d.decString(TAG_READ)
+	if err != nil {
+		return nil, jerrors.Errorf("error to read list type[%s]: %v", listTyp, err)
+	}
+
+	isVariableArr := tag == BC_LIST_VARIABLE
+
+	length := -1
+	if listFixedTypedLenTag(tag) {
+		length = int(tag - _listFixedTypedLenTagMin)
+	} else if tag == BC_LIST_FIXED {
+		ii, err := d.decInt32(TAG_READ)
+		if err != nil {
+			return nil, jerrors.Trace(err)
+		}
+		length = int(ii)
+	} else if isVariableArr {
+		length = 0
+	} else {
+		return nil, jerrors.Errorf("error typed list tag: 0x%x", tag)
+	}
+
+	// return when no element
+	if length < 0 {
+		return nil, nil
+	}
+
+	arr := make([]interface{}, length)
+	aryValue := reflect.ValueOf(arr)
+	holder := d.appendRefs(aryValue)
+
+	for j := 0; j < length || isVariableArr; j++ {
+		it, err := d.Decode()
+		if err != nil {
+			if err == io.EOF && isVariableArr {
+				break
+			}
+			return nil, jerrors.Trace(err)
+		}
+
+		if it == nil {
+			break
+		}
+
+		v := EnsureRawValue(it)
+		if isVariableArr {
+			aryValue = reflect.Append(aryValue, v)
+			holder.change(aryValue)
+		} else {
+			SetValue(aryValue.Index(j), v)
+		}
+	}
+
+	return holder, nil
+}
+
+//readUntypedList read untyped list
+// Include 3 formats:
+//      ::= x57 value* 'Z'        # variable-length untyped list
+//      ::= x58 int value*        # fixed-length untyped list
+//      ::= [x78-7f] value*       # fixed-length untyped list
+func (d *Decoder) readUntypedList(tag byte) (interface{}, error) {
+	isVariableArr := tag == BC_LIST_VARIABLE_UNTYPED
+
+	var length int
+	if listFixedUntypedLenTag(tag) {
+		length = int(tag - _listFixedUntypedLenTagMin)
+	} else if tag == BC_LIST_FIXED_UNTYPED {
+		ii, err := d.decInt32(TAG_READ)
+		if err != nil {
+			return nil, jerrors.Trace(err)
+		}
+		length = int(ii)
+	} else if isVariableArr {
+		length = 0
+	} else {
+		return nil, jerrors.Errorf("error untyped list tag: %x", tag)
+	}
+
+	ary := make([]interface{}, length)
+	aryValue := reflect.ValueOf(ary)
+	holder := d.appendRefs(aryValue)
+
+	for j := 0; j < length || isVariableArr; j++ {
+		it, err := d.Decode()
+		if err != nil {
+			if err == io.EOF && isVariableArr {
+				continue
+			}
+			return nil, jerrors.Trace(err)
+		}
+
+		if isVariableArr {
+			aryValue = reflect.Append(aryValue, EnsureRawValue(it))
+			holder.change(aryValue)
+		} else {
+			ary[j] = it
+		}
+	}
+
+	return holder, nil
 }
 
 /////////////////////////////////////////
@@ -896,40 +1027,70 @@ func (d *Decoder) decList(flag int32) (interface{}, error) {
 
 // ::= 'M' type (value value)* 'Z'  # key, value map pairs
 // ::= 'H' (value value)* 'Z'       # untyped key, value
-func (d *Decoder) decMapByValue(value reflect.Value) (interface{}, error) {
+func (d *Decoder) decMapByValue(value reflect.Value) error {
 	var (
-		tag byte
+		tag        byte
+		err        error
+		entryKey   interface{}
+		entryValue interface{}
 	)
 
-	tag, _ = d.readBufByte()
-	if tag == BC_MAP {
-		d.decString(TAG_READ)
-	} else if tag == BC_MAP_UNTYPED {
-		//do nothing
-	} else {
-		return nil, jerrors.Errorf("wrong header BC_MAP_UNTYPED")
+	//tag, _ = d.readBufByte()
+	tag, err = d.readByte()
+	// check error
+	if err != nil {
+		return jerrors.Trace(err)
 	}
 
-	m := reflect.MakeMap(value.Type())
+	switch tag {
+	case BC_NULL:
+		// null map tag check
+		return nil
+	case BC_REF:
+		refObj, err := d.decRef(int32(tag))
+		if err != nil {
+			return jerrors.Trace(err)
+		}
+		SetValue(value, EnsurePackValue(refObj))
+		return nil
+	case BC_MAP:
+		d.decString(TAG_READ) // read map type , ignored
+	case BC_MAP_UNTYPED:
+		//do nothing
+	default:
+		return jerrors.Errorf("expect map header, but get %x", tag)
+	}
+
+	m := reflect.MakeMap(UnpackPtrType(value.Type()))
+	// pack with pointer, so that to ref the same map
+	m = PackPtr(m)
+	d.appendRefs(m)
+
 	//read key and value
 	for {
-		key, err := d.Decode()
+		entryKey, err = d.Decode()
 		if err != nil {
+			// EOF means the end flag 'Z' of map is already read
 			if err == io.EOF {
 				break
 			} else {
-				return nil, jerrors.Trace(err)
+				return jerrors.Trace(err)
 			}
 		}
-		if key == nil {
+		if entryKey == nil {
 			break
 		}
-		vl, err := d.Decode()
-		m.SetMapIndex(reflect.ValueOf(key), reflect.ValueOf(vl))
+		entryValue, err = d.Decode()
+		// fix: check error
+		if err != nil {
+			return jerrors.Trace(err)
+		}
+		m.Elem().SetMapIndex(EnsurePackValue(entryKey), EnsurePackValue(entryValue))
 	}
-	value.Set(m)
 
-	return m, nil
+	SetValue(value, m)
+
+	return nil
 }
 
 func (d *Decoder) decMap(flag int32) (interface{}, error) {
@@ -957,6 +1118,10 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 	}
 
 	switch {
+	case tag == BC_NULL:
+		return nil, nil
+	case tag == BC_REF:
+		return d.decRef(int32(tag))
 	case tag == BC_MAP:
 		if t, err = d.decType(); err != nil {
 			return nil, err
@@ -981,7 +1146,11 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 				}
 				m[k] = v
 			}
-			d.readByte()
+			_, err = d.readByte()
+			// check error
+			if err != nil {
+				return nil, jerrors.Trace(err)
+			}
 
 			return m, nil
 		} else {
@@ -1031,7 +1200,11 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 			}
 			m[k] = v
 		}
-		d.readByte()
+		_, err = d.readByte()
+		// check error
+		if err != nil {
+			return nil, jerrors.Trace(err)
+		}
 		return m, nil
 
 	default:
@@ -1158,33 +1331,43 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 		return nil, jerrors.Errorf("wrong type expect Struct but get:%s", typ.String())
 	}
 
-	vRef := reflect.New(typ).Elem()
+	vRef := reflect.New(typ)
+	// add pointer ref so that ref the same object
 	d.appendRefs(vRef)
+
+	vv := vRef.Elem()
 	for i := 0; i < len(cls.fieldNameList); i++ {
 		fieldName := cls.fieldNameList[i]
+
 		index, err := findField(fieldName, typ)
 		if err != nil {
 			return nil, jerrors.Errorf("can not find field %s", fieldName)
 		}
-		fldValue := vRef.Field(index)
-		if !fldValue.CanSet() {
+		field := vv.Field(index)
+		if !field.CanSet() {
 			return nil, jerrors.Errorf("decInstance CanSet false for field %s", fieldName)
 		}
 
-		kind := fldValue.Kind()
+		// get field type from type object, not do that from value
+		fldTyp := UnpackPtrType(field.Type())
+
+		// unpack pointer to enable value setting
+		fldRawValue := UnpackPtrValue(field)
+
+		kind := fldTyp.Kind()
 		switch {
 		case kind == reflect.String:
 			str, err := d.decString(TAG_READ)
 			if err != nil {
 				return nil, jerrors.Annotatef(err, "decInstance->ReadString: %s", fieldName)
 			}
-			fldValue.SetString(str)
+			fldRawValue.SetString(str)
 
 		case kind == reflect.Int32 || kind == reflect.Int16:
 			num, err := d.decInt32(TAG_READ)
 			if err != nil {
 				// java enum
-				if fldValue.Type().Implements(javaEnumType) {
+				if fldRawValue.Type().Implements(javaEnumType) {
 					d.unreadByte() // enum解析，上面decInt64已经读取一个字节，所以这里需要回退一个字节
 					s, err := d.Decode()
 					if err != nil {
@@ -1197,12 +1380,12 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 				}
 			}
 
-			fldValue.SetInt(int64(num))
+			fldRawValue.SetInt(int64(num))
 
 		case kind == reflect.Int || kind == reflect.Int64 || kind == reflect.Uint64:
 			num, err := d.decInt64(TAG_READ)
 			if err != nil {
-				if fldValue.Type().Implements(javaEnumType) {
+				if fldTyp.Implements(javaEnumType) {
 					d.unreadByte() // enum解析，上面decInt64已经读取一个字节，所以这里需要回退一个字节
 					s, err := d.Decode()
 					if err != nil {
@@ -1215,80 +1398,69 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 				}
 			}
 
-			fldValue.SetInt(num)
+			fldRawValue.SetInt(num)
 
 		case kind == reflect.Bool:
 			b, err := d.Decode()
 			if err != nil {
 				return nil, jerrors.Annotatef(err, "decInstance->Decode field name:%s", fieldName)
 			}
-			fldValue.SetBool(b.(bool))
+			fldRawValue.SetBool(b.(bool))
 
 		case kind == reflect.Float32 || kind == reflect.Float64:
 			num, err := d.decDouble(TAG_READ)
 			if err != nil {
 				return nil, jerrors.Annotatef(err, "decInstance->decDouble field name:%s", fieldName)
 			}
-			fldValue.SetFloat(num.(float64))
+			fldRawValue.SetFloat(num.(float64))
 
 		case kind == reflect.Map:
-			d.decMapByValue(fldValue)
+			// decode map should use the original field value for correct value setting
+			err := d.decMapByValue(field)
+			if err != nil {
+				return nil, jerrors.Annotatef(err, "decInstance->decMapByValue field name: %s", fieldName)
+			}
 
 		case kind == reflect.Slice || kind == reflect.Array:
-			m, e := d.decList(TAG_READ)
-			if e != nil {
+			m, err := d.decList(TAG_READ)
+			if err != nil {
 				if err == io.EOF {
 					break
 				}
 				return nil, jerrors.Trace(err)
 			}
-			v := reflect.ValueOf(m)
-			if m != nil && v.Len() > 0 {
-				// fmt.Printf("fldValue type %s\n", fldValue.Type().String())
-				// ref note: the following codes is related to
-				// [issue 6](https://github.com/AlexStocks/dubbogo/issues/6).
-				// It is fixed by [wongoo](https://github.com/wongoo).
-				elemPtrType := fldValue.Type().Elem().Kind() == reflect.Ptr
-				sl := reflect.MakeSlice(fldValue.Type(), v.Len(), v.Len())
-				for j := 0; j < v.Len(); j++ {
-					item := v.Index(j).Interface()
-					itemValue := reflect.ValueOf(item)
-					if iv, ok := itemValue.Interface().(reflect.Value); ok {
-						itemValue = iv
-					}
-					if !elemPtrType && itemValue.Kind() == reflect.Ptr {
-						itemValue = itemValue.Elem()
-					}
-					sl.Index(j).Set(itemValue)
-				}
-				fldValue.Set(sl)
-			}
 
+			// set slice separately
+			err = SetSlice(fldRawValue, m)
+			if err != nil {
+				return nil, err
+			}
 		case kind == reflect.Struct:
 			var (
 				err error
 				s   interface{}
 			)
-			if fldValue.Type().String() == "time.Time" {
+			if fldRawValue.Type().String() == "time.Time" {
 				s, err = d.decDate(TAG_READ)
 				if err != nil {
 					return nil, jerrors.Trace(err)
 				}
-				fldValue.Set(reflect.ValueOf(s))
+				fldRawValue.Set(reflect.ValueOf(s))
 			} else {
 				s, err = d.decObject(TAG_READ)
 				if err != nil {
 					return nil, jerrors.Trace(err)
 				}
 				if s != nil {
-					fldValue.Set(reflect.Indirect(s.(reflect.Value)))
+					// set value which accepting pointers
+					SetValue(fldRawValue, EnsurePackValue(s))
 				}
 			}
 
 		default:
-			return nil, jerrors.Errorf("unknown struct member type:%d", kind)
+			return nil, jerrors.Errorf("unknown struct member type: %v", kind)
 		}
-	}
+	} // end for
 
 	return vRef, nil
 }
@@ -1355,6 +1527,10 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 	}
 
 	switch {
+	case tag == BC_NULL:
+		return nil, nil
+	case tag == BC_REF:
+		return d.decRef(int32(tag))
 	case tag == BC_OBJECT_DEF:
 		clsDef, err := d.decClassDef()
 		if err != nil {
@@ -1382,7 +1558,7 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 
 		return d.decInstance(typ, cls)
 
-	case (BC_OBJECT_DIRECT <= tag && tag <= (BC_OBJECT_DIRECT+OBJECT_DIRECT_MAX)):
+	case BC_OBJECT_DIRECT <= tag && tag <= (BC_OBJECT_DIRECT+OBJECT_DIRECT_MAX):
 		typ, cls, err = d.getStructDefByIndex(int(tag - BC_OBJECT_DIRECT))
 		if err != nil {
 			return nil, err
@@ -1427,7 +1603,8 @@ func (d *Decoder) decRef(flag int32) (interface{}, error) {
 		if len(d.refs) <= int(i) {
 			return nil, ErrIllegalRefIndex
 		}
-		return &d.refs[i], nil
+		// return the exact ref object, which maybe a _refHolder
+		return d.refs[i], nil
 
 	default:
 		return nil, jerrors.Errorf("decRef illegal ref type tag:%+v", tag)

@@ -45,6 +45,15 @@ import (
 	jerrors "github.com/juju/errors"
 )
 
+// used to ref object,list,map
+type _refElem struct {
+	// record the kind of target, objects are the same only if the address and kind are the same
+	kind  reflect.Kind
+
+	// ref index
+	index int
+}
+
 // nil bool int8 int32 int64 float32 float64 time.Time
 // string []byte []interface{} map[interface{}]interface{}
 // array object struct
@@ -52,6 +61,7 @@ import (
 type Encoder struct {
 	classInfoList []classInfo
 	buffer        []byte
+	refMap        map[unsafe.Pointer]_refElem
 }
 
 func NewEncoder() *Encoder {
@@ -59,6 +69,7 @@ func NewEncoder() *Encoder {
 
 	return &Encoder{
 		buffer: buffer[:0],
+		refMap: make(map[unsafe.Pointer]_refElem, 7),
 	}
 }
 
@@ -126,25 +137,20 @@ func (e *Encoder) Encode(v interface{}) error {
 		return e.encUntypedMap(v.(map[interface{}]interface{}))
 
 	default:
-		t := reflect.TypeOf(v)
-		if reflect.Ptr == t.Kind() {
-			// tmp := reflect.ValueOf(v).Elem()
-			// t = reflect.TypeOf(tmp)
-			t = reflect.TypeOf(reflect.ValueOf(v).Elem())
-		}
+		t := UnpackPtrType(reflect.TypeOf(v))
 		switch t.Kind() {
 		case reflect.Struct:
 			if p, ok := v.(POJO); ok {
 				return e.encStruct(p)
 			} else {
-				return jerrors.Errorf("struct type not Support! %s is not a instance of POJO", t.Kind().String())
+				return jerrors.Errorf("struct type not Support! %s[%v] is not a instance of POJO!", t.String(), v)
 			}
 		case reflect.Slice, reflect.Array:
 			return e.encUntypedList(v)
 		case reflect.Map: // 进入这个case，就说明map可能是map[string]int这种类型
 			return e.encMap(v)
 		default:
-			return jerrors.Errorf("type not Support! %s", t.Kind().String())
+			return jerrors.Errorf("type not supported! %s", t.Kind().String())
 		}
 	}
 
@@ -159,11 +165,16 @@ func encByte(b []byte, t ...byte) []byte {
 	return append(b, t...)
 }
 
+//encRef encode ref index
+func encRef(b []byte, index int) []byte {
+	return encInt32(int32(index), append(b, BC_REF))
+}
+
 /////////////////////////////////////////
 // Null
 /////////////////////////////////////////
 func encNull(b []byte) []byte {
-	return append(b, 'N')
+	return append(b, BC_NULL)
 }
 
 /////////////////////////////////////////
@@ -404,11 +415,18 @@ func (e *Encoder) encUntypedList(v interface{}) error {
 		err error
 	)
 
-	reflectValue := reflect.ValueOf(v)
+	value := reflect.ValueOf(v)
+
+	// check ref
+	if n, ok := e.checkRefMap(value); ok {
+		e.buffer = encRef(e.buffer, n)
+		return nil
+	}
+
 	e.buffer = encByte(e.buffer, BC_LIST_FIXED_UNTYPED) // x58
-	e.buffer = encInt32(int32(reflectValue.Len()), e.buffer)
-	for i := 0; i < reflectValue.Len(); i++ {
-		if err = e.Encode(reflectValue.Index(i).Interface()); err != nil {
+	e.buffer = encInt32(int32(value.Len()), e.buffer)
+	for i := 0; i < value.Len(); i++ {
+		if err = e.Encode(value.Index(i).Interface()); err != nil {
 			return err
 		}
 	}
@@ -424,6 +442,12 @@ func (e *Encoder) encUntypedList(v interface{}) error {
 // ::= 'H' (value value)* 'Z'       # untyped key, value
 func (e *Encoder) encUntypedMap(m map[interface{}]interface{}) error {
 	if len(m) == 0 {
+		return nil
+	}
+
+	// check ref
+	if n, ok := e.checkRefMap(reflect.ValueOf(m)); ok {
+		e.buffer = encRef(e.buffer, n)
 		return nil
 	}
 
@@ -482,7 +506,7 @@ func getMapKey(key reflect.Value, t reflect.Type) (interface{}, error) {
 		return key.String(), nil
 	}
 
-	return nil, jerrors.Errorf("unsuport map key kind %s", t.Kind().String())
+	return nil, jerrors.Errorf("unsupported map key kind %s", t.Kind().String())
 }
 
 func (e *Encoder) encMap(m interface{}) error {
@@ -495,11 +519,28 @@ func (e *Encoder) encMap(m interface{}) error {
 	)
 
 	value = reflect.ValueOf(m)
-	typ = reflect.TypeOf(m).Key()
-	keys = value.MapKeys()
-	if len(keys) == 0 {
+
+	// check ref
+	if n, ok := e.checkRefMap(value); ok {
+		e.buffer = encRef(e.buffer, n)
 		return nil
 	}
+
+	value = UnpackPtrValue(value)
+	// check nil map
+	if value.Kind() == reflect.Ptr && !value.Elem().IsValid() {
+		e.buffer = encNull(e.buffer)
+		return nil
+	}
+
+	keys = value.MapKeys()
+	if len(keys) == 0 {
+		// fix: set nil for empty map
+		e.buffer = encNull(e.buffer)
+		return nil
+	}
+
+	typ = value.Type().Key()
 	e.buffer = encByte(e.buffer, BC_MAP_UNTYPED)
 	for i := 0; i < len(keys); i++ {
 		k, err = getMapKey(keys[i], typ)
@@ -507,10 +548,11 @@ func (e *Encoder) encMap(m interface{}) error {
 			return jerrors.Annotatef(err, "getMapKey(idx:%d, key:%+v)", i, keys[i])
 		}
 		if err = e.Encode(k); err != nil {
-			return nil
+			return jerrors.Annotatef(err, "failed to encode map key(idx:%d, key:%+v)", i, keys[i])
 		}
-		if err = e.Encode(value.MapIndex(keys[i]).Interface()); err != nil {
-			return err
+		entryValueObj := value.MapIndex(keys[i]).Interface()
+		if err = e.Encode(entryValueObj); err != nil {
+			return jerrors.Annotatef(err, "failed to encode map value(idx:%d, key:%+v, value:%+v)", i, k, entryValueObj)
 		}
 	}
 	e.buffer = encByte(e.buffer, BC_END)
@@ -598,6 +640,18 @@ func (e *Encoder) encStruct(v POJO) error {
 	)
 
 	vv := reflect.ValueOf(v)
+	// check ref
+	if n, ok := e.checkRefMap(vv); ok {
+		e.buffer = encRef(e.buffer, n)
+		return nil
+	}
+
+	vv = UnpackPtr(vv)
+	// check nil pointer
+	if !vv.IsValid() {
+		e.buffer = encNull(e.buffer)
+		return nil
+	}
 
 	// write object definition
 	idx = -1
@@ -625,12 +679,56 @@ func (e *Encoder) encStruct(v POJO) error {
 		e.buffer = encByte(e.buffer, BC_OBJECT)
 		e.buffer = encInt32(int32(idx), e.buffer)
 	}
+
 	num = vv.NumField()
 	for i = 0; i < num; i++ {
-		if err = e.Encode(vv.Field(i).Interface()); err != nil {
-			return err
+		field := vv.Field(i)
+		fieldName := field.Type().String()
+		if err = e.Encode(field.Interface()); err != nil {
+			return jerrors.Annotatef(err, "failed to encode field: %s, %+v", fieldName, field.Interface())
 		}
 	}
 
 	return nil
+}
+
+// return the order number of ref object if found ,
+// otherwise, add the object into the encode ref map
+func (e *Encoder) checkRefMap(v reflect.Value) (int, bool) {
+	var (
+		kind reflect.Kind
+		addr unsafe.Pointer
+	)
+
+	if v.Kind() == reflect.Ptr {
+		for v.Elem().Kind() == reflect.Ptr {
+			v = v.Elem()
+		}
+		kind = v.Elem().Kind()
+		if kind == reflect.Slice || kind == reflect.Map {
+			addr = unsafe.Pointer(v.Elem().Pointer())
+		} else {
+			addr = unsafe.Pointer(v.Pointer())
+		}
+	} else {
+		kind = v.Kind()
+		switch kind {
+		case reflect.Slice, reflect.Map:
+			addr = unsafe.Pointer(v.Pointer())
+		default:
+			addr = unsafe.Pointer(PackPtr(v).Pointer())
+		}
+	}
+
+	if elem, ok := e.refMap[addr]; ok {
+		// the array addr is equal to the first elem, which must ignore
+		if elem.kind == kind {
+			return elem.index, ok
+		}
+		return 0, false
+	}
+
+	n := len(e.refMap)
+	e.refMap[addr] = _refElem{kind, n}
+	return 0, false
 }
