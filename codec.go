@@ -22,7 +22,9 @@ import (
 	"math"
 	"reflect"
 	"strings"
+)
 
+import (
 	jerrors "github.com/juju/errors"
 )
 
@@ -31,8 +33,8 @@ var (
 	_zeroValue      = reflect.ValueOf(_zeroBoolPinter).Elem()
 )
 
-//IntKind check whether k is int kind
-func IntKind(k reflect.Kind) bool {
+// validateIntKind check whether k is int kind
+func validateIntKind(k reflect.Kind) bool {
 	switch k {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return true
@@ -41,8 +43,8 @@ func IntKind(k reflect.Kind) bool {
 	}
 }
 
-//UintKind check whether k is uint kind
-func UintKind(k reflect.Kind) bool {
+// validateUintKind check whether k is uint kind
+func validateUintKind(k reflect.Kind) bool {
 	switch k {
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		return true
@@ -51,8 +53,8 @@ func UintKind(k reflect.Kind) bool {
 	}
 }
 
-//FloatKind check whether k is float kind
-func FloatKind(k reflect.Kind) bool {
+// validateFloatKind check whether k is float kind
+func validateFloatKind(k reflect.Kind) bool {
 	switch k {
 	case reflect.Float32, reflect.Float64:
 		return true
@@ -146,6 +148,7 @@ func UnpackPtr(v reflect.Value) reflect.Value {
 	for v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
+
 	return v
 }
 
@@ -237,15 +240,18 @@ func EnsureInterface(in interface{}, err error) (interface{}, error) {
 	if err != nil {
 		return in, err
 	}
+
 	if v, ok := in.(reflect.Value); ok {
 		in = v.Interface()
 	}
+
 	if v, ok := in.(*_refHolder); ok {
 		in = v.value.Interface()
+		if v, ok := in.(reflect.Value); ok {
+			in = v.Interface()
+		}
 	}
-	if v, ok := in.(reflect.Value); ok {
-		in = v.Interface()
-	}
+
 	return in, nil
 }
 
@@ -377,7 +383,7 @@ func SetSlice(dest reflect.Value, objects interface{}) error {
 		}
 		SetValue(dest, v)
 		ref.change(v) // change finally
-		ref.notify() // delay set value to all destinations
+		ref.notify()  // delay set value to all destinations
 		return nil
 	}
 
@@ -413,9 +419,9 @@ func ConvertSliceValueType(destTyp reflect.Type, v reflect.Value) (reflect.Value
 
 	elemKind := destTyp.Elem().Kind()
 	elemPtrType := elemKind == reflect.Ptr
-	elemFloatType := FloatKind(elemKind)
-	elemIntType := IntKind(elemKind)
-	elemUintType := UintKind(elemKind)
+	elemFloatType := validateFloatKind(elemKind)
+	elemIntType := validateIntKind(elemKind)
+	elemUintType := validateUintKind(elemKind)
 
 	sl := reflect.MakeSlice(destTyp, v.Len(), v.Len())
 	var itemValue reflect.Value

@@ -48,7 +48,7 @@ import (
 // used to ref object,list,map
 type _refElem struct {
 	// record the kind of target, objects are the same only if the address and kind are the same
-	kind  reflect.Kind
+	kind reflect.Kind
 
 	// ref index
 	index int
@@ -142,9 +142,9 @@ func (e *Encoder) Encode(v interface{}) error {
 		case reflect.Struct:
 			if p, ok := v.(POJO); ok {
 				return e.encStruct(p)
-			} else {
-				return jerrors.Errorf("struct type not Support! %s[%v] is not a instance of POJO!", t.String(), v)
 			}
+
+			return jerrors.Errorf("struct type not Support! %s[%v] is not a instance of POJO!", t.String(), v)
 		case reflect.Slice, reflect.Array:
 			return e.encUntypedList(v)
 		case reflect.Map: // 进入这个case，就说明map可能是map[string]int这种类型

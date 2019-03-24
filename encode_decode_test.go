@@ -17,10 +17,13 @@ package hessian
 import (
 	"bytes"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
 	"time"
+)
+
+import (
+	"github.com/stretchr/testify/assert"
 )
 
 // go test -v encode_decode_test.go encode.go decode.go const.go codec.go pojo.go
@@ -708,18 +711,28 @@ func TestRef(t *testing.T) {
 
 	e := NewEncoder()
 	err := e.Encode(c)
-
 	if err != nil {
 		panic(err)
 	}
 
 	bytes := e.Buffer()
 	t.Logf("circular bytes hex: %x, string: %s", bytes, string(bytes))
-	decoded, err := NewDecoder(bytes).Decode()
+	res, err := NewDecoder(bytes).Decode()
 	if err != nil {
 		panic(err)
 	}
-	t.Log("decode object: ", decoded)
+	res = res.(reflect.Value).Interface()
+	c1, ok := res.(*circular)
+	if !ok {
+		t.Fatalf("res:%T is not of type circular", c1)
+	}
+	t.Logf("encode object: %+v, decode object: %+v", c, c1)
+	if c.Num != c1.Num {
+		t.Errorf("encoded value %d != decoded value %d", c.Num, c1.Num)
+	}
+	if c1.Previous != c1.Next {
+		t.Errorf("decoded value previous %p != decoded value next %p", c1.Previous, c1.Next)
+	}
 }
 
 type personT struct {

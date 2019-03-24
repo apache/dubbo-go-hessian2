@@ -32,7 +32,9 @@
 
 package hessian
 
-import jerrors "github.com/juju/errors"
+import (
+	jerrors "github.com/juju/errors"
+)
 
 const (
 	mask = byte(127)
