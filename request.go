@@ -155,7 +155,6 @@ func PackRequest(service Service, header DubboHeader, params interface{}) ([]byt
 		err           error
 		types         string
 		byteArray     []byte
-		encoder       Encoder
 		version       string
 		pkgLen        int
 		serviceParams map[string]string
@@ -182,6 +181,8 @@ func PackRequest(service Service, header DubboHeader, params interface{}) ([]byt
 	byteArray[2] |= byte(header.SerialID & SERIAL_MASK)
 	// request id
 	binary.BigEndian.PutUint64(byteArray[4:], uint64(header.ID))
+
+	encoder := NewEncoder()
 	encoder.Append(byteArray[:HEADER_LENGTH])
 
 	// com.alibaba.dubbo.rpc.protocol.dubbo.DubboCodec.DubboCodec.java line144 encodeRequestData
