@@ -179,7 +179,7 @@ func PackRequest(service Service, header DubboHeader, params interface{}) ([]byt
 	}
 	// serialization id, two way flag, event, request/response flag
 	// java 中标识一个class的ID
-	byteArray[2] |= byte(header.ID & SERIAL_MASK)
+	byteArray[2] |= byte(header.SerialID & SERIAL_MASK)
 	// request id
 	binary.BigEndian.PutUint64(byteArray[4:], uint64(header.ID))
 	encoder.Append(byteArray[:HEADER_LENGTH])
