@@ -37,6 +37,9 @@ func TestPackRequest(t *testing.T) {
 		ID:       123,
 	}, []interface{}{1, 2})
 
-	t.Logf("pack request: %s", string(bytes))
 	assert.Nil(t, err)
+	
+	if bytes != nil {
+		t.Logf("pack request: %s", string(bytes))
+	}
 }
