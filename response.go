@@ -218,7 +218,7 @@ func ReflectResponse(in interface{}, out interface{}) error {
 	case reflect.String:
 		reflect.ValueOf(out).Elem().Set(reflect.ValueOf(in.(string)))
 	case reflect.Ptr:
-		reflect.ValueOf(out).Elem().Set(reflect.ValueOf(in.(reflect.Value).Elem().Interface()))
+		reflect.ValueOf(out).Elem().Set(reflect.ValueOf(reflect.ValueOf(in).Elem().Interface()))
 	case reflect.Struct:
 		reflect.ValueOf(out).Elem().Set(in.(reflect.Value)) // reflect.ValueOf(in.(reflect.Value)))
 	case reflect.Slice, reflect.Array:
