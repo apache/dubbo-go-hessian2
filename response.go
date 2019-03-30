@@ -73,7 +73,7 @@ func UnpackResponseHeaer(buf []byte, header *DubboHeader) error {
 }
 
 // hessian decode response body
-func UnpackResponseBody(buf []byte, body interface{}) error {
+func UnpackResponseBody(buf []byte, rspObj interface{}) error {
 	// body
 	decoder := NewDecoder(buf[:])
 	rspType, err := decoder.Decode()
@@ -94,7 +94,7 @@ func UnpackResponseBody(buf []byte, body interface{}) error {
 		if err != nil {
 			return jerrors.Trace(err)
 		}
-		return jerrors.Trace(ReflectResponse(rsp, body))
+		return jerrors.Trace(ReflectResponse(rsp, rspObj))
 
 	case RESPONSE_NULL_VALUE:
 		return jerrors.New("Received null")

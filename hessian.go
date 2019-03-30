@@ -116,7 +116,7 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader, pkgType PackgeType) error
 	return nil
 }
 
-func (h *HessianCodec) ReadBody(body interface{}) error {
+func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 	switch h.pkgType {
 	case Request:
 		return nil
@@ -139,8 +139,8 @@ func (h *HessianCodec) ReadBody(body interface{}) error {
 			return jerrors.Trace(err)
 		}
 
-		if body != nil {
-			if err = UnpackResponseBody(buf, body); err != nil {
+		if rspObj != nil {
+			if err = UnpackResponseBody(buf, rspObj); err != nil {
 				return jerrors.Trace(err)
 			}
 		}
