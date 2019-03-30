@@ -1,7 +1,5 @@
 module github.com/dubbogo/hessian2
 
-go 1.12
-
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/juju/errors v0.0.0-20190207033735-e65537c515d7
