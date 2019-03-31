@@ -206,6 +206,15 @@ func EnsureInt64(i interface{}) int64 {
 	if i32, ok := i.(int32); ok {
 		return int64(i32)
 	}
+	if i, ok := i.(int); ok {
+		return int64(i)
+	}
+	if i16, ok := i.(int16); ok {
+		return int64(i16)
+	}
+	if i8, ok := i.(int8); ok {
+		return int64(i8)
+	}
 	panic(fmt.Errorf("can't convert to int64: %v, type:%v", i, reflect.TypeOf(i)))
 }
 
@@ -314,7 +323,7 @@ func SetValue(dest, v reflect.Value) {
 	}
 
 	// set value as required type
-	if dest.Type() == v.Type() {
+	if dest.Type() == v.Type() && dest.CanSet() {
 		dest.Set(v)
 		return
 	}
