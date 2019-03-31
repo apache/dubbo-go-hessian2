@@ -97,7 +97,7 @@ func TestReflectResponse(t *testing.T) {
 	doTestReflectResponse(t, s3, &s3r)
 }
 
-// separately test copy map to map[interface{}]interface{}
+// separately test copy normal map to map[interface{}]interface{}
 func TestCopyMap(t *testing.T) {
 	type rr struct {
 		Name string
@@ -128,7 +128,7 @@ func TestCopyMap(t *testing.T) {
 	assert.True(t, reflect.DeepEqual(r2, rr2))
 }
 
-// separately test copy slic to []interface{}
+// separately test copy normal slice to []interface{}
 func TestCopySlice(t *testing.T) {
 	type rr struct {
 		Name string
