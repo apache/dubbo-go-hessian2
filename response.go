@@ -103,32 +103,26 @@ func UnpackResponseBody(buf []byte, rspObj interface{}) error {
 	return nil
 }
 
-func cpSlice(in, out interface{}) error {
-	inSlice := reflect.ValueOf(in)
+func CopySlice(inSlice, outSlice reflect.Value) error {
 	if inSlice.IsNil() {
 		return jerrors.New("@in is nil")
 	}
+	if inSlice.Kind() != reflect.Slice {
+		return jerrors.Errorf("@in is not slice, but %v", inSlice.Kind())
+	}
 
-	outSlice := reflect.ValueOf(out)
 	for outSlice.Kind() == reflect.Ptr {
 		outSlice = outSlice.Elem()
 	}
 
-	outSlice.Set(reflect.MakeSlice(outSlice.Type(), inSlice.Len(), inSlice.Len()))
-	//outElemKind := outSlice.Type().Elem().Kind()
-	for i := 0; i < outSlice.Len(); i++ {
+	size := inSlice.Len()
+	outSlice.Set(reflect.MakeSlice(outSlice.Type(), size, size))
+
+	for i := 0; i < size; i++ {
 		inSliceValue := inSlice.Index(i)
-		if outSlice.Index(i).Kind() == reflect.Struct {
-			//if inSliceValue.Kind() == reflect.Ptr && inSliceValue.Kind() != outElemKind {
-			//	inSliceValue = inSliceValue.Elem()
-			//}
-			inSliceValue = inSliceValue.Interface().(reflect.Value)
-		} else {
-			inSliceValue = reflect.ValueOf(inSliceValue)
-		}
 		if !inSliceValue.Type().AssignableTo(outSlice.Index(i).Type()) {
-			return jerrors.Errorf("in element type %s can not assign to out element type %s",
-				inSliceValue.Type().Name(), outSlice.Type().Name())
+			return jerrors.Errorf("in element type [%s] can not assign to out element type [%s]",
+				inSliceValue.Type().String(), outSlice.Type().String())
 		}
 		outSlice.Index(i).Set(inSliceValue)
 	}
@@ -136,47 +130,37 @@ func cpSlice(in, out interface{}) error {
 	return nil
 }
 
-func cpMap(in, out interface{}) error {
-	inMapValue := reflect.ValueOf(in)
+func CopyMap(inMapValue, outMapValue reflect.Value) error {
 	if inMapValue.IsNil() {
 		return jerrors.New("@in is nil")
 	}
 	if !inMapValue.CanInterface() {
 		return jerrors.New("@in's Interface can not be used.")
 	}
-	inMap := inMapValue.Interface().(map[interface{}]interface{})
-
-	outMap := reflect.ValueOf(out)
-	for outMap.Kind() == reflect.Ptr {
-		outMap = outMap.Elem()
+	if inMapValue.Kind() != reflect.Map {
+		return jerrors.Errorf("@in is not map, but %v", inMapValue.Kind())
 	}
 
-	outMap.Set(reflect.MakeMap(outMap.Type()))
-	outKeyType := outMap.Type().Key()
-	outKeyKind := outKeyType.Kind()
-	outValueType := outMap.Type().Elem()
-	outValueKind := outValueType.Kind()
-	var inKey, inValue reflect.Value
-	for k := range inMap {
-		if outKeyKind != reflect.Struct {
-			inKey = reflect.ValueOf(k)
-		} else {
-			inKey = k.(reflect.Value)
-		}
-		if outValueKind != reflect.Struct {
-			inValue = reflect.ValueOf(inMap[k])
-		} else {
-			inValue = inMap[k].(reflect.Value)
-		}
+	outMapType := UnpackPtrType(outMapValue.Type())
+	SetValue(outMapValue, reflect.MakeMap(outMapType))
+
+	outKeyType := outMapType.Key()
+
+	outMapValue = UnpackPtrValue(outMapValue)
+	outValueType := outMapValue.Type().Elem()
+
+	for _, inKey := range inMapValue.MapKeys() {
+		inValue := inMapValue.MapIndex(inKey)
+
 		if !inKey.Type().AssignableTo(outKeyType) {
 			return jerrors.Errorf("in Key:{type:%s, value:%#v} can not assign to out Key:{type:%s} ",
-				inKey.Type().Name(), inKey, outKeyType.Name())
+				inKey.Type().String(), inKey, outKeyType.String())
 		}
 		if !inValue.Type().AssignableTo(outValueType) {
 			return jerrors.Errorf("in Value:{type:%s, value:%#v} can not assign to out value:{type:%s}",
-				inValue.Type().Name(), inValue, outValueType.Name())
+				inValue.Type().String(), inValue, outValueType.String())
 		}
-		outMap.SetMapIndex(inKey, inValue)
+		outMapValue.SetMapIndex(inKey, inValue)
 	}
 
 	return nil
@@ -195,36 +179,16 @@ func ReflectResponse(in interface{}, out interface{}) error {
 		return jerrors.Errorf("@out should be a pointer")
 	}
 
-	if inV, ok := in.(reflect.Value); ok {
-		in = inV.Interface()
-	}
+	inValue := EnsurePackValue(in)
+	outValue := EnsurePackValue(out)
 
-	inType := reflect.TypeOf(in)
-	switch inType.Kind() {
-	case reflect.Bool:
-		reflect.ValueOf(out).Elem().Set(reflect.ValueOf(in.(bool)))
-	case reflect.Int8:
-		reflect.ValueOf(out).Elem().Set(reflect.ValueOf(in.(int8)))
-	case reflect.Int16:
-		reflect.ValueOf(out).Elem().Set(reflect.ValueOf(in.(int16)))
-	case reflect.Int32:
-		reflect.ValueOf(out).Elem().Set(reflect.ValueOf(in.(int32)))
-	case reflect.Int64:
-		reflect.ValueOf(out).Elem().Set(reflect.ValueOf(in.(int64)))
-	case reflect.Float32:
-		reflect.ValueOf(out).Elem().Set(reflect.ValueOf(in.(float32)))
-	case reflect.Float64:
-		reflect.ValueOf(out).Elem().Set(reflect.ValueOf(in.(float64)))
-	case reflect.String:
-		reflect.ValueOf(out).Elem().Set(reflect.ValueOf(in.(string)))
-	case reflect.Ptr:
-		reflect.ValueOf(out).Elem().Set(reflect.ValueOf(reflect.ValueOf(in).Elem().Interface()))
-	case reflect.Struct:
-		reflect.ValueOf(out).Elem().Set(in.(reflect.Value)) // reflect.ValueOf(in.(reflect.Value)))
+	switch inValue.Type().Kind() {
 	case reflect.Slice, reflect.Array:
-		return cpSlice(in, out)
+		return CopySlice(inValue, outValue)
 	case reflect.Map:
-		return cpMap(in, out)
+		return CopyMap(inValue, outValue)
+	default:
+		SetValue(outValue, inValue)
 	}
 
 	return nil
