@@ -107,11 +107,14 @@ func CopySlice(inSlice, outSlice reflect.Value) error {
 	if inSlice.IsNil() {
 		return jerrors.New("@in is nil")
 	}
+	if inSlice.Kind() != reflect.Slice {
+		return jerrors.Errorf("@in is not slice, but %v", inSlice.Kind())
+	}
 
 	for outSlice.Kind() == reflect.Ptr {
 		outSlice = outSlice.Elem()
 	}
-	
+
 	size := inSlice.Len()
 	outSlice.Set(reflect.MakeSlice(outSlice.Type(), size, size))
 

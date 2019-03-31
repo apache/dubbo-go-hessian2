@@ -64,7 +64,6 @@ func TestReflectResponse(t *testing.T) {
 	doTestReflectResponse(t, rr{"dubbogo", 32}, &r1)
 
 	// ------ map test -------
-	// NOTE: map type currently MUST be map[interface{}]interface{}
 	m1 := make(map[interface{}]interface{})
 	var m1r map[interface{}]interface{}
 	m1["hello"] = "world"
@@ -129,6 +128,7 @@ func TestCopyMap(t *testing.T) {
 	assert.True(t, reflect.DeepEqual(r2, rr2))
 }
 
+// separately test copy slic to []interface{}
 func TestCopySlice(t *testing.T) {
 	type rr struct {
 		Name string
