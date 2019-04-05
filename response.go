@@ -16,14 +16,95 @@ package hessian
 
 import (
 	"encoding/binary"
+	"math"
 	"reflect"
+	"strconv"
+	"strings"
 )
 
 import (
 	jerrors "github.com/juju/errors"
 )
 
-// hessian decode respone
+// dubbo-remoting/dubbo-remoting-api/src/main/java/com/alibaba/dubbo/remoting/exchange/codec/ExchangeCodec.java
+// v2.7.1 line 256 encodeResponse
+// hessian encode response
+func PackResponse(header DubboHeader, attachments map[string]string, ret interface{}) ([]byte, error) {
+	var (
+		byteArray []byte
+	)
+
+	hb := header.Type == Heartbeat
+
+	// magic
+	if hb {
+		byteArray = append(byteArray, DubboResponseHeartbeatHeader[:]...)
+	} else {
+		byteArray = append(byteArray, DubboResponseHeaderBytes[:]...)
+	}
+	// set serialID, identify serialization types, eg: fastjson->6, hessian2->2
+	byteArray[2] |= byte(header.SerialID & SERIAL_MASK)
+	// response status
+	if header.ResponseStatus != 0 {
+		byteArray[3] = header.ResponseStatus
+	}
+
+	// request id
+	binary.BigEndian.PutUint64(byteArray[4:], uint64(header.ID))
+
+	// body
+	encoder := NewEncoder()
+	encoder.Append(byteArray[:HEADER_LENGTH])
+
+	if hb {
+		encoder.Encode(nil)
+	} else {
+		// com.alibaba.dubbo.rpc.protocol.dubbo.DubboCodec.DubboCodec.java
+		// v2.7.1 line191 encodeRequestData
+
+		atta := isSupportResponseAttachment(attachments[DUBBO_VERSION_KEY])
+
+		var resWithException, resValue, resNullValue int32
+		if atta {
+			resWithException = RESPONSE_WITH_EXCEPTION
+			resValue = RESPONSE_VALUE
+			resNullValue = RESPONSE_NULL_VALUE
+		} else {
+			resWithException = RESPONSE_WITH_EXCEPTION_WITH_ATTACHMENTS
+			resValue = RESPONSE_VALUE_WITH_ATTACHMENTS
+			resNullValue = RESPONSE_NULL_VALUE_WITH_ATTACHMENTS
+		}
+
+		if e, ok := ret.(error); ok { // throw error
+			encoder.Encode(resWithException)
+			encoder.Encode(e.Error())
+		} else {
+			if ret == nil {
+				encoder.Encode(resNullValue)
+			} else {
+				encoder.Encode(resValue)
+				encoder.Encode(ret) // result
+			}
+		}
+
+		if atta {
+			encoder.Encode(attachments) // attachments
+		}
+	}
+
+	byteArray = encoder.Buffer()
+	byteArray = encNull(byteArray) // if not, "java client" will throw exception  "unexpected end of file"
+	pkgLen := len(byteArray)
+	if pkgLen > int(DEFAULT_LEN) { // 8M
+		return nil, jerrors.Errorf("Data length %d too large, max payload %d", pkgLen, DEFAULT_LEN)
+	}
+	// byteArray{body length}
+	binary.BigEndian.PutUint32(byteArray[12:], uint32(pkgLen-HEADER_LENGTH))
+	return byteArray, nil
+
+}
+
+// hessian decode response
 func UnpackResponseHeaer(buf []byte, header *DubboHeader) error {
 	// length := len(buf)
 	// // hessianCodec.ReadHeader has check the header length
@@ -44,9 +125,10 @@ func UnpackResponseHeaer(buf []byte, header *DubboHeader) error {
 	if flag != byte(0x00) {
 		header.Type |= Heartbeat
 	}
-	flag = buf[2] & FLAG_TWOWAY
+	flag = buf[3]
 	if flag != byte(0x00) {
 		header.Type |= Response
+		header.ResponseStatus = flag
 	}
 	flag = buf[2] & FLAG_REQUEST
 	if flag != byte(0x00) {
@@ -82,21 +164,21 @@ func UnpackResponseBody(buf []byte, rspObj interface{}) error {
 	}
 
 	switch rspType {
-	case RESPONSE_WITH_EXCEPTION:
+	case RESPONSE_WITH_EXCEPTION, RESPONSE_WITH_EXCEPTION_WITH_ATTACHMENTS:
 		expt, err := decoder.Decode()
 		if err != nil {
 			return jerrors.Trace(err)
 		}
 		return jerrors.Errorf("got exception: %+v", expt)
 
-	case RESPONSE_VALUE:
+	case RESPONSE_VALUE, RESPONSE_VALUE_WITH_ATTACHMENTS:
 		rsp, err := decoder.Decode()
 		if err != nil {
 			return jerrors.Trace(err)
 		}
 		return jerrors.Trace(ReflectResponse(rsp, rspObj))
 
-	case RESPONSE_NULL_VALUE:
+	case RESPONSE_NULL_VALUE, RESPONSE_NULL_VALUE_WITH_ATTACHMENTS:
 		return jerrors.New("Received null")
 	}
 
@@ -192,4 +274,39 @@ func ReflectResponse(in interface{}, out interface{}) error {
 	}
 
 	return nil
+}
+
+var versionInt = make(map[string]int)
+
+func isSupportResponseAttachment(version string) bool {
+	if version == "" {
+		return false
+	}
+
+	v, ok := versionInt[version]
+	if !ok {
+		v = version2Int(version)
+		if v == -1 {
+			return false
+		}
+	}
+
+	if v >= 2001000 && v <= 2060200 {
+		return false
+	}
+	return v >= LOWEST_VERSION_FOR_RESPONSE_ATTACHMENT
+}
+
+func version2Int(version string) int {
+	var v = 0
+	varr := strings.Split(version, ".")
+	len := len(varr)
+	for key, value := range varr {
+		v0, err := strconv.Atoi(value)
+		if err != nil {
+			return -1
+		}
+		v += v0 * int(math.Pow10((len-key-1)*2))
+	}
+	return v
 }

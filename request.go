@@ -30,38 +30,6 @@ import (
 // dubbo
 /////////////////////////////////////////
 
-/**
- * 协议头是16字节的定长数据
- * 2字节magic字符串0xdabb,0-7高位，8-15低位
- * 1字节的消息标志位。16-20序列id,21 event,22 two way,23请求或响应标识
- * 1字节状态。当消息类型为响应时，设置响应状态。24-31位。
- * 8字节，消息ID,long类型，32-95位。
- * 4字节，消息长度，96-127位
- **/
-const (
-	// header length.
-	HEADER_LENGTH = 16
-
-	// magic header
-	MAGIC      = uint16(0xdabb)
-	MAGIC_HIGH = byte(0xda)
-	MAGIC_LOW  = byte(0xbb)
-
-	// message flag.
-	FLAG_REQUEST = byte(0x80)
-	FLAG_TWOWAY  = byte(0x40)
-	FLAG_EVENT   = byte(0x20) // for heartbeat
-	SERIAL_MASK  = 0x1f
-
-	DUBBO_VERSION = "2.5.4"
-	DEFAULT_LEN   = 8388608 // 8 * 1024 * 1024 default body max length
-)
-
-var (
-	DubboHeaderBytes     = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, FLAG_REQUEST | FLAG_TWOWAY}
-	DubboHeartbeatHeader = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, FLAG_REQUEST | FLAG_TWOWAY | FLAG_EVENT | 0x0F}
-)
-
 // com.alibaba.dubbo.common.utils.ReflectUtils.ReflectUtils.java line245 getDesc
 func getArgType(v interface{}) string {
 	if v == nil {
@@ -172,9 +140,9 @@ func PackRequest(service Service, header DubboHeader, params interface{}) ([]byt
 	//////////////////////////////////////////
 	// magic
 	if hb {
-		byteArray = append(byteArray, DubboHeartbeatHeader[:]...)
+		byteArray = append(byteArray, DubboRequestHeartbeatHeader[:]...)
 	} else {
-		byteArray = append(byteArray, DubboHeaderBytes[:]...)
+		byteArray = append(byteArray, DubboRequestHeaderBytes[:]...)
 	}
 	// serialization id, two way flag, event, request/response flag
 	// java 中标识一个class的ID
@@ -229,6 +197,107 @@ END:
 	}
 	// byteArray{body length}
 	binary.BigEndian.PutUint32(byteArray[12:], uint32(pkgLen-HEADER_LENGTH))
-
 	return byteArray, nil
+}
+
+func UnpackRequestHeaer(buf []byte, header *DubboHeader) error {
+	if buf[0] != byte(MAGIC_HIGH) && buf[1] != byte(MAGIC_LOW) {
+		return ErrIllegalPackage
+	}
+
+	// Header{serialization id(5 bit), event, two way, req/response}
+	if header.SerialID = buf[2] & SERIAL_MASK; header.SerialID == byte(0x00) {
+		return jerrors.Errorf("serialization ID:%v", header.SerialID)
+	}
+
+	flag := buf[2] & FLAG_EVENT
+	if flag != byte(0x00) {
+		header.Type |= Heartbeat
+	}
+	flag = buf[2] & FLAG_REQUEST
+	if flag != byte(0x00) {
+		header.Type |= Request
+	} else {
+		return jerrors.Errorf("response flag:%v", flag)
+	}
+	flag = buf[2] & FLAG_TWOWAY
+	if flag != byte(0x00) {
+		header.Type |= Request_TwoWay
+	}
+
+	// Header{req id}
+	header.ID = int64(binary.BigEndian.Uint64(buf[4:]))
+
+	// Header{body len}
+	header.BodyLen = int(binary.BigEndian.Uint32(buf[12:]))
+	if header.BodyLen < 0 {
+		return ErrIllegalPackage
+	}
+
+	return nil
+}
+
+// hessian decode request body
+func UnpackRequestBody(buf []byte, reqObj interface{}) error {
+
+	req, ok := reqObj.([]interface{})
+	if !ok {
+		return jerrors.Errorf("@reqObj is not of type: []interface{}")
+	}
+
+	var (
+		err                                                     error
+		dubboVersion, target, serviceVersion, method, argsTypes interface{}
+		args                                                    []interface{}
+	)
+	decoder := NewDecoder(buf[:])
+
+	dubboVersion, err = decoder.Decode()
+	if err != nil {
+		return jerrors.Trace(err)
+	}
+	req[0] = dubboVersion
+
+	target, err = decoder.Decode()
+	if err != nil {
+		return jerrors.Trace(err)
+	}
+	req[1] = target
+
+	serviceVersion, err = decoder.Decode()
+	if err != nil {
+		return jerrors.Trace(err)
+	}
+	req[2] = serviceVersion
+
+	method, err = decoder.Decode()
+	if err != nil {
+		return jerrors.Trace(err)
+	}
+	req[3] = method
+
+	argsTypes, err = decoder.Decode()
+	if err != nil {
+		return jerrors.Trace(err)
+	}
+	req[4] = argsTypes
+
+	ats := strings.Split(argsTypes.(string), ";")
+	var arg interface{}
+	for i := 0; i < len(ats)-1; i++ {
+		arg, err = decoder.Decode()
+		if err != nil {
+			return jerrors.Trace(err)
+		}
+		args = append(args, arg)
+	}
+	req[5] = args
+
+	attachments, err := decoder.Decode()
+	if err != nil {
+		return jerrors.Trace(err)
+	}
+	req[6] = attachments
+
+	return nil
 }

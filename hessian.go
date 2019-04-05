@@ -16,6 +16,7 @@ package hessian
 
 import (
 	"bufio"
+	"encoding/binary"
 	"time"
 )
 
@@ -24,19 +25,21 @@ import (
 )
 
 const (
-	Error     PackgeType = 0x01
-	Request              = 0x02
-	Response             = 0x04
-	Heartbeat            = 0x08
+	Error          PackgeType = 0x01
+	Request                   = 0x02
+	Response                  = 0x04
+	Heartbeat                 = 0x08
+	Request_TwoWay            = 0x10
 )
 
 type PackgeType int
 
 type DubboHeader struct {
-	SerialID byte
-	Type     PackgeType
-	ID       int64
-	BodyLen  int
+	SerialID       byte
+	Type           PackgeType
+	ID             int64
+	BodyLen        int
+	ResponseStatus byte
 }
 
 type Service struct {
@@ -49,9 +52,9 @@ type Service struct {
 }
 
 type HessianCodec struct {
-	pkgType    PackgeType
-	reader     *bufio.Reader
-	rspBodyLen int
+	pkgType PackgeType
+	reader  *bufio.Reader
+	bodyLen int
 }
 
 func NewHessianCodec(reader *bufio.Reader) *HessianCodec {
@@ -62,11 +65,16 @@ func NewHessianCodec(reader *bufio.Reader) *HessianCodec {
 
 func (h *HessianCodec) Write(service Service, header DubboHeader, body interface{}) ([]byte, error) {
 	switch header.Type {
-	case Heartbeat, Request:
+	case Heartbeat:
+		if header.ResponseStatus == 0x00 {
+			return PackRequest(service, header, body)
+		}
+		return PackResponse(header, map[string]string{}, body)
+	case Request:
 		return PackRequest(service, header, body)
 
 	case Response:
-		return nil, nil
+		return PackResponse(header, map[string]string{}, body)
 
 	default:
 		return nil, jerrors.Errorf("Unrecognised message type: %v", header.Type)
@@ -75,70 +83,101 @@ func (h *HessianCodec) Write(service Service, header DubboHeader, body interface
 	return nil, nil
 }
 
-func (h *HessianCodec) ReadHeader(header *DubboHeader, pkgType PackgeType) error {
-	h.pkgType = pkgType
+func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 
-	switch pkgType {
-	case Request:
-		return nil
+	var err error
 
-	case Heartbeat, Response:
-		buf, err := h.reader.Peek(HEADER_LENGTH)
-		if err != nil { // this is impossible
-			return jerrors.Trace(err)
+	buf, err := h.reader.Peek(HEADER_LENGTH)
+	if err != nil { // this is impossible
+		return jerrors.Trace(err)
+	}
+	_, err = h.reader.Discard(HEADER_LENGTH)
+	if err != nil { // this is impossible
+		return jerrors.Trace(err)
+	}
+
+	//// read header
+
+	if buf[0] != byte(MAGIC_HIGH) && buf[1] != byte(MAGIC_LOW) {
+		return ErrIllegalPackage
+	}
+
+	// Header{serialization id(5 bit), event, two way, req/response}
+	if header.SerialID = buf[2] & SERIAL_MASK; header.SerialID == byte(0x00) {
+		return jerrors.Errorf("serialization ID:%v", header.SerialID)
+	}
+
+	flag := buf[2] & FLAG_EVENT
+	if flag != byte(0x00) {
+		header.Type |= Heartbeat
+	}
+	flag = buf[2] & FLAG_REQUEST
+	if flag != byte(0x00) {
+		header.Type |= Request
+		flag = buf[2] & FLAG_TWOWAY
+		if flag != byte(0x00) {
+			header.Type |= Request_TwoWay
 		}
-		_, err = h.reader.Discard(HEADER_LENGTH)
-		if err != nil { // this is impossible
-			return jerrors.Trace(err)
-		}
+	} else {
+		header.Type |= Response
 
-		err = UnpackResponseHeaer(buf[:], header)
-		if err == ErrJavaException {
+		// Header{status}
+		if buf[3] != Response_OK {
+			err = ErrJavaException
+			header.Type |= Error
 			bufSize := h.reader.Buffered()
-			if bufSize > 2 {
+			if bufSize > 2 { // responseType + objectType + error content,so it's size > 2
 				expBuf, expErr := h.reader.Peek(bufSize)
 				if expErr == nil {
 					err = jerrors.Errorf("java exception:%s", string(expBuf[2:bufSize-1]))
 				}
 			}
 		}
-		if err != nil {
-			return jerrors.Trace(err)
-		}
-		h.rspBodyLen = header.BodyLen
-
-		return nil
-
-	default:
-		return jerrors.Errorf("Unrecognised message type: %v", pkgType)
 	}
 
-	return nil
+	// Header{req id}
+	header.ID = int64(binary.BigEndian.Uint64(buf[4:]))
+
+	// Header{body len}
+	header.BodyLen = int(binary.BigEndian.Uint32(buf[12:]))
+	if header.BodyLen < 0 {
+		return ErrIllegalPackage
+	}
+
+	h.pkgType = header.Type
+	h.bodyLen = header.BodyLen
+
+	return jerrors.Trace(err)
+
 }
 
 func (h *HessianCodec) ReadBody(rspObj interface{}) error {
-	switch h.pkgType {
+
+	buf, err := h.reader.Peek(h.bodyLen)
+	if err == bufio.ErrBufferFull {
+		return ErrBodyNotEnough
+	}
+	if err != nil {
+		return jerrors.Trace(err)
+	}
+	_, err = h.reader.Discard(h.bodyLen)
+	if err != nil { // this is impossible
+		return jerrors.Trace(err)
+	}
+
+	switch h.pkgType & 0x0f {
+	case Request | Heartbeat, Response | Heartbeat:
+		return nil
 	case Request:
+		if rspObj != nil {
+			if err = UnpackRequestBody(buf, rspObj); err != nil {
+				return jerrors.Trace(err)
+			}
+		}
+
 		return nil
 
-	case Heartbeat, Response:
-		// remark on 20180611: the heartbeat return is nil
-		//if ret == nil {
-		//	return jerrors.Errorf("@ret is nil")
-		//}
-
-		buf, err := h.reader.Peek(h.rspBodyLen)
-		if err == bufio.ErrBufferFull {
-			return ErrBodyNotEnough
-		}
-		if err != nil {
-			return jerrors.Trace(err)
-		}
-		_, err = h.reader.Discard(h.rspBodyLen)
-		if err != nil { // this is impossible
-			return jerrors.Trace(err)
-		}
-
+	case Response:
 		if rspObj != nil {
 			if err = UnpackResponseBody(buf, rspObj); err != nil {
 				return jerrors.Trace(err)
