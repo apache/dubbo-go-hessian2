@@ -66,7 +66,7 @@ func NewHessianCodec(reader *bufio.Reader) *HessianCodec {
 func (h *HessianCodec) Write(service Service, header DubboHeader, body interface{}) ([]byte, error) {
 	switch header.Type {
 	case Heartbeat:
-		if header.ResponseStatus == 0x00 {
+		if header.ResponseStatus == Zero {
 			return PackRequest(service, header, body)
 		}
 		return PackResponse(header, map[string]string{}, body)
@@ -103,19 +103,19 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 	}
 
 	// Header{serialization id(5 bit), event, two way, req/response}
-	if header.SerialID = buf[2] & SERIAL_MASK; header.SerialID == byte(0x00) {
+	if header.SerialID = buf[2] & SERIAL_MASK; header.SerialID == Zero {
 		return jerrors.Errorf("serialization ID:%v", header.SerialID)
 	}
 
 	flag := buf[2] & FLAG_EVENT
-	if flag != byte(0x00) {
+	if flag != Zero {
 		header.Type |= Heartbeat
 	}
 	flag = buf[2] & FLAG_REQUEST
-	if flag != byte(0x00) {
+	if flag != Zero {
 		header.Type |= Request
 		flag = buf[2] & FLAG_TWOWAY
-		if flag != byte(0x00) {
+		if flag != Zero {
 			header.Type |= Request_TwoWay
 		}
 	} else {

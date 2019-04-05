@@ -117,21 +117,21 @@ func UnpackResponseHeaer(buf []byte, header *DubboHeader) error {
 	}
 
 	// Header{serialization id(5 bit), event, two way, req/response}
-	if header.SerialID = buf[2] & SERIAL_MASK; header.SerialID == byte(0x00) {
+	if header.SerialID = buf[2] & SERIAL_MASK; header.SerialID == Zero {
 		return jerrors.Errorf("serialization ID:%v", header.SerialID)
 	}
 
 	flag := buf[2] & FLAG_EVENT
-	if flag != byte(0x00) {
+	if flag != Zero {
 		header.Type |= Heartbeat
 	}
 	flag = buf[3]
-	if flag != byte(0x00) {
+	if flag != Zero {
 		header.Type |= Response
 		header.ResponseStatus = flag
 	}
 	flag = buf[2] & FLAG_REQUEST
-	if flag != byte(0x00) {
+	if flag != Zero {
 		return jerrors.Errorf("response flag:%v", flag)
 	}
 

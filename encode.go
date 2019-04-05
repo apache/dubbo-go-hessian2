@@ -141,7 +141,7 @@ func (e *Encoder) Encode(v interface{}) error {
 		switch t.Kind() {
 		case reflect.Struct:
 			if p, ok := v.(POJO); ok {
-				return e.encStruct(p)
+				return e.encObject(p)
 			}
 
 			return jerrors.Errorf("struct type not Support! %s[%v] is not a instance of POJO!", t.String(), v)
@@ -151,7 +151,7 @@ func (e *Encoder) Encode(v interface{}) error {
 			return e.encMap(v)
 		default:
 			if p, ok := v.(POJOEnum); ok { // JavaEnum
-				return e.encStruct(p)
+				return e.encObject(p)
 			}
 			return jerrors.Errorf("type not supported! %s", t.Kind().String())
 		}
@@ -632,7 +632,7 @@ func typeof(v interface{}) string {
 //  x04 BLUE                # BLUE value
 //
 //x51 x91                   # object ref #1, i.e. Color.GREEN
-func (e *Encoder) encStruct(v POJO) error {
+func (e *Encoder) encObject(v POJO) error {
 	var (
 		ok     bool
 		i      int

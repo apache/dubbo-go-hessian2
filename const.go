@@ -42,6 +42,10 @@ const (
 )
 
 const (
+	Zero = byte(0x00)
+)
+
+const (
 	TAG_READ        = int32(-1)
 	ASCII_GAP       = 32
 	CHUNK_SIZE      = 4096
@@ -211,7 +215,7 @@ const (
 
 var (
 	DubboRequestHeaderBytes      = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, FLAG_REQUEST | FLAG_TWOWAY}
-	DubboResponseHeaderBytes     = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, 0x00, Response_OK}
+	DubboResponseHeaderBytes     = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, Zero, Response_OK}
 	DubboRequestHeartbeatHeader  = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, FLAG_REQUEST | FLAG_TWOWAY | FLAG_EVENT}
 	DubboResponseHeartbeatHeader = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, FLAG_EVENT}
 )
