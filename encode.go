@@ -141,7 +141,7 @@ func (e *Encoder) Encode(v interface{}) error {
 		switch t.Kind() {
 		case reflect.Struct:
 			if p, ok := v.(POJO); ok {
-				return e.encStruct(p)
+				return e.encObject(p)
 			}
 
 			return jerrors.Errorf("struct type not Support! %s[%v] is not a instance of POJO!", t.String(), v)
@@ -150,6 +150,9 @@ func (e *Encoder) Encode(v interface{}) error {
 		case reflect.Map: // 进入这个case，就说明map可能是map[string]int这种类型
 			return e.encMap(v)
 		default:
+			if p, ok := v.(POJOEnum); ok { // JavaEnum
+				return e.encObject(p)
+			}
 			return jerrors.Errorf("type not supported! %s", t.Kind().String())
 		}
 	}
@@ -629,7 +632,7 @@ func typeof(v interface{}) string {
 //  x04 BLUE                # BLUE value
 //
 //x51 x91                   # object ref #1, i.e. Color.GREEN
-func (e *Encoder) encStruct(v POJO) error {
+func (e *Encoder) encObject(v POJO) error {
 	var (
 		ok     bool
 		i      int
@@ -664,7 +667,11 @@ func (e *Encoder) encStruct(v POJO) error {
 	if idx == -1 {
 		idx, ok = checkPOJORegistry(typeof(v))
 		if !ok { // 不存在
-			idx = RegisterPOJO(v)
+			if reflect.TypeOf(v).Implements(javaEnumType) {
+				idx = RegisterJavaEnum(v.(POJOEnum))
+			} else {
+				idx = RegisterPOJO(v)
+			}
 		}
 		_, clsDef, _ = getStructDefByIndex(idx)
 		idx = len(e.classInfoList)
@@ -680,6 +687,10 @@ func (e *Encoder) encStruct(v POJO) error {
 		e.buffer = encInt32(int32(idx), e.buffer)
 	}
 
+	if reflect.TypeOf(v).Implements(javaEnumType) {
+		e.buffer = encString(v.(POJOEnum).String(), e.buffer)
+		return nil
+	}
 	num = vv.NumField()
 	for i = 0; i < num; i++ {
 		field := vv.Field(i)

@@ -16,64 +16,97 @@ package hessian
 
 import (
 	"encoding/binary"
+	"math"
 	"reflect"
+	"strconv"
+	"strings"
 )
 
 import (
 	jerrors "github.com/juju/errors"
 )
 
-// hessian decode respone
-func UnpackResponseHeaer(buf []byte, header *DubboHeader) error {
-	// length := len(buf)
-	// // hessianCodec.ReadHeader has check the header length
-	// if length < HEADER_LENGTH {
-	// 	return ErrHeaderNotEnough
-	// }
+// dubbo-remoting/dubbo-remoting-api/src/main/java/com/alibaba/dubbo/remoting/exchange/codec/ExchangeCodec.java
+// v2.7.1 line 256 encodeResponse
+// hessian encode response
+func packResponse(header DubboHeader, attachments map[string]string, ret interface{}) ([]byte, error) {
+	var (
+		byteArray []byte
+	)
 
-	if buf[0] != byte(MAGIC_HIGH) && buf[1] != byte(MAGIC_LOW) {
-		return ErrIllegalPackage
+	hb := header.Type == Heartbeat
+
+	// magic
+	if hb {
+		byteArray = append(byteArray, DubboResponseHeartbeatHeader[:]...)
+	} else {
+		byteArray = append(byteArray, DubboResponseHeaderBytes[:]...)
+	}
+	// set serialID, identify serialization types, eg: fastjson->6, hessian2->2
+	byteArray[2] |= byte(header.SerialID & SERIAL_MASK)
+	// response status
+	if header.ResponseStatus != 0 {
+		byteArray[3] = header.ResponseStatus
 	}
 
-	// Header{serialization id(5 bit), event, two way, req/response}
-	if header.SerialID = buf[2] & SERIAL_MASK; header.SerialID == byte(0x00) {
-		return jerrors.Errorf("serialization ID:%v", header.SerialID)
+	// request id
+	binary.BigEndian.PutUint64(byteArray[4:], uint64(header.ID))
+
+	// body
+	encoder := NewEncoder()
+	encoder.Append(byteArray[:HEADER_LENGTH])
+
+	if hb {
+		encoder.Encode(nil)
+	} else {
+		// com.alibaba.dubbo.rpc.protocol.dubbo.DubboCodec.DubboCodec.java
+		// v2.7.1 line191 encodeRequestData
+
+		atta := isSupportResponseAttachment(attachments[DUBBO_VERSION_KEY])
+
+		var resWithException, resValue, resNullValue int32
+		if atta {
+			resWithException = RESPONSE_WITH_EXCEPTION
+			resValue = RESPONSE_VALUE
+			resNullValue = RESPONSE_NULL_VALUE
+		} else {
+			resWithException = RESPONSE_WITH_EXCEPTION_WITH_ATTACHMENTS
+			resValue = RESPONSE_VALUE_WITH_ATTACHMENTS
+			resNullValue = RESPONSE_NULL_VALUE_WITH_ATTACHMENTS
+		}
+
+		if e, ok := ret.(error); ok { // throw error
+			encoder.Encode(resWithException)
+			encoder.Encode(e.Error())
+		} else {
+			if ret == nil {
+				encoder.Encode(resNullValue)
+			} else {
+				encoder.Encode(resValue)
+				encoder.Encode(ret) // result
+			}
+		}
+
+		if atta {
+			encoder.Encode(attachments) // attachments
+		}
 	}
 
-	flag := buf[2] & FLAG_EVENT
-	if flag != byte(0x00) {
-		header.Type |= Heartbeat
+	byteArray = encoder.Buffer()
+	byteArray = encNull(byteArray) // if not, "java client" will throw exception  "unexpected end of file"
+	pkgLen := len(byteArray)
+	if pkgLen > int(DEFAULT_LEN) { // 8M
+		return nil, jerrors.Errorf("Data length %d too large, max payload %d", pkgLen, DEFAULT_LEN)
 	}
-	flag = buf[2] & FLAG_TWOWAY
-	if flag != byte(0x00) {
-		header.Type |= Response
-	}
-	flag = buf[2] & FLAG_REQUEST
-	if flag != byte(0x00) {
-		return jerrors.Errorf("response flag:%v", flag)
-	}
+	// byteArray{body length}
+	binary.BigEndian.PutUint32(byteArray[12:], uint32(pkgLen-HEADER_LENGTH))
+	return byteArray, nil
 
-	// Header{status}
-	var err error
-	if buf[3] != Response_OK {
-		err = ErrJavaException
-		// return jerrors.Errorf("Response not OK, java exception:%s", string(buf[18:length-1]))
-	}
-
-	// Header{req id}
-	header.ID = int64(binary.BigEndian.Uint64(buf[4:]))
-
-	// Header{body len}
-	header.BodyLen = int(binary.BigEndian.Uint32(buf[12:]))
-	if header.BodyLen < 0 {
-		return ErrIllegalPackage
-	}
-
-	return err
 }
 
 // hessian decode response body
-func UnpackResponseBody(buf []byte, rspObj interface{}) error {
+// todo: need to read attachments, but don't known it's effect yet
+func unpackResponseBody(buf []byte, rspObj interface{}) error {
 	// body
 	decoder := NewDecoder(buf[:])
 	rspType, err := decoder.Decode()
@@ -82,21 +115,21 @@ func UnpackResponseBody(buf []byte, rspObj interface{}) error {
 	}
 
 	switch rspType {
-	case RESPONSE_WITH_EXCEPTION:
+	case RESPONSE_WITH_EXCEPTION, RESPONSE_WITH_EXCEPTION_WITH_ATTACHMENTS:
 		expt, err := decoder.Decode()
 		if err != nil {
 			return jerrors.Trace(err)
 		}
 		return jerrors.Errorf("got exception: %+v", expt)
 
-	case RESPONSE_VALUE:
+	case RESPONSE_VALUE, RESPONSE_VALUE_WITH_ATTACHMENTS:
 		rsp, err := decoder.Decode()
 		if err != nil {
 			return jerrors.Trace(err)
 		}
 		return jerrors.Trace(ReflectResponse(rsp, rspObj))
 
-	case RESPONSE_NULL_VALUE:
+	case RESPONSE_NULL_VALUE, RESPONSE_NULL_VALUE_WITH_ATTACHMENTS:
 		return jerrors.New("Received null")
 	}
 
@@ -192,4 +225,39 @@ func ReflectResponse(in interface{}, out interface{}) error {
 	}
 
 	return nil
+}
+
+var versionInt = make(map[string]int)
+
+func isSupportResponseAttachment(version string) bool {
+	if version == "" {
+		return false
+	}
+
+	v, ok := versionInt[version]
+	if !ok {
+		v = version2Int(version)
+		if v == -1 {
+			return false
+		}
+	}
+
+	if v >= 2001000 && v <= 2060200 {
+		return false
+	}
+	return v >= LOWEST_VERSION_FOR_RESPONSE_ATTACHMENT
+}
+
+func version2Int(version string) int {
+	var v = 0
+	varr := strings.Split(version, ".")
+	len := len(varr)
+	for key, value := range varr {
+		v0, err := strconv.Atoi(value)
+		if err != nil {
+			return -1
+		}
+		v += v0 * int(math.Pow10((len-key-1)*2))
+	}
+	return v
 }
