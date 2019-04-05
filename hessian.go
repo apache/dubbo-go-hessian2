@@ -67,14 +67,14 @@ func (h *HessianCodec) Write(service Service, header DubboHeader, body interface
 	switch header.Type {
 	case Heartbeat:
 		if header.ResponseStatus == Zero {
-			return PackRequest(service, header, body)
+			return packRequest(service, header, body)
 		}
-		return PackResponse(header, map[string]string{}, body)
+		return packResponse(header, map[string]string{}, body)
 	case Request:
-		return PackRequest(service, header, body)
+		return packRequest(service, header, body)
 
 	case Response:
-		return PackResponse(header, map[string]string{}, body)
+		return packResponse(header, map[string]string{}, body)
 
 	default:
 		return nil, jerrors.Errorf("Unrecognised message type: %v", header.Type)
@@ -170,7 +170,7 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 		return nil
 	case Request:
 		if rspObj != nil {
-			if err = UnpackRequestBody(buf, rspObj); err != nil {
+			if err = unpackRequestBody(buf, rspObj); err != nil {
 				return jerrors.Trace(err)
 			}
 		}
@@ -179,7 +179,7 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 
 	case Response:
 		if rspObj != nil {
-			if err = UnpackResponseBody(buf, rspObj); err != nil {
+			if err = unpackResponseBody(buf, rspObj); err != nil {
 				return jerrors.Trace(err)
 			}
 		}

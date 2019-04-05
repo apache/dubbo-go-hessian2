@@ -24,7 +24,7 @@ import (
 )
 
 func TestPackRequest(t *testing.T) {
-	bytes, err := PackRequest(Service{
+	bytes, err := packRequest(Service{
 		Path:      "/test",
 		Interface: "ITest",
 		Version:   "v1.0",

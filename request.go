@@ -118,7 +118,7 @@ func getArgsTypeList(args []interface{}) (string, error) {
 
 // dubbo-remoting/dubbo-remoting-api/src/main/java/com/alibaba/dubbo/remoting/exchange/codec/ExchangeCodec.java
 // v2.5.4 line 204 encodeRequest
-func PackRequest(service Service, header DubboHeader, params interface{}) ([]byte, error) {
+func packRequest(service Service, header DubboHeader, params interface{}) ([]byte, error) {
 	var (
 		err           error
 		types         string
@@ -200,45 +200,8 @@ END:
 	return byteArray, nil
 }
 
-func UnpackRequestHeaer(buf []byte, header *DubboHeader) error {
-	if buf[0] != byte(MAGIC_HIGH) && buf[1] != byte(MAGIC_LOW) {
-		return ErrIllegalPackage
-	}
-
-	// Header{serialization id(5 bit), event, two way, req/response}
-	if header.SerialID = buf[2] & SERIAL_MASK; header.SerialID == Zero {
-		return jerrors.Errorf("serialization ID:%v", header.SerialID)
-	}
-
-	flag := buf[2] & FLAG_EVENT
-	if flag != Zero {
-		header.Type |= Heartbeat
-	}
-	flag = buf[2] & FLAG_REQUEST
-	if flag != Zero {
-		header.Type |= Request
-	} else {
-		return jerrors.Errorf("response flag:%v", flag)
-	}
-	flag = buf[2] & FLAG_TWOWAY
-	if flag != Zero {
-		header.Type |= Request_TwoWay
-	}
-
-	// Header{req id}
-	header.ID = int64(binary.BigEndian.Uint64(buf[4:]))
-
-	// Header{body len}
-	header.BodyLen = int(binary.BigEndian.Uint32(buf[12:]))
-	if header.BodyLen < 0 {
-		return ErrIllegalPackage
-	}
-
-	return nil
-}
-
 // hessian decode request body
-func UnpackRequestBody(buf []byte, reqObj interface{}) error {
+func unpackRequestBody(buf []byte, reqObj interface{}) error {
 
 	req, ok := reqObj.([]interface{})
 	if !ok {

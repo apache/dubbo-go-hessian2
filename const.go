@@ -175,6 +175,9 @@ const (
 	Response_SERVER_ERROR      byte = 80
 	Response_CLIENT_ERROR      byte = 90
 
+	// According to "java dubbo" There are two cases of response:
+	// 		1. with attachments
+	// 		2. no attachments
 	RESPONSE_WITH_EXCEPTION                  int32 = 0
 	RESPONSE_VALUE                           int32 = 1
 	RESPONSE_NULL_VALUE                      int32 = 2

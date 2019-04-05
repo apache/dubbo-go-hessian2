@@ -29,7 +29,7 @@ import (
 // dubbo-remoting/dubbo-remoting-api/src/main/java/com/alibaba/dubbo/remoting/exchange/codec/ExchangeCodec.java
 // v2.7.1 line 256 encodeResponse
 // hessian encode response
-func PackResponse(header DubboHeader, attachments map[string]string, ret interface{}) ([]byte, error) {
+func packResponse(header DubboHeader, attachments map[string]string, ret interface{}) ([]byte, error) {
 	var (
 		byteArray []byte
 	)
@@ -104,58 +104,9 @@ func PackResponse(header DubboHeader, attachments map[string]string, ret interfa
 
 }
 
-// hessian decode response
-func UnpackResponseHeaer(buf []byte, header *DubboHeader) error {
-	// length := len(buf)
-	// // hessianCodec.ReadHeader has check the header length
-	// if length < HEADER_LENGTH {
-	// 	return ErrHeaderNotEnough
-	// }
-
-	if buf[0] != byte(MAGIC_HIGH) && buf[1] != byte(MAGIC_LOW) {
-		return ErrIllegalPackage
-	}
-
-	// Header{serialization id(5 bit), event, two way, req/response}
-	if header.SerialID = buf[2] & SERIAL_MASK; header.SerialID == Zero {
-		return jerrors.Errorf("serialization ID:%v", header.SerialID)
-	}
-
-	flag := buf[2] & FLAG_EVENT
-	if flag != Zero {
-		header.Type |= Heartbeat
-	}
-	flag = buf[3]
-	if flag != Zero {
-		header.Type |= Response
-		header.ResponseStatus = flag
-	}
-	flag = buf[2] & FLAG_REQUEST
-	if flag != Zero {
-		return jerrors.Errorf("response flag:%v", flag)
-	}
-
-	// Header{status}
-	var err error
-	if buf[3] != Response_OK {
-		err = ErrJavaException
-		// return jerrors.Errorf("Response not OK, java exception:%s", string(buf[18:length-1]))
-	}
-
-	// Header{req id}
-	header.ID = int64(binary.BigEndian.Uint64(buf[4:]))
-
-	// Header{body len}
-	header.BodyLen = int(binary.BigEndian.Uint32(buf[12:]))
-	if header.BodyLen < 0 {
-		return ErrIllegalPackage
-	}
-
-	return err
-}
-
 // hessian decode response body
-func UnpackResponseBody(buf []byte, rspObj interface{}) error {
+// todo: need to read attachments, but don't known it's effect yet
+func unpackResponseBody(buf []byte, rspObj interface{}) error {
 	// body
 	decoder := NewDecoder(buf[:])
 	rspType, err := decoder.Decode()
