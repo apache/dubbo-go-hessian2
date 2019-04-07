@@ -124,14 +124,14 @@ func RegisterPOJO(o POJO) int {
 
 		b = b[:0]
 		b = encByte(b, BC_OBJECT_DEF)
-		b = encString(t.javaName, b)
+		b = encString(b, t.javaName)
 		l = l[:0]
 		n = t.typ.NumField()
-		b = encInt32(int32(n), b)
+		b = encInt32(b, int32(n))
 		for i = 0; i < n; i++ {
 			f = strings.ToLower(t.typ.Field(i).Name)
 			l = append(l, f)
-			b = encString(f, b)
+			b = encString(b, f)
 		}
 
 		c = classInfo{javaName: t.javaName, fieldNameList: l}
@@ -180,13 +180,13 @@ func RegisterJavaEnum(o POJOEnum) int {
 
 		b = b[:0]
 		b = encByte(b, BC_OBJECT_DEF)
-		b = encString(t.javaName, b)
+		b = encString(b, t.javaName)
 		l = l[:0]
 		n = 1
-		b = encInt32(int32(n), b)
+		b = encInt32(b, int32(n))
 		f = strings.ToLower("name")
 		l = append(l, f)
-		b = encString(f, b)
+		b = encString(b, f)
 
 		c = classInfo{javaName: t.javaName, fieldNameList: l}
 		c.buffer = append(c.buffer, b[:]...)

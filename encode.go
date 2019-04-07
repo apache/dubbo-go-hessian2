@@ -94,16 +94,16 @@ func (e *Encoder) Encode(v interface{}) error {
 		return nil
 
 	case bool:
-		e.buffer = encBool(v.(bool), e.buffer)
+		e.buffer = encBool(e.buffer, v.(bool))
 
 	case int8:
-		e.buffer = encInt32(v.(int32), e.buffer)
+		e.buffer = encInt32(e.buffer, v.(int32))
 
 	case int16:
-		e.buffer = encInt32(v.(int32), e.buffer)
+		e.buffer = encInt32(e.buffer, v.(int32))
 
 	case int32:
-		e.buffer = encInt32(v.(int32), e.buffer)
+		e.buffer = encInt32(e.buffer, v.(int32))
 
 	case int:
 		// if v.(int) >= -2147483648 && v.(int) <= 2147483647 {
@@ -112,26 +112,26 @@ func (e *Encoder) Encode(v interface{}) error {
 		// 	b = encInt64(int64(v.(int)), b)
 		// }
 		// 把int统一按照int64处理，这样才不会导致decode的时候出现" reflect: Call using int32 as type int64 [recovered]"这种panic
-		e.buffer = encInt64(int64(v.(int)), e.buffer)
+		e.buffer = encInt64(e.buffer, int64(v.(int)))
 
 	case int64:
-		e.buffer = encInt64(v.(int64), e.buffer)
+		e.buffer = encInt64(e.buffer, v.(int64))
 
 	case time.Time:
-		e.buffer = encDateInMs(v.(time.Time), e.buffer)
+		e.buffer = encDateInMs(e.buffer, v.(time.Time))
 		// e.buffer = encDateInMimute(v.(time.Time), e.buffer)
 
 	case float32:
-		e.buffer = encFloat(float64(v.(float32)), e.buffer)
+		e.buffer = encFloat(e.buffer, float64(v.(float32)))
 
 	case float64:
-		e.buffer = encFloat(v.(float64), e.buffer)
+		e.buffer = encFloat(e.buffer, v.(float64))
 
 	case string:
-		e.buffer = encString(v.(string), e.buffer)
+		e.buffer = encString(e.buffer, v.(string))
 
 	case []byte:
-		e.buffer = encBinary(v.([]byte), e.buffer)
+		e.buffer = encBinary(e.buffer, v.([]byte))
 
 	case map[interface{}]interface{}:
 		return e.encUntypedMap(v.(map[interface{}]interface{}))
@@ -170,7 +170,7 @@ func encByte(b []byte, t ...byte) []byte {
 
 //encRef encode ref index
 func encRef(b []byte, index int) []byte {
-	return encInt32(int32(index), append(b, BC_REF))
+	return encInt32(append(b, BC_REF), int32(index))
 }
 
 /////////////////////////////////////////
@@ -187,7 +187,7 @@ func encNull(b []byte) []byte {
 // # boolean true/false
 // ::= 'T'
 // ::= 'F'
-func encBool(v bool, b []byte) []byte {
+func encBool(b []byte, v bool) []byte {
 	var c byte = BC_FALSE
 	if v == true {
 		c = BC_TRUE
@@ -206,7 +206,7 @@ func encBool(v bool, b []byte) []byte {
 // ::= [xc0-xcf] b0          # -x800 to x7ff
 // ::= [xd0-xd7] b1 b0       # -x40000 to x3ffff
 // hessian-lite/src/main/java/com/alibaba/com/alibaba/com/caucho/hessian/io/Hessian2Output.java:642 WriteInt
-func encInt32(v int32, b []byte) []byte {
+func encInt32(b []byte, v int32) []byte {
 	if int32(INT_DIRECT_MIN) <= v && v <= int32(INT_DIRECT_MAX) {
 		return encByte(b, byte(v+int32(BC_INT_ZERO)))
 	} else if int32(INT_BYTE_MIN) <= v && v <= int32(INT_BYTE_MAX) {
@@ -229,7 +229,7 @@ func encInt32(v int32, b []byte) []byte {
 // ::= [x38-x3f] b1 b0       # -x40000 to x3ffff
 // ::= x59 b3 b2 b1 b0       # 32-bit integer cast to long
 // hessian-lite/src/main/java/com/alibaba/com/alibaba/com/caucho/hessian/io/Hessian2Output.java:642 WriteLong
-func encInt64(v int64, b []byte) []byte {
+func encInt64(b []byte, v int64) []byte {
 	if int64(LONG_DIRECT_MIN) <= v && v <= int64(LONG_DIRECT_MAX) {
 		return encByte(b, byte(v+int64(BC_LONG_ZERO)))
 	} else if int64(LONG_BYTE_MIN) <= v && v <= int64(LONG_BYTE_MAX) {
@@ -250,12 +250,12 @@ func encInt64(v int64, b []byte) []byte {
 // # time in UTC encoded as 64-bit long milliseconds since epoch
 // ::= x4a b7 b6 b5 b4 b3 b2 b1 b0
 // ::= x4b b3 b2 b1 b0       # minutes since epoch
-func encDateInMs(v time.Time, b []byte) []byte {
+func encDateInMs(b []byte, v time.Time) []byte {
 	b = append(b, BC_DATE)
 	return append(b, PackInt64(v.UnixNano()/1e6)...)
 }
 
-func encDateInMimute(v time.Time, b []byte) []byte {
+func encDateInMimute(b []byte, v time.Time) []byte {
 	b = append(b, BC_DATE_MINUTE)
 	return append(b, PackInt32(int32(v.UnixNano()/60e9))...)
 }
@@ -271,7 +271,7 @@ func encDateInMimute(v time.Time, b []byte) []byte {
 // ::= x5d b0                # byte cast to double (-128.0 to 127.0)
 // ::= x5e b1 b0             # short cast to double
 // ::= x5f b3 b2 b1 b0       # 32-bit float cast to double
-func encFloat(v float64, b []byte) []byte {
+func encFloat(b []byte, v float64) []byte {
 	fv := float64(int64(v))
 	if fv == v {
 		iv := int64(v)
@@ -314,7 +314,7 @@ func Slice(s string) (b []byte) {
 // ::= 'S' b1 b0 <utf8-data>         # string of length 0-65535
 // ::= [x00-x1f] <utf8-data>         # string of length 0-31
 // ::= [x30-x34] <utf8-data>         # string of length 0-1023
-func encString(v string, b []byte) []byte {
+func encString(b []byte, v string) []byte {
 	var (
 		vBuf = *bytes.NewBufferString(v)
 		vLen = utf8.RuneCountInString(v)
@@ -367,7 +367,7 @@ func encString(v string, b []byte) []byte {
 // ::= x42(B) b1 b0 <binary-data>        # final chunk
 // ::= [x20-x2f] <binary-data>           # binary data of length 0-15
 // ::= [x34-x37] <binary-data>           # binary data of length 0-1023
-func encBinary(v []byte, b []byte) []byte {
+func encBinary(b []byte, v []byte) []byte {
 	var (
 		length  uint16
 		vLength int
@@ -427,7 +427,7 @@ func (e *Encoder) encUntypedList(v interface{}) error {
 	}
 
 	e.buffer = encByte(e.buffer, BC_LIST_FIXED_UNTYPED) // x58
-	e.buffer = encInt32(int32(value.Len()), e.buffer)
+	e.buffer = encInt32(e.buffer, int32(value.Len()))
 	for i := 0; i < value.Len(); i++ {
 		if err = e.Encode(value.Index(i).Interface()); err != nil {
 			return err
@@ -684,11 +684,11 @@ func (e *Encoder) encObject(v POJO) error {
 		e.buffer = encByte(e.buffer, byte(idx)+BC_OBJECT_DIRECT)
 	} else {
 		e.buffer = encByte(e.buffer, BC_OBJECT)
-		e.buffer = encInt32(int32(idx), e.buffer)
+		e.buffer = encInt32(e.buffer, int32(idx))
 	}
 
 	if reflect.TypeOf(v).Implements(javaEnumType) {
-		e.buffer = encString(v.(POJOEnum).String(), e.buffer)
+		e.buffer = encString(e.buffer, v.(POJOEnum).String())
 		return nil
 	}
 	num = vv.NumField()
