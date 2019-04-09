@@ -209,7 +209,7 @@ func unpackRequestBody(buf []byte, reqObj interface{}) error {
 		return jerrors.Errorf("@reqObj is not of type: []interface{}")
 	}
 	if len(req) < 7 {
-		return jerrors.New("reqObj need length 7")
+		return jerrors.New("length of @reqObj should  be 7")
 	}
 
 	var (
