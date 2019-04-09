@@ -17,6 +17,7 @@ package hessian
 import (
 	"encoding/binary"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -207,6 +208,9 @@ func unpackRequestBody(buf []byte, reqObj interface{}) error {
 	if !ok {
 		return jerrors.Errorf("@reqObj is not of type: []interface{}")
 	}
+	if len(req) < 7 {
+		return jerrors.New("reqObj need length 7")
+	}
 
 	var (
 		err                                                     error
@@ -245,9 +249,13 @@ func unpackRequestBody(buf []byte, reqObj interface{}) error {
 	}
 	req[4] = argsTypes
 
-	ats := strings.Split(argsTypes.(string), ";")
+	reg, err := regexp.Compile(DESC_REGEX)
+	if err != nil {
+		return jerrors.Trace(err)
+	}
+	ats := reg.FindAllString(argsTypes.(string), -1)
 	var arg interface{}
-	for i := 0; i < len(ats)-1; i++ {
+	for i := 0; i < len(ats); i++ {
 		arg, err = decoder.Decode()
 		if err != nil {
 			return jerrors.Trace(err)

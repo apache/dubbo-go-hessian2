@@ -151,3 +151,32 @@ func TestCopySlice(t *testing.T) {
 	assert.True(t, reflect.DeepEqual(r1, s1r[0]))
 	assert.True(t, reflect.DeepEqual(r2, s1r[1]))
 }
+
+func TestIsSupportResponseAttachment(t *testing.T) {
+	is := isSupportResponseAttachment("2.0.10")
+	assert.True(t, is)
+
+	is = isSupportResponseAttachment("2.5.3")
+	assert.True(t, is)
+
+	is = isSupportResponseAttachment("2.6.2")
+	assert.True(t, is)
+
+	is = isSupportResponseAttachment("1.5.5")
+	assert.False(t, is)
+
+	is = isSupportResponseAttachment("2.7.2")
+	assert.False(t, is)
+}
+
+func TestVersion2Int(t *testing.T) {
+	v := version2Int("2.0.6")
+	assert.Equal(t, 2000600, v)
+
+	v = version2Int("21.7.10")
+	assert.Equal(t, 21071000, v)
+
+	v = version2Int("2.11.0")
+	assert.Equal(t, 2110000, v)
+
+}
