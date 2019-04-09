@@ -3,10 +3,13 @@ package hessian
 import (
 	"bufio"
 	"bytes"
-	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
 	"time"
+)
+
+import (
+	"github.com/stretchr/testify/assert"
 )
 
 type Case struct {
