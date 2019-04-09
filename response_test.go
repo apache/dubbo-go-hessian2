@@ -154,19 +154,19 @@ func TestCopySlice(t *testing.T) {
 
 func TestIsSupportResponseAttachment(t *testing.T) {
 	is := isSupportResponseAttachment("2.0.10")
-	assert.True(t, is)
+	assert.False(t, is)
 
 	is = isSupportResponseAttachment("2.5.3")
-	assert.True(t, is)
+	assert.False(t, is)
 
 	is = isSupportResponseAttachment("2.6.2")
-	assert.True(t, is)
+	assert.False(t, is)
 
 	is = isSupportResponseAttachment("1.5.5")
 	assert.False(t, is)
 
 	is = isSupportResponseAttachment("2.7.2")
-	assert.False(t, is)
+	assert.True(t, is)
 }
 
 func TestVersion2Int(t *testing.T) {
