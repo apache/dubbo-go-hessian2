@@ -151,3 +151,56 @@ func TestCopySlice(t *testing.T) {
 	assert.True(t, reflect.DeepEqual(r1, s1r[0]))
 	assert.True(t, reflect.DeepEqual(r2, s1r[1]))
 }
+
+func TestIsSupportResponseAttachment(t *testing.T) {
+	is := isSupportResponseAttachment("2.0.10")
+	assert.False(t, is)
+
+	is = isSupportResponseAttachment("2.5.3")
+	assert.False(t, is)
+
+	is = isSupportResponseAttachment("2.6.2")
+	assert.False(t, is)
+
+	is = isSupportResponseAttachment("1.5.5")
+	assert.False(t, is)
+
+	is = isSupportResponseAttachment("0.0.0")
+	assert.False(t, is)
+
+	is = isSupportResponseAttachment("2.0.2")
+	assert.True(t, is)
+
+	is = isSupportResponseAttachment("2.7.2")
+	assert.True(t, is)
+}
+
+func TestVersion2Int(t *testing.T) {
+	v := version2Int("2.1.3")
+	assert.Equal(t, 2010300, v)
+
+	v = version2Int("22.11.33")
+	assert.Equal(t, 22113300, v)
+
+	v = version2Int("222.111.333")
+	assert.Equal(t, 223143300, v)
+
+	v = version2Int("220.110.333")
+	assert.Equal(t, 221133300, v)
+
+	v = version2Int("229.119.333")
+	assert.Equal(t, 230223300, v)
+
+	v = version2Int("2222.1111.3333")
+	assert.Equal(t, 2233443300, v)
+
+	v = version2Int("2.11")
+	assert.Equal(t, 211, v)
+
+	v = version2Int("2.1.3.4")
+	assert.Equal(t, 2010304, v)
+
+	v = version2Int("2.1.3.4.5")
+	assert.Equal(t, 201030405, v)
+
+}

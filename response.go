@@ -229,6 +229,10 @@ func ReflectResponse(in interface{}, out interface{}) error {
 
 var versionInt = make(map[string]int)
 
+// isSupportResponseAttachment is for compatibility among some dubbo version
+// but we haven't used it yet.
+// dubbo-common/src/main/java/org/apache/dubbo/common/Version.java
+// v2.7.1 line 96
 func isSupportResponseAttachment(version string) bool {
 	if version == "" {
 		return false
@@ -242,7 +246,7 @@ func isSupportResponseAttachment(version string) bool {
 		}
 	}
 
-	if v >= 2001000 && v <= 2060200 {
+	if v >= 2001000 && v <= 2060200 { // 2.0.10 ~ 2.6.2
 		return false
 	}
 	return v >= LOWEST_VERSION_FOR_RESPONSE_ATTACHMENT
@@ -258,6 +262,9 @@ func version2Int(version string) int {
 			return -1
 		}
 		v += v0 * int(math.Pow10((len-key-1)*2))
+	}
+	if len == 3 {
+		return v * 100
 	}
 	return v
 }

@@ -38,8 +38,36 @@ func TestPackRequest(t *testing.T) {
 	}, []interface{}{1, 2})
 
 	assert.Nil(t, err)
-	
+
 	if bytes != nil {
 		t.Logf("pack request: %s", string(bytes))
 	}
+}
+
+func TestDescRegex(t *testing.T) {
+	results := DescRegex.FindAllString("Ljava/lang/String;", -1)
+	assert.Equal(t, 1, len(results))
+	assert.Equal(t, "Ljava/lang/String;", results[0])
+
+	results = DescRegex.FindAllString("Ljava/lang/String;I", -1)
+	assert.Equal(t, 2, len(results))
+	assert.Equal(t, "Ljava/lang/String;", results[0])
+	assert.Equal(t, "I", results[1])
+
+	results = DescRegex.FindAllString("ILjava/lang/String;", -1)
+	assert.Equal(t, 2, len(results))
+	assert.Equal(t, "I", results[0])
+	assert.Equal(t, "Ljava/lang/String;", results[1])
+
+	results = DescRegex.FindAllString("ILjava/lang/String;IZ", -1)
+	assert.Equal(t, 4, len(results))
+	assert.Equal(t, "I", results[0])
+	assert.Equal(t, "Ljava/lang/String;", results[1])
+	assert.Equal(t, "I", results[2])
+	assert.Equal(t, "Z", results[3])
+
+	results = DescRegex.FindAllString("[Ljava/lang/String;[I", -1)
+	assert.Equal(t, 2, len(results))
+	assert.Equal(t, "[Ljava/lang/String;", results[0])
+	assert.Equal(t, "[I", results[1])
 }

@@ -34,6 +34,7 @@ package hessian
 
 import (
 	jerrors "github.com/juju/errors"
+	"regexp"
 )
 
 const (
@@ -216,6 +217,14 @@ const (
 	DEFAULT_LEN                            = 8388608 // 8 * 1024 * 1024 default body max length
 )
 
+// regular
+const (
+	JAVA_IDENT_REGEX = "(?:[_$a-zA-Z][_$a-zA-Z0-9]*)"
+	CLASS_DESC       = "(?:L" + JAVA_IDENT_REGEX + "(?:\\/" + JAVA_IDENT_REGEX + ")*;)"
+	ARRAY_DESC       = "(?:\\[+(?:(?:[VZBCDFIJS])|" + CLASS_DESC + "))"
+	DESC_REGEX       = "(?:(?:[VZBCDFIJS])|" + CLASS_DESC + "|" + ARRAY_DESC + ")"
+)
+
 var (
 	DubboRequestHeaderBytes      = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, FLAG_REQUEST | FLAG_TWOWAY}
 	DubboResponseHeaderBytes     = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, Zero, Response_OK}
@@ -229,3 +238,5 @@ var (
 	ErrJavaException   = jerrors.New("got java exception")
 	ErrIllegalPackage  = jerrors.New("illegal package!")
 )
+
+var DescRegex, _ = regexp.Compile(DESC_REGEX)

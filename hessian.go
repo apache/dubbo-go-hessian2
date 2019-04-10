@@ -120,6 +120,7 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 		}
 	} else {
 		header.Type |= Response
+		header.ResponseStatus = buf[3]
 
 		// Header{status}
 		if buf[3] != Response_OK {
