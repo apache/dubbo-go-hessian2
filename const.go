@@ -34,6 +34,7 @@ package hessian
 
 import (
 	jerrors "github.com/juju/errors"
+	"regexp"
 )
 
 const (
@@ -237,3 +238,5 @@ var (
 	ErrJavaException   = jerrors.New("got java exception")
 	ErrIllegalPackage  = jerrors.New("illegal package!")
 )
+
+var DescRegex, _ = regexp.Compile(DESC_REGEX)
