@@ -297,7 +297,6 @@ func (d *Decoder) decInt32(flag int32) (int32, error) {
 	var (
 		err error
 		tag byte
-		buf [4]byte
 	)
 
 	if flag != TAG_READ {
@@ -308,25 +307,34 @@ func (d *Decoder) decInt32(flag int32) (int32, error) {
 
 	switch {
 	case tag >= 0x80 && tag <= 0xbf:
-		return int32(int8(tag - BC_INT_ZERO)), nil
+		i8 := int8(tag - BC_INT_ZERO)
+		return int32(i8), nil
 
 	case tag >= 0xc0 && tag <= 0xcf:
-		if _, err = io.ReadFull(d.reader, buf[:1]); err != nil {
+		buf := []byte{tag - BC_INT_BYTE_ZERO, 0}
+		if _, err = io.ReadFull(d.reader, buf[1:]); err != nil {
 			return 0, jerrors.Trace(err)
 		}
-		return int32(int8(tag - BC_INT_BYTE_ZERO)) << 8 + int32(buf[0]), nil
+		u16 := binary.BigEndian.Uint16(buf)
+		i16 := int16(u16)
+		return int32(i16), nil
 
 	case tag >= 0xd0 && tag <= 0xd7:
-		if _, err = io.ReadFull(d.reader, buf[:2]); err != nil {
+		buf := []byte{0, tag - BC_INT_SHORT_ZERO, 0, 0}
+		if _, err = io.ReadFull(d.reader, buf[2:]); err != nil {
 			return 0, jerrors.Trace(err)
 		}
-		return int32(int8(tag - BC_INT_SHORT_ZERO)) << 16 + int32(buf[0]) << 8 + int32(buf[1]), nil
+		// Use int32 to represent int24.
+		if buf[1] & 0x80 != 0 {
+			buf[0] = 0xff
+		}
+		u32 := binary.BigEndian.Uint32(buf)
+		return int32(u32), nil
 
 	case tag == BC_INT:
-		if _, err = io.ReadFull(d.reader, buf[:4]); err != nil {
-			return 0, jerrors.Trace(err)
-		}
-		return int32(buf[0]) << 24 + int32(buf[1]) << 16 + int32(buf[2]) << 8 + int32(buf[3]), nil
+		var i32 int32
+		err = binary.Read(d.reader, binary.BigEndian, &i32)
+		return i32, jerrors.Trace(err)
 
 	default:
 		return 0, jerrors.Errorf("decInt32 integer wrong tag:%#x", tag)
@@ -400,32 +408,41 @@ func (d *Decoder) decInt64(flag int32) (int64, error) {
 		i32, err := d.decInt32(TAG_READ)
 		return int64(i32), err
 
-	case tag == BC_LONG_INT: // x59
+	case tag == BC_LONG_INT:
 		var t int32
 		err = binary.Read(d.reader, binary.BigEndian, &t)
 		return int64(t), jerrors.Trace(err)
 
 	case tag >= 0xd8 && tag <= 0xef:
-		return int64(int8(tag - BC_LONG_ZERO)), nil
+		i8 := int8(tag - BC_LONG_ZERO)
+		return int64(i8), nil
 
 	case tag >= 0xf0 && tag <= 0xff:
-		if _, err = io.ReadFull(d.reader, buf[:1]); err != nil {
+		buf := []byte{tag - BC_LONG_BYTE_ZERO, 0}
+		if _, err = io.ReadFull(d.reader, buf[1:]); err != nil {
 			return 0, jerrors.Trace(err)
 		}
-		return int64(int8(tag - BC_LONG_BYTE_ZERO)) << 8 + int64(buf[0]), nil
+		u16 := binary.BigEndian.Uint16(buf)
+		i16 := int16(u16)
+		return int64(i16), nil
 
-	case tag >= 0x38 && tag <= 0x3f: // ['8',  '?']
-		if _, err = io.ReadFull(d.reader, buf[:2]); err != nil {
+	case tag >= 0x38 && tag <= 0x3f:
+		buf := []byte{0, tag - BC_LONG_SHORT_ZERO, 0, 0}
+		if _, err = io.ReadFull(d.reader, buf[2:]); err != nil {
 			return 0, jerrors.Trace(err)
 		}
-		return int64(int8(tag - BC_LONG_SHORT_ZERO)) << 16 + int64(buf[0]) << 8 + int64(buf[1]), nil
+		// Use int32 to represent int24.
+		if buf[1] & 0x80 != 0 {
+			buf[0] = 0xff
+		}
+		u32 := binary.BigEndian.Uint32(buf)
+		i32 := int32(u32)
+		return int64(i32), nil
 
-	case tag == BC_LONG: // 'L'
-		if _, err = io.ReadFull(d.reader, buf[:8]); err != nil {
-			return 0, jerrors.Trace(err)
-		}
-		return int64(buf[0]) << 56 + int64(buf[1]) << 48 + int64(buf[2]) << 40 + int64(buf[3]) << 32 +
-			int64(buf[4]) << 24 + int64(buf[5]) << 16 + int64(buf[6]) << 8 + int64(buf[7]), nil
+	case tag == BC_LONG:
+		var i64 int64
+		err = binary.Read(d.reader, binary.BigEndian, &i64)
+		return i64, jerrors.Trace(err)
 
 	case tag == BC_DOUBLE_ZERO:
 		return int64(0), nil
@@ -530,24 +547,24 @@ func (d *Decoder) decDouble(flag int32) (interface{}, error) {
 		return float64(1), nil
 
 	case BC_DOUBLE_BYTE:
-		var bits8 int8
-		err = binary.Read(d.reader, binary.BigEndian, &bits8)
-		return float64(bits8), jerrors.Trace(err)
+		var i8 int8
+		err = binary.Read(d.reader, binary.BigEndian, &i8)
+		return float64(i8), jerrors.Trace(err)
 
 	case BC_DOUBLE_SHORT:
-		var bits16 int16
-		err = binary.Read(d.reader, binary.BigEndian, &bits16)
-		return float64(bits16), jerrors.Trace(err)
+		var i16 int16
+		err = binary.Read(d.reader, binary.BigEndian, &i16)
+		return float64(i16), jerrors.Trace(err)
 
 	case BC_DOUBLE_MILL:
-		var bits32 int32
-		err = binary.Read(d.reader, binary.BigEndian, &bits32)
-		return float64(bits32) / 1000, jerrors.Trace(err)
+		var i32 int32
+		err = binary.Read(d.reader, binary.BigEndian, &i32)
+		return float64(i32) / 1000, jerrors.Trace(err)
 
 	case BC_DOUBLE:
-		var bits64 float64
-		err = binary.Read(d.reader, binary.BigEndian, &bits64)
-		return bits64, jerrors.Trace(err)
+		var f64 float64
+		err = binary.Read(d.reader, binary.BigEndian, &f64)
+		return f64, jerrors.Trace(err)
 	}
 
 	return nil, jerrors.Errorf("decDouble parse double wrong tag:%d-%#x", int(tag), tag)
