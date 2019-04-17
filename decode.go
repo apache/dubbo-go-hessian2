@@ -312,7 +312,8 @@ func (d *Decoder) decInt32(flag int32) (int32, error) {
 
 	case tag >= 0xc0 && tag <= 0xcf:
 		buf := []byte{tag - BC_INT_BYTE_ZERO, 0}
-		if _, err = io.ReadFull(d.reader, buf[1:]); err != nil {
+		_, err = io.ReadFull(d.reader, buf[1:])
+		if err != nil {
 			return 0, jerrors.Trace(err)
 		}
 		u16 := binary.BigEndian.Uint16(buf)
@@ -320,13 +321,14 @@ func (d *Decoder) decInt32(flag int32) (int32, error) {
 		return int32(i16), nil
 
 	case tag >= 0xd0 && tag <= 0xd7:
-		buf := []byte{0, tag - BC_INT_SHORT_ZERO, 0, 0}
-		if _, err = io.ReadFull(d.reader, buf[2:]); err != nil {
-			return 0, jerrors.Trace(err)
-		}
 		// Use int32 to represent int24.
+		buf := []byte{0, tag - BC_INT_SHORT_ZERO, 0, 0}
 		if buf[1] & 0x80 != 0 {
 			buf[0] = 0xff
+		}
+		_, err = io.ReadFull(d.reader, buf[2:])
+		if err != nil {
+			return 0, jerrors.Trace(err)
 		}
 		u32 := binary.BigEndian.Uint32(buf)
 		return int32(u32), nil
@@ -409,9 +411,9 @@ func (d *Decoder) decInt64(flag int32) (int64, error) {
 		return int64(i32), err
 
 	case tag == BC_LONG_INT:
-		var t int32
-		err = binary.Read(d.reader, binary.BigEndian, &t)
-		return int64(t), jerrors.Trace(err)
+		var i32 int32
+		err = binary.Read(d.reader, binary.BigEndian, &i32)
+		return int64(i32), jerrors.Trace(err)
 
 	case tag >= 0xd8 && tag <= 0xef:
 		i8 := int8(tag - BC_LONG_ZERO)
@@ -419,7 +421,8 @@ func (d *Decoder) decInt64(flag int32) (int64, error) {
 
 	case tag >= 0xf0 && tag <= 0xff:
 		buf := []byte{tag - BC_LONG_BYTE_ZERO, 0}
-		if _, err = io.ReadFull(d.reader, buf[1:]); err != nil {
+		_, err = io.ReadFull(d.reader, buf[1:])
+		if err != nil {
 			return 0, jerrors.Trace(err)
 		}
 		u16 := binary.BigEndian.Uint16(buf)
@@ -427,13 +430,14 @@ func (d *Decoder) decInt64(flag int32) (int64, error) {
 		return int64(i16), nil
 
 	case tag >= 0x38 && tag <= 0x3f:
-		buf := []byte{0, tag - BC_LONG_SHORT_ZERO, 0, 0}
-		if _, err = io.ReadFull(d.reader, buf[2:]); err != nil {
-			return 0, jerrors.Trace(err)
-		}
 		// Use int32 to represent int24.
+		buf := []byte{0, tag - BC_LONG_SHORT_ZERO, 0, 0}
 		if buf[1] & 0x80 != 0 {
 			buf[0] = 0xff
+		}
+		_, err = io.ReadFull(d.reader, buf[2:])
+		if err != nil {
+			return 0, jerrors.Trace(err)
 		}
 		u32 := binary.BigEndian.Uint32(buf)
 		i32 := int32(u32)
@@ -799,8 +803,6 @@ func (d *Decoder) decBinary(flag int32) ([]byte, error) {
 		err    error
 		tag    byte
 		length int
-		chunk  [CHUNK_SIZE]byte
-		data   []byte
 	)
 
 	if flag != TAG_READ {
@@ -813,30 +815,31 @@ func (d *Decoder) decBinary(flag int32) ([]byte, error) {
 		return []byte(""), nil
 	}
 
-	data = make([]byte, 0, CHUNK_SIZE<<1)
-	for tag == BC_BINARY_CHUNK {
+	data := make([]byte, 0)
+	buf := make([]byte, 65536)
+	for {
 		length, err = d.getBinaryLength(tag)
-		if err != nil || CHUNK_SIZE < length {
-			return nil, jerrors.Annotatef(err, "getBinaryLength(tag:%d) = length:%d", tag, length)
-		}
-		_, err = io.ReadFull(d.reader, chunk[:length])
 		if err != nil {
-			return nil, jerrors.Annotatef(err, "decBinary->io.ReadFull(len:%d)", length)
+			return nil, jerrors.Trace(err)
 		}
-		data = append(data, chunk[:length]...)
-		tag, _ = d.readBufByte()
-	}
 
-	length, err = d.getBinaryLength(tag)
-	if err != nil || CHUNK_SIZE < length {
-		return nil, jerrors.Annotatef(err, "decBinary->getBinaryLength(tag:%d) = length:%d", tag, length)
-	}
-	_, err = io.ReadFull(d.reader, chunk[:length])
-	if err != nil {
-		return nil, jerrors.Annotatef(err, "decBinary->io.ReadFull(len:%d)", length)
-	}
+		_, err = io.ReadFull(d.reader, buf[:length])
+		if err != nil {
+			return nil, jerrors.Trace(err)
+		}
 
-	return append(data, chunk[:length]...), nil
+		data = append(data, buf[:length]...)
+
+		if tag != BC_BINARY_CHUNK {
+			break
+		}
+
+		tag, err = d.readBufByte()
+		if err != nil {
+			return nil, jerrors.Trace(err)
+		}
+	}
+	return data, nil
 }
 
 /////////////////////////////////////////

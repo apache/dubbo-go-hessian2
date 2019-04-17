@@ -24,6 +24,8 @@ import (
 	"encoding/binary"
 	"testing"
 	"reflect"
+	"fmt"
+	"time"
 )
 
 func encodeCall(method string) []byte {
@@ -69,6 +71,72 @@ func decodeResponse(method string) (interface{}, error) {
 		return nil, e
 	}
 	return r, nil
+}
+
+func testBinaryFramework(t *testing.T, method string, expected []byte) {
+	r, e := decodeResponse(method)
+	if e != nil {
+		t.Errorf("%s: decode fail with error %v", method, e)
+		return
+	}
+
+	v, ok := r.([]byte)
+	if ! ok {
+		t.Errorf("%s: %v is not binary", method, r)
+		return
+	}
+
+	if ! bytes.Equal(v, expected) {
+		t.Errorf("%s: got %v, wanted %v", method, v, expected)
+	}
+}
+
+func TestBinary(t *testing.T) {
+	s0 := ""
+	s1 := "0"
+	s16 := "0123456789012345"
+
+	s1024 := ""
+	for i := 0; i < 16; i++ {
+		s1024 += fmt.Sprintf("%02d 456789012345678901234567890123456789012345678901234567890123\n", i)
+	}
+
+	s65560 := ""
+	for i := 0; i < 1024; i++ {
+		s65560 += fmt.Sprintf("%03d 56789012345678901234567890123456789012345678901234567890123\n", i)
+	}
+
+	testBinaryFramework(t, "replyBinary_0", []byte(s0))
+	testBinaryFramework(t, "replyBinary_1", []byte(s1))
+	testBinaryFramework(t, "replyBinary_1023", []byte(s1024[:1023]))
+	testBinaryFramework(t, "replyBinary_1024", []byte(s1024))
+	testBinaryFramework(t, "replyBinary_15", []byte(s16[:15]))
+	testBinaryFramework(t, "replyBinary_16", []byte(s16))
+	testBinaryFramework(t, "replyBinary_65536", []byte(s65560[:65536]))
+}
+
+func testDateFramework(t *testing.T, method string, expected time.Time) {
+	r, e := decodeResponse(method)
+	if e != nil {
+		t.Errorf("%s: decode fail with error %v", method, e)
+		return
+	}
+
+	v, ok := r.(time.Time)
+	if ! ok {
+		t.Errorf("%s: %v is not date", method, r)
+		return
+	}
+
+	if ! v.Equal(expected) {
+		t.Errorf("%s: got %v, wanted %v", method, v, expected)
+	}
+}
+
+func TestDate(t *testing.T) {
+	testDateFramework(t, "replyDate_0", time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC))
+	testDateFramework(t, "replyDate_1", time.Date(1998, 5, 8, 9, 51, 31, 0, time.UTC))
+	testDateFramework(t, "replyDate_2", time.Date(1998, 5, 8, 9, 51, 0, 0, time.UTC))
 }
 
 func testDoubleFramework(t *testing.T, method string, expected float64) {
@@ -203,14 +271,20 @@ func TestLong(t *testing.T) {
 	testLongFramework(t, "replyLong_m9", -9)
 }
 
-func TestNull(t *testing.T) {
-	r, e := decodeResponse("replyNull")
+func testNullFramework(t *testing.T, method string) {
+	r, e := decodeResponse(method)
 	if e != nil {
-		t.Errorf("replyNull: decode fail with error %v", e)
+		t.Errorf("%s: decode fail with error %v", method, e)
 		return
 	}
 
 	if reflect.TypeOf(r) != nil {  // detect nil interface, not only nil value
-		t.Errorf("replyNull: %v is not null", r)
+		t.Errorf("%s: %v is not null", method, r)
 	}
+}
+
+func TestNull(t *testing.T) {
+	testNullFramework(t, "replyBinary_null")
+	testNullFramework(t, "replyNull")
+	testNullFramework(t, "replyString_null")
 }
