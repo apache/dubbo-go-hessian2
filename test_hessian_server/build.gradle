@@ -1,0 +1,20 @@
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'com.caucho', name: 'hessian', version: '4.0.60'
+    compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.16.v20190411'
+    compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.16.v20190411'
+}
+
+jar {
+    from {configurations.compile.collect {it.isDirectory() ? it : zipTree(it)}}
+    manifest {
+        attributes 'Main-Class': 'test.HessianServer'
+    }
+}

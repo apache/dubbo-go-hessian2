@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Unit test for decoding hessian2 based on official api. One can find api
-// doc on http://javadoc4.caucho.com/com/caucho/hessian/test/TestHessian2.html
+// Unit test for decoding hessian2 based on official api with doc on
+// http://javadoc4.caucho.com/com/caucho/hessian/test/TestHessian2.html.
+// One can use the api by starting a local server in test_hessian_server,
+// or sending a request to the remote server http://hessian.caucho.com/test/test
+// directly.
 package hessian
 
 import (
@@ -43,7 +46,7 @@ func sendRequest(method string) []byte {
 
 	req, err := http.NewRequest(
 		"POST",
-		"http://hessian.caucho.com/test/test",
+		"http://localhost:8080",
 		bytes.NewReader(encodeCall(method)),
 	)
 	if err != nil {
