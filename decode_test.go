@@ -17,14 +17,14 @@
 package hessian
 
 import (
-	"net/http"
 	"bytes"
-	"log"
-	"io/ioutil"
 	"encoding/binary"
-	"testing"
-	"reflect"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"reflect"
+	"testing"
 	"time"
 )
 
@@ -60,7 +60,7 @@ func sendRequest(method string) []byte {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return body[4:]  // skip H 0x02 0x00
+	return body[4:] // skip H 0x02 0x00
 }
 
 func decodeResponse(method string) (interface{}, error) {
@@ -81,12 +81,12 @@ func testBinaryFramework(t *testing.T, method string, expected []byte) {
 	}
 
 	v, ok := r.([]byte)
-	if ! ok {
+	if !ok {
 		t.Errorf("%s: %v is not binary", method, r)
 		return
 	}
 
-	if ! bytes.Equal(v, expected) {
+	if !bytes.Equal(v, expected) {
 		t.Errorf("%s: got %v, wanted %v", method, v, expected)
 	}
 }
@@ -123,12 +123,12 @@ func testDateFramework(t *testing.T, method string, expected time.Time) {
 	}
 
 	v, ok := r.(time.Time)
-	if ! ok {
+	if !ok {
 		t.Errorf("%s: %v is not date", method, r)
 		return
 	}
 
-	if ! v.Equal(expected) {
+	if !v.Equal(expected) {
 		t.Errorf("%s: got %v, wanted %v", method, v, expected)
 	}
 }
@@ -147,7 +147,7 @@ func testDoubleFramework(t *testing.T, method string, expected float64) {
 	}
 
 	v, ok := r.(float64)
-	if ! ok {
+	if !ok {
 		t.Errorf("%s: %v is not double", method, r)
 		return
 	}
@@ -181,7 +181,7 @@ func testBooleanFramework(t *testing.T, method string, expected bool) {
 	}
 
 	v, ok := r.(bool)
-	if ! ok {
+	if !ok {
 		t.Errorf("%s: %v is not bool", method, r)
 		return
 	}
@@ -204,7 +204,7 @@ func testIntFramework(t *testing.T, method string, expected int32) {
 	}
 
 	v, ok := r.(int32)
-	if ! ok {
+	if !ok {
 		t.Errorf("%s: %v is not int", method, r)
 		return
 	}
@@ -241,7 +241,7 @@ func testLongFramework(t *testing.T, method string, expected int64) {
 	}
 
 	v, ok := r.(int64)
-	if ! ok {
+	if !ok {
 		t.Errorf("%s: %v is not long", method, r)
 		return
 	}
@@ -278,7 +278,7 @@ func testNullFramework(t *testing.T, method string) {
 		return
 	}
 
-	if reflect.TypeOf(r) != nil {  // detect nil interface, not only nil value
+	if reflect.TypeOf(r) != nil { // detect nil interface, not only nil value
 		t.Errorf("%s: %v is not null", method, r)
 	}
 }

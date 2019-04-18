@@ -323,7 +323,7 @@ func (d *Decoder) decInt32(flag int32) (int32, error) {
 	case tag >= 0xd0 && tag <= 0xd7:
 		// Use int32 to represent int24.
 		buf := []byte{0, tag - BC_INT_SHORT_ZERO, 0, 0}
-		if buf[1] & 0x80 != 0 {
+		if buf[1]&0x80 != 0 {
 			buf[0] = 0xff
 		}
 		_, err = io.ReadFull(d.reader, buf[2:])
@@ -432,7 +432,7 @@ func (d *Decoder) decInt64(flag int32) (int64, error) {
 	case tag >= 0x38 && tag <= 0x3f:
 		// Use int32 to represent int24.
 		buf := []byte{0, tag - BC_LONG_SHORT_ZERO, 0, 0}
-		if buf[1] & 0x80 != 0 {
+		if buf[1]&0x80 != 0 {
 			buf[0] = 0xff
 		}
 		_, err = io.ReadFull(d.reader, buf[2:])
