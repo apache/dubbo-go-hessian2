@@ -5,8 +5,6 @@ go:
   - "1.12"
 
 script:
-  - gradle build --build-file test_hessian_server/build.gradle
-  - java -jar test_hessian_server/build/libs/test_hessian_server.jar & # start test hessian server on port 8080
   - go fmt && [[ -z `git status -s` ]]
   - GO111MODULE=on && go mod vendor && go test -race && go test -bench . -race
 

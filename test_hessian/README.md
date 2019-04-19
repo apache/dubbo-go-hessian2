@@ -1,4 +1,4 @@
-# Test Hessian Server
+# Test Hessian
 
 ## requirement
 
@@ -10,5 +10,5 @@
 ```
 $ cd test_hessian_server
 $ gradle build
-$ java -jar build/libs/test_hessian_server.jar
+$ java -jar build/libs/test_hessian_server.jar replyBinary_0
 ```
