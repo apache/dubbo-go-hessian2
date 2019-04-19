@@ -26,7 +26,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os/exec"
 	"reflect"
 	"testing"
 	"time"
@@ -95,7 +94,7 @@ func testBinaryFramework(t *testing.T, method string, expected []byte) {
 	}
 }
 
-func testBinary(t *testing.T) {
+func TestBinary(t *testing.T) {
 	s0 := ""
 	s1 := "0"
 	s16 := "0123456789012345"
@@ -137,7 +136,7 @@ func testDateFramework(t *testing.T, method string, expected time.Time) {
 	}
 }
 
-func testDate(t *testing.T) {
+func TestDate(t *testing.T) {
 	testDateFramework(t, "replyDate_0", time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC))
 	testDateFramework(t, "replyDate_1", time.Date(1998, 5, 8, 9, 51, 31, 0, time.UTC))
 	testDateFramework(t, "replyDate_2", time.Date(1998, 5, 8, 9, 51, 0, 0, time.UTC))
@@ -161,7 +160,7 @@ func testDoubleFramework(t *testing.T, method string, expected float64) {
 	}
 }
 
-func testDouble(t *testing.T) {
+func TestDouble(t *testing.T) {
 	testDoubleFramework(t, "replyDouble_0_0", 0.0)
 	testDoubleFramework(t, "replyDouble_0_001", 0.001)
 	testDoubleFramework(t, "replyDouble_1_0", 1.0)
@@ -195,7 +194,7 @@ func testBooleanFramework(t *testing.T, method string, expected bool) {
 	}
 }
 
-func testBoolean(t *testing.T) {
+func TestBoolean(t *testing.T) {
 	testBooleanFramework(t, "replyFalse", false)
 	testBooleanFramework(t, "replyTrue", true)
 }
@@ -218,7 +217,7 @@ func testIntFramework(t *testing.T, method string, expected int32) {
 	}
 }
 
-func testInt(t *testing.T) {
+func TestInt(t *testing.T) {
 	testIntFramework(t, "replyInt_0", 0)
 	testIntFramework(t, "replyInt_0x30", 0x30)
 	testIntFramework(t, "replyInt_0x3ffff", 0x3ffff)
@@ -255,7 +254,7 @@ func testLongFramework(t *testing.T, method string, expected int64) {
 	}
 }
 
-func testLong(t *testing.T) {
+func TestLong(t *testing.T) {
 	testLongFramework(t, "replyLong_0", 0)
 	testLongFramework(t, "replyLong_0x10", 0x10)
 	testLongFramework(t, "replyLong_0x3ffff", 0x3ffff)
@@ -287,29 +286,8 @@ func testNullFramework(t *testing.T, method string) {
 	}
 }
 
-func testNull(t *testing.T) {
+func TestNull(t *testing.T) {
 	testNullFramework(t, "replyBinary_null")
 	testNullFramework(t, "replyNull")
 	testNullFramework(t, "replyString_null")
-}
-
-func TestDecodeSuite(t *testing.T) {
-	cmd := exec.Command("java", "-jar", "test_hessian_server/build/libs/test_hessian_server.jar")
-	err := cmd.Start()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	t.Run("binary", testBinary)
-	t.Run("date", testDate)
-	t.Run("double", testDouble)
-	t.Run("boolean", testBoolean)
-	t.Run("int", testInt)
-	t.Run("long", testLong)
-	t.Run("null", testNull)
-
-	err = cmd.Process.Kill()
-	if err != nil {
-		log.Fatal(err)
-	}
 }
