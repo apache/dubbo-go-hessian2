@@ -12,55 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Unit test for decoding hessian2 based on official api. One can find api
-// doc on http://javadoc4.caucho.com/com/caucho/hessian/test/TestHessian2.html
+// Unit test for decoding hessian2 based on official api with doc on
+// http://javadoc4.caucho.com/com/caucho/hessian/test/TestHessian2.html.
+// One can call the api by running the local test_hessian.jar or sending
+// a request to the remote server http://hessian.caucho.com/test/test
+// directly.
 package hessian
 
 import (
-	"bytes"
-	"encoding/binary"
-	"io/ioutil"
 	"log"
-	"net/http"
+	"os/exec"
 )
 
-func encodeCall(method string) []byte {
-	b := []byte{'c', 2, 0, 'm'}
-	bMethodLength := make([]byte, 2)
-	binary.BigEndian.PutUint16(bMethodLength, uint16(len(method)))
-	b = append(b, bMethodLength...)
-	b = append(b, method...)
-	b = append(b, 'z')
-	return b
-}
-
-func sendRequest(method string) []byte {
-	client := &http.Client{}
-
-	req, err := http.NewRequest(
-		"POST",
-		"http://hessian.caucho.com/test/test",
-		bytes.NewReader(encodeCall(method)),
-	)
+func getReply(method string) []byte {
+	cmd := exec.Command("java", "-jar", "test_hessian/target/test_hessian-1.0.0.jar", method)
+	out, err := cmd.Output()
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return body[4:] // skip H 0x02 0x00
+	return out
 }
 
 func decodeResponse(method string) (interface{}, error) {
-	b := sendRequest(method)
+	b := getReply(method)
 	d := NewDecoder(b)
 	r, e := d.Decode()
 	if e != nil {
