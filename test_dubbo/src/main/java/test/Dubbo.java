@@ -1,10 +1,10 @@
 package test;
 
-import com.alibaba.dubbo.remoting.Codec2;
-import com.alibaba.dubbo.rpc.protocol.dubbo.DubboCodec;
-import com.alibaba.dubbo.remoting.Channel;
-import com.alibaba.dubbo.remoting.buffer.ChannelBuffer;
-import com.alibaba.dubbo.remoting.buffer.DynamicChannelBuffer;
+import org.apache.dubbo.remoting.Codec2;
+import org.apache.dubbo.rpc.protocol.dubbo.DubboCodec;
+import org.apache.dubbo.remoting.Channel;
+import org.apache.dubbo.remoting.buffer.ChannelBuffer;
+import org.apache.dubbo.remoting.buffer.DynamicChannelBuffer;
 
 import java.lang.reflect.Method;
 

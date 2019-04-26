@@ -1,7 +1,7 @@
 package test;
 
-import com.alibaba.dubbo.rpc.RpcInvocation;
-import com.alibaba.dubbo.remoting.exchange.Request;
+import org.apache.dubbo.rpc.RpcInvocation;
+import org.apache.dubbo.remoting.exchange.Request;
 
 
 public class TestDubbo {

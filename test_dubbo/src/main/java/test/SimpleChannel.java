@@ -1,9 +1,9 @@
 package test;
 
-import com.alibaba.dubbo.common.URL;
-import com.alibaba.dubbo.remoting.Channel;
-import com.alibaba.dubbo.remoting.ChannelHandler;
-import com.alibaba.dubbo.remoting.RemotingException;
+import org.apache.dubbo.common.URL;
+import org.apache.dubbo.remoting.Channel;
+import org.apache.dubbo.remoting.ChannelHandler;
+import org.apache.dubbo.remoting.RemotingException;
 
 import java.net.InetSocketAddress;
 
