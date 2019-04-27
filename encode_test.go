@@ -24,4 +24,3 @@ var assertEqual = func(want, got []byte, t *testing.T) {
 		t.Fatalf("want %v , got %v", want, got)
 	}
 }
-
