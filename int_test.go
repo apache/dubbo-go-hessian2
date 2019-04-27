@@ -14,7 +14,9 @@
 
 package hessian
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestEncInt32Len1B(t *testing.T) {
 	var (

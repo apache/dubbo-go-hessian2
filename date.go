@@ -14,7 +14,9 @@
 
 package hessian
 
-import "time"
+import (
+	"time"
+)
 
 import (
 	jerrors "github.com/juju/errors"

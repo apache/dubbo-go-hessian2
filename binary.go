@@ -14,7 +14,9 @@
 
 package hessian
 
-import "io"
+import (
+	"io"
+)
 
 import (
 	jerrors "github.com/juju/errors"

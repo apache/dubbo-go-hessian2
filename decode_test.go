@@ -21,11 +21,41 @@ package hessian
 
 import (
 	"log"
+	"os"
 	"os/exec"
 )
 
+const (
+	hessianJar = "test_hessian/target/test_hessian-1.0.0.jar"
+)
+
+func isFileExist(file string) bool {
+	stat, err := os.Stat(file)
+	if err != nil {
+		return false
+	}
+
+	return !stat.IsDir()
+}
+
+func genHessianJar() {
+	existFlag := isFileExist(hessianJar)
+	if existFlag {
+		return
+	}
+
+	cmd := exec.Command("mvn", "clean", "package")
+	cmd.Dir = "./test_hessian"
+	out, err := cmd.Output()
+	if err != nil {
+		log.Fatalf("after exec command 'mvn clean package', got error:%v, error output:%v",
+			err, string(out))
+	}
+}
+
 func getReply(method string) []byte {
-	cmd := exec.Command("java", "-jar", "test_hessian/target/test_hessian-1.0.0.jar", method)
+	genHessianJar()
+	cmd := exec.Command("java", "-jar", hessianJar, method)
 	out, err := cmd.Output()
 	if err != nil {
 		log.Fatal(err)

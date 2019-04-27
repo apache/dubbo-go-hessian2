@@ -19,6 +19,18 @@ import (
 	"testing"
 )
 
+func TestEncNull(t *testing.T) {
+	var (
+		e *Encoder
+	)
+
+	e = NewEncoder()
+	e.Encode(nil)
+	if e.Buffer() == nil {
+		t.Fail()
+	}
+	t.Logf("nil enc result:%s\n", string(e.buffer))
+}
 func testNullFramework(t *testing.T, method string) {
 	r, e := decodeResponse(method)
 	if e != nil {

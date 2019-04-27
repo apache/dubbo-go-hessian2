@@ -14,7 +14,9 @@
 
 package hessian
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestEncBool(t *testing.T) {
 	var (

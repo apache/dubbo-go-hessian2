@@ -19,22 +19,8 @@ import (
 	"testing"
 )
 
-// go test -v encode_test.go encode.go decode.go const.go codec.go pojo.go
 var assertEqual = func(want, got []byte, t *testing.T) {
 	if !bytes.Equal(want, got) {
 		t.Fatalf("want %v , got %v", want, got)
 	}
-}
-
-func TestEncNull(t *testing.T) {
-	var (
-		e *Encoder
-	)
-
-	e = NewEncoder()
-	e.Encode(nil)
-	if e.Buffer() == nil {
-		t.Fail()
-	}
-	t.Logf("nil enc result:%s\n", string(e.buffer))
 }
