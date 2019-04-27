@@ -20,13 +20,45 @@
 package hessian
 
 import (
+	"fmt"
 	"log"
+	"os"
 	"os/exec"
 )
 
-func getReply(method string) []byte {
-	cmd := exec.Command("java", "-jar", "test_hessian/target/test_hessian-1.0.0.jar", method)
+const (
+	hessianJar = "test_hessian/target/test_hessian-1.0.0.jar"
+)
+
+func isFileExist(file string) bool {
+	stat, err := os.Stat(file)
+	if err != nil {
+		return false
+	}
+
+	return !stat.IsDir()
+}
+
+func genHessianJar() {
+	existFlag := isFileExist(hessianJar)
+	if existFlag {
+		return
+	}
+
+	cmd := exec.Command("mvn", "clean", "package")
+	cmd.Dir = "./test_hessian"
 	out, err := cmd.Output()
+	if err != nil {
+		log.Fatalf("after exec command 'mvn clean package', got error:%v, error output:%v",
+			err, string(out))
+	}
+}
+
+func getReply(method string) []byte {
+	genHessianJar()
+	cmd := exec.Command("java", "-jar", hessianJar, method)
+	out, err := cmd.Output()
+	fmt.Printf("out:%v, err:%v\n", out, err)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -34,6 +66,7 @@ func getReply(method string) []byte {
 }
 
 func decodeResponse(method string) (interface{}, error) {
+	fmt.Printf("hello\n")
 	b := getReply(method)
 	d := NewDecoder(b)
 	r, e := d.Decode()
