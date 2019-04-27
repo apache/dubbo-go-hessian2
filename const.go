@@ -33,8 +33,11 @@
 package hessian
 
 import (
-	jerrors "github.com/juju/errors"
 	"regexp"
+)
+
+import (
+	jerrors "github.com/juju/errors"
 )
 
 const (
@@ -188,12 +191,12 @@ const (
 )
 
 /**
- * 协议头是16字节的定长数据
- * 2字节magic字符串0xdabb,0-7高位，8-15低位
- * 1字节的消息标志位。16-20序列id,21 event,22 two way,23请求或响应标识
- * 1字节状态。当消息类型为响应时，设置响应状态。24-31位。
- * 8字节，消息ID,long类型，32-95位。
- * 4字节，消息长度，96-127位
+ * the dubbo protocol header length is 16 Bytes.
+ * the first 2 Bytes is magic code '0xdabb'
+ * the next 1 Byte is message flags, in which its 16-20 bit is serial id, 21 for event, 22 for two way, 23 for request/response flag
+ * the next 1 Bytes is response state.
+ * the next 8 Bytes is package DI.
+ * the next 4 Bytes is package length.
  **/
 const (
 	// header length.

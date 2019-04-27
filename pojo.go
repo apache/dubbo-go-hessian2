@@ -32,7 +32,7 @@ const (
 // !!! Pls attention that Every field name should be upper case.
 // Otherwise the app may panic.
 type POJO interface {
-	JavaClassName() string // 获取对应的java classs的package name
+	JavaClassName() string // got a go struct's Java Class package name which should be a POJO class.
 }
 
 type POJOEnum interface {
@@ -87,12 +87,10 @@ func showPOJORegistry() {
 	pojoRegistry.Unlock()
 }
 
-// Register a POJO instance.
-// The return value is -1 if @o has been registered.
-//
-// # definition for an object (compact map)
-// class-def  ::= 'C' string int string*
+// Register a POJO instance. The return value is -1 if @o has been registered.
 func RegisterPOJO(o POJO) int {
+	// # definition for an object (compact map)
+	// class-def  ::= 'C' string int string*
 	var (
 		ok bool
 		b  []byte
