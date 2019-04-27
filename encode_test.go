@@ -15,13 +15,12 @@
 package hessian
 
 import (
-	"bytes"
-	"testing"
+    "bytes"
+    "testing"
 )
 
 var assertEqual = func(want, got []byte, t *testing.T) {
-	if !bytes.Equal(want, got) {
-		t.Fatalf("want %v , got %v", want, got)
-	}
+    if !bytes.Equal(want, got) {
+        t.Fatalf("want %v , got %v", want, got)
+    }
 }
-
