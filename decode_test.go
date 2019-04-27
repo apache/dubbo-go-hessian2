@@ -20,7 +20,6 @@
 package hessian
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -58,7 +57,6 @@ func getReply(method string) []byte {
 	genHessianJar()
 	cmd := exec.Command("java", "-jar", hessianJar, method)
 	out, err := cmd.Output()
-	fmt.Printf("out:%v, err:%v\n", out, err)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -66,7 +64,6 @@ func getReply(method string) []byte {
 }
 
 func decodeResponse(method string) (interface{}, error) {
-	fmt.Printf("hello\n")
 	b := getReply(method)
 	d := NewDecoder(b)
 	r, e := d.Decode()
