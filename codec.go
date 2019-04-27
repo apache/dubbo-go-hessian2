@@ -33,6 +33,10 @@ var (
 	_zeroValue      = reflect.ValueOf(_zeroBoolPinter).Elem()
 )
 
+func encByte(b []byte, t ...byte) []byte {
+	return append(b, t...)
+}
+
 // validateIntKind check whether k is int kind
 func validateIntKind(k reflect.Kind) bool {
 	switch k {

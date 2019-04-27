@@ -34,11 +34,16 @@ package hessian
 
 import (
 	jerrors "github.com/juju/errors"
+	"regexp"
 )
 
 const (
 	mask = byte(127)
 	flag = byte(128)
+)
+
+const (
+	Zero = byte(0x00)
 )
 
 const (
@@ -171,9 +176,60 @@ const (
 	Response_SERVER_ERROR      byte = 80
 	Response_CLIENT_ERROR      byte = 90
 
-	RESPONSE_WITH_EXCEPTION int32 = 0
-	RESPONSE_VALUE          int32 = 1
-	RESPONSE_NULL_VALUE     int32 = 2
+	// According to "java dubbo" There are two cases of response:
+	// 		1. with attachments
+	// 		2. no attachments
+	RESPONSE_WITH_EXCEPTION                  int32 = 0
+	RESPONSE_VALUE                           int32 = 1
+	RESPONSE_NULL_VALUE                      int32 = 2
+	RESPONSE_WITH_EXCEPTION_WITH_ATTACHMENTS int32 = 3
+	RESPONSE_VALUE_WITH_ATTACHMENTS          int32 = 4
+	RESPONSE_NULL_VALUE_WITH_ATTACHMENTS     int32 = 5
+)
+
+/**
+ * 协议头是16字节的定长数据
+ * 2字节magic字符串0xdabb,0-7高位，8-15低位
+ * 1字节的消息标志位。16-20序列id,21 event,22 two way,23请求或响应标识
+ * 1字节状态。当消息类型为响应时，设置响应状态。24-31位。
+ * 8字节，消息ID,long类型，32-95位。
+ * 4字节，消息长度，96-127位
+ **/
+const (
+	// header length.
+	HEADER_LENGTH = 16
+
+	// magic header
+	MAGIC      = uint16(0xdabb)
+	MAGIC_HIGH = byte(0xda)
+	MAGIC_LOW  = byte(0xbb)
+
+	// message flag.
+	FLAG_REQUEST = byte(0x80)
+	FLAG_TWOWAY  = byte(0x40)
+	FLAG_EVENT   = byte(0x20) // for heartbeat
+	SERIAL_MASK  = 0x1f
+
+	DUBBO_VERSION                          = "2.5.4"
+	DUBBO_VERSION_KEY                      = "dubbo"
+	DEFAULT_DUBBO_PROTOCOL_VERSION         = "2.0.2" // Dubbo RPC protocol version, for compatibility, it must not be between 2.0.10 ~ 2.6.2
+	LOWEST_VERSION_FOR_RESPONSE_ATTACHMENT = 2000200
+	DEFAULT_LEN                            = 8388608 // 8 * 1024 * 1024 default body max length
+)
+
+// regular
+const (
+	JAVA_IDENT_REGEX = "(?:[_$a-zA-Z][_$a-zA-Z0-9]*)"
+	CLASS_DESC       = "(?:L" + JAVA_IDENT_REGEX + "(?:\\/" + JAVA_IDENT_REGEX + ")*;)"
+	ARRAY_DESC       = "(?:\\[+(?:(?:[VZBCDFIJS])|" + CLASS_DESC + "))"
+	DESC_REGEX       = "(?:(?:[VZBCDFIJS])|" + CLASS_DESC + "|" + ARRAY_DESC + ")"
+)
+
+var (
+	DubboRequestHeaderBytes      = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, FLAG_REQUEST | FLAG_TWOWAY}
+	DubboResponseHeaderBytes     = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, Zero, Response_OK}
+	DubboRequestHeartbeatHeader  = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, FLAG_REQUEST | FLAG_TWOWAY | FLAG_EVENT}
+	DubboResponseHeartbeatHeader = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, FLAG_EVENT}
 )
 
 var (
@@ -182,3 +238,5 @@ var (
 	ErrJavaException   = jerrors.New("got java exception")
 	ErrIllegalPackage  = jerrors.New("illegal package!")
 )
+
+var DescRegex, _ = regexp.Compile(DESC_REGEX)
