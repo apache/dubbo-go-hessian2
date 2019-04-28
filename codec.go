@@ -72,48 +72,38 @@ func PackInt8(v int8, b []byte) []byte {
 }
 
 //[10].pack('N').bytes => [0, 0, 0, 10]
-// func PackInt16(v int16, b []byte) []byte {
 func PackInt16(v int16) []byte {
 	var array [2]byte
 	binary.BigEndian.PutUint16(array[:2], uint16(v))
-	// return append(b, array[:2]...)
 	return array[:]
 }
 
 //[10].pack('N').bytes => [0, 0, 0, 10]
-// func PackUint16(v uint16, b []byte) []byte {
 func PackUint16(v uint16) []byte {
 	var array [2]byte
 	binary.BigEndian.PutUint16(array[:2], v)
-	// return append(b, array[:2]...)
 	return array[:]
 }
 
 //[10].pack('N').bytes => [0, 0, 0, 10]
-// func PackInt32(v int32, b []byte) []byte {
 func PackInt32(v int32) []byte {
 	var array [4]byte
 	binary.BigEndian.PutUint32(array[:4], uint32(v))
-	// return append(b, array[:4]...)
 	return array[:]
 }
 
 //[10].pack('q>').bytes => [0, 0, 0, 0, 0, 0, 0, 10]
-// func PackInt64(v int64, b []byte) []byte {
 func PackInt64(v int64) []byte {
 	var array [8]byte
 	binary.BigEndian.PutUint64(array[:8], uint64(v))
-	// return append(b, array[:8]...)
 	return array[:]
 }
 
 //[10].pack('G').bytes => [64, 36, 0, 0, 0, 0, 0, 0]
-// func PackFloat64(v float64, b []byte) []byte {
-// 直接使用math库相关函数优化float64的pack/unpack
+// PackFloat64 invokes go's official math library function Float64bits.
 func PackFloat64(v float64) []byte {
 	var array [8]byte
 	binary.BigEndian.PutUint64(array[:8], math.Float64bits(v))
-	// return append(b, array[:8]...)
 	return array[:]
 }
 
@@ -180,7 +170,7 @@ func UnpackPtrValue(v reflect.Value) reflect.Value {
 	return v
 }
 
-//将字节数组格式化成 hex
+// SprintHex converts the []byte to a Hex string.
 func SprintHex(b []byte) (rs string) {
 	rs = fmt.Sprintf("[]byte{")
 	for _, v := range b {
