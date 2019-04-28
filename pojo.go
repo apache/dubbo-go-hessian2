@@ -25,24 +25,29 @@ import (
 	jerrors "github.com/juju/errors"
 )
 
+// invalid consts
 const (
 	InvalidJavaEnum JavaEnum = -1
 )
 
+// POJO interface
 // !!! Pls attention that Every field name should be upper case.
 // Otherwise the app may panic.
 type POJO interface {
 	JavaClassName() string // 获取对应的java classs的package name
 }
 
+// POJOEnum enum for POJO
 type POJOEnum interface {
 	POJO
 	String() string
 	EnumValue(string) JavaEnum
 }
 
+// JavaEnum type
 type JavaEnum int32
 
+// JavaEnumClass struct
 type JavaEnumClass struct {
 	name string
 }
@@ -61,6 +66,7 @@ type structInfo struct {
 	inst     interface{}
 }
 
+// POJORegistry pojo registry struct
 type POJORegistry struct {
 	sync.RWMutex
 	classInfoList []classInfo           // {class name, field name list...} list
@@ -87,7 +93,7 @@ func showPOJORegistry() {
 	pojoRegistry.Unlock()
 }
 
-// Register a POJO instance.
+// RegisterPOJO Register a POJO instance.
 // The return value is -1 if @o has been registered.
 //
 // # definition for an object (compact map)
@@ -147,7 +153,7 @@ func RegisterPOJO(o POJO) int {
 	return i
 }
 
-// Register a value type JavaEnum variable.
+// RegisterJavaEnum Register a value type JavaEnum variable.
 func RegisterJavaEnum(o POJOEnum) int {
 	var (
 		ok bool

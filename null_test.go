@@ -20,11 +20,7 @@ import (
 )
 
 func TestEncNull(t *testing.T) {
-	var (
-		e *Encoder
-	)
-
-	e = NewEncoder()
+	var e = NewEncoder()
 	e.Encode(nil)
 	if e.Buffer() == nil {
 		t.Fail()

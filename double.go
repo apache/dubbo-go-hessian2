@@ -54,7 +54,7 @@ func encFloat(b []byte, v float64) []byte {
 	}
 
 END:
-	bits := uint64(math.Float64bits(v))
+	bits := math.Float64bits(v)
 	return encByte(b, BC_DOUBLE, byte(bits>>56), byte(bits>>48), byte(bits>>40),
 		byte(bits>>32), byte(bits>>24), byte(bits>>16), byte(bits>>8), byte(bits))
 }

@@ -43,7 +43,7 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 		byteArray = append(byteArray, DubboResponseHeaderBytes[:]...)
 	}
 	// set serialID, identify serialization types, eg: fastjson->6, hessian2->2
-	byteArray[2] |= byte(header.SerialID & SERIAL_MASK)
+	byteArray[2] |= header.SerialID & SERIAL_MASK
 	// response status
 	if header.ResponseStatus != 0 {
 		byteArray[3] = header.ResponseStatus
@@ -136,6 +136,7 @@ func unpackResponseBody(buf []byte, rspObj interface{}) error {
 	return nil
 }
 
+// CopySlice copy from inSlice to outSlice
 func CopySlice(inSlice, outSlice reflect.Value) error {
 	if inSlice.IsNil() {
 		return jerrors.New("@in is nil")
@@ -163,6 +164,7 @@ func CopySlice(inSlice, outSlice reflect.Value) error {
 	return nil
 }
 
+// CopyMap copy from in map to out map
 func CopyMap(inMapValue, outMapValue reflect.Value) error {
 	if inMapValue.IsNil() {
 		return jerrors.New("@in is nil")
@@ -199,7 +201,7 @@ func CopyMap(inMapValue, outMapValue reflect.Value) error {
 	return nil
 }
 
-// reflect return value
+// ReflectResponse reflect return value
 func ReflectResponse(in interface{}, out interface{}) error {
 	if in == nil {
 		return jerrors.Errorf("@in is nil")
@@ -255,15 +257,15 @@ func isSupportResponseAttachment(version string) bool {
 func version2Int(version string) int {
 	var v = 0
 	varr := strings.Split(version, ".")
-	len := len(varr)
+	length := len(varr)
 	for key, value := range varr {
 		v0, err := strconv.Atoi(value)
 		if err != nil {
 			return -1
 		}
-		v += v0 * int(math.Pow10((len-key-1)*2))
+		v += v0 * int(math.Pow10((length-key-1)*2))
 	}
-	if len == 3 {
+	if length == 3 {
 		return v * 100
 	}
 	return v

@@ -55,17 +55,20 @@ import (
 	jerrors "github.com/juju/errors"
 )
 
+// Decoder struct
 type Decoder struct {
 	reader        *bufio.Reader
 	refs          []interface{}
 	classInfoList []classInfo
 }
 
+// Error part
 var (
 	ErrNotEnoughBuf    = jerrors.Errorf("not enough buf")
 	ErrIllegalRefIndex = jerrors.Errorf("illegal ref index")
 )
 
+// NewDecoder generate a decoder instance
 func NewDecoder(b []byte) *Decoder {
 	return &Decoder{reader: bufio.NewReader(bytes.NewReader(b))}
 }
@@ -160,7 +163,7 @@ func (d *Decoder) decType() (string, error) {
 	return "", err
 }
 
-// 解析 hessian 数据包
+// Decode parses hessian data
 func (d *Decoder) Decode() (interface{}, error) {
 	var (
 		err error

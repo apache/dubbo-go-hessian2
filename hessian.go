@@ -24,24 +24,28 @@ import (
 	jerrors "github.com/juju/errors"
 )
 
+// enum part
 const (
-	Error          PackgeType = 0x01
-	Request                   = 0x02
-	Response                  = 0x04
-	Heartbeat                 = 0x08
-	Request_TwoWay            = 0x10
+	Error          PackageType = 0x01
+	Request                    = 0x02
+	Response                   = 0x04
+	Heartbeat                  = 0x08
+	Request_TwoWay             = 0x10
 )
 
-type PackgeType int
+// PackageType ...
+type PackageType int
 
+// DubboHeader dubbo header
 type DubboHeader struct {
 	SerialID       byte
-	Type           PackgeType
+	Type           PackageType
 	ID             int64
 	BodyLen        int
 	ResponseStatus byte
 }
 
+// Service defines service instance
 type Service struct {
 	Path      string
 	Interface string
@@ -51,12 +55,14 @@ type Service struct {
 	Timeout   time.Duration // request timeout
 }
 
+// HessianCodec defines hessian codec
 type HessianCodec struct {
-	pkgType PackgeType
+	pkgType PackageType
 	reader  *bufio.Reader
 	bodyLen int
 }
 
+// NewHessianCodec generate a new hessian codec instance
 func NewHessianCodec(reader *bufio.Reader) *HessianCodec {
 	return &HessianCodec{
 		reader: reader,
@@ -80,9 +86,10 @@ func (h *HessianCodec) Write(service Service, header DubboHeader, body interface
 		return nil, jerrors.Errorf("Unrecognised message type: %v", header.Type)
 	}
 
-	return nil, nil
+	// unreachable return nil, nil
 }
 
+// ReadHeader uses hessian codec to read dubbo header
 func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 
 	var err error
@@ -98,7 +105,7 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 
 	//// read header
 
-	if buf[0] != byte(MAGIC_HIGH) && buf[1] != byte(MAGIC_LOW) {
+	if buf[0] != MAGIC_HIGH && buf[1] != MAGIC_LOW {
 		return ErrIllegalPackage
 	}
 
@@ -152,6 +159,7 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 
 }
 
+// ReadBody uses hessian codec to read response body
 func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 
 	buf, err := h.reader.Peek(h.bodyLen)

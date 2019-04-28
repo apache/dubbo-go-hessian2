@@ -46,12 +46,14 @@ import (
 // string []byte []interface{} map[interface{}]interface{}
 // array object struct
 
+// Encoder struct
 type Encoder struct {
 	classInfoList []classInfo
 	buffer        []byte
 	refMap        map[unsafe.Pointer]_refElem
 }
 
+// NewEncoder generate an encoder instance
 func NewEncoder() *Encoder {
 	var buffer = make([]byte, 64)
 
@@ -61,15 +63,17 @@ func NewEncoder() *Encoder {
 	}
 }
 
+// Buffer returns byte buffer
 func (e *Encoder) Buffer() []byte {
 	return e.buffer[:]
 }
 
+// Append byte arr to encoder buffer
 func (e *Encoder) Append(buf []byte) {
 	e.buffer = append(e.buffer, buf[:]...)
 }
 
-// If @v can not be encoded, the return value is nil. At present only struct may can not be encoded.
+// Encode If @v can not be encoded, the return value is nil. At present only struct may can not be encoded.
 func (e *Encoder) Encode(v interface{}) error {
 	if v == nil {
 		e.buffer = encNull(e.buffer)

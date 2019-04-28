@@ -46,7 +46,7 @@ func encBinary(b []byte, v []byte) []byte {
 	for vLength > 0 {
 		if vLength > CHUNK_SIZE {
 			length = CHUNK_SIZE
-			b = encByte(b, byte(BC_BINARY_CHUNK), byte(length>>8), byte(length))
+			b = encByte(b, BC_BINARY_CHUNK, byte(length>>8), byte(length))
 		} else {
 			length = uint16(vLength)
 			if vLength <= int(BINARY_DIRECT_MAX) {
@@ -54,7 +54,7 @@ func encBinary(b []byte, v []byte) []byte {
 			} else if vLength <= int(BINARY_SHORT_MAX) {
 				b = encByte(b, byte(int(BC_BINARY_SHORT)+vLength>>8), byte(vLength))
 			} else {
-				b = encByte(b, byte(BC_BINARY), byte(vLength>>8), byte(vLength))
+				b = encByte(b, BC_BINARY, byte(vLength>>8), byte(vLength))
 			}
 		}
 
@@ -116,7 +116,10 @@ func (d *Decoder) decBinary(flag int32) ([]byte, error) {
 	if flag != TAG_READ {
 		tag = byte(flag)
 	} else {
-		tag, _ = d.readBufByte()
+		tag, err = d.readBufByte()
+		if err != nil {
+			return nil, jerrors.Trace(err)
+		}
 	}
 
 	if tag == BC_NULL {

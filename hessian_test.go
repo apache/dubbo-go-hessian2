@@ -21,7 +21,7 @@ func (c *Case) JavaClassName() string {
 	return "com.test.case"
 }
 
-func doTest(t *testing.T, packageType PackgeType, responseStatus byte, body interface{}) {
+func doTest(t *testing.T, packageType PackageType, responseStatus byte, body interface{}) {
 	RegisterPOJO(&Case{})
 
 	codecW := NewHessianCodec(nil)

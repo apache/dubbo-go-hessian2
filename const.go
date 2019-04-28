@@ -33,8 +33,9 @@
 package hessian
 
 import (
-	jerrors "github.com/juju/errors"
 	"regexp"
+
+	jerrors "github.com/juju/errors"
 )
 
 const (
@@ -43,9 +44,11 @@ const (
 )
 
 const (
+	// Zero : byte zero
 	Zero = byte(0x00)
 )
 
+// constansts
 const (
 	TAG_READ        = int32(-1)
 	ASCII_GAP       = 32
@@ -165,6 +168,7 @@ const (
 	STRING_ONE   = "1.0"
 )
 
+// Response related consts
 const (
 	Response_OK                byte = 20
 	Response_CLIENT_TIMEOUT    byte = 30
@@ -225,6 +229,7 @@ const (
 	DESC_REGEX       = "(?:(?:[VZBCDFIJS])|" + CLASS_DESC + "|" + ARRAY_DESC + ")"
 )
 
+// Dubbo request response related consts
 var (
 	DubboRequestHeaderBytes      = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, FLAG_REQUEST | FLAG_TWOWAY}
 	DubboResponseHeaderBytes     = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, Zero, Response_OK}
@@ -232,6 +237,7 @@ var (
 	DubboResponseHeartbeatHeader = [HEADER_LENGTH]byte{MAGIC_HIGH, MAGIC_LOW, FLAG_EVENT}
 )
 
+// Error part
 var (
 	ErrHeaderNotEnough = jerrors.New("header buffer too short")
 	ErrBodyNotEnough   = jerrors.New("body buffer too short")
@@ -239,4 +245,5 @@ var (
 	ErrIllegalPackage  = jerrors.New("illegal package!")
 )
 
+// DescRegex ...
 var DescRegex, _ = regexp.Compile(DESC_REGEX)
