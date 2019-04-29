@@ -80,21 +80,15 @@ func (e *Encoder) Encode(v interface{}) error {
 		return nil
 	}
 
-	switch v.(type) {
+	switch val := v.(type) {
 	case nil:
 		e.buffer = encNull(e.buffer)
 		return nil
 
 	case bool:
-		e.buffer = encBool(e.buffer, v.(bool))
+		e.buffer = encBool(e.buffer, val)
 
-	case int8:
-		e.buffer = encInt32(e.buffer, v.(int32))
-
-	case int16:
-		e.buffer = encInt32(e.buffer, v.(int32))
-
-	case int32:
+	case int8, int16, int32:
 		e.buffer = encInt32(e.buffer, v.(int32))
 
 	case int:
@@ -104,29 +98,29 @@ func (e *Encoder) Encode(v interface{}) error {
 		// 	b = encInt64(int64(v.(int)), b)
 		// }
 		// 把int统一按照int64处理，这样才不会导致decode的时候出现" reflect: Call using int32 as type int64 [recovered]"这种panic
-		e.buffer = encInt64(e.buffer, int64(v.(int)))
+		e.buffer = encInt64(e.buffer, int64(val))
 
 	case int64:
-		e.buffer = encInt64(e.buffer, v.(int64))
+		e.buffer = encInt64(e.buffer, val)
 
 	case time.Time:
-		e.buffer = encDateInMs(e.buffer, v.(time.Time))
+		e.buffer = encDateInMs(e.buffer, val)
 		// e.buffer = encDateInMimute(v.(time.Time), e.buffer)
 
 	case float32:
-		e.buffer = encFloat(e.buffer, float64(v.(float32)))
+		e.buffer = encFloat(e.buffer, float64(val))
 
 	case float64:
-		e.buffer = encFloat(e.buffer, v.(float64))
+		e.buffer = encFloat(e.buffer, val)
 
 	case string:
-		e.buffer = encString(e.buffer, v.(string))
+		e.buffer = encString(e.buffer, val)
 
 	case []byte:
-		e.buffer = encBinary(e.buffer, v.([]byte))
+		e.buffer = encBinary(e.buffer, val)
 
 	case map[interface{}]interface{}:
-		return e.encUntypedMap(v.(map[interface{}]interface{}))
+		return e.encUntypedMap(val)
 
 	default:
 		t := UnpackPtrType(reflect.TypeOf(v))
