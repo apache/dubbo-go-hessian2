@@ -33,7 +33,7 @@ func TestPackRequest(t *testing.T) {
 		Timeout:   time.Second * 10,
 	}, DubboHeader{
 		SerialID: 0,
-		Type:     Request,
+		Type:     PackageRequest,
 		ID:       123,
 	}, []interface{}{1, 2})
 

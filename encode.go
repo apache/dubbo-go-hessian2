@@ -46,12 +46,14 @@ import (
 // string []byte []interface{} map[interface{}]interface{}
 // array object struct
 
+// Encoder struct
 type Encoder struct {
 	classInfoList []classInfo
 	buffer        []byte
 	refMap        map[unsafe.Pointer]_refElem
 }
 
+// NewEncoder generate an encoder instance
 func NewEncoder() *Encoder {
 	var buffer = make([]byte, 64)
 
@@ -61,36 +63,32 @@ func NewEncoder() *Encoder {
 	}
 }
 
+// Buffer returns byte buffer
 func (e *Encoder) Buffer() []byte {
 	return e.buffer[:]
 }
 
+// Append byte arr to encoder buffer
 func (e *Encoder) Append(buf []byte) {
 	e.buffer = append(e.buffer, buf[:]...)
 }
 
-// If @v can not be encoded, the return value is nil. At present only struct may can not be encoded.
+// Encode If @v can not be encoded, the return value is nil. At present only struct may can not be encoded.
 func (e *Encoder) Encode(v interface{}) error {
 	if v == nil {
 		e.buffer = encNull(e.buffer)
 		return nil
 	}
 
-	switch v.(type) {
+	switch val := v.(type) {
 	case nil:
 		e.buffer = encNull(e.buffer)
 		return nil
 
 	case bool:
-		e.buffer = encBool(e.buffer, v.(bool))
+		e.buffer = encBool(e.buffer, val)
 
-	case int8:
-		e.buffer = encInt32(e.buffer, v.(int32))
-
-	case int16:
-		e.buffer = encInt32(e.buffer, v.(int32))
-
-	case int32:
+	case int8, int16, int32:
 		e.buffer = encInt32(e.buffer, v.(int32))
 
 	case int:
@@ -99,30 +97,31 @@ func (e *Encoder) Encode(v interface{}) error {
 		// } else {
 		// 	b = encInt64(int64(v.(int)), b)
 		// }
-		// 把int统一按照int64处理，这样才不会导致decode的时候出现" reflect: Call using int32 as type int64 [recovered]"这种panic
-		e.buffer = encInt64(e.buffer, int64(v.(int)))
+		// use int64 type to handle int, to avoid  panic like :  reflect: Call using int32 as type int64 [recovered]
+		// when decode
+		e.buffer = encInt64(e.buffer, int64(val))
 
 	case int64:
-		e.buffer = encInt64(e.buffer, v.(int64))
+		e.buffer = encInt64(e.buffer, val)
 
 	case time.Time:
-		e.buffer = encDateInMs(e.buffer, v.(time.Time))
+		e.buffer = encDateInMs(e.buffer, val)
 		// e.buffer = encDateInMimute(v.(time.Time), e.buffer)
 
 	case float32:
-		e.buffer = encFloat(e.buffer, float64(v.(float32)))
+		e.buffer = encFloat(e.buffer, float64(val))
 
 	case float64:
-		e.buffer = encFloat(e.buffer, v.(float64))
+		e.buffer = encFloat(e.buffer, val)
 
 	case string:
-		e.buffer = encString(e.buffer, v.(string))
+		e.buffer = encString(e.buffer, val)
 
 	case []byte:
-		e.buffer = encBinary(e.buffer, v.([]byte))
+		e.buffer = encBinary(e.buffer, val)
 
 	case map[interface{}]interface{}:
-		return e.encUntypedMap(v.(map[interface{}]interface{}))
+		return e.encUntypedMap(val)
 
 	default:
 		t := UnpackPtrType(reflect.TypeOf(v))
@@ -135,7 +134,7 @@ func (e *Encoder) Encode(v interface{}) error {
 			return jerrors.Errorf("struct type not Support! %s[%v] is not a instance of POJO!", t.String(), v)
 		case reflect.Slice, reflect.Array:
 			return e.encUntypedList(v)
-		case reflect.Map: // 进入这个case，就说明map可能是map[string]int这种类型
+		case reflect.Map: // the type must be map[string]int
 			return e.encMap(v)
 		default:
 			if p, ok := v.(POJOEnum); ok { // JavaEnum

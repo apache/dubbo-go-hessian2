@@ -32,6 +32,7 @@ import (
 // String
 /////////////////////////////////////////
 
+// Slice convert string to byte slice
 func Slice(s string) (b []byte) {
 	pbytes := (*reflect.SliceHeader)(unsafe.Pointer(&b))
 	pstring := (*reflect.StringHeader)(unsafe.Pointer(&s))
@@ -48,8 +49,9 @@ func Slice(s string) (b []byte) {
 // ::= [x30-x34] <utf8-data>         # string of length 0-1023
 func encString(b []byte, v string) []byte {
 	var (
+		vLen int
+
 		vBuf = *bytes.NewBufferString(v)
-		vLen = utf8.RuneCountInString(v)
 
 		vChunk = func(length int) {
 			for i := 0; i < length; i++ {
@@ -175,13 +177,13 @@ func (d *Decoder) decString(flag int32) (string, error) {
 	}
 
 	switch {
-	case tag == byte(BC_NULL):
+	case tag == BC_NULL:
 		return STRING_NIL, nil
 
-	case tag == byte(BC_TRUE):
+	case tag == BC_TRUE:
 		return STRING_TRUE, nil
 
-	case tag == byte(BC_FALSE):
+	case tag == BC_FALSE:
 		return STRING_FALSE, nil
 
 	case (0x80 <= tag && tag <= 0xbf) || (0xc0 <= tag && tag <= 0xcf) ||
@@ -195,13 +197,13 @@ func (d *Decoder) decString(flag int32) (string, error) {
 
 		return strconv.Itoa(int(i64)), nil
 
-	case tag == byte(BC_DOUBLE_ZERO):
+	case tag == BC_DOUBLE_ZERO:
 		return STRING_ZERO, nil
 
-	case tag == byte(BC_DOUBLE_ONE):
+	case tag == BC_DOUBLE_ONE:
 		return STRING_ONE, nil
 
-	case tag == byte(BC_DOUBLE_BYTE) || tag == byte(BC_DOUBLE_SHORT):
+	case tag == BC_DOUBLE_BYTE || tag == BC_DOUBLE_SHORT:
 		f, err := d.decDouble(int32(tag))
 		if err != nil {
 			return "", jerrors.Annotatef(err, "tag:%+v", tag)
@@ -210,7 +212,6 @@ func (d *Decoder) decString(flag int32) (string, error) {
 		return strconv.FormatFloat(f.(float64), 'E', -1, 64), nil
 	}
 
-	last = true
 	if (tag >= BC_STRING_DIRECT && tag <= STRING_DIRECT_MAX) ||
 		(tag >= 0x30 && tag <= 0x33) ||
 		(tag == BC_STRING_CHUNK || tag == BC_STRING) {
@@ -268,7 +269,8 @@ func (d *Decoder) decString(flag int32) (string, error) {
 			}
 		}
 
-		return string(runeDate), nil
+		// unreachable
+		// return string(runeDate), nil
 	}
 
 	return s, jerrors.Errorf("unknown string tag %#x\n", tag)

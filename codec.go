@@ -67,10 +67,12 @@ func validateFloatKind(k reflect.Kind) bool {
 	}
 }
 
+// PackInt8 packs int to byte array
 func PackInt8(v int8, b []byte) []byte {
 	return append(b, byte(v))
 }
 
+// PackInt16 packs int16 to byte array
 //[10].pack('N').bytes => [0, 0, 0, 10]
 func PackInt16(v int16) []byte {
 	var array [2]byte
@@ -78,6 +80,7 @@ func PackInt16(v int16) []byte {
 	return array[:]
 }
 
+// PackUint16 packs uint16 to byte array
 //[10].pack('N').bytes => [0, 0, 0, 10]
 func PackUint16(v uint16) []byte {
 	var array [2]byte
@@ -85,6 +88,7 @@ func PackUint16(v uint16) []byte {
 	return array[:]
 }
 
+// PackInt32 packs int32 to byte array
 //[10].pack('N').bytes => [0, 0, 0, 10]
 func PackInt32(v int32) []byte {
 	var array [4]byte
@@ -92,6 +96,7 @@ func PackInt32(v int32) []byte {
 	return array[:]
 }
 
+// PackInt64 packs int64 to byte array
 //[10].pack('q>').bytes => [0, 0, 0, 0, 0, 0, 0, 10]
 func PackInt64(v int64) []byte {
 	var array [8]byte
@@ -99,6 +104,7 @@ func PackInt64(v int64) []byte {
 	return array[:]
 }
 
+// PackFloat64 packs float64 to byte array
 //[10].pack('G').bytes => [64, 36, 0, 0, 0, 0, 0, 0]
 // PackFloat64 invokes go's official math library function Float64bits.
 func PackFloat64(v float64) []byte {
@@ -107,30 +113,35 @@ func PackFloat64(v float64) []byte {
 	return array[:]
 }
 
+// UnpackInt16 unpacks int16 from byte array
 //(0,2).unpack('n')
 func UnpackInt16(b []byte) int16 {
 	var arr = b[:2]
 	return int16(binary.BigEndian.Uint16(arr))
 }
 
+// UnpackUint16 unpacks int16 from byte array
 //(0,2).unpack('n')
 func UnpackUint16(b []byte) uint16 {
 	var arr = b[:2]
-	return uint16(binary.BigEndian.Uint16(arr))
+	return binary.BigEndian.Uint16(arr)
 }
 
+// UnpackInt32 unpacks int32 from byte array
 //(0,4).unpack('N')
 func UnpackInt32(b []byte) int32 {
 	var arr = b[:4]
 	return int32(binary.BigEndian.Uint32(arr))
 }
 
+// UnpackInt64 unpacks int64 from byte array
 //long (0,8).unpack('q>')
 func UnpackInt64(b []byte) int64 {
 	var arr = b[:8]
 	return int64(binary.BigEndian.Uint64(arr))
 }
 
+// UnpackFloat64 unpacks float64 from byte array
 //Double (0,8).unpack('G)
 func UnpackFloat64(b []byte) float64 {
 	var arr = b[:8]
@@ -181,7 +192,7 @@ func SprintHex(b []byte) (rs string) {
 	return
 }
 
-//EnsureFloat64 convert i to float64
+// EnsureFloat64 convert i to float64
 func EnsureFloat64(i interface{}) float64 {
 	if i64, ok := i.(float64); ok {
 		return i64
@@ -192,7 +203,7 @@ func EnsureFloat64(i interface{}) float64 {
 	panic(fmt.Errorf("can't convert to float64: %v, type:%v", i, reflect.TypeOf(i)))
 }
 
-//EnsureInt64 convert i to int64
+// EnsureInt64 convert i to int64
 func EnsureInt64(i interface{}) int64 {
 	if i64, ok := i.(int64); ok {
 		return i64
@@ -212,7 +223,7 @@ func EnsureInt64(i interface{}) int64 {
 	panic(fmt.Errorf("can't convert to int64: %v, type:%v", i, reflect.TypeOf(i)))
 }
 
-//EnsureUint64 convert i to uint64
+// EnsureUint64 convert i to uint64
 func EnsureUint64(i interface{}) uint64 {
 	if i64, ok := i.(uint64); ok {
 		return i64
@@ -229,7 +240,7 @@ func EnsureUint64(i interface{}) uint64 {
 	panic(fmt.Errorf("can't convert to uint64: %v, type:%v", i, reflect.TypeOf(i)))
 }
 
-//EnsurePackValue pack the interface with value
+// EnsurePackValue pack the interface with value
 func EnsurePackValue(in interface{}) reflect.Value {
 	if v, ok := in.(reflect.Value); ok {
 		return v
@@ -344,6 +355,7 @@ func SetValue(dest, v reflect.Value) {
 	dest.Set(v)
 }
 
+// AddrEqual compares addrs
 func AddrEqual(x, y interface{}) bool {
 	if x == nil || y == nil {
 		return x == y

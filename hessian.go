@@ -24,24 +24,28 @@ import (
 	jerrors "github.com/juju/errors"
 )
 
+// enum part
 const (
-	Error          PackgeType = 0x01
-	Request                   = 0x02
-	Response                  = 0x04
-	Heartbeat                 = 0x08
-	Request_TwoWay            = 0x10
+	PackageError          = PackageType(0x01)
+	PackageRequest        = PackageType(0x02)
+	PackageResponse       = PackageType(0x04)
+	PackageHeartbeat      = PackageType(0x08)
+	PackageRequest_TwoWay = PackageType(0x10)
 )
 
-type PackgeType int
+// PackageType ...
+type PackageType int
 
+// DubboHeader dubbo header
 type DubboHeader struct {
 	SerialID       byte
-	Type           PackgeType
+	Type           PackageType
 	ID             int64
 	BodyLen        int
 	ResponseStatus byte
 }
 
+// Service defines service instance
 type Service struct {
 	Path      string
 	Interface string
@@ -51,12 +55,14 @@ type Service struct {
 	Timeout   time.Duration // request timeout
 }
 
+// HessianCodec defines hessian codec
 type HessianCodec struct {
-	pkgType PackgeType
+	pkgType PackageType
 	reader  *bufio.Reader
 	bodyLen int
 }
 
+// NewHessianCodec generate a new hessian codec instance
 func NewHessianCodec(reader *bufio.Reader) *HessianCodec {
 	return &HessianCodec{
 		reader: reader,
@@ -65,24 +71,25 @@ func NewHessianCodec(reader *bufio.Reader) *HessianCodec {
 
 func (h *HessianCodec) Write(service Service, header DubboHeader, body interface{}) ([]byte, error) {
 	switch header.Type {
-	case Heartbeat:
+	case PackageHeartbeat:
 		if header.ResponseStatus == Zero {
 			return packRequest(service, header, body)
 		}
 		return packResponse(header, map[string]string{}, body)
-	case Request:
+	case PackageRequest:
 		return packRequest(service, header, body)
 
-	case Response:
+	case PackageResponse:
 		return packResponse(header, map[string]string{}, body)
 
 	default:
 		return nil, jerrors.Errorf("Unrecognised message type: %v", header.Type)
 	}
 
-	return nil, nil
+	// unreachable return nil, nil
 }
 
+// ReadHeader uses hessian codec to read dubbo header
 func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 
 	var err error
@@ -98,7 +105,7 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 
 	//// read header
 
-	if buf[0] != byte(MAGIC_HIGH) && buf[1] != byte(MAGIC_LOW) {
+	if buf[0] != MAGIC_HIGH && buf[1] != MAGIC_LOW {
 		return ErrIllegalPackage
 	}
 
@@ -109,23 +116,23 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 
 	flag := buf[2] & FLAG_EVENT
 	if flag != Zero {
-		header.Type |= Heartbeat
+		header.Type |= PackageHeartbeat
 	}
 	flag = buf[2] & FLAG_REQUEST
 	if flag != Zero {
-		header.Type |= Request
+		header.Type |= PackageRequest
 		flag = buf[2] & FLAG_TWOWAY
 		if flag != Zero {
-			header.Type |= Request_TwoWay
+			header.Type |= PackageRequest_TwoWay
 		}
 	} else {
-		header.Type |= Response
+		header.Type |= PackageResponse
 		header.ResponseStatus = buf[3]
 
 		// Header{status}
 		if buf[3] != Response_OK {
 			err = ErrJavaException
-			header.Type |= Error
+			header.Type |= PackageError
 			bufSize := h.reader.Buffered()
 			if bufSize > 2 { // responseType + objectType + error content,so it's size > 2
 				expBuf, expErr := h.reader.Peek(bufSize)
@@ -152,6 +159,7 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 
 }
 
+// ReadBody uses hessian codec to read response body
 func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 
 	buf, err := h.reader.Peek(h.bodyLen)
@@ -167,9 +175,9 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 	}
 
 	switch h.pkgType & 0x0f {
-	case Request | Heartbeat, Response | Heartbeat:
+	case PackageRequest | PackageHeartbeat, PackageResponse | PackageHeartbeat:
 		return nil
-	case Request:
+	case PackageRequest:
 		if rspObj != nil {
 			if err = unpackRequestBody(buf, rspObj); err != nil {
 				return jerrors.Trace(err)
@@ -178,7 +186,7 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 
 		return nil
 
-	case Response:
+	case PackageResponse:
 		if rspObj != nil {
 			if err = unpackResponseBody(buf, rspObj); err != nil {
 				return jerrors.Trace(err)

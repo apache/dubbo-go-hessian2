@@ -125,6 +125,7 @@ func (e *Encoder) encObject(v POJO) error {
 			break
 		}
 	}
+
 	if idx == -1 {
 		idx, ok = checkPOJORegistry(typeof(v))
 		if !ok { // 不存在
@@ -134,7 +135,11 @@ func (e *Encoder) encObject(v POJO) error {
 				idx = RegisterPOJO(v)
 			}
 		}
-		_, clsDef, _ = getStructDefByIndex(idx)
+		_, clsDef, err = getStructDefByIndex(idx)
+		if err != nil {
+			return jerrors.Trace(err)
+		}
+
 		idx = len(e.classInfoList)
 		e.classInfoList = append(e.classInfoList, clsDef)
 		e.buffer = append(e.buffer, clsDef.buffer...)

@@ -86,7 +86,7 @@ func getMapKey(key reflect.Value, t reflect.Type) (interface{}, error) {
 	case reflect.Float32:
 		return float32(key.Float()), nil
 	case reflect.Float64:
-		return float64(key.Float()), nil
+		return key.Float(), nil
 
 	case reflect.Uintptr:
 		return key.UnsafeAddr(), nil
@@ -254,6 +254,7 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 		if t, err = d.decType(); err != nil {
 			return nil, err
 		}
+
 		if _, ok = checkPOJORegistry(t); ok {
 			m = make(map[interface{}]interface{}) // 此处假设了map的定义形式，这是不对的
 			d.appendRefs(m)
@@ -281,39 +282,40 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 			}
 
 			return m, nil
-		} else {
-			inst = createInstance(t)
-			d.appendRefs(inst)
-
-			for d.peekByte() != 'z' {
-				if key, err = d.Decode(); err != nil {
-					return nil, err
-				}
-				if value, err = d.Decode(); err != nil {
-					return nil, err
-				}
-				//set value of the struct to Zero
-				if fieldValue = reflect.ValueOf(value); fieldValue.IsValid() {
-					keyName = key.(string)
-					if keyName[0] >= 'a' { //convert to Upper
-						methodName = "Set" + string(keyName[0]-32) + keyName[1:]
-					} else {
-						methodName = "Set" + keyName
-					}
-
-					args = args[:0]
-					args = append(args, fieldValue)
-					reflect.ValueOf(inst).MethodByName(methodName).Call(args)
-				}
-			}
-
-			return inst, nil
 		}
+
+		// check failed
+		inst = createInstance(t)
+		d.appendRefs(inst)
+
+		for d.peekByte() != 'z' {
+			if key, err = d.Decode(); err != nil {
+				return nil, err
+			}
+			if value, err = d.Decode(); err != nil {
+				return nil, err
+			}
+			//set value of the struct to Zero
+			if fieldValue = reflect.ValueOf(value); fieldValue.IsValid() {
+				keyName = key.(string)
+				if keyName[0] >= 'a' { //convert to Upper
+					methodName = "Set" + string(keyName[0]-32) + keyName[1:]
+				} else {
+					methodName = "Set" + keyName
+				}
+
+				args = args[:0]
+				args = append(args, fieldValue)
+				reflect.ValueOf(inst).MethodByName(methodName).Call(args)
+			}
+		}
+
+		return inst, nil
 
 	case tag == BC_MAP_UNTYPED:
 		m = make(map[interface{}]interface{})
 		d.appendRefs(m)
-		for d.peekByte() != byte(BC_END) {
+		for d.peekByte() != BC_END {
 			k, err = d.Decode()
 			if err != nil {
 				if err == io.EOF {
