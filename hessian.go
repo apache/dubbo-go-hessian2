@@ -26,11 +26,11 @@ import (
 
 // enum part
 const (
-	Error          PackageType = 0x01
-	Request                    = 0x02
-	Response                   = 0x04
-	Heartbeat                  = 0x08
-	Request_TwoWay             = 0x10
+	Error          = PackageType(0x01)
+	Request        = PackageType(0x02)
+	Response       = PackageType(0x04)
+	Heartbeat      = PackageType(0x08)
+	Request_TwoWay = PackageType(0x10)
 )
 
 // PackageType ...
