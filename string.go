@@ -49,8 +49,9 @@ func Slice(s string) (b []byte) {
 // ::= [x30-x34] <utf8-data>         # string of length 0-1023
 func encString(b []byte, v string) []byte {
 	var (
+		vLen int
+
 		vBuf = *bytes.NewBufferString(v)
-		vLen = utf8.RuneCountInString(v)
 
 		vChunk = func(length int) {
 			for i := 0; i < length; i++ {
@@ -211,7 +212,6 @@ func (d *Decoder) decString(flag int32) (string, error) {
 		return strconv.FormatFloat(f.(float64), 'E', -1, 64), nil
 	}
 
-	last = true
 	if (tag >= BC_STRING_DIRECT && tag <= STRING_DIRECT_MAX) ||
 		(tag >= 0x30 && tag <= 0x33) ||
 		(tag == BC_STRING_CHUNK || tag == BC_STRING) {
