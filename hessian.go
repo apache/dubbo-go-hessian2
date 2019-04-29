@@ -26,11 +26,11 @@ import (
 
 // enum part
 const (
-	Error          = PackageType(0x01)
-	Request        = PackageType(0x02)
-	Response       = PackageType(0x04)
-	Heartbeat      = PackageType(0x08)
-	Request_TwoWay = PackageType(0x10)
+	PackageError          = PackageType(0x01)
+	PackageRequest        = PackageType(0x02)
+	PackageResponse       = PackageType(0x04)
+	PackageHeartbeat      = PackageType(0x08)
+	PackageRequest_TwoWay = PackageType(0x10)
 )
 
 // PackageType ...
@@ -71,15 +71,15 @@ func NewHessianCodec(reader *bufio.Reader) *HessianCodec {
 
 func (h *HessianCodec) Write(service Service, header DubboHeader, body interface{}) ([]byte, error) {
 	switch header.Type {
-	case Heartbeat:
+	case PackageHeartbeat:
 		if header.ResponseStatus == Zero {
 			return packRequest(service, header, body)
 		}
 		return packResponse(header, map[string]string{}, body)
-	case Request:
+	case PackageRequest:
 		return packRequest(service, header, body)
 
-	case Response:
+	case PackageResponse:
 		return packResponse(header, map[string]string{}, body)
 
 	default:
@@ -116,23 +116,23 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 
 	flag := buf[2] & FLAG_EVENT
 	if flag != Zero {
-		header.Type |= Heartbeat
+		header.Type |= PackageHeartbeat
 	}
 	flag = buf[2] & FLAG_REQUEST
 	if flag != Zero {
-		header.Type |= Request
+		header.Type |= PackageRequest
 		flag = buf[2] & FLAG_TWOWAY
 		if flag != Zero {
-			header.Type |= Request_TwoWay
+			header.Type |= PackageRequest_TwoWay
 		}
 	} else {
-		header.Type |= Response
+		header.Type |= PackageResponse
 		header.ResponseStatus = buf[3]
 
 		// Header{status}
 		if buf[3] != Response_OK {
 			err = ErrJavaException
-			header.Type |= Error
+			header.Type |= PackageError
 			bufSize := h.reader.Buffered()
 			if bufSize > 2 { // responseType + objectType + error content,so it's size > 2
 				expBuf, expErr := h.reader.Peek(bufSize)
@@ -175,9 +175,9 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 	}
 
 	switch h.pkgType & 0x0f {
-	case Request | Heartbeat, Response | Heartbeat:
+	case PackageRequest | PackageHeartbeat, PackageResponse | PackageHeartbeat:
 		return nil
-	case Request:
+	case PackageRequest:
 		if rspObj != nil {
 			if err = unpackRequestBody(buf, rspObj); err != nil {
 				return jerrors.Trace(err)
@@ -186,7 +186,7 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 
 		return nil
 
-	case Response:
+	case PackageResponse:
 		if rspObj != nil {
 			if err = unpackResponseBody(buf, rspObj); err != nil {
 				return jerrors.Trace(err)

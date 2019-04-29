@@ -34,7 +34,7 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 		byteArray []byte
 	)
 
-	hb := header.Type == Heartbeat
+	hb := header.Type == PackageHeartbeat
 
 	// magic
 	if hb {

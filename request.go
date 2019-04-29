@@ -134,7 +134,7 @@ func packRequest(service Service, header DubboHeader, params interface{}) ([]byt
 		return nil, jerrors.Errorf("@params is not of type: []interface{}")
 	}
 
-	hb := header.Type == Heartbeat
+	hb := header.Type == PackageHeartbeat
 
 	//////////////////////////////////////////
 	// byteArray

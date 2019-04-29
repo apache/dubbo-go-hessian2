@@ -52,7 +52,7 @@ func doTest(t *testing.T, packageType PackageType, responseStatus byte, body int
 		return
 	}
 	assert.Equal(t, byte(2), h.SerialID)
-	assert.Equal(t, packageType, h.Type&(Request|Response|Heartbeat))
+	assert.Equal(t, packageType, h.Type&(PackageRequest|PackageResponse|PackageHeartbeat))
 	assert.Equal(t, int64(1), h.ID)
 	assert.Equal(t, responseStatus, h.ResponseStatus)
 
@@ -80,27 +80,27 @@ func doTest(t *testing.T, packageType PackageType, responseStatus byte, body int
 	t.Log(c)
 	//t.Log(reflect.ValueOf(body).Type())
 	//t.Log(reflect.ValueOf(c).Type())
-	if packageType == Request {
+	if packageType == PackageRequest {
 		assert.True(t, len(body.([]interface{})) == len(c.([]interface{})[5].([]interface{})))
-	} else if packageType == Response {
+	} else if packageType == PackageResponse {
 		assert.True(t, reflect.DeepEqual(body, c))
 	}
 }
 
 func TestResponse(t *testing.T) {
-	doTest(t, Response, Response_OK, &Case{A: "a", B: 1})
-	doTest(t, Response, Response_OK, "ok!!!!!")
-	doTest(t, Response, Response_OK, int64(3))
-	doTest(t, Response, Response_OK, true)
-	doTest(t, Response, Response_SERVER_ERROR, "error!!!!!")
+	doTest(t, PackageResponse, Response_OK, &Case{A: "a", B: 1})
+	doTest(t, PackageResponse, Response_OK, "ok!!!!!")
+	doTest(t, PackageResponse, Response_OK, int64(3))
+	doTest(t, PackageResponse, Response_OK, true)
+	doTest(t, PackageResponse, Response_SERVER_ERROR, "error!!!!!")
 }
 
 func TestRequest(t *testing.T) {
-	doTest(t, Request, byte(0), []interface{}{"a"})
-	doTest(t, Request, byte(0), []interface{}{"a", 3})
-	doTest(t, Request, byte(0), []interface{}{"a", true})
-	doTest(t, Request, byte(0), []interface{}{"a", 3, true})
-	doTest(t, Request, byte(0), []interface{}{3.2, true})
-	doTest(t, Request, byte(0), []interface{}{"a", 3, true, &Case{A: "a", B: 3}})
-	doTest(t, Request, byte(0), []interface{}{"a", 3, true, []*Case{{A: "a", B: 3}}})
+	doTest(t, PackageRequest, byte(0), []interface{}{"a"})
+	doTest(t, PackageRequest, byte(0), []interface{}{"a", 3})
+	doTest(t, PackageRequest, byte(0), []interface{}{"a", true})
+	doTest(t, PackageRequest, byte(0), []interface{}{"a", 3, true})
+	doTest(t, PackageRequest, byte(0), []interface{}{3.2, true})
+	doTest(t, PackageRequest, byte(0), []interface{}{"a", 3, true, &Case{A: "a", B: 3}})
+	doTest(t, PackageRequest, byte(0), []interface{}{"a", 3, true, []*Case{{A: "a", B: 3}}})
 }
