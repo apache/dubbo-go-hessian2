@@ -159,7 +159,7 @@ func packRequest(service Service, header DubboHeader, params interface{}) ([]byt
 	// body
 	//////////////////////////////////////////
 	if hb {
-		_ = encoder.Encode(nil)
+		encoder.Encode(nil)
 		goto END
 	}
 

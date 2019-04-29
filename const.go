@@ -34,7 +34,9 @@ package hessian
 
 import (
 	"regexp"
+)
 
+import (
 	jerrors "github.com/juju/errors"
 )
 
