@@ -97,7 +97,8 @@ func (e *Encoder) Encode(v interface{}) error {
 		// } else {
 		// 	b = encInt64(int64(v.(int)), b)
 		// }
-		// 把int统一按照int64处理，这样才不会导致decode的时候出现" reflect: Call using int32 as type int64 [recovered]"这种panic
+		// use int64 type to handle int, to avoid  panic like :  reflect: Call using int32 as type int64 [recovered]
+		// when decode
 		e.buffer = encInt64(e.buffer, int64(val))
 
 	case int64:
@@ -133,7 +134,7 @@ func (e *Encoder) Encode(v interface{}) error {
 			return jerrors.Errorf("struct type not Support! %s[%v] is not a instance of POJO!", t.String(), v)
 		case reflect.Slice, reflect.Array:
 			return e.encUntypedList(v)
-		case reflect.Map: // 进入这个case，就说明map可能是map[string]int这种类型
+		case reflect.Map: // the type must be map[string]int
 			return e.encMap(v)
 		default:
 			if p, ok := v.(POJOEnum); ok { // JavaEnum

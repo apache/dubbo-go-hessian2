@@ -77,39 +77,39 @@ func NewDecoder(b []byte) *Decoder {
 // utilities
 /////////////////////////////////////////
 
-// 读取当前字节,指针不前移
+// peek a byte
 func (d *Decoder) peekByte() byte {
 	return d.peek(1)[0]
 }
 
-// 获取缓冲长度
+// get the buffer length
 func (d *Decoder) len() int {
-	d.peek(1) //需要先读一下资源才能得到已缓冲的长度
+	d.peek(1) // peek one byte to get the buffer length
 	return d.reader.Buffered()
 }
 
-// 读取 Decoder 结构中的一个字节,并后移一个字节
+// read a byte from Decoder, advance the ptr
 func (d *Decoder) readByte() (byte, error) {
 	return d.reader.ReadByte()
 }
 
-// 前移一个字节
+// unread a byte
 func (d *Decoder) unreadByte() error {
 	return d.reader.UnreadByte()
 }
 
-// 读取指定长度的字节,并后移len(b)个字节
+// read byte arr, and return the length of b
 func (d *Decoder) next(b []byte) (int, error) {
 	return d.reader.Read(b)
 }
 
-// 读取指定长度字节,指针不后移
+// peek n bytes, will not advance the read ptr
 func (d *Decoder) peek(n int) []byte {
 	b, _ := d.reader.Peek(n)
 	return b
 }
 
-// 读取len(s)的 utf8 字符
+// read utf8 len(s) of array
 func (d *Decoder) nextRune(s []rune) []rune {
 	var (
 		n   int
@@ -130,7 +130,7 @@ func (d *Decoder) nextRune(s []rune) []rune {
 	return s
 }
 
-// 读取数据类型描述,用于 list 和 map
+// read the type of data, used to decode list or map
 func (d *Decoder) decType() (string, error) {
 	var (
 		err error
@@ -189,7 +189,7 @@ func (d *Decoder) Decode() (interface{}, error) {
 	case tag == BC_FALSE: //'F': //false
 		return false, nil
 
-	case tag == BC_REF: // 'R': //ref, 一个整数，用以指代前面的list 或者 map
+	case tag == BC_REF: // 'R': //ref, a int which represents the previous list or map
 		return d.decRef(int32(tag))
 
 	case (0x80 <= tag && tag <= 0xbf) || (0xc0 <= tag && tag <= 0xcf) ||
