@@ -87,19 +87,21 @@ func TestEncStruct(t *testing.T) {
 
 	e = NewEncoder()
 	w = WorkerInfo{
-		Name:          "Trump",
-		Addrress:      "W,D.C.",
-		Age:           72,
-		Salary:        21000.03,
-		Payload:       map[string]int32{"Number": 2017061118},
-		FamilyMembers: []string{"m1", "m2", "m3"},
+		Name:              "Trump",
+		Addrress:          "W,D.C.",
+		Age:               72,
+		Salary:            21000.03,
+		Payload:           map[string]int32{"Number": 2017061118},
+		FamilyMembers:     []string{"m1", "m2", "m3"},
+		FamilyPhoneNumber: "010-12345678",
 		Dpt: Department{
 			Name: "Adm",
 		},
 	}
-	e.Encode(w)
-
-	t.Logf("encoded bytes: %s", string(e.Buffer()))
+	err = e.Encode(w)
+	if err != nil {
+		t.Errorf("Encode() = %v", err)
+	}
 
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
