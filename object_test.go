@@ -28,13 +28,14 @@ func (Department) JavaClassName() string {
 }
 
 type WorkerInfo struct {
-	Name           string
-	Addrress       string
-	Age            int
-	Salary         float32
-	Payload        map[string]int32
-	FalimyMemebers []string
-	Dpt            Department
+	Name              string
+	Addrress          string
+	Age               int
+	Salary            float32
+	Payload           map[string]int32
+	FamilyMembers     []string `hessian:"familyMembers"`
+	FamilyPhoneNumber string   // default convert to => familyPhoneNumber
+	Dpt               Department
 }
 
 func (WorkerInfo) JavaClassName() string {
@@ -52,12 +53,13 @@ func TestEncEmptyStruct(t *testing.T) {
 
 	e = NewEncoder()
 	w = WorkerInfo{
-		Name:           "Trump",
-		Addrress:       "W,D.C.",
-		Age:            72,
-		Salary:         21000.03,
-		Payload:        map[string]int32{"Number": 2017061118},
-		FalimyMemebers: []string{"m1", "m2", "m3"},
+		Name:              "Trump",
+		Addrress:          "W,D.C.",
+		Age:               72,
+		Salary:            21000.03,
+		Payload:           map[string]int32{"Number": 2017061118},
+		FamilyMembers:     []string{"m1", "m2", "m3"},
+		FamilyPhoneNumber: "010-12345678",
 		// Dpt: Department{
 		// 	Name: "Adm",
 		// },
@@ -85,17 +87,19 @@ func TestEncStruct(t *testing.T) {
 
 	e = NewEncoder()
 	w = WorkerInfo{
-		Name:           "Trump",
-		Addrress:       "W,D.C.",
-		Age:            72,
-		Salary:         21000.03,
-		Payload:        map[string]int32{"Number": 2017061118},
-		FalimyMemebers: []string{"m1", "m2", "m3"},
+		Name:          "Trump",
+		Addrress:      "W,D.C.",
+		Age:           72,
+		Salary:        21000.03,
+		Payload:       map[string]int32{"Number": 2017061118},
+		FamilyMembers: []string{"m1", "m2", "m3"},
 		Dpt: Department{
 			Name: "Adm",
 		},
 	}
 	e.Encode(w)
+
+	t.Logf("encoded bytes: %s", string(e.Buffer()))
 
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()

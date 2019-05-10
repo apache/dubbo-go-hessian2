@@ -30,6 +30,9 @@ const (
 	InvalidJavaEnum JavaEnum = -1
 )
 
+// TagIdentifier: struct filed tag of hessian
+var TagIdentifier = "hessian"
+
 // POJO interface
 // !!! Pls attention that Every field name should be upper case.
 // Otherwise the app may panic.
@@ -133,7 +136,10 @@ func RegisterPOJO(o POJO) int {
 		n = t.typ.NumField()
 		b = encInt32(b, int32(n))
 		for i = 0; i < n; i++ {
-			f = strings.ToLower(t.typ.Field(i).Name)
+			f = strCamelCase(t.typ.Field(i).Name, false)
+			if val, has := t.typ.Field(i).Tag.Lookup(TagIdentifier); has {
+				f = val
+			}
 			l = append(l, f)
 			b = encString(b, f)
 		}
@@ -276,4 +282,12 @@ func createInstance(goName string) interface{} {
 	}
 
 	return reflect.New(s.typ).Interface()
+}
+
+func strCamelCase(s string, upper bool) string {
+	if upper {
+		return s
+	}
+	rune := []rune(s)
+	return strings.ToLower(string(rune[0])) + string(rune[1:])
 }
