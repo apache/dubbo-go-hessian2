@@ -19,6 +19,7 @@ import (
 	"reflect"
 	"strings"
 	"sync"
+	"unicode"
 )
 
 import (
@@ -29,6 +30,22 @@ import (
 const (
 	InvalidJavaEnum JavaEnum = -1
 )
+
+// struct filed tag of hessian
+var tagIdentifier = "hessian"
+
+// SetTagIdentifier for customize struct filed tag of hessian, your can use it like:
+//
+// hessian.SetTagIdentifier("json")
+//
+// type MyUser struct {
+// 	UserFullName      string   `json:"user_full_name"`
+// 	FamilyPhoneNumber string   // default convert to => familyPhoneNumber
+// }
+//
+// var user MyUser
+// hessian.NewEncoder().Encode(user)
+func SetTagIdentifier(s string) { tagIdentifier = s }
 
 // POJO interface
 // !!! Pls attention that Every field name should be upper case.
@@ -133,7 +150,11 @@ func RegisterPOJO(o POJO) int {
 		n = t.typ.NumField()
 		b = encInt32(b, int32(n))
 		for i = 0; i < n; i++ {
-			f = strings.ToLower(t.typ.Field(i).Name)
+			if val, has := t.typ.Field(i).Tag.Lookup(tagIdentifier); has {
+				f = val
+			} else {
+				f = lowerCamelCase(t.typ.Field(i).Name)
+			}
 			l = append(l, f)
 			b = encString(b, f)
 		}
@@ -276,4 +297,10 @@ func createInstance(goName string) interface{} {
 	}
 
 	return reflect.New(s.typ).Interface()
+}
+
+func lowerCamelCase(s string) string {
+	runes := []rune(s)
+	runes[0] = unicode.ToLower(runes[0])
+	return string(runes)
 }

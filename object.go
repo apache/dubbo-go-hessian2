@@ -269,15 +269,22 @@ func (d *Decoder) decClassDef() (interface{}, error) {
 
 func findField(name string, typ reflect.Type) (int, error) {
 	for i := 0; i < typ.NumField(); i++ {
-		str := typ.Field(i).Name
-		if strings.Compare(str, name) == 0 {
+		// matching tag first, then lowerCamelCase, SameCase, lowerCase
+
+		if val, has := typ.Field(i).Tag.Lookup(tagIdentifier); has && strings.Compare(val, name) == 0 {
 			return i, nil
 		}
-		// str1 := strings.Title(name)
-		str1 := strings.ToLower(str)
-		if strings.Compare(name, str1) == 0 {
+
+		fieldName := typ.Field(i).Name
+		switch {
+		case strings.Compare(lowerCamelCase(fieldName), name) == 0:
+			return i, nil
+		case strings.Compare(fieldName, name) == 0:
+			return i, nil
+		case strings.Compare(strings.ToLower(fieldName), name) == 0:
 			return i, nil
 		}
+
 	}
 
 	return 0, jerrors.Errorf("failed to find field %s", name)
