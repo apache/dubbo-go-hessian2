@@ -92,8 +92,47 @@ The encoded bytes of the struct from above example will look like:
 
 #### Struct filed name decoding
 Hessian decoder will compare all filed's name of struct until it matches the correct name, the order of matching rules is:
-```text
-tag lookup => lower camelcase => samecase => lowercase
+```go
+type MyUser struct {
+	MobilePhone      string   `hessian:"mobile-phone"`
+}
+
+// You must define the tag of struct for lookup filed form encoded binary bytes, in this case：
+// 00000000  43 12 63 6f 6d 2e 63 6f  6d 70 61 6e 79 2e 6d 79  |C.com.company.my|
+// 00000010  75 73 65 72 91 0c 6d 6f  62 69 6c 65 2d 70 68 6f  |user..mobile-pho|
+// 00000020  6e 65 60 0b 31 37 36 31  32 33 34 31 32 33 34     |ne`.17612341234|
+//
+// mobile-phone(tag lookup) => mobilePhone(lowerCameCase) => MobilePhone(SameCase) => mobilephone(lowercase)
+// ^ will matched
+
+
+type MyUser struct {
+	MobilePhone      string  
+}
+
+// The following encoded binary bytes will be hit automatically:
+//
+// 00000000  43 12 63 6f 6d 2e 63 6f  6d 70 61 6e 79 2e 6d 79  |C.com.company.my|
+// 00000010  75 73 65 72 91 0b 6d 6f  62 69 6c 65 50 68 6f 6e  |user..mobilePhon|
+// 00000020  65 60 0b 31 37 36 31 32  33 34 31 32 33 34        |e`.17612341234|
+//
+// mobile-phone(tag lookup) => mobilePhone(lowerCameCase) => MobilePhone(SameCase) => mobilephone(lowercase)
+//                             ^ will matched
+//
+// 00000000  43 12 63 6f 6d 2e 63 6f  6d 70 61 6e 79 2e 6d 79  |C.com.company.my|
+// 00000010  75 73 65 72 91 0b 4d 6f  62 69 6c 65 50 68 6f 6e  |user..MobilePhon|
+// 00000020  65 60 0b 31 37 36 31 32  33 34 31 32 33 34        |e`.17612341234|
+//
+// mobile-phone(tag lookup) => mobilePhone(lowerCameCase) => MobilePhone(SameCase) => mobilephone(lowercase)
+//                                                           ^ will matched
+// 
+// 00000000  43 12 63 6f 6d 2e 63 6f  6d 70 61 6e 79 2e 6d 79  |C.com.company.my|
+// 00000010  75 73 65 72 91 0b 6d 6f  62 69 6c 65 70 68 6f 6e  |user..mobilephon|
+// 00000020  65 60 0b 31 37 36 31 32  33 34 31 32 33 34        |e`.17612341234|
+//
+// mobile-phone(tag lookup) => mobilePhone(lowerCameCase) => MobilePhone(SameCase) => mobilephone(lowercase)
+//                                                                                    ^ will matched
+
 ```
 
 
