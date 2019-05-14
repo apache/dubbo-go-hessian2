@@ -150,6 +150,11 @@ func RegisterPOJO(o POJO) int {
 		n = t.typ.NumField()
 		b = encInt32(b, int32(n))
 		for i = 0; i < n; i++ {
+			// skip unexported anonymous filed
+			if t.typ.Field(i).PkgPath != "" {
+				continue
+			}
+
 			if val, has := t.typ.Field(i).Tag.Lookup(tagIdentifier); has {
 				f = val
 			} else {

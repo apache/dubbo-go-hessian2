@@ -159,6 +159,11 @@ func (e *Encoder) encObject(v POJO) error {
 	}
 	num = vv.NumField()
 	for i = 0; i < num; i++ {
+		// skip unexported anonymous filed
+		if vv.Type().Field(i).PkgPath != "" {
+			continue
+		}
+
 		field := vv.Field(i)
 		fieldName := field.Type().String()
 		if err = e.Encode(field.Interface()); err != nil {
@@ -307,6 +312,12 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 		if err != nil {
 			return nil, jerrors.Errorf("can not find field %s", fieldName)
 		}
+
+		// skip unexported anonymous filed
+		if vv.Type().Field(index).PkgPath != "" {
+			continue
+		}
+
 		field := vv.Field(index)
 		if !field.CanSet() {
 			return nil, jerrors.Errorf("decInstance CanSet false for field %s", fieldName)
