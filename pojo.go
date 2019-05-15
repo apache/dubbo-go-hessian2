@@ -114,67 +114,68 @@ func showPOJORegistry() {
 func RegisterPOJO(o POJO) int {
 	// # definition for an object (compact map)
 	// class-def  ::= 'C' string int string*
-	var (
-		ok bool
-		b  []byte
-		i  int
-		n  int
-		f  string
-		l  []string
-		t  structInfo
-		c  classInfo
-		v  reflect.Value
-	)
-
 	pojoRegistry.Lock()
 	defer pojoRegistry.Unlock()
-	if _, ok = pojoRegistry.registry[o.JavaClassName()]; !ok {
-		v = reflect.ValueOf(o)
-		switch v.Kind() {
-		case reflect.Struct:
-			t.typ = v.Type()
-		case reflect.Ptr:
-			t.typ = v.Elem().Type()
-		default:
-			t.typ = reflect.TypeOf(o)
-		}
-		t.goName = t.typ.String()
-		t.javaName = o.JavaClassName()
-		t.inst = o
-		pojoRegistry.j2g[t.javaName] = t.goName
 
-		b = b[:0]
-		b = encByte(b, BC_OBJECT_DEF)
-		b = encString(b, t.javaName)
-		l = l[:0]
-		n = t.typ.NumField()
-		b = encInt32(b, int32(n))
-		for i = 0; i < n; i++ {
-			// skip unexported anonymous filed
-			if t.typ.Field(i).PkgPath != "" {
-				continue
-			}
-
-			if val, has := t.typ.Field(i).Tag.Lookup(tagIdentifier); has {
-				f = val
-			} else {
-				f = lowerCamelCase(t.typ.Field(i).Name)
-			}
-			l = append(l, f)
-			b = encString(b, f)
-		}
-
-		c = classInfo{javaName: t.javaName, fieldNameList: l}
-		c.buffer = append(c.buffer, b[:]...)
-		t.index = len(pojoRegistry.classInfoList)
-		pojoRegistry.classInfoList = append(pojoRegistry.classInfoList, c)
-		pojoRegistry.registry[t.goName] = t
-		i = t.index
-	} else {
-		i = -1
+	if _, ok := pojoRegistry.registry[o.JavaClassName()]; ok {
+		return -1
 	}
 
-	return i
+	var (
+		bHeader    []byte
+		bBody      []byte
+		fieldList  []string
+		structInfo structInfo
+		clsDef     classInfo
+		v          reflect.Value
+	)
+
+	v = reflect.ValueOf(o)
+	switch v.Kind() {
+	case reflect.Struct:
+		structInfo.typ = v.Type()
+	case reflect.Ptr:
+		structInfo.typ = v.Elem().Type()
+	default:
+		structInfo.typ = reflect.TypeOf(o)
+	}
+
+	structInfo.goName = structInfo.typ.String()
+	structInfo.javaName = o.JavaClassName()
+	structInfo.inst = o
+	pojoRegistry.j2g[structInfo.javaName] = structInfo.goName
+
+	// prepare header of objectDef
+	bHeader = encByte(bHeader, BC_OBJECT_DEF)
+	bHeader = encString(bHeader, structInfo.javaName)
+
+	// handle fields body of objectDef
+	for i := 0; i < structInfo.typ.NumField(); i++ {
+		// skip unexported anonymous filed
+		if structInfo.typ.Field(i).PkgPath != "" {
+			continue
+		}
+
+		var fieldName string
+		if val, has := structInfo.typ.Field(i).Tag.Lookup(tagIdentifier); has {
+			fieldName = val
+		} else {
+			fieldName = lowerCamelCase(structInfo.typ.Field(i).Name)
+		}
+
+		fieldList = append(fieldList, fieldName)
+		bBody = encString(bBody, fieldName)
+	}
+
+	// write fields length to header of objectDef, assembly data
+	bHeader = encInt32(bHeader, int32(len(fieldList)))
+	clsDef = classInfo{javaName: structInfo.javaName, fieldNameList: fieldList, buffer: append(bHeader, bBody...)}
+
+	structInfo.index = len(pojoRegistry.classInfoList)
+	pojoRegistry.classInfoList = append(pojoRegistry.classInfoList, clsDef)
+	pojoRegistry.registry[structInfo.goName] = structInfo
+
+	return structInfo.index
 }
 
 // RegisterJavaEnum Register a value type JavaEnum variable.
