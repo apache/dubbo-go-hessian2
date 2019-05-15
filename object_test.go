@@ -28,12 +28,13 @@ func (Department) JavaClassName() string {
 }
 
 type WorkerInfo struct {
+	unexportedFiled   string
 	Name              string
 	Addrress          string
 	Age               int
 	Salary            float32
 	Payload           map[string]int32
-	FamilyMembers     []string `hessian:"familyMembers"`
+	FamilyMembers     []string `hessian:"familyMembers1"`
 	FamilyPhoneNumber string   // default convert to => familyPhoneNumber
 	Dpt               Department
 }
@@ -97,7 +98,11 @@ func TestEncStruct(t *testing.T) {
 		Dpt: Department{
 			Name: "Adm",
 		},
+		unexportedFiled: "you cannot see me!",
 	}
+	wCopy := w
+	wCopy.unexportedFiled = ""
+
 	err = e.Encode(w)
 	if err != nil {
 		t.Errorf("Encode() = %v", err)
@@ -108,7 +113,7 @@ func TestEncStruct(t *testing.T) {
 	if err != nil {
 		t.Errorf("Decode() = %v", err)
 	}
-	t.Logf("decode(%v) = %v, %v\n", w, res, err)
+	t.Logf("decode(%+v) = %+v, %v\n", w, res, err)
 
 	res = res.(reflect.Value).Interface()
 	w2, ok := res.(*WorkerInfo)
@@ -116,8 +121,8 @@ func TestEncStruct(t *testing.T) {
 		t.Fatalf("res:%T is not of type WorkerInfo", w2)
 	}
 
-	if !reflect.DeepEqual(w, *w2) {
-		t.Fatalf("w:%#v != w2:%#v", w, w2)
+	if !reflect.DeepEqual(wCopy, *w2) {
+		t.Fatalf("w != w2:\n%#v\n!=\n%#v", wCopy, w2)
 	}
 }
 
