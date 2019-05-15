@@ -145,11 +145,7 @@ func RegisterPOJO(o POJO) int {
 	structInfo.inst = o
 	pojoRegistry.j2g[structInfo.javaName] = structInfo.goName
 
-	// prepare header of objectDef
-	bHeader = encByte(bHeader, BC_OBJECT_DEF)
-	bHeader = encString(bHeader, structInfo.javaName)
-
-	// handle fields body of objectDef
+	// prepare fields info of objectDef
 	for i := 0; i < structInfo.typ.NumField(); i++ {
 		// skip unexported anonymous filed
 		if structInfo.typ.Field(i).PkgPath != "" {
@@ -167,9 +163,19 @@ func RegisterPOJO(o POJO) int {
 		bBody = encString(bBody, fieldName)
 	}
 
-	// write fields length to header of objectDef, assembly data
+	// prepare header of objectDef
+	bHeader = encByte(bHeader, BC_OBJECT_DEF)
+	bHeader = encString(bHeader, structInfo.javaName)
+
+	// write fields length into header of objectDef
+	// note: cause fieldList is a dynamic slice, so one must calculate length only after it being prepared already.
 	bHeader = encInt32(bHeader, int32(len(fieldList)))
-	clsDef = classInfo{javaName: structInfo.javaName, fieldNameList: fieldList, buffer: append(bHeader, bBody...)}
+
+	// prepare classDef
+	clsDef = classInfo{javaName: structInfo.javaName, fieldNameList: fieldList}
+
+	// merge header and body of objectDef into buffer of classInfo
+	clsDef.buffer = append(bHeader, bBody...)
 
 	structInfo.index = len(pojoRegistry.classInfoList)
 	pojoRegistry.classInfoList = append(pojoRegistry.classInfoList, clsDef)
