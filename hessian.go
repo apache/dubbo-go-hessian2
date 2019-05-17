@@ -76,7 +76,7 @@ func (h *HessianCodec) Write(service Service, header DubboHeader, body interface
 			return packRequest(service, header, body)
 		}
 		return packResponse(header, map[string]string{}, body)
-	case PackageRequest:
+	case PackageRequest, PackageRequest_TwoWay:
 		return packRequest(service, header, body)
 
 	case PackageResponse:

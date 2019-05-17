@@ -143,7 +143,11 @@ func packRequest(service Service, header DubboHeader, params interface{}) ([]byt
 	if hb {
 		byteArray = append(byteArray, DubboRequestHeartbeatHeader[:]...)
 	} else {
-		byteArray = append(byteArray, DubboRequestHeaderBytes[:]...)
+		if header.Type == PackageRequest_TwoWay {
+			byteArray = append(byteArray, DubboRequestHeaderBytesTwoWay[:]...)
+		} else {
+			byteArray = append(byteArray, DubboRequestHeaderBytes[:]...)
+		}
 	}
 	// serialization id, two way flag, event, request/response flag
 	// java 中标识一个class的ID
