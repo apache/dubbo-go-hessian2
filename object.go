@@ -302,7 +302,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 
 	vRef := reflect.New(typ)
 	// add pointer ref so that ref the same object
-	d.appendRefs(vRef)
+	d.appendRefs(vRef.Interface())
 
 	vv := vRef.Elem()
 	for i := 0; i < len(cls.fieldNameList); i++ {
@@ -437,7 +437,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 		}
 	} // end for
 
-	return vRef, nil
+	return vRef.Interface(), nil
 }
 
 func (d *Decoder) appendClsDef(cd classInfo) {

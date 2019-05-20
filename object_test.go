@@ -115,7 +115,6 @@ func TestEncStruct(t *testing.T) {
 	}
 	t.Logf("decode(%+v) = %+v, %v\n", w, res, err)
 
-	res = res.(reflect.Value).Interface()
 	w2, ok := res.(*WorkerInfo)
 	if !ok {
 		t.Fatalf("res:%T is not of type WorkerInfo", w2)
@@ -199,7 +198,6 @@ func TestIssue6(t *testing.T) {
 	}
 	t.Logf("type of decode object:%v", reflect.TypeOf(res))
 
-	res = res.(reflect.Value).Interface()
 	worker2, ok := res.(*Worker)
 	if !ok {
 		t.Fatalf("res:%#v is not of type Worker", res)
