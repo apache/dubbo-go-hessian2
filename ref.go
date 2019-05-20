@@ -62,7 +62,7 @@ func (h *_refHolder) add(dest reflect.Value) {
 	h.destinations = append(h.destinations, dest)
 }
 
-// 添加引用
+// Add reference
 func (d *Decoder) appendRefs(v interface{}) *_refHolder {
 	var holder *_refHolder
 	vv := EnsurePackValue(v)

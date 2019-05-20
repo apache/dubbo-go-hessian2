@@ -100,7 +100,7 @@ var (
 	javaEnumType = reflect.TypeOf((*POJOEnum)(nil)).Elem()
 )
 
-// 解析struct
+// struct parsing
 func showPOJORegistry() {
 	pojoRegistry.Lock()
 	for k, v := range pojoRegistry.registry {
