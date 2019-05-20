@@ -51,7 +51,6 @@ func TestRef(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	res = res.(reflect.Value).Interface()
 	c1, ok := res.(*circular)
 	if !ok {
 		t.Fatalf("res:%T is not of type circular", c1)

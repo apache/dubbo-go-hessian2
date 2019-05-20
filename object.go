@@ -437,7 +437,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 		}
 	} // end for
 
-	return vRef, nil
+	return vRef.Interface(), nil
 }
 
 func (d *Decoder) appendClsDef(cd classInfo) {

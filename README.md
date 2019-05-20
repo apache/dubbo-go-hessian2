@@ -49,7 +49,6 @@ decodedObject, err := NewDecoder(bytes).Decode()
 if err != nil {
     panic(err)
 }
-obj = decodedObject.(reflect.Value).Interface()
 circular, ok := obj.(*Circular)
 // ...
 ```
