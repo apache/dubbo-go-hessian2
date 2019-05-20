@@ -128,7 +128,7 @@ func (e *Encoder) encObject(v POJO) error {
 
 	if idx == -1 {
 		idx, ok = checkPOJORegistry(typeof(v))
-		if !ok { // 不存在
+		if !ok {
 			if reflect.TypeOf(v).Implements(javaEnumType) {
 				idx = RegisterJavaEnum(v.(POJOEnum))
 			} else {
@@ -343,7 +343,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 			if err != nil {
 				// java enum
 				if fldRawValue.Type().Implements(javaEnumType) {
-					d.unreadByte() // enum解析，上面decInt64已经读取一个字节，所以这里需要回退一个字节
+					d.unreadByte() // Enum parsing, decInt64 above has read a byte, so you need to return a byte here
 					s, err := d.Decode()
 					if err != nil {
 						return nil, jerrors.Annotatef(err, "decInstance->decObject field name:%s", fieldName)
@@ -361,7 +361,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 			num, err := d.decInt64(TAG_READ)
 			if err != nil {
 				if fldTyp.Implements(javaEnumType) {
-					d.unreadByte() // enum解析，上面decInt64已经读取一个字节，所以这里需要回退一个字节
+					d.unreadByte() // Enum parsing, decInt64 above has read a byte, so you need to return a byte here
 					s, err := d.Decode()
 					if err != nil {
 						return nil, jerrors.Annotatef(err, "decInstance->decObject field name:%s", fieldName)

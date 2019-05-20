@@ -37,7 +37,7 @@ func getArgType(v interface{}) string {
 	}
 
 	switch v.(type) {
-	// 基本类型的序列化tag
+	// Serialized tags for base types
 	case nil:
 		return "V"
 	case bool:
@@ -48,7 +48,7 @@ func getArgType(v interface{}) string {
 		return "B"
 	case int16:
 		return "S"
-	case uint16: // 相当于Java的Char
+	case uint16: // Equivalent to Char of Java
 		return "C"
 	// case rune:
 	//	return "C"
@@ -72,7 +72,7 @@ func getArgType(v interface{}) string {
 		// return  "java.util.HashMap"
 		return "java.util.Map"
 
-	//  复杂类型的序列化tag
+	//  Serialized tags for complex types
 	default:
 		t := reflect.TypeOf(v)
 		if reflect.Ptr == t.Kind() {
@@ -84,7 +84,7 @@ func getArgType(v interface{}) string {
 		case reflect.Slice, reflect.Array:
 			// return "java.util.ArrayList"
 			return "java.util.List"
-		case reflect.Map: // 进入这个case，就说明map可能是map[string]int这种类型
+		case reflect.Map: // Enter here, map may be map[string]int
 			return "java.util.Map"
 		default:
 			return ""
@@ -140,13 +140,17 @@ func packRequest(service Service, header DubboHeader, params interface{}) ([]byt
 	// byteArray
 	//////////////////////////////////////////
 	// magic
-	if hb {
+	switch header.Type {
+	case PackageHeartbeat:
 		byteArray = append(byteArray, DubboRequestHeartbeatHeader[:]...)
-	} else {
+	case PackageRequest_TwoWay:
+		byteArray = append(byteArray, DubboRequestHeaderBytesTwoWay[:]...)
+	default:
 		byteArray = append(byteArray, DubboRequestHeaderBytes[:]...)
 	}
+
 	// serialization id, two way flag, event, request/response flag
-	// java 中标识一个class的ID
+	// SerialID is id of serialization approach in java dubbo
 	byteArray[2] |= header.SerialID & SERIAL_MASK
 	// request id
 	binary.BigEndian.PutUint64(byteArray[4:], uint64(header.ID))

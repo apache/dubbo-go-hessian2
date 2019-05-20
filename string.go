@@ -57,7 +57,7 @@ func encString(b []byte, v string) []byte {
 			for i := 0; i < length; i++ {
 				if r, s, err := vBuf.ReadRune(); s > 0 && err == nil {
 					// b = append(b, []byte(string(r))...)
-					b = append(b, Slice(string(r))...) // 直接基于r的内存空间把它转换为[]byte
+					b = append(b, Slice(string(r))...) // converts it to []byte in memory space of "r"
 				}
 			}
 		}

@@ -256,10 +256,10 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 		}
 
 		if _, ok = checkPOJORegistry(t); ok {
-			m = make(map[interface{}]interface{}) // 此处假设了map的定义形式，这是不对的
+			m = make(map[interface{}]interface{}) // todo: This assumes the definition of map, which is incorrect.
 			d.appendRefs(m)
 
-			// d.decType() // 忽略
+			// d.decType() // ignore
 			for d.peekByte() != byte('z') {
 				k, err = d.Decode()
 				if err != nil {
