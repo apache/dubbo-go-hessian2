@@ -20,7 +20,7 @@ import (
 )
 
 import (
-	jerrors "github.com/juju/errors"
+	"github.com/pkg/errors"
 )
 
 /////////////////////////////////////////
@@ -95,7 +95,7 @@ func getMapKey(key reflect.Value, t reflect.Type) (interface{}, error) {
 		return key.String(), nil
 	}
 
-	return nil, jerrors.Errorf("unsupported map key kind %s", t.Kind().String())
+	return nil, errors.Errorf("unsupported map key kind %s", t.Kind().String())
 }
 
 func (e *Encoder) encMap(m interface{}) error {
@@ -134,14 +134,14 @@ func (e *Encoder) encMap(m interface{}) error {
 	for i := 0; i < len(keys); i++ {
 		k, err = getMapKey(keys[i], typ)
 		if err != nil {
-			return jerrors.Annotatef(err, "getMapKey(idx:%d, key:%+v)", i, keys[i])
+			return errors.Wrapf(err, "getMapKey(idx:%d, key:%+v)", i, keys[i])
 		}
 		if err = e.Encode(k); err != nil {
-			return jerrors.Annotatef(err, "failed to encode map key(idx:%d, key:%+v)", i, keys[i])
+			return errors.Wrapf(err, "failed to encode map key(idx:%d, key:%+v)", i, keys[i])
 		}
 		entryValueObj := value.MapIndex(keys[i]).Interface()
 		if err = e.Encode(entryValueObj); err != nil {
-			return jerrors.Annotatef(err, "failed to encode map value(idx:%d, key:%+v, value:%+v)", i, k, entryValueObj)
+			return errors.Wrapf(err, "failed to encode map value(idx:%d, key:%+v, value:%+v)", i, k, entryValueObj)
 		}
 	}
 	e.buffer = encByte(e.buffer, BC_END)
@@ -167,7 +167,7 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 	tag, err = d.readByte()
 	// check error
 	if err != nil {
-		return jerrors.Trace(err)
+		return errors.WithStack(err)
 	}
 
 	switch tag {
@@ -177,7 +177,7 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 	case BC_REF:
 		refObj, err := d.decRef(int32(tag))
 		if err != nil {
-			return jerrors.Trace(err)
+			return errors.WithStack(err)
 		}
 		SetValue(value, EnsurePackValue(refObj))
 		return nil
@@ -186,7 +186,7 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 	case BC_MAP_UNTYPED:
 		//do nothing
 	default:
-		return jerrors.Errorf("expect map header, but get %x", tag)
+		return errors.Errorf("expect map header, but get %x", tag)
 	}
 
 	m := reflect.MakeMap(UnpackPtrType(value.Type()))
@@ -202,7 +202,7 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 			if err == io.EOF {
 				break
 			} else {
-				return jerrors.Trace(err)
+				return errors.WithStack(err)
 			}
 		}
 		if entryKey == nil {
@@ -211,7 +211,7 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 		entryValue, err = d.Decode()
 		// fix: check error
 		if err != nil {
-			return jerrors.Trace(err)
+			return errors.WithStack(err)
 		}
 		m.Elem().SetMapIndex(EnsurePackValue(entryKey), EnsurePackValue(entryValue))
 	}
@@ -278,7 +278,7 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 			_, err = d.readByte()
 			// check error
 			if err != nil {
-				return nil, jerrors.Trace(err)
+				return nil, errors.WithStack(err)
 			}
 
 			return m, nil
@@ -333,11 +333,11 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 		_, err = d.readByte()
 		// check error
 		if err != nil {
-			return nil, jerrors.Trace(err)
+			return nil, errors.WithStack(err)
 		}
 		return m, nil
 
 	default:
-		return nil, jerrors.Errorf("illegal map type tag:%+v", tag)
+		return nil, errors.Errorf("illegal map type tag:%+v", tag)
 	}
 }

@@ -23,7 +23,7 @@ import (
 )
 
 import (
-	jerrors "github.com/juju/errors"
+	"github.com/pkg/errors"
 )
 
 // dubbo-remoting/dubbo-remoting-api/src/main/java/com/alibaba/dubbo/remoting/exchange/codec/ExchangeCodec.java
@@ -96,7 +96,7 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 	byteArray = encNull(byteArray) // if not, "java client" will throw exception  "unexpected end of file"
 	pkgLen := len(byteArray)
 	if pkgLen > int(DEFAULT_LEN) { // 8M
-		return nil, jerrors.Errorf("Data length %d too large, max payload %d", pkgLen, DEFAULT_LEN)
+		return nil, errors.Errorf("Data length %d too large, max payload %d", pkgLen, DEFAULT_LEN)
 	}
 	// byteArray{body length}
 	binary.BigEndian.PutUint32(byteArray[12:], uint32(pkgLen-HEADER_LENGTH))
@@ -111,26 +111,26 @@ func unpackResponseBody(buf []byte, rspObj interface{}) error {
 	decoder := NewDecoder(buf[:])
 	rspType, err := decoder.Decode()
 	if err != nil {
-		return jerrors.Trace(err)
+		return errors.WithStack(err)
 	}
 
 	switch rspType {
 	case RESPONSE_WITH_EXCEPTION, RESPONSE_WITH_EXCEPTION_WITH_ATTACHMENTS:
 		expt, err := decoder.Decode()
 		if err != nil {
-			return jerrors.Trace(err)
+			return errors.WithStack(err)
 		}
-		return jerrors.Errorf("got exception: %+v", expt)
+		return errors.Errorf("got exception: %+v", expt)
 
 	case RESPONSE_VALUE, RESPONSE_VALUE_WITH_ATTACHMENTS:
 		rsp, err := decoder.Decode()
 		if err != nil {
-			return jerrors.Trace(err)
+			return errors.WithStack(err)
 		}
-		return jerrors.Trace(ReflectResponse(rsp, rspObj))
+		return errors.WithStack(ReflectResponse(rsp, rspObj))
 
 	case RESPONSE_NULL_VALUE, RESPONSE_NULL_VALUE_WITH_ATTACHMENTS:
-		return jerrors.New("Received null")
+		return errors.New("Received null")
 	}
 
 	return nil
@@ -139,10 +139,10 @@ func unpackResponseBody(buf []byte, rspObj interface{}) error {
 // CopySlice copy from inSlice to outSlice
 func CopySlice(inSlice, outSlice reflect.Value) error {
 	if inSlice.IsNil() {
-		return jerrors.New("@in is nil")
+		return errors.New("@in is nil")
 	}
 	if inSlice.Kind() != reflect.Slice {
-		return jerrors.Errorf("@in is not slice, but %v", inSlice.Kind())
+		return errors.Errorf("@in is not slice, but %v", inSlice.Kind())
 	}
 
 	for outSlice.Kind() == reflect.Ptr {
@@ -155,7 +155,7 @@ func CopySlice(inSlice, outSlice reflect.Value) error {
 	for i := 0; i < size; i++ {
 		inSliceValue := inSlice.Index(i)
 		if !inSliceValue.Type().AssignableTo(outSlice.Index(i).Type()) {
-			return jerrors.Errorf("in element type [%s] can not assign to out element type [%s]",
+			return errors.Errorf("in element type [%s] can not assign to out element type [%s]",
 				inSliceValue.Type().String(), outSlice.Type().String())
 		}
 		outSlice.Index(i).Set(inSliceValue)
@@ -167,13 +167,13 @@ func CopySlice(inSlice, outSlice reflect.Value) error {
 // CopyMap copy from in map to out map
 func CopyMap(inMapValue, outMapValue reflect.Value) error {
 	if inMapValue.IsNil() {
-		return jerrors.New("@in is nil")
+		return errors.New("@in is nil")
 	}
 	if !inMapValue.CanInterface() {
-		return jerrors.New("@in's Interface can not be used.")
+		return errors.New("@in's Interface can not be used.")
 	}
 	if inMapValue.Kind() != reflect.Map {
-		return jerrors.Errorf("@in is not map, but %v", inMapValue.Kind())
+		return errors.Errorf("@in is not map, but %v", inMapValue.Kind())
 	}
 
 	outMapType := UnpackPtrType(outMapValue.Type())
@@ -188,11 +188,11 @@ func CopyMap(inMapValue, outMapValue reflect.Value) error {
 		inValue := inMapValue.MapIndex(inKey)
 
 		if !inKey.Type().AssignableTo(outKeyType) {
-			return jerrors.Errorf("in Key:{type:%s, value:%#v} can not assign to out Key:{type:%s} ",
+			return errors.Errorf("in Key:{type:%s, value:%#v} can not assign to out Key:{type:%s} ",
 				inKey.Type().String(), inKey, outKeyType.String())
 		}
 		if !inValue.Type().AssignableTo(outValueType) {
-			return jerrors.Errorf("in Value:{type:%s, value:%#v} can not assign to out value:{type:%s}",
+			return errors.Errorf("in Value:{type:%s, value:%#v} can not assign to out value:{type:%s}",
 				inValue.Type().String(), inValue, outValueType.String())
 		}
 		outMapValue.SetMapIndex(inKey, inValue)
@@ -204,14 +204,14 @@ func CopyMap(inMapValue, outMapValue reflect.Value) error {
 // ReflectResponse reflect return value
 func ReflectResponse(in interface{}, out interface{}) error {
 	if in == nil {
-		return jerrors.Errorf("@in is nil")
+		return errors.Errorf("@in is nil")
 	}
 
 	if out == nil {
-		return jerrors.Errorf("@out is nil")
+		return errors.Errorf("@out is nil")
 	}
 	if reflect.TypeOf(out).Kind() != reflect.Ptr {
-		return jerrors.Errorf("@out should be a pointer")
+		return errors.Errorf("@out should be a pointer")
 	}
 
 	inValue := EnsurePackValue(in)

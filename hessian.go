@@ -21,7 +21,7 @@ import (
 )
 
 import (
-	jerrors "github.com/juju/errors"
+	"github.com/pkg/errors"
 )
 
 // enum part
@@ -83,7 +83,7 @@ func (h *HessianCodec) Write(service Service, header DubboHeader, body interface
 		return packResponse(header, map[string]string{}, body)
 
 	default:
-		return nil, jerrors.Errorf("Unrecognised message type: %v", header.Type)
+		return nil, errors.Errorf("Unrecognised message type: %v", header.Type)
 	}
 
 	// unreachable return nil, nil
@@ -96,11 +96,11 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 
 	buf, err := h.reader.Peek(HEADER_LENGTH)
 	if err != nil { // this is impossible
-		return jerrors.Trace(err)
+		return errors.WithStack(err)
 	}
 	_, err = h.reader.Discard(HEADER_LENGTH)
 	if err != nil { // this is impossible
-		return jerrors.Trace(err)
+		return errors.WithStack(err)
 	}
 
 	//// read header
@@ -111,7 +111,7 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 
 	// Header{serialization id(5 bit), event, two way, req/response}
 	if header.SerialID = buf[2] & SERIAL_MASK; header.SerialID == Zero {
-		return jerrors.Errorf("serialization ID:%v", header.SerialID)
+		return errors.Errorf("serialization ID:%v", header.SerialID)
 	}
 
 	flag := buf[2] & FLAG_EVENT
@@ -137,7 +137,7 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 			if bufSize > 2 { // responseType + objectType + error content,so it's size > 2
 				expBuf, expErr := h.reader.Peek(bufSize)
 				if expErr == nil {
-					err = jerrors.Errorf("java exception:%s", string(expBuf[2:bufSize-1]))
+					err = errors.Errorf("java exception:%s", string(expBuf[2:bufSize-1]))
 				}
 			}
 		}
@@ -155,7 +155,7 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 	h.pkgType = header.Type
 	h.bodyLen = header.BodyLen
 
-	return jerrors.Trace(err)
+	return errors.WithStack(err)
 
 }
 
@@ -167,11 +167,11 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 		return ErrBodyNotEnough
 	}
 	if err != nil {
-		return jerrors.Trace(err)
+		return errors.WithStack(err)
 	}
 	_, err = h.reader.Discard(h.bodyLen)
 	if err != nil { // this is impossible
-		return jerrors.Trace(err)
+		return errors.WithStack(err)
 	}
 
 	switch h.pkgType & 0x0f {
@@ -180,7 +180,7 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 	case PackageRequest:
 		if rspObj != nil {
 			if err = unpackRequestBody(buf, rspObj); err != nil {
-				return jerrors.Trace(err)
+				return errors.WithStack(err)
 			}
 		}
 
@@ -189,7 +189,7 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 	case PackageResponse:
 		if rspObj != nil {
 			if err = unpackResponseBody(buf, rspObj); err != nil {
-				return jerrors.Trace(err)
+				return errors.WithStack(err)
 			}
 		}
 	}

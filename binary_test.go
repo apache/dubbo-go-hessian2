@@ -37,7 +37,7 @@ func TestEncBinary(t *testing.T) {
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
 	if err != nil {
-		t.Errorf("Decode() = %v", err)
+		t.Errorf("Decode() = %+v", err)
 	}
 	t.Logf("decode(%v) = %v, %v\n", v, res, err)
 
@@ -48,7 +48,7 @@ func TestEncBinary(t *testing.T) {
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
 	if err != nil {
-		t.Errorf("Decode() = %v", err)
+		t.Errorf("Decode() = %+v", err)
 	}
 	t.Logf("decode(%v) = %v, %v, equal:%v\n", v, res, err, bytes.Equal(v, res.([]byte)))
 	assertEqual(v, res.([]byte), t)
@@ -72,7 +72,7 @@ func TestEncBinaryShort(t *testing.T) {
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
 	if err != nil {
-		t.Errorf("Decode() = %v", err)
+		t.Errorf("Decode() = %+v", err)
 	}
 	assertEqual(v[:], res.([]byte), t)
 }
@@ -95,7 +95,7 @@ func TestEncBinaryChunk(t *testing.T) {
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
 	if err != nil {
-		t.Errorf("Decode() = %v", err)
+		t.Errorf("Decode() = %+v", err)
 	}
 	assertEqual(v[:], res.([]byte), t)
 }

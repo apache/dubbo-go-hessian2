@@ -39,7 +39,7 @@ import (
 )
 
 import (
-	jerrors "github.com/juju/errors"
+	"github.com/pkg/errors"
 )
 
 // nil bool int8 int32 int64 float32 float64 time.Time
@@ -131,7 +131,7 @@ func (e *Encoder) Encode(v interface{}) error {
 				return e.encObject(p)
 			}
 
-			return jerrors.Errorf("struct type not Support! %s[%v] is not a instance of POJO!", t.String(), v)
+			return errors.Errorf("struct type not Support! %s[%v] is not a instance of POJO!", t.String(), v)
 		case reflect.Slice, reflect.Array:
 			return e.encUntypedList(v)
 		case reflect.Map: // the type must be map[string]int
@@ -140,7 +140,7 @@ func (e *Encoder) Encode(v interface{}) error {
 			if p, ok := v.(POJOEnum); ok { // JavaEnum
 				return e.encObject(p)
 			}
-			return jerrors.Errorf("type not supported! %s", t.Kind().String())
+			return errors.Errorf("type not supported! %s", t.Kind().String())
 		}
 	}
 

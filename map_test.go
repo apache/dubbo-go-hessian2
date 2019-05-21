@@ -42,7 +42,7 @@ func TestEncUntypedMap(t *testing.T) {
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
 	if err != nil {
-		t.Errorf("Decode() = %v", err)
+		t.Errorf("Decode() = %+v", err)
 	}
 	t.Logf("decode(%v) = %v, %v\n", m, res, err)
 }
@@ -69,7 +69,7 @@ func TestEncTypedMap(t *testing.T) {
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
 	if err != nil {
-		t.Errorf("Decode() = %v", err)
+		t.Errorf("Decode() = %+v", err)
 	}
 	t.Logf("decode(%v) = %v, %v\n", m, res, err)
 }
