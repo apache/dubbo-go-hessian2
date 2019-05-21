@@ -70,7 +70,7 @@ func TestEncEmptyStruct(t *testing.T) {
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
 	if err != nil {
-		t.Errorf("Decode() = %v", err)
+		t.Errorf("Decode() = %+v", err)
 	}
 	t.Logf("decode(%v) = %v, %v\n", w, res, err)
 
@@ -105,13 +105,13 @@ func TestEncStruct(t *testing.T) {
 
 	err = e.Encode(w)
 	if err != nil {
-		t.Errorf("Encode() = %v", err)
+		t.Errorf("Encode() = %+v", err)
 	}
 
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
 	if err != nil {
-		t.Errorf("Decode() = %v", err)
+		t.Errorf("Decode() = %+v", err)
 	}
 	t.Logf("decode(%+v) = %+v, %v\n", w, res, err)
 

@@ -37,7 +37,7 @@ func TestEncList(t *testing.T) {
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
 	if err != nil {
-		t.Errorf("Decode() = %v", err)
+		t.Errorf("Decode() = %+v", err)
 	}
 	t.Logf("decode(%v) = %v, %v\n", list, res, err)
 }

@@ -30,7 +30,7 @@ func TestEncNull(t *testing.T) {
 func testNullFramework(t *testing.T, method string) {
 	r, e := decodeResponse(method)
 	if e != nil {
-		t.Errorf("%s: decode fail with error %v", method, e)
+		t.Errorf("%s: decode fail with error %+v", method, e)
 		return
 	}
 

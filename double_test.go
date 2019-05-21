@@ -42,7 +42,7 @@ func TestEncDouble(t *testing.T) {
 func testDoubleFramework(t *testing.T, method string, expected float64) {
 	r, e := decodeResponse(method)
 	if e != nil {
-		t.Errorf("%s: decode fail with error %v", method, e)
+		t.Errorf("%s: decode fail with error %+v", method, e)
 		return
 	}
 

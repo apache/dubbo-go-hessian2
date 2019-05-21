@@ -38,7 +38,7 @@ import (
 )
 
 import (
-	jerrors "github.com/juju/errors"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -243,10 +243,10 @@ var (
 
 // Error part
 var (
-	ErrHeaderNotEnough = jerrors.New("header buffer too short")
-	ErrBodyNotEnough   = jerrors.New("body buffer too short")
-	ErrJavaException   = jerrors.New("got java exception")
-	ErrIllegalPackage  = jerrors.New("illegal package!")
+	ErrHeaderNotEnough = errors.New("header buffer too short")
+	ErrBodyNotEnough   = errors.New("body buffer too short")
+	ErrJavaException   = errors.New("got java exception")
+	ErrIllegalPackage  = errors.New("illegal package!")
 )
 
 // DescRegex ...
