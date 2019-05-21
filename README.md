@@ -9,10 +9,6 @@
 
 It's a golang hessian library used by dubbogo.
 
-It was first build in project [viant/gohessian](https://github.com/viant/gohessian), 
-and then improved by [AlexStocks](https://github.com/AlexStocks).
-Thanks to [viant](https://github.com/viant) and [AlexStocks](https://github.com/AlexStocks) for their great work.
-
 ## Basic Usage Examples
 
 ### Encode To Bytes
