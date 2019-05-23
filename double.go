@@ -20,7 +20,7 @@ import (
 )
 
 import (
-	"github.com/pkg/errors"
+	perrors "github.com/pkg/errors"
 )
 
 /////////////////////////////////////////
@@ -94,23 +94,23 @@ func (d *Decoder) decDouble(flag int32) (interface{}, error) {
 	case BC_DOUBLE_BYTE:
 		var i8 int8
 		err = binary.Read(d.reader, binary.BigEndian, &i8)
-		return float64(i8), errors.WithStack(err)
+		return float64(i8), perrors.WithStack(err)
 
 	case BC_DOUBLE_SHORT:
 		var i16 int16
 		err = binary.Read(d.reader, binary.BigEndian, &i16)
-		return float64(i16), errors.WithStack(err)
+		return float64(i16), perrors.WithStack(err)
 
 	case BC_DOUBLE_MILL:
 		var i32 int32
 		err = binary.Read(d.reader, binary.BigEndian, &i32)
-		return float64(i32) / 1000, errors.WithStack(err)
+		return float64(i32) / 1000, perrors.WithStack(err)
 
 	case BC_DOUBLE:
 		var f64 float64
 		err = binary.Read(d.reader, binary.BigEndian, &f64)
-		return f64, errors.WithStack(err)
+		return f64, perrors.WithStack(err)
 	}
 
-	return nil, errors.Errorf("decDouble parse double wrong tag:%d-%#x", int(tag), tag)
+	return nil, perrors.Errorf("decDouble parse double wrong tag:%d-%#x", int(tag), tag)
 }

@@ -20,7 +20,7 @@ import (
 )
 
 import (
-	"github.com/pkg/errors"
+	perrors "github.com/pkg/errors"
 )
 
 // used to ref object,list,map
@@ -158,6 +158,6 @@ func (d *Decoder) decRef(flag int32) (interface{}, error) {
 		return d.refs[i], nil
 
 	default:
-		return nil, errors.Errorf("decRef illegal ref type tag:%+v", tag)
+		return nil, perrors.Errorf("decRef illegal ref type tag:%+v", tag)
 	}
 }
