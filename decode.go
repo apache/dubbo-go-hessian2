@@ -22,7 +22,7 @@ import (
 )
 
 import (
-	"github.com/pkg/errors"
+	perrors "github.com/pkg/errors"
 )
 
 // Decoder struct
@@ -34,8 +34,8 @@ type Decoder struct {
 
 // Error part
 var (
-	ErrNotEnoughBuf    = errors.Errorf("not enough buf")
-	ErrIllegalRefIndex = errors.Errorf("illegal ref index")
+	ErrNotEnoughBuf    = perrors.Errorf("not enough buf")
+	ErrIllegalRefIndex = perrors.Errorf("illegal ref index")
 )
 
 // NewDecoder generate a decoder instance
@@ -113,7 +113,7 @@ func (d *Decoder) decType() (string, error) {
 
 	buf = arr[:1]
 	if _, err = io.ReadFull(d.reader, buf); err != nil {
-		return "", errors.WithStack(err)
+		return "", perrors.WithStack(err)
 	}
 	tag = buf[0]
 	if (tag >= BC_STRING_DIRECT && tag <= STRING_DIRECT_MAX) ||
@@ -122,7 +122,7 @@ func (d *Decoder) decType() (string, error) {
 	}
 
 	if idx, err = d.decInt32(TAG_READ); err != nil {
-		return "", errors.WithStack(err)
+		return "", perrors.WithStack(err)
 	}
 
 	typ, _, err = d.getStructDefByIndex(int(idx))
@@ -202,6 +202,6 @@ func (d *Decoder) Decode() (interface{}, error) {
 		return d.decObject(int32(tag))
 
 	default:
-		return nil, errors.Errorf("Invalid type: %v,>>%v<<<", string(tag), d.peek(d.len()))
+		return nil, perrors.Errorf("Invalid type: %v,>>%v<<<", string(tag), d.peek(d.len()))
 	}
 }

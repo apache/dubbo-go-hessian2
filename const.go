@@ -19,7 +19,7 @@ import (
 )
 
 import (
-	"github.com/pkg/errors"
+	perrors "github.com/pkg/errors"
 )
 
 const (
@@ -224,10 +224,10 @@ var (
 
 // Error part
 var (
-	ErrHeaderNotEnough = errors.New("header buffer too short")
-	ErrBodyNotEnough   = errors.New("body buffer too short")
-	ErrJavaException   = errors.New("got java exception")
-	ErrIllegalPackage  = errors.New("illegal package!")
+	ErrHeaderNotEnough = perrors.New("header buffer too short")
+	ErrBodyNotEnough   = perrors.New("body buffer too short")
+	ErrJavaException   = perrors.New("got java exception")
+	ErrIllegalPackage  = perrors.New("illegal package!")
 )
 
 // DescRegex ...

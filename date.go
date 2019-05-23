@@ -19,7 +19,7 @@ import (
 )
 
 import (
-	"github.com/pkg/errors"
+	perrors "github.com/pkg/errors"
 )
 
 /////////////////////////////////////////
@@ -90,6 +90,6 @@ func (d *Decoder) decDate(flag int32) (time.Time, error) {
 		return time.Unix(i64*60, 0), nil
 
 	default:
-		return t, errors.Errorf("decDate Invalid type: %v", tag)
+		return t, perrors.Errorf("decDate Invalid type: %v", tag)
 	}
 }
