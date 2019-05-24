@@ -24,7 +24,7 @@ import (
 )
 
 import (
-	"github.com/pkg/errors"
+	perrors "github.com/pkg/errors"
 )
 
 var (
@@ -421,7 +421,7 @@ func ConvertSliceValueType(destTyp reflect.Type, v reflect.Value) (reflect.Value
 
 	k := v.Type().Kind()
 	if k != reflect.Slice && k != reflect.Array {
-		return _zeroValue, errors.Errorf("expect slice type, but get %v, objects: %v", k, v)
+		return _zeroValue, perrors.Errorf("expect slice type, but get %v, objects: %v", k, v)
 	}
 
 	if v.Len() <= 0 {

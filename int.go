@@ -20,7 +20,7 @@ import (
 )
 
 import (
-	"github.com/pkg/errors"
+	perrors "github.com/pkg/errors"
 )
 
 /////////////////////////////////////////
@@ -75,7 +75,7 @@ func (d *Decoder) decInt32(flag int32) (int32, error) {
 		buf := []byte{tag - BC_INT_BYTE_ZERO, 0}
 		_, err = io.ReadFull(d.reader, buf[1:])
 		if err != nil {
-			return 0, errors.WithStack(err)
+			return 0, perrors.WithStack(err)
 		}
 		u16 := binary.BigEndian.Uint16(buf)
 		i16 := int16(u16)
@@ -89,7 +89,7 @@ func (d *Decoder) decInt32(flag int32) (int32, error) {
 		}
 		_, err = io.ReadFull(d.reader, buf[2:])
 		if err != nil {
-			return 0, errors.WithStack(err)
+			return 0, perrors.WithStack(err)
 		}
 		u32 := binary.BigEndian.Uint32(buf)
 		return int32(u32), nil
@@ -97,9 +97,9 @@ func (d *Decoder) decInt32(flag int32) (int32, error) {
 	case tag == BC_INT:
 		var i32 int32
 		err = binary.Read(d.reader, binary.BigEndian, &i32)
-		return i32, errors.WithStack(err)
+		return i32, perrors.WithStack(err)
 
 	default:
-		return 0, errors.Errorf("decInt32 integer wrong tag:%#x", tag)
+		return 0, perrors.Errorf("decInt32 integer wrong tag:%#x", tag)
 	}
 }

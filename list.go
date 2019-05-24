@@ -20,7 +20,7 @@ import (
 )
 
 import (
-	"github.com/pkg/errors"
+	perrors "github.com/pkg/errors"
 )
 
 /////////////////////////////////////////
@@ -81,7 +81,7 @@ func (d *Decoder) readBufByte() (byte, error) {
 
 	_, err = io.ReadFull(d.reader, buf[:1])
 	if err != nil {
-		return 0, errors.WithStack(err)
+		return 0, perrors.WithStack(err)
 	}
 
 	return buf[0], nil
@@ -123,7 +123,7 @@ func (d *Decoder) decList(flag int32) (interface{}, error) {
 	} else {
 		tag, err = d.readByte()
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, perrors.WithStack(err)
 		}
 	}
 
@@ -137,7 +137,7 @@ func (d *Decoder) decList(flag int32) (interface{}, error) {
 	case untypedListTag(tag):
 		return d.readUntypedList(tag)
 	default:
-		return nil, errors.Errorf("error list tag: 0x%x", tag)
+		return nil, perrors.Errorf("error list tag: 0x%x", tag)
 	}
 }
 
@@ -149,7 +149,7 @@ func (d *Decoder) decList(flag int32) (interface{}, error) {
 func (d *Decoder) readTypedList(tag byte) (interface{}, error) {
 	listTyp, err := d.decString(TAG_READ)
 	if err != nil {
-		return nil, errors.Errorf("error to read list type[%s]: %v", listTyp, err)
+		return nil, perrors.Errorf("error to read list type[%s]: %v", listTyp, err)
 	}
 
 	isVariableArr := tag == BC_LIST_VARIABLE
@@ -160,13 +160,13 @@ func (d *Decoder) readTypedList(tag byte) (interface{}, error) {
 	} else if tag == BC_LIST_FIXED {
 		ii, err := d.decInt32(TAG_READ)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, perrors.WithStack(err)
 		}
 		length = int(ii)
 	} else if isVariableArr {
 		length = 0
 	} else {
-		return nil, errors.Errorf("error typed list tag: 0x%x", tag)
+		return nil, perrors.Errorf("error typed list tag: 0x%x", tag)
 	}
 
 	// return when no element
@@ -184,7 +184,7 @@ func (d *Decoder) readTypedList(tag byte) (interface{}, error) {
 			if err == io.EOF && isVariableArr {
 				break
 			}
-			return nil, errors.WithStack(err)
+			return nil, perrors.WithStack(err)
 		}
 
 		if it == nil {
@@ -217,13 +217,13 @@ func (d *Decoder) readUntypedList(tag byte) (interface{}, error) {
 	} else if tag == BC_LIST_FIXED_UNTYPED {
 		ii, err := d.decInt32(TAG_READ)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, perrors.WithStack(err)
 		}
 		length = int(ii)
 	} else if isVariableArr {
 		length = 0
 	} else {
-		return nil, errors.Errorf("error untyped list tag: %x", tag)
+		return nil, perrors.Errorf("error untyped list tag: %x", tag)
 	}
 
 	ary := make([]interface{}, length)
@@ -236,7 +236,7 @@ func (d *Decoder) readUntypedList(tag byte) (interface{}, error) {
 			if err == io.EOF && isVariableArr {
 				continue
 			}
-			return nil, errors.WithStack(err)
+			return nil, perrors.WithStack(err)
 		}
 
 		if isVariableArr {

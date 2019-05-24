@@ -1,33 +1,3 @@
-/*
- *
- *  * Copyright 2012-2016 Viant.
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- *  * use this file except in compliance with the License. You may obtain a copy of
- *  * the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- *  * License for the specific language governing permissions and limitations under
- *  * the License.
- *
- */
-
-/*
-decoder implement hessian 2 protocol, It follows java hessian package standard.
-It assume that you using the java name convention
-baisca difference between java and go
-fully qualify java class name is composed of package + class name
-Go assume upper case of field name is exportable and java did not have that constrain
-but in general java using camo camlecase. So it did conversion of field name from
-the first letter of from upper to lower case
-typMap{string]reflect.Type contain full java package+class name and go relfect.Type
-must provide in order to correctly decode to galang interface
-*/
-
 // Copyright 2016-2019 Alex Stocks
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,7 +22,7 @@ import (
 )
 
 import (
-	"github.com/pkg/errors"
+	perrors "github.com/pkg/errors"
 )
 
 // Decoder struct
@@ -64,8 +34,8 @@ type Decoder struct {
 
 // Error part
 var (
-	ErrNotEnoughBuf    = errors.Errorf("not enough buf")
-	ErrIllegalRefIndex = errors.Errorf("illegal ref index")
+	ErrNotEnoughBuf    = perrors.Errorf("not enough buf")
+	ErrIllegalRefIndex = perrors.Errorf("illegal ref index")
 )
 
 // NewDecoder generate a decoder instance
@@ -143,7 +113,7 @@ func (d *Decoder) decType() (string, error) {
 
 	buf = arr[:1]
 	if _, err = io.ReadFull(d.reader, buf); err != nil {
-		return "", errors.WithStack(err)
+		return "", perrors.WithStack(err)
 	}
 	tag = buf[0]
 	if (tag >= BC_STRING_DIRECT && tag <= STRING_DIRECT_MAX) ||
@@ -152,7 +122,7 @@ func (d *Decoder) decType() (string, error) {
 	}
 
 	if idx, err = d.decInt32(TAG_READ); err != nil {
-		return "", errors.WithStack(err)
+		return "", perrors.WithStack(err)
 	}
 
 	typ, _, err = d.getStructDefByIndex(int(idx))
@@ -232,6 +202,6 @@ func (d *Decoder) Decode() (interface{}, error) {
 		return d.decObject(int32(tag))
 
 	default:
-		return nil, errors.Errorf("Invalid type: %v,>>%v<<<", string(tag), d.peek(d.len()))
+		return nil, perrors.Errorf("Invalid type: %v,>>%v<<<", string(tag), d.peek(d.len()))
 	}
 }
