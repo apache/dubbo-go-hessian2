@@ -260,6 +260,9 @@ func unpackRequestBody(buf []byte, reqObj interface{}) error {
 		if err != nil {
 			return perrors.WithStack(err)
 		}
+		if rh, ok := arg.(*_refHolder); ok {
+			arg = rh.value.Interface()
+		}
 		args = append(args, arg)
 	}
 	req[5] = args
