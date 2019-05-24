@@ -202,6 +202,7 @@ func CopyMap(inMapValue, outMapValue reflect.Value) error {
 }
 
 // ReflectResponse reflect return value
+// TODO response object should not be copied again to another object, it should be the exact type of the object
 func ReflectResponse(in interface{}, out interface{}) error {
 	if in == nil {
 		return perrors.Errorf("@in is nil")

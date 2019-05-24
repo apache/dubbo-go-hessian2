@@ -196,7 +196,7 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 
 	//read key and value
 	for {
-		entryKey, err = d.Decode()
+		entryKey, err = d.DecodeValue()
 		if err != nil {
 			// EOF means the end flag 'Z' of map is already read
 			if err == io.EOF {
@@ -208,11 +208,12 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 		if entryKey == nil {
 			break
 		}
-		entryValue, err = d.Decode()
+		entryValue, err = d.DecodeValue()
 		// fix: check error
 		if err != nil {
 			return perrors.WithStack(err)
 		}
+		// TODO map value may be a ref object
 		m.Elem().SetMapIndex(EnsurePackValue(entryKey), EnsurePackValue(entryValue))
 	}
 
@@ -221,6 +222,7 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 	return nil
 }
 
+// TODO to decode ref object in map
 func (d *Decoder) decMap(flag int32) (interface{}, error) {
 	var (
 		err        error
