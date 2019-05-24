@@ -87,7 +87,7 @@ func doTest(t *testing.T, packageType PackageType, responseStatus byte, body int
 		c = &tmp
 		c = &c
 	} else if n == "[]*hessian.Case" {
-		c = &[]interface{}{}
+		c = &[]interface{}{} // it must be &[]interface{} in this case!
 	} else {
 		c = make([]interface{}, 7)
 	}
