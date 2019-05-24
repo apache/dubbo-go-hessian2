@@ -86,6 +86,8 @@ func doTest(t *testing.T, packageType PackageType, responseStatus byte, body int
 		tmp := false
 		c = &tmp
 		c = &c
+	} else if n == "[]*hessian.Case" {
+		c = &[]interface{}{}
 	} else {
 		c = make([]interface{}, 7)
 	}
@@ -97,12 +99,18 @@ func doTest(t *testing.T, packageType PackageType, responseStatus byte, body int
 	if packageType == PackageRequest {
 		assert.True(t, len(body.([]interface{})) == len(c.([]interface{})[5].([]interface{})))
 	} else if packageType == PackageResponse {
-		assert.True(t, reflect.DeepEqual(body, c))
+		if reflect.TypeOf(c).String() == "*[]interface {}" {
+			var b []interface{}
+			b = append(b, body.([]*Case)[0])
+			assert.Equal(t, &b, c)
+		} else {
+			assert.Equal(t, body, c)
+		}
 	}
 }
 
 func TestResponse(t *testing.T) {
-	doTest(t, PackageResponse, Response_OK, &Case{A: "a", B: 1})
+	doTest(t, PackageResponse, Response_OK, []*Case{{A: "a", B: 1}})
 	doTest(t, PackageResponse, Response_OK, "ok!!!!!")
 	doTest(t, PackageResponse, Response_OK, int64(3))
 	doTest(t, PackageResponse, Response_OK, true)

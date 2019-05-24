@@ -40,6 +40,9 @@ func (e *Encoder) encUntypedList(v interface{}) error {
 	)
 
 	value := reflect.ValueOf(v)
+	if reflect.TypeOf(v).Kind() == reflect.Ptr {
+		value = reflect.ValueOf(v).Elem()
+	}
 
 	// check ref
 	if n, ok := e.checkRefMap(value); ok {

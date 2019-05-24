@@ -214,6 +214,10 @@ func ReflectResponse(in interface{}, out interface{}) error {
 		return errors.Errorf("@out should be a pointer")
 	}
 
+	if rh, ok := in.(*_refHolder); ok {
+		in = rh.value
+	}
+
 	inValue := EnsurePackValue(in)
 	outValue := EnsurePackValue(out)
 
