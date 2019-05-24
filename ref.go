@@ -40,8 +40,6 @@ type _refHolder struct {
 	value reflect.Value
 }
 
-var _refHolderType = reflect.TypeOf(_refHolder{})
-
 // change ref value
 func (h *_refHolder) change(v reflect.Value) {
 	if h.value.CanAddr() && v.CanAddr() && h.value.Pointer() == v.Pointer() {

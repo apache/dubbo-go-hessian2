@@ -223,20 +223,11 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 
 func (d *Decoder) decMap(flag int32) (interface{}, error) {
 	var (
-		err        error
-		tag        byte
-		ok         bool
-		k          interface{}
-		v          interface{}
-		t          string
-		keyName    string
-		methodName string
-		key        interface{}
-		value      interface{}
-		inst       interface{}
-		m          map[interface{}]interface{}
-		fieldValue reflect.Value
-		args       []reflect.Value
+		err	error
+		tag byte
+		k   interface{}
+		v   interface{}
+		m   map[interface{}]interface{}
 	)
 
 	if flag != TAG_READ {
@@ -251,66 +242,29 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 	case tag == BC_REF:
 		return d.decRef(int32(tag))
 	case tag == BC_MAP:
-		if t, err = d.decType(); err != nil {
+		if _, err = d.decType(); err != nil {
 			return nil, err
 		}
 
-		if _, ok = checkPOJORegistry(t); ok {
-			m = make(map[interface{}]interface{}) // todo: This assumes the definition of map, which is incorrect.
-			d.appendRefs(m)
-
-			// d.decType() // ignore
-			for d.peekByte() != byte('z') {
-				k, err = d.Decode()
-				if err != nil {
-					if err == io.EOF {
-						break
-					}
-
-					return nil, err
-				}
-				v, err = d.Decode()
-				if err != nil {
-					return nil, err
-				}
-				m[k] = v
-			}
-			_, err = d.readByte()
-			// check error
+		m = make(map[interface{}]interface{})
+		d.appendRefs(m)
+		for d.peekByte() != BC_END {
+			k, err = d.Decode()
 			if err != nil {
-				return nil, perrors.WithStack(err)
-			}
-
-			return m, nil
-		}
-
-		// check failed
-		inst = createInstance(t)
-		d.appendRefs(inst)
-
-		for d.peekByte() != 'z' {
-			if key, err = d.Decode(); err != nil {
 				return nil, err
 			}
-			if value, err = d.Decode(); err != nil {
+			v, err = d.Decode()
+			if err != nil {
 				return nil, err
 			}
-			//set value of the struct to Zero
-			if fieldValue = reflect.ValueOf(value); fieldValue.IsValid() {
-				keyName = key.(string)
-				if keyName[0] >= 'a' { //convert to Upper
-					methodName = "Set" + string(keyName[0]-32) + keyName[1:]
-				} else {
-					methodName = "Set" + keyName
-				}
-
-				args = args[:0]
-				args = append(args, fieldValue)
-				reflect.ValueOf(inst).MethodByName(methodName).Call(args)
-			}
+			m[k] = v
 		}
-
-		return inst, nil
+		_, err = d.readByte()
+		// check error
+		if err != nil {
+			return nil, perrors.WithStack(err)
+		}
+		return m, nil
 
 	case tag == BC_MAP_UNTYPED:
 		m = make(map[interface{}]interface{})
@@ -318,10 +272,6 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 		for d.peekByte() != BC_END {
 			k, err = d.Decode()
 			if err != nil {
-				if err == io.EOF {
-					break
-				}
-
 				return nil, err
 			}
 			v, err = d.Decode()
