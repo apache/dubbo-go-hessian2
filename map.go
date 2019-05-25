@@ -223,7 +223,7 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 
 func (d *Decoder) decMap(flag int32) (interface{}, error) {
 	var (
-		err	error
+		err error
 		tag byte
 		k   interface{}
 		v   interface{}

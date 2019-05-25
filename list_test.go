@@ -15,8 +15,8 @@
 package hessian
 
 import (
-	"testing"
 	"reflect"
+	"testing"
 )
 
 func TestEncList(t *testing.T) {

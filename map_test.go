@@ -15,8 +15,8 @@
 package hessian
 
 import (
-	"testing"
 	"reflect"
+	"testing"
 )
 
 func TestEncUntypedMap(t *testing.T) {
