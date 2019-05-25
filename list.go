@@ -175,17 +175,10 @@ func (d *Decoder) readTypedList(tag byte) (interface{}, error) {
 	aryValue := reflect.ValueOf(arr)
 	holder := d.appendRefs(aryValue)
 
-	for j := 0; j < length || isVariableArr; j++ {
+	for j := 0; j < length || (isVariableArr && d.peekByte() != BC_END); j++ {
 		it, err := d.Decode()
 		if err != nil {
-			if err == io.EOF && isVariableArr {
-				break
-			}
 			return nil, perrors.WithStack(err)
-		}
-
-		if it == nil {
-			break
 		}
 
 		v := EnsureRawValue(it)
@@ -194,6 +187,14 @@ func (d *Decoder) readTypedList(tag byte) (interface{}, error) {
 			holder.change(aryValue)
 		} else {
 			SetValue(aryValue.Index(j), v)
+		}
+	}
+
+	if isVariableArr {
+		_, err = d.readByte()
+		// check error
+		if err != nil {
+			return nil, perrors.WithStack(err)
 		}
 	}
 
@@ -227,12 +228,9 @@ func (d *Decoder) readUntypedList(tag byte) (interface{}, error) {
 	aryValue := reflect.ValueOf(ary)
 	holder := d.appendRefs(aryValue)
 
-	for j := 0; j < length || isVariableArr; j++ {
+	for j := 0; j < length || (isVariableArr && d.peekByte() != BC_END); j++ {
 		it, err := d.Decode()
 		if err != nil {
-			if err == io.EOF && isVariableArr {
-				continue
-			}
 			return nil, perrors.WithStack(err)
 		}
 
@@ -241,6 +239,14 @@ func (d *Decoder) readUntypedList(tag byte) (interface{}, error) {
 			holder.change(aryValue)
 		} else {
 			ary[j] = it
+		}
+	}
+
+	if isVariableArr {
+		_, err := d.readByte()
+		// check error
+		if err != nil {
+			return nil, perrors.WithStack(err)
 		}
 	}
 

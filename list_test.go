@@ -16,6 +16,7 @@ package hessian
 
 import (
 	"testing"
+	"reflect"
 )
 
 func TestEncList(t *testing.T) {
@@ -40,4 +41,31 @@ func TestEncList(t *testing.T) {
 		t.Errorf("Decode() = %+v", err)
 	}
 	t.Logf("decode(%v) = %v, %v\n", list, res, err)
+}
+
+func testListFramework(t *testing.T, method string, expected interface{}) {
+	r, e := decodeResponse(method)
+	if e != nil {
+		t.Errorf("%s: decode fail with error %v", method, e)
+		return
+	}
+
+	tmp, ok := r.(*_refHolder)
+	if ok {
+		r = tmp.value.Interface()
+	}
+	if !reflect.DeepEqual(r, expected) {
+		t.Errorf("%s: got %v, wanted %v", method, r, expected)
+	}
+}
+
+func TestList(t *testing.T) {
+	testListFramework(t, "replyTypedFixedList_0", []interface{}{})
+	testListFramework(t, "replyTypedFixedList_1", []interface{}{"1"})
+	testListFramework(t, "replyTypedFixedList_7", []interface{}{"1", "2", "3", "4", "5", "6", "7"})
+	testListFramework(t, "replyTypedFixedList_8", []interface{}{"1", "2", "3", "4", "5", "6", "7", "8"})
+	testListFramework(t, "replyUntypedFixedList_0", []interface{}{})
+	testListFramework(t, "replyUntypedFixedList_1", []interface{}{"1"})
+	testListFramework(t, "replyUntypedFixedList_7", []interface{}{"1", "2", "3", "4", "5", "6", "7"})
+	testListFramework(t, "replyUntypedFixedList_8", []interface{}{"1", "2", "3", "4", "5", "6", "7", "8"})
 }
