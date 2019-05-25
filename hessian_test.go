@@ -35,9 +35,8 @@ func (c *Case) JavaClassName() string {
 	return "com.test.case"
 }
 
-func doTest(t *testing.T, packageType PackageType, responseStatus byte, body interface{}) {
+func doTestHessianEncodeHeader(t *testing.T, packageType PackageType, responseStatus byte, body interface{}) ([]byte, error) {
 	RegisterPOJO(&Case{})
-
 	codecW := NewHessianCodec(nil)
 	resp, err := codecW.Write(Service{
 		Path:      "/test",
@@ -53,12 +52,17 @@ func doTest(t *testing.T, packageType PackageType, responseStatus byte, body int
 		ResponseStatus: responseStatus,
 	}, body)
 	assert.Nil(t, err)
+	return resp, err
+}
+
+func doTestResponse(t *testing.T, packageType PackageType, responseStatus byte, body interface{}, decodedObject interface{}) {
+	resp, err := doTestHessianEncodeHeader(t, packageType, responseStatus, body)
 
 	codecR := NewHessianCodec(bufio.NewReader(bytes.NewReader(resp)))
 
 	h := &DubboHeader{}
 	err = codecR.ReadHeader(h)
-	if responseStatus == Response_OK || responseStatus == Zero {
+	if responseStatus == Response_OK {
 		assert.Nil(t, err)
 	} else {
 		t.Log(err)
@@ -70,51 +74,69 @@ func doTest(t *testing.T, packageType PackageType, responseStatus byte, body int
 	assert.Equal(t, int64(1), h.ID)
 	assert.Equal(t, responseStatus, h.ResponseStatus)
 
-	var c interface{}
-	n := reflect.TypeOf(body).String()
-	if n == "*hessian.Case" {
-		c = &Case{}
-	} else if n == "string" {
-		tmp := ""
-		c = &tmp
-		c = &c
-	} else if n == "int64" {
-		tmp := 1
-		c = &tmp
-		c = &c
-	} else if n == "bool" {
-		tmp := false
-		c = &tmp
-		c = &c
-	} else {
-		c = make([]interface{}, 7)
-	}
-	err = codecR.ReadBody(c)
+	err = codecR.ReadBody(decodedObject)
 	assert.Nil(t, err)
-	t.Log(c)
-	//t.Log(reflect.ValueOf(body).Type())
-	//t.Log(reflect.ValueOf(c).Type())
-	if packageType == PackageRequest {
-		assert.True(t, len(body.([]interface{})) == len(c.([]interface{})[5].([]interface{})))
-	} else if packageType == PackageResponse {
-		assert.True(t, reflect.DeepEqual(body, c))
+	t.Log(decodedObject)
+
+	if reflect.TypeOf(decodedObject).String() == "*[]interface {}" {
+		// TODO currently not support typed list
+		var b []interface{}
+		arrBody := body.([]*Case)
+		b = append(b, arrBody[0])
+		assert.Equal(t, &b, decodedObject)
+	} else {
+		in, _ := EnsureInterface(UnpackPtrValue(EnsurePackValue(body)), nil)
+		out, _ := EnsureInterface(UnpackPtrValue(EnsurePackValue(decodedObject)), nil)
+		assert.Equal(t, in, out)
 	}
 }
 
 func TestResponse(t *testing.T) {
-	doTest(t, PackageResponse, Response_OK, &Case{A: "a", B: 1})
-	doTest(t, PackageResponse, Response_OK, "ok!!!!!")
-	doTest(t, PackageResponse, Response_OK, int64(3))
-	doTest(t, PackageResponse, Response_OK, true)
-	doTest(t, PackageResponse, Response_SERVER_ERROR, "error!!!!!")
+	arr := []*Case{{A: "a", B: 1}}
+	doTestResponse(t, PackageResponse, Response_OK, arr, &[]interface{}{})
+
+	doTestResponse(t, PackageResponse, Response_OK, &Case{A: "a", B: 1}, &Case{})
+
+	s := "ok!!!!!"
+	strObj := ""
+	doTestResponse(t, PackageResponse, Response_OK, s, &strObj)
+
+	var intObj int64
+	doTestResponse(t, PackageResponse, Response_OK, int64(3), &intObj)
+
+	boolObj := false
+	doTestResponse(t, PackageResponse, Response_OK, true, &boolObj)
+
+	strObj = ""
+	doTestResponse(t, PackageResponse, Response_SERVER_ERROR, "error!!!!!", &strObj)
+}
+
+func doTestRequest(t *testing.T, packageType PackageType, responseStatus byte, body interface{}) {
+	resp, err := doTestHessianEncodeHeader(t, packageType, responseStatus, body)
+
+	codecR := NewHessianCodec(bufio.NewReader(bytes.NewReader(resp)))
+
+	h := &DubboHeader{}
+	err = codecR.ReadHeader(h)
+	assert.Nil(t, err)
+	assert.Equal(t, byte(2), h.SerialID)
+	assert.Equal(t, packageType, h.Type&(PackageRequest|PackageResponse|PackageHeartbeat))
+	assert.Equal(t, int64(1), h.ID)
+	assert.Equal(t, responseStatus, h.ResponseStatus)
+
+	c := make([]interface{}, 7)
+	err = codecR.ReadBody(c)
+	assert.Nil(t, err)
+	t.Log(c)
+	assert.True(t, len(body.([]interface{})) == len(c[5].([]interface{})))
 }
 
 func TestRequest(t *testing.T) {
-	doTest(t, PackageRequest, byte(0), []interface{}{"a"})
-	doTest(t, PackageRequest, byte(0), []interface{}{"a", 3})
-	doTest(t, PackageRequest, byte(0), []interface{}{"a", true})
-	doTest(t, PackageRequest, byte(0), []interface{}{"a", 3, true})
-	doTest(t, PackageRequest, byte(0), []interface{}{3.2, true})
-	doTest(t, PackageRequest, byte(0), []interface{}{"a", 3, true, &Case{A: "a", B: 3}})
-	doTest(t, PackageRequest, byte(0), []interface{}{"a", 3, true, []*Case{{A: "a", B: 3}}})
+	doTestRequest(t, PackageRequest, Zero, []interface{}{"a"})
+	doTestRequest(t, PackageRequest, Zero, []interface{}{"a", 3})
+	doTestRequest(t, PackageRequest, Zero, []interface{}{"a", true})
+	doTestRequest(t, PackageRequest, Zero, []interface{}{"a", 3, true})
+	doTestRequest(t, PackageRequest, Zero, []interface{}{3.2, true})
+	doTestRequest(t, PackageRequest, Zero, []interface{}{"a", 3, true, &Case{A: "a", B: 3}})
+	doTestRequest(t, PackageRequest, Zero, []interface{}{"a", 3, true, []*Case{{A: "a", B: 3}}})
 }

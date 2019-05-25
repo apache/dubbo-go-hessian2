@@ -47,6 +47,8 @@ func (e *Encoder) encUntypedList(v interface{}) error {
 		return nil
 	}
 
+	value = UnpackPtrValue(value)
+
 	e.buffer = encByte(e.buffer, BC_LIST_FIXED_UNTYPED) // x58
 	e.buffer = encInt32(e.buffer, int32(value.Len()))
 	for i := 0; i < value.Len(); i++ {
@@ -176,7 +178,7 @@ func (d *Decoder) readTypedList(tag byte) (interface{}, error) {
 	holder := d.appendRefs(aryValue)
 
 	for j := 0; j < length || isVariableArr; j++ {
-		it, err := d.Decode()
+		it, err := d.DecodeValue()
 		if err != nil {
 			if err == io.EOF && isVariableArr {
 				break
@@ -228,7 +230,7 @@ func (d *Decoder) readUntypedList(tag byte) (interface{}, error) {
 	holder := d.appendRefs(aryValue)
 
 	for j := 0; j < length || isVariableArr; j++ {
-		it, err := d.Decode()
+		it, err := d.DecodeValue()
 		if err != nil {
 			if err == io.EOF && isVariableArr {
 				continue
