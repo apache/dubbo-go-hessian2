@@ -344,7 +344,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 				// java enum
 				if fldRawValue.Type().Implements(javaEnumType) {
 					d.unreadByte() // Enum parsing, decInt64 above has read a byte, so you need to return a byte here
-					s, err := d.Decode()
+					s, err := d.DecodeValue()
 					if err != nil {
 						return nil, perrors.Wrapf(err, "decInstance->decObject field name:%s", fieldName)
 					}
@@ -515,7 +515,7 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 		//add to slice
 		d.appendClsDef(cls)
 
-		return d.Decode()
+		return d.DecodeValue()
 
 	case tag == BC_OBJECT:
 		idx, err = d.decInt32(TAG_READ)

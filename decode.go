@@ -133,8 +133,13 @@ func (d *Decoder) decType() (string, error) {
 	return "", err
 }
 
-// Decode parses hessian data
+// Decode parse hessian data, and ensure the reflection value unpacked
 func (d *Decoder) Decode() (interface{}, error) {
+	return EnsureInterface(d.DecodeValue())
+}
+
+// DecodeValue parse hessian data, the return value maybe a reflection value when it's a map, list, object, or ref.
+func (d *Decoder) DecodeValue() (interface{}, error) {
 	var (
 		err error
 		tag byte
