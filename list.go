@@ -186,6 +186,10 @@ func (d *Decoder) readTypedList(tag byte) (interface{}, error) {
 			return nil, perrors.WithStack(err)
 		}
 
+		if it == nil {
+			break
+		}
+
 		v := EnsureRawValue(it)
 		if isVariableArr {
 			aryValue = reflect.Append(aryValue, v)
