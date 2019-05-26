@@ -207,3 +207,175 @@ func TestIssue6(t *testing.T) {
 		t.Fatalf("worker:%#v != worker2:%#v", worker, worker2)
 	}
 }
+
+func testObjectFramework(t *testing.T, method string, expected interface{}) {
+	r, e := decodeResponse(method)
+	if e != nil {
+		t.Errorf("%s: decode fail with error %v", method, e)
+		return
+	}
+
+	tmp, ok := r.(*_refHolder)
+	if ok {
+		r = tmp.value.Interface()
+	}
+	if !reflect.DeepEqual(r, expected) {
+		t.Errorf("%s: got %v, wanted %v", method, r, expected)
+	}
+}
+
+type A0 struct{}
+
+func (*A0) JavaClassName() string {
+	return "com.caucho.hessian.test.A0"
+}
+
+type A1 struct{}
+
+func (*A1) JavaClassName() string {
+	return "com.caucho.hessian.test.A1"
+}
+
+type A2 struct{}
+
+func (*A2) JavaClassName() string {
+	return "com.caucho.hessian.test.A2"
+}
+
+type A3 struct{}
+
+func (*A3) JavaClassName() string {
+	return "com.caucho.hessian.test.A3"
+}
+
+type A4 struct{}
+
+func (*A4) JavaClassName() string {
+	return "com.caucho.hessian.test.A4"
+}
+
+type A5 struct{}
+
+func (*A5) JavaClassName() string {
+	return "com.caucho.hessian.test.A5"
+}
+
+type A6 struct{}
+
+func (*A6) JavaClassName() string {
+	return "com.caucho.hessian.test.A6"
+}
+
+type A7 struct{}
+
+func (*A7) JavaClassName() string {
+	return "com.caucho.hessian.test.A7"
+}
+
+type A8 struct{}
+
+func (*A8) JavaClassName() string {
+	return "com.caucho.hessian.test.A8"
+}
+
+type A9 struct{}
+
+func (*A9) JavaClassName() string {
+	return "com.caucho.hessian.test.A9"
+}
+
+type A10 struct{}
+
+func (*A10) JavaClassName() string {
+	return "com.caucho.hessian.test.A10"
+}
+
+type A11 struct{}
+
+func (*A11) JavaClassName() string {
+	return "com.caucho.hessian.test.A11"
+}
+
+type A12 struct{}
+
+func (*A12) JavaClassName() string {
+	return "com.caucho.hessian.test.A12"
+}
+
+type A13 struct{}
+
+func (*A13) JavaClassName() string {
+	return "com.caucho.hessian.test.A13"
+}
+
+type A14 struct{}
+
+func (*A14) JavaClassName() string {
+	return "com.caucho.hessian.test.A14"
+}
+
+type A15 struct{}
+
+func (*A15) JavaClassName() string {
+	return "com.caucho.hessian.test.A15"
+}
+
+type A16 struct{}
+
+func (*A16) JavaClassName() string {
+	return "com.caucho.hessian.test.A16"
+}
+
+type TestObjectStruct struct {
+	Value int `hessian:"_value"`
+}
+
+func (*TestObjectStruct) JavaClassName() string {
+	return "com.caucho.hessian.test.TestObject"
+}
+
+type TestConsStruct struct {
+	First string          `hessian:"_first"`
+	Rest  *TestConsStruct `hessian:"_rest"`
+}
+
+func (*TestConsStruct) JavaClassName() string {
+	return "com.caucho.hessian.test.TestCons"
+}
+
+func TestObject(t *testing.T) {
+	RegisterPOJO(&A0{})
+	RegisterPOJO(&A1{})
+	RegisterPOJO(&A2{})
+	RegisterPOJO(&A3{})
+	RegisterPOJO(&A4{})
+	RegisterPOJO(&A5{})
+	RegisterPOJO(&A6{})
+	RegisterPOJO(&A7{})
+	RegisterPOJO(&A8{})
+	RegisterPOJO(&A9{})
+	RegisterPOJO(&A10{})
+	RegisterPOJO(&A11{})
+	RegisterPOJO(&A12{})
+	RegisterPOJO(&A13{})
+	RegisterPOJO(&A14{})
+	RegisterPOJO(&A15{})
+	RegisterPOJO(&A16{})
+	RegisterPOJO(&TestObjectStruct{})
+	RegisterPOJO(&TestConsStruct{})
+
+	testObjectFramework(t, "replyObject_0", &A0{})
+	testObjectFramework(t, "replyObject_1", &TestObjectStruct{Value: 0})
+	testObjectFramework(t, "replyObject_16", []interface{}{&A0{}, &A1{}, &A2{}, &A3{}, &A4{}, &A5{}, &A6{}, &A7{}, &A8{}, &A9{}, &A10{}, &A11{}, &A12{}, &A13{}, &A14{}, &A15{}, &A16{}})
+	testObjectFramework(t, "replyObject_2", []interface{}{&TestObjectStruct{Value: 0}, &TestObjectStruct{Value: 1}})
+	testObjectFramework(t, "replyObject_2b", []interface{}{&TestObjectStruct{Value: 0}, &TestObjectStruct{Value: 0}})
+
+	object := TestObjectStruct{Value: 0}
+	object2a := []interface{}{&object, &object}
+	testObjectFramework(t, "replyObject_2a", object2a)
+
+	cons := TestConsStruct{}
+	cons.First = "a"
+	cons.Rest = &cons
+	testObjectFramework(t, "replyObject_3", &cons)
+}

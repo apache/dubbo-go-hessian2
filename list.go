@@ -233,7 +233,7 @@ func (d *Decoder) readUntypedList(tag byte) (interface{}, error) {
 		it, err := d.DecodeValue()
 		if err != nil {
 			if err == io.EOF && isVariableArr {
-				continue
+				break
 			}
 			return nil, perrors.WithStack(err)
 		}

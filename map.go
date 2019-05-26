@@ -71,7 +71,6 @@ func getMapKey(key reflect.Value, t reflect.Type) (interface{}, error) {
 		return int(key.Int()), nil
 	case reflect.Int64:
 		return key.Int(), nil
-
 	case reflect.Uint8:
 		return byte(key.Uint()), nil
 	case reflect.Uint16:
@@ -82,15 +81,12 @@ func getMapKey(key reflect.Value, t reflect.Type) (interface{}, error) {
 		return uint(key.Uint()), nil
 	case reflect.Uint64:
 		return key.Uint(), nil
-
 	case reflect.Float32:
 		return float32(key.Float()), nil
 	case reflect.Float64:
 		return key.Float(), nil
-
 	case reflect.Uintptr:
 		return key.UnsafeAddr(), nil
-
 	case reflect.String:
 		return key.String(), nil
 	}
@@ -228,17 +224,14 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 		err        error
 		tag        byte
 		ok         bool
+		t          string
+		m          map[interface{}]interface{}
 		k          interface{}
 		v          interface{}
-		t          string
-		keyName    string
-		methodName string
-		key        interface{}
-		value      interface{}
 		inst       interface{}
-		m          map[interface{}]interface{}
+		instValue  reflect.Value
+		fieldName  string
 		fieldValue reflect.Value
-		args       []reflect.Value
 	)
 
 	if flag != TAG_READ {
@@ -257,18 +250,41 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 			return nil, err
 		}
 
-		if _, ok = checkPOJORegistry(t); ok {
-			m = make(map[interface{}]interface{}) // todo: This assumes the definition of map, which is incorrect.
-			d.appendRefs(m)
-
-			// d.decType() // ignore
-			for d.peekByte() != byte('z') {
+		_, ok = checkPOJORegistry(t)
+		if ok {
+			inst = createInstance(t)
+			instValue = reflect.ValueOf(inst)
+			d.appendRefs(inst)
+			for d.peekByte() != BC_END {
 				k, err = d.Decode()
 				if err != nil {
-					if err == io.EOF {
-						break
-					}
+					return nil, err
+				}
+				v, err = d.Decode()
+				if err != nil {
+					return nil, err
+				}
 
+				fieldName, ok = k.(string)
+				if !ok {
+					return nil, perrors.Errorf("the type of map key must be string, but get %v", k)
+				}
+				fieldValue = instValue.FieldByName(fieldName)
+				if fieldValue.IsValid() {
+					fieldValue.Set(EnsureRawValue(v))
+				}
+			}
+			_, err = d.readByte()
+			if err != nil {
+				return nil, perrors.WithStack(err)
+			}
+			return inst, nil
+		} else {
+			m = make(map[interface{}]interface{})
+			d.appendRefs(m)
+			for d.peekByte() != BC_END {
+				k, err = d.Decode()
+				if err != nil {
 					return nil, err
 				}
 				v, err = d.Decode()
@@ -278,41 +294,11 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 				m[k] = v
 			}
 			_, err = d.readByte()
-			// check error
 			if err != nil {
 				return nil, perrors.WithStack(err)
 			}
-
 			return m, nil
 		}
-
-		// check failed
-		inst = createInstance(t)
-		d.appendRefs(inst)
-
-		for d.peekByte() != 'z' {
-			if key, err = d.Decode(); err != nil {
-				return nil, err
-			}
-			if value, err = d.Decode(); err != nil {
-				return nil, err
-			}
-			//set value of the struct to Zero
-			if fieldValue = reflect.ValueOf(value); fieldValue.IsValid() {
-				keyName = key.(string)
-				if keyName[0] >= 'a' { //convert to Upper
-					methodName = "Set" + string(keyName[0]-32) + keyName[1:]
-				} else {
-					methodName = "Set" + keyName
-				}
-
-				args = args[:0]
-				args = append(args, fieldValue)
-				reflect.ValueOf(inst).MethodByName(methodName).Call(args)
-			}
-		}
-
-		return inst, nil
 
 	case tag == BC_MAP_UNTYPED:
 		m = make(map[interface{}]interface{})
@@ -320,10 +306,6 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 		for d.peekByte() != BC_END {
 			k, err = d.Decode()
 			if err != nil {
-				if err == io.EOF {
-					break
-				}
-
 				return nil, err
 			}
 			v, err = d.Decode()
@@ -333,7 +315,6 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 			m[k] = v
 		}
 		_, err = d.readByte()
-		// check error
 		if err != nil {
 			return nil, perrors.WithStack(err)
 		}

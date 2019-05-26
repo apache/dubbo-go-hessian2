@@ -15,6 +15,7 @@
 package hessian
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -72,4 +73,27 @@ func TestEncTypedMap(t *testing.T) {
 		t.Errorf("Decode() = %+v", err)
 	}
 	t.Logf("decode(%v) = %v, %v\n", m, res, err)
+}
+
+func testMapFramework(t *testing.T, method string, expected interface{}) {
+	r, e := decodeResponse(method)
+	if e != nil {
+		t.Errorf("%s: decode fail with error %v", method, e)
+		return
+	}
+
+	if !reflect.DeepEqual(r, expected) {
+		t.Errorf("%s: got %v, wanted %v", method, r, expected)
+	}
+}
+
+func TestMap(t *testing.T) {
+	testMapFramework(t, "replyTypedMap_0", map[interface{}]interface{}{})
+	testMapFramework(t, "replyTypedMap_1", map[interface{}]interface{}{"a": int32(0)})
+	testMapFramework(t, "replyTypedMap_2", map[interface{}]interface{}{int32(0): "a", int32(1): "b"})
+	//testMapFramework(t, "replyTypedMap_3", []interface{}{})
+	testMapFramework(t, "replyUntypedMap_0", map[interface{}]interface{}{})
+	testMapFramework(t, "replyUntypedMap_1", map[interface{}]interface{}{"a": int32(0)})
+	testMapFramework(t, "replyUntypedMap_2", map[interface{}]interface{}{int32(0): "a", int32(1): "b"})
+	//testMapFramework(t, "replyTypedMap_3", []interface{}{})
 }
