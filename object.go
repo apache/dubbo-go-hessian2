@@ -446,9 +446,9 @@ func (d *Decoder) appendClsDef(cd classInfo) {
 
 func (d *Decoder) getStructDefByIndex(idx int) (reflect.Type, classInfo, error) {
 	var (
-		ok      bool
-		cls     classInfo
-		s       structInfo
+		ok  bool
+		cls classInfo
+		s   structInfo
 	)
 
 	if len(d.classInfoList) <= idx || idx < 0 {
