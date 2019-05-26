@@ -447,7 +447,6 @@ func (d *Decoder) appendClsDef(cd classInfo) {
 func (d *Decoder) getStructDefByIndex(idx int) (reflect.Type, classInfo, error) {
 	var (
 		ok      bool
-		clsName string
 		cls     classInfo
 		s       structInfo
 	)
@@ -458,7 +457,7 @@ func (d *Decoder) getStructDefByIndex(idx int) (reflect.Type, classInfo, error) 
 	cls = d.classInfoList[idx]
 	s, ok = getStructInfo(cls.javaName)
 	if !ok {
-		return nil, cls, perrors.Errorf("can not find go type name %s in registry", clsName)
+		return nil, cls, perrors.Errorf("can not find go type name %s in registry", cls.javaName)
 	}
 
 	return s.typ, cls, nil
