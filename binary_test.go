@@ -100,24 +100,6 @@ func TestEncBinaryChunk(t *testing.T) {
 	assertEqual(v[:], res.([]byte), t)
 }
 
-func testBinaryFramework(t *testing.T, method string, expected []byte) {
-	r, e := decodeResponse(method)
-	if e != nil {
-		t.Errorf("%s: decode fail with error %v", method, e)
-		return
-	}
-
-	v, ok := r.([]byte)
-	if !ok {
-		t.Errorf("%s: %v is not binary", method, r)
-		return
-	}
-
-	if !bytes.Equal(v, expected) {
-		t.Errorf("%s: got %v, wanted %v", method, v, expected)
-	}
-}
-
 func TestBinary(t *testing.T) {
 	s0 := ""
 	s1 := "0"
@@ -133,11 +115,12 @@ func TestBinary(t *testing.T) {
 		s65560 += fmt.Sprintf("%03d 56789012345678901234567890123456789012345678901234567890123\n", i)
 	}
 
-	testBinaryFramework(t, "replyBinary_0", []byte(s0))
-	testBinaryFramework(t, "replyBinary_1", []byte(s1))
-	testBinaryFramework(t, "replyBinary_1023", []byte(s1024[:1023]))
-	testBinaryFramework(t, "replyBinary_1024", []byte(s1024))
-	testBinaryFramework(t, "replyBinary_15", []byte(s16[:15]))
-	testBinaryFramework(t, "replyBinary_16", []byte(s16))
-	testBinaryFramework(t, "replyBinary_65536", []byte(s65560[:65536]))
+	testDecodeFramework(t, "replyBinary_0", []byte(s0))
+	testDecodeFramework(t, "replyBinary_1", []byte(s1))
+	testDecodeFramework(t, "replyBinary_1023", []byte(s1024[:1023]))
+	testDecodeFramework(t, "replyBinary_1024", []byte(s1024))
+	testDecodeFramework(t, "replyBinary_15", []byte(s16[:15]))
+	testDecodeFramework(t, "replyBinary_16", []byte(s16))
+	testDecodeFramework(t, "replyBinary_65536", []byte(s65560[:65536]))
+	testDecodeFramework(t, "replyBinary_null", nil)
 }

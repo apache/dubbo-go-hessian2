@@ -92,3 +92,28 @@ func TestEncRune(t *testing.T) {
 	// t.Logf("decode(%v) = %v, %v\n", v, res, err)
 	assertEqual([]byte(res.(string)), []byte(v), t)
 }
+
+func TestString(t *testing.T) {
+	s0 := ""
+	s1 := "0"
+	s32 := "01234567890123456789012345678901"
+
+	s1024 := ""
+	for i := 0; i < 16; i++ {
+		s1024 += fmt.Sprintf("%02d 456789012345678901234567890123456789012345678901234567890123\n", i)
+	}
+
+	s65560 := ""
+	for i := 0; i < 1024; i++ {
+		s65560 += fmt.Sprintf("%03d 56789012345678901234567890123456789012345678901234567890123\n", i)
+	}
+
+	testDecodeFramework(t, "replyString_0", s0)
+	testDecodeFramework(t, "replyString_1", s1)
+	testDecodeFramework(t, "replyString_1023", s1024[:1023])
+	testDecodeFramework(t, "replyString_1024", s1024)
+	testDecodeFramework(t, "replyString_31", s32[:31])
+	testDecodeFramework(t, "replyString_32", s32)
+	testDecodeFramework(t, "replyString_65536", s65560[:65536])
+	testDecodeFramework(t, "replyString_null", nil)
+}

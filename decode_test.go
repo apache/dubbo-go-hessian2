@@ -23,6 +23,8 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"reflect"
+	"testing"
 )
 
 const (
@@ -71,4 +73,20 @@ func decodeResponse(method string) (interface{}, error) {
 		return nil, e
 	}
 	return r, nil
+}
+
+func testDecodeFramework(t *testing.T, method string, expected interface{}) {
+	r, e := decodeResponse(method)
+	if e != nil {
+		t.Errorf("%s: decode fail with error %v", method, e)
+		return
+	}
+
+	tmp, ok := r.(*_refHolder)
+	if ok {
+		r = tmp.value.Interface()
+	}
+	if !reflect.DeepEqual(r, expected) {
+		t.Errorf("%s: got %v, wanted %v", method, r, expected)
+	}
 }
