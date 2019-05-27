@@ -23,8 +23,8 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"testing"
 	"reflect"
+	"testing"
 )
 
 const (
