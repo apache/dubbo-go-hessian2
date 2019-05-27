@@ -15,7 +15,6 @@
 package hessian
 
 import (
-	"reflect"
 	"testing"
 )
 
@@ -27,20 +26,7 @@ func TestEncNull(t *testing.T) {
 	}
 	t.Logf("nil enc result:%s\n", string(e.buffer))
 }
-func testNullFramework(t *testing.T, method string) {
-	r, e := decodeResponse(method)
-	if e != nil {
-		t.Errorf("%s: decode fail with error %+v", method, e)
-		return
-	}
-
-	if reflect.TypeOf(r) != nil { // detect nil interface, not only nil value
-		t.Errorf("%s: %v is not null", method, r)
-	}
-}
 
 func TestNull(t *testing.T) {
-	testNullFramework(t, "replyBinary_null")
-	testNullFramework(t, "replyNull")
-	testNullFramework(t, "replyString_null")
+	testDecodeFramework(t, "replyNull", nil)
 }
