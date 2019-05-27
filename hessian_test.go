@@ -55,7 +55,7 @@ func doTestHessianEncodeHeader(t *testing.T, packageType PackageType, responseSt
 	return resp, err
 }
 
-func doTestResponse(t *testing.T, packageType PackageType, responseStatus byte, body interface{}, decodedObject interface{}) {
+func doTestResponse(t *testing.T, packageType PackageType, responseStatus byte, body interface{}, decodedObject interface{}, assertFunc func()) {
 	resp, err := doTestHessianEncodeHeader(t, packageType, responseStatus, body)
 
 	codecR := NewHessianCodec(bufio.NewReader(bytes.NewReader(resp)))
@@ -78,37 +78,56 @@ func doTestResponse(t *testing.T, packageType PackageType, responseStatus byte, 
 	assert.Nil(t, err)
 	t.Log(decodedObject)
 
-	if reflect.TypeOf(decodedObject).String() == "*[]interface {}" {
-		// TODO currently not support typed list
-		var b []interface{}
-		arrBody := body.([]*Case)
-		b = append(b, arrBody[0])
-		assert.Equal(t, &b, decodedObject)
-	} else {
-		in, _ := EnsureInterface(UnpackPtrValue(EnsurePackValue(body)), nil)
-		out, _ := EnsureInterface(UnpackPtrValue(EnsurePackValue(decodedObject)), nil)
-		assert.Equal(t, in, out)
+	if assertFunc != nil {
+		assertFunc()
+		return
 	}
+
+	in, _ := EnsureInterface(UnpackPtrValue(EnsurePackValue(body)), nil)
+	out, _ := EnsureInterface(UnpackPtrValue(EnsurePackValue(decodedObject)), nil)
+	assert.Equal(t, in, out)
 }
 
 func TestResponse(t *testing.T) {
-	arr := []*Case{{A: "a", B: 1}}
-	doTestResponse(t, PackageResponse, Response_OK, arr, &[]interface{}{})
+	caseObj := Case{A: "a", B: 1}
 
-	doTestResponse(t, PackageResponse, Response_OK, &Case{A: "a", B: 1}, &Case{})
+	arr := []*Case{&caseObj}
+	var arrRes []interface{}
+	doTestResponse(t, PackageResponse, Response_OK, arr, &arrRes, func() {
+		assert.Equal(t, 1, len(arrRes))
+		assert.Equal(t, &caseObj, arrRes[0])
+	})
+
+	doTestResponse(t, PackageResponse, Response_OK, &Case{A: "a", B: 1}, &Case{}, nil)
 
 	s := "ok!!!!!"
 	strObj := ""
-	doTestResponse(t, PackageResponse, Response_OK, s, &strObj)
+	doTestResponse(t, PackageResponse, Response_OK, s, &strObj, nil)
 
 	var intObj int64
-	doTestResponse(t, PackageResponse, Response_OK, int64(3), &intObj)
+	doTestResponse(t, PackageResponse, Response_OK, int64(3), &intObj, nil)
 
 	boolObj := false
-	doTestResponse(t, PackageResponse, Response_OK, true, &boolObj)
+	doTestResponse(t, PackageResponse, Response_OK, true, &boolObj, nil)
 
 	strObj = ""
-	doTestResponse(t, PackageResponse, Response_SERVER_ERROR, "error!!!!!", &strObj)
+	doTestResponse(t, PackageResponse, Response_SERVER_ERROR, "error!!!!!", &strObj, nil)
+
+	mapObj := map[string][]*Case{"key": {&caseObj}}
+	mapRes := map[interface{}]interface{}{}
+	doTestResponse(t, PackageResponse, Response_OK, mapObj, &mapRes, func() {
+		c, ok := mapRes["key"]
+		if !ok {
+			assert.FailNow(t, "no key in decoded response map")
+		}
+
+		mapValueArr, ok := c.([]interface{})
+		if !ok {
+			assert.FailNow(t, "invalid decoded response map value", "expect []interface{}, but get %v", reflect.TypeOf(c))
+		}
+		assert.Equal(t, 1, len(mapValueArr))
+		assert.Equal(t, &caseObj, mapValueArr[0])
+	})
 }
 
 func doTestRequest(t *testing.T, packageType PackageType, responseStatus byte, body interface{}) {
@@ -139,4 +158,5 @@ func TestRequest(t *testing.T) {
 	doTestRequest(t, PackageRequest, Zero, []interface{}{3.2, true})
 	doTestRequest(t, PackageRequest, Zero, []interface{}{"a", 3, true, &Case{A: "a", B: 3}})
 	doTestRequest(t, PackageRequest, Zero, []interface{}{"a", 3, true, []*Case{{A: "a", B: 3}}})
+	doTestRequest(t, PackageRequest, Zero, []interface{}{map[string][]*Case{"key": {{A: "a", B: 3}}}})
 }
