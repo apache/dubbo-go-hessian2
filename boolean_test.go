@@ -41,25 +41,7 @@ func TestEncBool(t *testing.T) {
 	assertEqual(want, e.Buffer(), t)
 }
 
-func testBooleanFramework(t *testing.T, method string, expected bool) {
-	r, e := decodeResponse(method)
-	if e != nil {
-		t.Errorf("%s: decode fail with error %+v", method, e)
-		return
-	}
-
-	v, ok := r.(bool)
-	if !ok {
-		t.Errorf("%s: %v is not bool", method, r)
-		return
-	}
-
-	if ok && v != expected {
-		t.Errorf("%s: got %v, wanted %v", method, v, expected)
-	}
-}
-
 func TestBoolean(t *testing.T) {
-	testBooleanFramework(t, "replyFalse", false)
-	testBooleanFramework(t, "replyTrue", true)
+	testDecodeFramework(t, "replyFalse", false)
+	testDecodeFramework(t, "replyTrue", true)
 }

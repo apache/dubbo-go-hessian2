@@ -208,22 +208,6 @@ func TestIssue6(t *testing.T) {
 	}
 }
 
-func testObjectFramework(t *testing.T, method string, expected interface{}) {
-	r, e := decodeResponse(method)
-	if e != nil {
-		t.Errorf("%s: decode fail with error %v", method, e)
-		return
-	}
-
-	tmp, ok := r.(*_refHolder)
-	if ok {
-		r = tmp.value.Interface()
-	}
-	if !reflect.DeepEqual(r, expected) {
-		t.Errorf("%s: got %v, wanted %v", method, r, expected)
-	}
-}
-
 type A0 struct{}
 
 func (*A0) JavaClassName() string {
@@ -364,18 +348,18 @@ func TestObject(t *testing.T) {
 	RegisterPOJO(&TestObjectStruct{})
 	RegisterPOJO(&TestConsStruct{})
 
-	testObjectFramework(t, "replyObject_0", &A0{})
-	testObjectFramework(t, "replyObject_1", &TestObjectStruct{Value: 0})
-	testObjectFramework(t, "replyObject_16", []interface{}{&A0{}, &A1{}, &A2{}, &A3{}, &A4{}, &A5{}, &A6{}, &A7{}, &A8{}, &A9{}, &A10{}, &A11{}, &A12{}, &A13{}, &A14{}, &A15{}, &A16{}})
-	testObjectFramework(t, "replyObject_2", []interface{}{&TestObjectStruct{Value: 0}, &TestObjectStruct{Value: 1}})
-	testObjectFramework(t, "replyObject_2b", []interface{}{&TestObjectStruct{Value: 0}, &TestObjectStruct{Value: 0}})
+	testDecodeFramework(t, "replyObject_0", &A0{})
+	testDecodeFramework(t, "replyObject_1", &TestObjectStruct{Value: 0})
+	testDecodeFramework(t, "replyObject_16", []interface{}{&A0{}, &A1{}, &A2{}, &A3{}, &A4{}, &A5{}, &A6{}, &A7{}, &A8{}, &A9{}, &A10{}, &A11{}, &A12{}, &A13{}, &A14{}, &A15{}, &A16{}})
+	testDecodeFramework(t, "replyObject_2", []interface{}{&TestObjectStruct{Value: 0}, &TestObjectStruct{Value: 1}})
+	testDecodeFramework(t, "replyObject_2b", []interface{}{&TestObjectStruct{Value: 0}, &TestObjectStruct{Value: 0}})
 
 	object := TestObjectStruct{Value: 0}
 	object2a := []interface{}{&object, &object}
-	testObjectFramework(t, "replyObject_2a", object2a)
+	testDecodeFramework(t, "replyObject_2a", object2a)
 
 	cons := TestConsStruct{}
 	cons.First = "a"
 	cons.Rest = &cons
-	testObjectFramework(t, "replyObject_3", &cons)
+	testDecodeFramework(t, "replyObject_3", &cons)
 }

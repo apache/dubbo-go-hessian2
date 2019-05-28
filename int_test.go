@@ -81,39 +81,21 @@ func TestEncInt32Len4B(t *testing.T) {
 	t.Logf("decode(%v) = %v, %v\n", v, res, err)
 }
 
-func testIntFramework(t *testing.T, method string, expected int32) {
-	r, e := decodeResponse(method)
-	if e != nil {
-		t.Errorf("%s: decode fail with error %+v", method, e)
-		return
-	}
-
-	v, ok := r.(int32)
-	if !ok {
-		t.Errorf("%s: %v is not int", method, r)
-		return
-	}
-
-	if v != expected {
-		t.Errorf("%s: got %v, wanted %v", method, v, expected)
-	}
-}
-
 func TestInt(t *testing.T) {
-	testIntFramework(t, "replyInt_0", 0)
-	testIntFramework(t, "replyInt_0x30", 0x30)
-	testIntFramework(t, "replyInt_0x3ffff", 0x3ffff)
-	testIntFramework(t, "replyInt_0x40000", 0x40000)
-	testIntFramework(t, "replyInt_0x7ff", 0x7ff)
-	testIntFramework(t, "replyInt_0x7fffffff", 0x7fffffff)
-	testIntFramework(t, "replyInt_0x800", 0x800)
-	testIntFramework(t, "replyInt_1", 1)
-	testIntFramework(t, "replyInt_47", 47)
-	testIntFramework(t, "replyInt_m0x40000", -0x40000)
-	testIntFramework(t, "replyInt_m0x40001", -0x40001)
-	testIntFramework(t, "replyInt_m0x800", -0x800)
-	testIntFramework(t, "replyInt_m0x80000000", -0x80000000)
-	testIntFramework(t, "replyInt_m0x801", -0x801)
-	testIntFramework(t, "replyInt_m16", -16)
-	testIntFramework(t, "replyInt_m17", -17)
+	testDecodeFramework(t, "replyInt_0", int32(0))
+	testDecodeFramework(t, "replyInt_0x30", int32(0x30))
+	testDecodeFramework(t, "replyInt_0x3ffff", int32(0x3ffff))
+	testDecodeFramework(t, "replyInt_0x40000", int32(0x40000))
+	testDecodeFramework(t, "replyInt_0x7ff", int32(0x7ff))
+	testDecodeFramework(t, "replyInt_0x7fffffff", int32(0x7fffffff))
+	testDecodeFramework(t, "replyInt_0x800", int32(0x800))
+	testDecodeFramework(t, "replyInt_1", int32(1))
+	testDecodeFramework(t, "replyInt_47", int32(47))
+	testDecodeFramework(t, "replyInt_m0x40000", int32(-0x40000))
+	testDecodeFramework(t, "replyInt_m0x40001", int32(-0x40001))
+	testDecodeFramework(t, "replyInt_m0x800", int32(-0x800))
+	testDecodeFramework(t, "replyInt_m0x80000000", int32(-0x80000000))
+	testDecodeFramework(t, "replyInt_m0x801", int32(-0x801))
+	testDecodeFramework(t, "replyInt_m16", int32(-16))
+	testDecodeFramework(t, "replyInt_m17", int32(-17))
 }
