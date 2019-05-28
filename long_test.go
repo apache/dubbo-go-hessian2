@@ -123,40 +123,22 @@ func TestEncInt64Len8B(t *testing.T) {
 	t.Logf("decode(int64(%#x)) = %#x, %v\n", v, res, err)
 }
 
-func testLongFramework(t *testing.T, method string, expected int64) {
-	r, e := decodeResponse(method)
-	if e != nil {
-		t.Errorf("%s: decode fail with error %v", method, e)
-		return
-	}
-
-	v, ok := r.(int64)
-	if !ok {
-		t.Errorf("%s: %v is not long", method, r)
-		return
-	}
-
-	if v != expected {
-		t.Errorf("%s: got %v, wanted %v", method, v, expected)
-	}
-}
-
 func TestLong(t *testing.T) {
-	testLongFramework(t, "replyLong_0", 0)
-	testLongFramework(t, "replyLong_0x10", 0x10)
-	testLongFramework(t, "replyLong_0x3ffff", 0x3ffff)
-	testLongFramework(t, "replyLong_0x40000", 0x40000)
-	testLongFramework(t, "replyLong_0x7ff", 0x7ff)
-	testLongFramework(t, "replyLong_0x7fffffff", 0x7fffffff)
-	testLongFramework(t, "replyLong_0x800", 0x800)
-	testLongFramework(t, "replyLong_1", 1)
-	testLongFramework(t, "replyLong_15", 15)
-	testLongFramework(t, "replyLong_m0x40000", -0x40000)
-	testLongFramework(t, "replyLong_m0x40001", -0x40001)
-	testLongFramework(t, "replyLong_m0x800", -0x800)
-	testLongFramework(t, "replyLong_m0x80000000", -0x80000000)
-	testLongFramework(t, "replyLong_m0x80000001", -0x80000001)
-	testLongFramework(t, "replyLong_m0x801", -0x801)
-	testLongFramework(t, "replyLong_m8", -8)
-	testLongFramework(t, "replyLong_m9", -9)
+	testDecodeFramework(t, "replyLong_0", int64(0))
+	testDecodeFramework(t, "replyLong_0x10", int64(0x10))
+	testDecodeFramework(t, "replyLong_0x3ffff", int64(0x3ffff))
+	testDecodeFramework(t, "replyLong_0x40000", int64(0x40000))
+	testDecodeFramework(t, "replyLong_0x7ff", int64(0x7ff))
+	testDecodeFramework(t, "replyLong_0x7fffffff", int64(0x7fffffff))
+	testDecodeFramework(t, "replyLong_0x800", int64(0x800))
+	testDecodeFramework(t, "replyLong_1", int64(1))
+	testDecodeFramework(t, "replyLong_15", int64(15))
+	testDecodeFramework(t, "replyLong_m0x40000", int64(-0x40000))
+	testDecodeFramework(t, "replyLong_m0x40001", int64(-0x40001))
+	testDecodeFramework(t, "replyLong_m0x800", int64(-0x800))
+	testDecodeFramework(t, "replyLong_m0x80000000", int64(-0x80000000))
+	testDecodeFramework(t, "replyLong_m0x80000001", int64(-0x80000001))
+	testDecodeFramework(t, "replyLong_m0x801", int64(-0x801))
+	testDecodeFramework(t, "replyLong_m8", int64(-8))
+	testDecodeFramework(t, "replyLong_m9", int64(-9))
 }

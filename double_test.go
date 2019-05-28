@@ -39,36 +39,18 @@ func TestEncDouble(t *testing.T) {
 	t.Logf("decode(%v) = %v, %v\n", v, res, err)
 }
 
-func testDoubleFramework(t *testing.T, method string, expected float64) {
-	r, e := decodeResponse(method)
-	if e != nil {
-		t.Errorf("%s: decode fail with error %+v", method, e)
-		return
-	}
-
-	v, ok := r.(float64)
-	if !ok {
-		t.Errorf("%s: %v is not double", method, r)
-		return
-	}
-
-	if v != expected {
-		t.Errorf("%s: got %v, wanted %v", method, v, expected)
-	}
-}
-
 func TestDouble(t *testing.T) {
-	testDoubleFramework(t, "replyDouble_0_0", 0.0)
-	testDoubleFramework(t, "replyDouble_0_001", 0.001)
-	testDoubleFramework(t, "replyDouble_1_0", 1.0)
-	testDoubleFramework(t, "replyDouble_127_0", 127.0)
-	testDoubleFramework(t, "replyDouble_128_0", 128.0)
-	testDoubleFramework(t, "replyDouble_2_0", 2.0)
-	testDoubleFramework(t, "replyDouble_3_14159", 3.14159)
-	testDoubleFramework(t, "replyDouble_32767_0", 32767.0)
-	testDoubleFramework(t, "replyDouble_65_536", 65.536)
-	testDoubleFramework(t, "replyDouble_m0_001", -0.001)
-	testDoubleFramework(t, "replyDouble_m128_0", -128.0)
-	testDoubleFramework(t, "replyDouble_m129_0", -129.0)
-	testDoubleFramework(t, "replyDouble_m32768_0", -32768.0)
+	testDecodeFramework(t, "replyDouble_0_0", 0.0)
+	testDecodeFramework(t, "replyDouble_0_001", 0.001)
+	testDecodeFramework(t, "replyDouble_1_0", 1.0)
+	testDecodeFramework(t, "replyDouble_127_0", 127.0)
+	testDecodeFramework(t, "replyDouble_128_0", 128.0)
+	testDecodeFramework(t, "replyDouble_2_0", 2.0)
+	testDecodeFramework(t, "replyDouble_3_14159", 3.14159)
+	testDecodeFramework(t, "replyDouble_32767_0", 32767.0)
+	testDecodeFramework(t, "replyDouble_65_536", 65.536)
+	testDecodeFramework(t, "replyDouble_m0_001", -0.001)
+	testDecodeFramework(t, "replyDouble_m128_0", -128.0)
+	testDecodeFramework(t, "replyDouble_m129_0", -129.0)
+	testDecodeFramework(t, "replyDouble_m32768_0", -32768.0)
 }
