@@ -66,13 +66,13 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 
 		var resWithException, resValue, resNullValue int32
 		if atta {
-			resWithException = RESPONSE_WITH_EXCEPTION
-			resValue = RESPONSE_VALUE
-			resNullValue = RESPONSE_NULL_VALUE
-		} else {
 			resWithException = RESPONSE_WITH_EXCEPTION_WITH_ATTACHMENTS
 			resValue = RESPONSE_VALUE_WITH_ATTACHMENTS
 			resNullValue = RESPONSE_NULL_VALUE_WITH_ATTACHMENTS
+		} else {
+			resWithException = RESPONSE_WITH_EXCEPTION
+			resValue = RESPONSE_VALUE
+			resNullValue = RESPONSE_NULL_VALUE
 		}
 
 		if e, ok := ret.(error); ok { // throw error
@@ -105,7 +105,7 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 }
 
 // hessian decode response body
-// todo: need to read attachments, but don't known it's effect yet
+// todo: need to read attachments
 func unpackResponseBody(buf []byte, rspObj interface{}) error {
 	// body
 	decoder := NewDecoder(buf[:])

@@ -119,6 +119,7 @@ func getArgsTypeList(args []interface{}) (string, error) {
 
 // dubbo-remoting/dubbo-remoting-api/src/main/java/com/alibaba/dubbo/remoting/exchange/codec/ExchangeCodec.java
 // v2.5.4 line 204 encodeRequest
+// todo: attachments
 func packRequest(service Service, header DubboHeader, params interface{}) ([]byte, error) {
 	var (
 		err           error
