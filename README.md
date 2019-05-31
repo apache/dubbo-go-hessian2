@@ -78,7 +78,7 @@ if err != nil {
 }
 ``` 
 
-The encoded bytes of the struct `MyUser` is as follow:
+The encoded bytes of the struct `MyUser` is as following:
 ```text
  00000000  43 12 63 6f 6d 2e 63 6f  6d 70 61 6e 79 2e 6d 79  |C.com.company.my|
  00000010  75 73 65 72 92 0e 75 73  65 72 5f 66 75 6c 6c 5f  |user..user_full_|
@@ -165,7 +165,7 @@ if err != nil {
 }
 ``` 
 
-The encoded bytes of the struct `MyUser` is as follow:
+The encoded bytes of the struct `MyUser` is as following:
 ```text
  00000000  43 12 63 6f 6d 2e 63 6f  6d 70 61 6e 79 2e 6d 79  |C.com.company.my|
  00000010  75 73 65 72 92 0e 75 73  65 72 5f 66 75 6c 6c 5f  |user..user_full_|
