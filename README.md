@@ -51,8 +51,9 @@ circular, ok := obj.(*Circular)
 
 ## Customize Usage Examples
 
-#### Struct filed name encoding
-Hessian encoder will convert the filed name of struct to lower camelcase defaulted, but you customize it by `hessian` tag of struct.
+#### Encoding filed name 
+
+Hessian encoder default converts filed names of struct to lower camelcase, but you can customize it using `hessian` tag.
 
 Example:
 ```go
@@ -76,7 +77,8 @@ if err != nil {
     panic(err)
 }
 ``` 
-The encoded bytes of the struct from above example will look like:
+
+The encoded bytes of the struct `MyUser` is as following:
 ```text
  00000000  43 12 63 6f 6d 2e 63 6f  6d 70 61 6e 79 2e 6d 79  |C.com.company.my|
  00000010  75 73 65 72 92 0e 75 73  65 72 5f 66 75 6c 6c 5f  |user..user_full_|
@@ -85,8 +87,11 @@ The encoded bytes of the struct from above example will look like:
  00000040  0c 30 31 30 2d 31 32 33  34 35 36 37 38           |.010-12345678|
 ```
 
-#### Struct filed name decoding
-Hessian decoder will compare all filed's name of struct until it matches the correct name, the order of matching rules is:
+#### Decoding filed name 
+
+Hessian decoder finds the correct target field though comparing all filed names of struct one by one until matching.
+
+The following example shows the order of the matching rules:
 ```go
 type MyUser struct {
 	MobilePhone      string   `hessian:"mobile-phone"`
@@ -133,7 +138,7 @@ type MyUser struct {
 
 ##### hessian.SetTagIdentifier
 
-You can use `hessian.SetTagIdentifier` to customize tag-identifier of hessian, it's will effect both encoder and decoder. 
+You can use `hessian.SetTagIdentifier` to customize tag-identifier of hessian, which takes effect to both encoder and decoder. 
 
 Example:
 ```go
@@ -159,7 +164,8 @@ if err != nil {
     panic(err)
 }
 ``` 
-The encoded bytes of the struct from above example will look like:
+
+The encoded bytes of the struct `MyUser` is as following:
 ```text
  00000000  43 12 63 6f 6d 2e 63 6f  6d 70 61 6e 79 2e 6d 79  |C.com.company.my|
  00000010  75 73 65 72 92 0e 75 73  65 72 5f 66 75 6c 6c 5f  |user..user_full_|
