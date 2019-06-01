@@ -22,13 +22,18 @@ import java.lang.reflect.Method;
 
 public class Hessian {
     public static void main(String[] args) throws Exception {
-        Method method = TestHessian2Servlet.class.getMethod(args[0]);
+        if (args[0].startsWith("reply")) {
+            Method method = TestHessian2Servlet.class.getMethod(args[0]);
+            TestHessian2Servlet servlet = new TestHessian2Servlet();
+            Object object = method.invoke(servlet);
 
-        TestHessian2Servlet servlet = new TestHessian2Servlet();
-        Object object = method.invoke(servlet);
-
-        Hessian2Output output = new Hessian2Output(System.out);
-        output.writeObject(object);
-        output.flush();
+            Hessian2Output output = new Hessian2Output(System.out);
+            output.writeObject(object);
+            output.flush();
+        } else {
+            Method method = CustomReply.class.getMethod(args[0]);
+            CustomReply customReply = new CustomReply(System.out);
+            method.invoke(customReply);
+        }
     }
 }
