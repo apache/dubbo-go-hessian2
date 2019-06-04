@@ -134,10 +134,10 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 			err = ErrJavaException
 			header.Type |= PackageError
 			bufSize := h.reader.Buffered()
-			if bufSize > 2 { // responseType + objectType + error content,so it's size > 2
+			if bufSize > 1 {
 				expBuf, expErr := h.reader.Peek(bufSize)
 				if expErr == nil {
-					err = perrors.Errorf("java exception:%s", string(expBuf[2:bufSize-1]))
+					err = perrors.Errorf("java exception:%s", string(expBuf[1:]))
 				}
 			}
 		}
