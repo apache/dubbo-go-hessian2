@@ -58,15 +58,7 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 
 	if hb {
 		encoder.Encode(nil)
-	} else if header.ResponseStatus != Response_OK {
-		if e, ok := ret.(error); ok { // throw error
-			encoder.Encode(e.Error())
-		} else if e, ok := ret.(string); ok {
-			encoder.Encode(e)
-		} else {
-			return nil, perrors.New("Ret must be error or string!")
-		}
-	} else {
+	} else if header.ResponseStatus == Response_OK {
 		// com.alibaba.dubbo.rpc.protocol.dubbo.DubboCodec.DubboCodec.java
 		// v2.7.1 line191 encodeRequestData
 
@@ -97,6 +89,16 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 
 		if atta {
 			encoder.Encode(attachments) // attachments
+		}
+	} else {
+		// com.alibaba.dubbo.remoting.exchange.codec.ExchangeCodec
+		// v2.6.5 line280 encodeResponse
+		if e, ok := ret.(error); ok { // throw error
+			encoder.Encode(e.Error())
+		} else if e, ok := ret.(string); ok {
+			encoder.Encode(e)
+		} else {
+			return nil, perrors.New("Ret must be error or string!")
 		}
 	}
 
