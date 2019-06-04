@@ -137,7 +137,7 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 			if bufSize > 1 {
 				expBuf, expErr := h.reader.Peek(bufSize)
 				if expErr == nil {
-					err = perrors.Errorf("java exception:%s", string(expBuf[1:]))
+					err = perrors.Errorf("java exception:%s", string(expBuf[1:bufSize-1]))
 				}
 			}
 		}
