@@ -184,6 +184,17 @@ func RegisterPOJO(o POJO) int {
 	return structInfo.index
 }
 
+// RegisterPOJOs register a POJO instance arr @os. The return value is @os's
+// mathching index array, in which "-1" means its matching POJO has been registered.
+func RegisterPOJOs(os ...POJO) []int {
+    arr := make([]int, len(os))
+    for i := range os {
+        arr[i] = RegisterPOJO(os[i])
+    }
+
+    return arr
+}
+
 // RegisterJavaEnum Register a value type JavaEnum variable.
 func RegisterJavaEnum(o POJOEnum) int {
 	var (
