@@ -328,25 +328,27 @@ func (*TestConsStruct) JavaClassName() string {
 }
 
 func TestObject(t *testing.T) {
-	RegisterPOJO(&A0{})
-	RegisterPOJO(&A1{})
-	RegisterPOJO(&A2{})
-	RegisterPOJO(&A3{})
-	RegisterPOJO(&A4{})
-	RegisterPOJO(&A5{})
-	RegisterPOJO(&A6{})
-	RegisterPOJO(&A7{})
-	RegisterPOJO(&A8{})
-	RegisterPOJO(&A9{})
-	RegisterPOJO(&A10{})
-	RegisterPOJO(&A11{})
-	RegisterPOJO(&A12{})
-	RegisterPOJO(&A13{})
-	RegisterPOJO(&A14{})
-	RegisterPOJO(&A15{})
-	RegisterPOJO(&A16{})
-	RegisterPOJO(&TestObjectStruct{})
-	RegisterPOJO(&TestConsStruct{})
+	RegisterPOJOs(
+		&A0{},
+		&A1{},
+		&A2{},
+		&A3{},
+		&A4{},
+		&A5{},
+		&A6{},
+		&A7{},
+		&A8{},
+		&A9{},
+		&A10{},
+		&A11{},
+		&A12{},
+		&A13{},
+		&A14{},
+		&A15{},
+		&A16{},
+		&TestObjectStruct{},
+		&TestConsStruct{},
+	)
 
 	testDecodeFramework(t, "replyObject_0", &A0{})
 	testDecodeFramework(t, "replyObject_1", &TestObjectStruct{Value: 0})
