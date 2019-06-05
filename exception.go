@@ -1,8 +1,18 @@
 package hessian
 
 func init() {
+	RegisterPOJO(&Throwable{})
 	RegisterPOJO(&Exception{})
 	RegisterPOJO(&StackTraceElement{})
+}
+
+////////////////////////////
+// Throwable interface
+////////////////////////////
+
+type ThrowableIntf interface {
+	Error() string
+	JavaClassName() string
 }
 
 ////////////////////////////
@@ -16,6 +26,10 @@ type Throwable struct {
 	SuppressedExceptions []Throwable
 	StackTrace           []StackTraceElement
 	Cause                *Throwable
+}
+
+func NewThrowable(detailMessage string) *Throwable {
+	return &Throwable{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
 }
 
 func (e Throwable) Error() string {
@@ -39,6 +53,10 @@ type Exception struct {
 	Cause                *Exception
 }
 
+func NewException(detailMessage string) *Exception {
+	return &Exception{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
+}
+
 func (e Exception) Error() string {
 	return e.DetailMessage
 }
@@ -51,7 +69,7 @@ type StackTraceElement struct {
 	DeclaringClass string
 	MethodName     string
 	FileName       string
-	LineNumber     string
+	LineNumber     int
 }
 
 func (StackTraceElement) JavaClassName() string {

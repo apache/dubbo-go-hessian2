@@ -77,7 +77,11 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 
 		if e, ok := ret.(error); ok { // throw error
 			encoder.Encode(resWithException)
-			encoder.Encode(e.Error())
+			if t, ok := e.(ThrowableIntf); ok {
+				encoder.Encode(t)
+			} else {
+				encoder.Encode(e.Error())
+			}
 		} else {
 			if ret == nil {
 				encoder.Encode(resNullValue)
@@ -129,6 +133,9 @@ func unpackResponseBody(buf []byte, rspObj interface{}) error {
 		expt, err := decoder.Decode()
 		if err != nil {
 			return perrors.WithStack(err)
+		}
+		if e, ok := expt.(error); ok {
+			return e
 		}
 		return perrors.Errorf("got exception: %+v", expt)
 
