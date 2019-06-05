@@ -14,23 +14,21 @@
 
 package test;
 
-import com.caucho.hessian.io.Hessian2Output;
+import com.alibaba.com.caucho.hessian.io.Hessian2Output;
 import com.caucho.hessian.test.A0;
 import com.caucho.hessian.test.A1;
 
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 
-public class CustomReply {
+public class TestHessian {
 
     private Hessian2Output output;
     private HashMap<Class<?>, String> typeMap;
 
-    CustomReply(OutputStream os) {
+    TestHessian(OutputStream os) {
         output = new Hessian2Output(os);
 
         typeMap = new HashMap<>();
@@ -89,19 +87,22 @@ public class CustomReply {
     }
 
     public void customReplyUntypedFixedListHasNull() throws Exception {
-        List o = new ArrayList();
-        o.add(new A0());
-        o.add(new A1());
-        o.add(null);
-        output.writeObject(o);
+        Object[] o = new Object[]{new A0(), new A1(), null};
+        if (output.addRef(o)) {
+            return;
+        }
+        boolean hasEnd = output.writeListBegin(o.length, null);
+        for (Object tmp: o) {
+            output.writeObject(tmp);
+        }
+        if (hasEnd) {
+            output.writeListEnd();
+        }
         output.flush();
     }
 
     public void customReplyUntypedVariableListHasNull() throws Exception {
-        List o = new ArrayList();
-        o.add(new A0());
-        o.add(new A1());
-        o.add(null);
+        Object[] o = new Object[]{new A0(), new A1(), null};
         if (output.addRef(o)) {
             return;
         }

@@ -14,7 +14,7 @@
 
 package test;
 
-import com.caucho.hessian.io.Hessian2Output;
+import com.alibaba.com.caucho.hessian.io.Hessian2Output;
 import com.caucho.hessian.test.TestHessian2Servlet;
 
 import java.lang.reflect.Method;
@@ -31,9 +31,9 @@ public class Hessian {
             output.writeObject(object);
             output.flush();
         } else {
-            Method method = CustomReply.class.getMethod(args[0]);
-            CustomReply customReply = new CustomReply(System.out);
-            method.invoke(customReply);
+            Method method = TestHessian.class.getMethod(args[0]);
+            TestHessian testHessian = new TestHessian(System.out);
+            method.invoke(testHessian);
         }
     }
 }
