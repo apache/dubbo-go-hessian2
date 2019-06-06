@@ -90,3 +90,17 @@ func testDecodeFramework(t *testing.T, method string, expected interface{}) {
 		t.Errorf("%s: got %v, wanted %v", method, r, expected)
 	}
 }
+
+func testDecodeFrameworkFunc(t *testing.T, method string, expected func(interface{})) {
+	r, e := decodeResponse(method)
+	if e != nil {
+		t.Errorf("%s: decode fail with error %v", method, e)
+		return
+	}
+
+	tmp, ok := r.(*_refHolder)
+	if ok {
+		r = tmp.value.Interface()
+	}
+	expected(r)
+}

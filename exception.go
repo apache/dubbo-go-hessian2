@@ -10,7 +10,7 @@ func init() {
 // Throwable interface
 ////////////////////////////
 
-type ThrowableIntf interface {
+type Throwabler interface {
 	Error() string
 	JavaClassName() string
 }
@@ -20,9 +20,8 @@ type ThrowableIntf interface {
 ////////////////////////////
 
 type Throwable struct {
-	SerialVersionUID int64
-	DetailMessage    string
-	//todo:backtrace
+	SerialVersionUID     int64
+	DetailMessage        string
 	SuppressedExceptions []Throwable
 	StackTrace           []StackTraceElement
 	Cause                *Throwable
@@ -45,9 +44,8 @@ func (Throwable) JavaClassName() string {
 ////////////////////////////
 
 type Exception struct {
-	SerialVersionUID int64
-	DetailMessage    string
-	//todo:backtrace
+	SerialVersionUID     int64
+	DetailMessage        string
 	SuppressedExceptions []Exception
 	StackTrace           []StackTraceElement
 	Cause                *Exception

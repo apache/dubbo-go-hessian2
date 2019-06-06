@@ -22,7 +22,12 @@ import java.lang.reflect.Method;
 
 public class Hessian {
     public static void main(String[] args) throws Exception {
-        Method method = TestHessian2Servlet.class.getMethod(args[0]);
+        Method method = null;
+        if (args[0].startsWith("throw_")) {
+            method = TestThrowable.class.getMethod(args[0]);
+        } else {
+            method = TestHessian2Servlet.class.getMethod(args[0]);
+        }
 
         TestHessian2Servlet servlet = new TestHessian2Servlet();
         Object object = method.invoke(servlet);
