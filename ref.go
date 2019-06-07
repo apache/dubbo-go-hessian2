@@ -25,8 +25,11 @@ import (
 
 // used to ref object,list,map
 type _refElem struct {
-	// record the kind of target, objects are the same only if the address and kind are the same
+	// different kind may share the same address, i.e. slice and its first element
 	kind reflect.Kind
+
+	// empty struct may share the same address
+	tp reflect.Type
 
 	// ref index
 	index int
@@ -87,6 +90,7 @@ func encRef(b []byte, index int) []byte {
 func (e *Encoder) checkRefMap(v reflect.Value) (int, bool) {
 	var (
 		kind reflect.Kind
+		tp   reflect.Type
 		addr unsafe.Pointer
 	)
 
@@ -95,6 +99,9 @@ func (e *Encoder) checkRefMap(v reflect.Value) (int, bool) {
 			v = v.Elem()
 		}
 		kind = v.Elem().Kind()
+		if kind != reflect.Invalid {
+			tp = v.Elem().Type()
+		}
 		if kind == reflect.Slice || kind == reflect.Map {
 			addr = unsafe.Pointer(v.Elem().Pointer())
 		} else {
@@ -102,6 +109,7 @@ func (e *Encoder) checkRefMap(v reflect.Value) (int, bool) {
 		}
 	} else {
 		kind = v.Kind()
+		tp = v.Type()
 		switch kind {
 		case reflect.Slice, reflect.Map:
 			addr = unsafe.Pointer(v.Pointer())
@@ -111,15 +119,18 @@ func (e *Encoder) checkRefMap(v reflect.Value) (int, bool) {
 	}
 
 	if elem, ok := e.refMap[addr]; ok {
-		// the array addr is equal to the first elem, which must ignore
 		if elem.kind == kind {
-			return elem.index, ok
+			if elem.kind != reflect.Struct {
+				return elem.index, ok
+			} else if elem.tp == tp {
+				return elem.index, ok
+			}
 		}
 		return 0, false
 	}
 
 	n := len(e.refMap)
-	e.refMap[addr] = _refElem{kind, n}
+	e.refMap[addr] = _refElem{kind, tp, n}
 	return 0, false
 }
 

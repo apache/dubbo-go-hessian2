@@ -66,4 +66,6 @@ func TestListEncode(t *testing.T) {
 	testEncodeFramework(t, "argUntypedFixedList_1", []interface{}{"1"})
 	testEncodeFramework(t, "argUntypedFixedList_7", []interface{}{"1", "2", "3", "4", "5", "6", "7"})
 	testEncodeFramework(t, "argUntypedFixedList_8", []interface{}{"1", "2", "3", "4", "5", "6", "7", "8"})
+
+	testEncodeFramework(t, "customArgUntypedFixedListHasNull", []interface{}{new(A0), new(A1), nil})
 }
