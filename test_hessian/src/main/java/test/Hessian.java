@@ -14,6 +14,7 @@
 
 package test;
 
+import com.alibaba.com.caucho.hessian.io.Hessian2Input;
 import com.alibaba.com.caucho.hessian.io.Hessian2Output;
 import com.caucho.hessian.test.TestHessian2Servlet;
 
@@ -30,10 +31,21 @@ public class Hessian {
             Hessian2Output output = new Hessian2Output(System.out);
             output.writeObject(object);
             output.flush();
-        } else {
+        } else if (args[0].startsWith("customReply")) {
             Method method = TestHessian.class.getMethod(args[0]);
             TestHessian testHessian = new TestHessian(System.out);
             method.invoke(testHessian);
+        } else if (args[0].startsWith("arg")) {
+            Hessian2Input input = new Hessian2Input(System.in);
+            Object o = input.readObject();
+
+            Method method = TestHessian2Servlet.class.getMethod(args[0], Object.class);
+            TestHessian2Servlet servlet = new TestHessian2Servlet();
+            System.out.print(method.invoke(servlet, o));
+        } else {
+            Method method = TestHessianEncode.class.getMethod(args[0]);
+            TestHessianEncode testHessianEncode = new TestHessianEncode(System.in);
+            System.out.print(method.invoke(testHessianEncode));
         }
     }
 }
