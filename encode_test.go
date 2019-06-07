@@ -16,8 +16,8 @@ package hessian
 
 import (
 	"bytes"
-	"testing"
 	"os/exec"
+	"testing"
 )
 
 var assertEqual = func(want, got []byte, t *testing.T) {
