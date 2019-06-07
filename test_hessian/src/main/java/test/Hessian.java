@@ -42,10 +42,18 @@ public class Hessian {
             Method method = TestHessian2Servlet.class.getMethod(args[0], Object.class);
             TestHessian2Servlet servlet = new TestHessian2Servlet();
             System.out.print(method.invoke(servlet, o));
-        } else {
+        } else if (args[0].startsWith("customArg")) {
             Method method = TestHessianEncode.class.getMethod(args[0]);
             TestHessianEncode testHessianEncode = new TestHessianEncode(System.in);
             System.out.print(method.invoke(testHessianEncode));
+        } else if (args[0].startsWith("throw_")) {
+            Method method = method = TestThrowable.class.getMethod(args[0]);
+            TestHessian2Servlet servlet = new TestHessian2Servlet();
+            Object object = method.invoke(servlet);
+
+            Hessian2Output output = new Hessian2Output(System.out);
+            output.writeObject(object);
+            output.flush();
         }
     }
 }

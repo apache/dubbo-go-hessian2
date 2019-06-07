@@ -51,7 +51,7 @@ circular, ok := obj.(*Circular)
 
 ## Customize Usage Examples
 
-#### Encoding filed name 
+#### Encoding filed name
 
 Hessian encoder default converts filed names of struct to lower camelcase, but you can customize it using `hessian` tag.
 
@@ -76,7 +76,7 @@ err := e.Encode(user)
 if err != nil {
     panic(err)
 }
-``` 
+```
 
 The encoded bytes of the struct `MyUser` is as following:
 ```text
@@ -87,7 +87,7 @@ The encoded bytes of the struct `MyUser` is as following:
  00000040  0c 30 31 30 2d 31 32 33  34 35 36 37 38           |.010-12345678|
 ```
 
-#### Decoding filed name 
+#### Decoding filed name
 
 Hessian decoder finds the correct target field though comparing all filed names of struct one by one until matching.
 
@@ -107,7 +107,7 @@ type MyUser struct {
 
 
 type MyUser struct {
-	MobilePhone      string  
+	MobilePhone      string
 }
 
 // The following encoded binary bytes will be hit automatically:
@@ -125,7 +125,7 @@ type MyUser struct {
 //
 // mobile-phone(tag lookup) => mobilePhone(lowerCameCase) => MobilePhone(SameCase) => mobilephone(lowercase)
 //                                                           ^ will matched
-// 
+//
 // 00000000  43 12 63 6f 6d 2e 63 6f  6d 70 61 6e 79 2e 6d 79  |C.com.company.my|
 // 00000010  75 73 65 72 91 0b 6d 6f  62 69 6c 65 70 68 6f 6e  |user..mobilephon|
 // 00000020  65 60 0b 31 37 36 31 32  33 34 31 32 33 34        |e`.17612341234|
@@ -138,7 +138,7 @@ type MyUser struct {
 
 ##### hessian.SetTagIdentifier
 
-You can use `hessian.SetTagIdentifier` to customize tag-identifier of hessian, which takes effect to both encoder and decoder. 
+You can use `hessian.SetTagIdentifier` to customize tag-identifier of hessian, which takes effect to both encoder and decoder.
 
 Example:
 ```go
@@ -163,7 +163,7 @@ err := e.Encode(user)
 if err != nil {
     panic(err)
 }
-``` 
+```
 
 The encoded bytes of the struct `MyUser` is as following:
 ```text
@@ -173,8 +173,3 @@ The encoded bytes of the struct `MyUser` is as following:
  00000030  4e 75 6d 62 65 72 60 08  75 73 65 72 6e 61 6d 65  |Number`.username|
  00000040  0c 30 31 30 2d 31 32 33  34 35 36 37 38           |.010-12345678|
 ```
-
-
-## Dubbo Service
-
-TODO

@@ -58,7 +58,7 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 
 	if hb {
 		encoder.Encode(nil)
-	} else {
+	} else if header.ResponseStatus == Response_OK {
 		// com.alibaba.dubbo.rpc.protocol.dubbo.DubboCodec.DubboCodec.java
 		// v2.7.1 line191 encodeRequestData
 
@@ -77,7 +77,11 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 
 		if e, ok := ret.(error); ok { // throw error
 			encoder.Encode(resWithException)
-			encoder.Encode(e.Error())
+			if t, ok := e.(Throwabler); ok {
+				encoder.Encode(t)
+			} else {
+				encoder.Encode(e.Error())
+			}
 		} else {
 			if ret == nil {
 				encoder.Encode(resNullValue)
@@ -89,6 +93,16 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 
 		if atta {
 			encoder.Encode(attachments) // attachments
+		}
+	} else {
+		// com.alibaba.dubbo.remoting.exchange.codec.ExchangeCodec
+		// v2.6.5 line280 encodeResponse
+		if e, ok := ret.(error); ok { // throw error
+			encoder.Encode(e.Error())
+		} else if e, ok := ret.(string); ok {
+			encoder.Encode(e)
+		} else {
+			return nil, perrors.New("Ret must be error or string!")
 		}
 	}
 
@@ -119,6 +133,9 @@ func unpackResponseBody(buf []byte, rspObj interface{}) error {
 		expt, err := decoder.Decode()
 		if err != nil {
 			return perrors.WithStack(err)
+		}
+		if e, ok := expt.(error); ok {
+			return e
 		}
 		return perrors.Errorf("got exception: %+v", expt)
 

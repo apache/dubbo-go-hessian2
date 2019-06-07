@@ -43,8 +43,7 @@ func TestEncList(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
-	RegisterPOJO(new(A0))
-	RegisterPOJO(new(A1))
+	RegisterPOJOs(new(A0), new(A1))
 
 	testDecodeFramework(t, "replyTypedFixedList_0", []interface{}{})
 	testDecodeFramework(t, "replyTypedFixedList_1", []interface{}{"1"})
