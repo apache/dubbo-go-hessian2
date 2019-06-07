@@ -95,6 +95,9 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 	var err error
 
 	buf, err := h.reader.Peek(HEADER_LENGTH)
+	if err == bufio.ErrBufferFull {
+		return ErrHeaderNotEnough
+	}
 	if err != nil { // this is impossible
 		return perrors.WithStack(err)
 	}
