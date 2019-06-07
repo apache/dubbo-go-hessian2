@@ -26,6 +26,12 @@ import (
 	perrors "github.com/pkg/errors"
 )
 
+type Response struct {
+	RspObj    interface{}
+	Exception error
+	//Attachments map[string]string
+}
+
 // dubbo-remoting/dubbo-remoting-api/src/main/java/com/alibaba/dubbo/remoting/exchange/codec/ExchangeCodec.java
 // v2.7.1 line 256 encodeResponse
 // hessian encode response
@@ -120,7 +126,7 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 
 // hessian decode response body
 // todo: need to read attachments
-func unpackResponseBody(buf []byte, rspObj interface{}) error {
+func unpackResponseBody(buf []byte, response *Response) error {
 	// body
 	decoder := NewDecoder(buf[:])
 	rspType, err := decoder.Decode()
@@ -135,19 +141,21 @@ func unpackResponseBody(buf []byte, rspObj interface{}) error {
 			return perrors.WithStack(err)
 		}
 		if e, ok := expt.(error); ok {
-			return e
+			response.Exception = e
+			return nil
 		}
-		return perrors.Errorf("got exception: %+v", expt)
+		response.Exception = perrors.Errorf("got exception: %+v", expt)
+		return nil
 
 	case RESPONSE_VALUE, RESPONSE_VALUE_WITH_ATTACHMENTS:
 		rsp, err := decoder.Decode()
 		if err != nil {
 			return perrors.WithStack(err)
 		}
-		return perrors.WithStack(ReflectResponse(rsp, rspObj))
+		return perrors.WithStack(ReflectResponse(rsp, response.RspObj))
 
 	case RESPONSE_NULL_VALUE, RESPONSE_NULL_VALUE_WITH_ATTACHMENTS:
-		return perrors.New("Received null")
+		return nil
 	}
 
 	return nil

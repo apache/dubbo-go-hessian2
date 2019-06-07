@@ -55,7 +55,7 @@ func doTestHessianEncodeHeader(t *testing.T, packageType PackageType, responseSt
 	return resp, err
 }
 
-func doTestResponse(t *testing.T, packageType PackageType, responseStatus byte, body interface{}, decodedObject interface{}, assertFunc func()) {
+func doTestResponse(t *testing.T, packageType PackageType, responseStatus byte, body interface{}, decodedResponse *Response, assertFunc func()) {
 	resp, err := doTestHessianEncodeHeader(t, packageType, responseStatus, body)
 
 	codecR := NewHessianCodec(bufio.NewReader(bytes.NewReader(resp)))
@@ -74,9 +74,9 @@ func doTestResponse(t *testing.T, packageType PackageType, responseStatus byte, 
 	assert.Equal(t, int64(1), h.ID)
 	assert.Equal(t, responseStatus, h.ResponseStatus)
 
-	err = codecR.ReadBody(decodedObject)
+	err = codecR.ReadBody(decodedResponse)
 	assert.Nil(t, err)
-	t.Log(decodedObject)
+	t.Log(decodedResponse)
 
 	if assertFunc != nil {
 		assertFunc()
@@ -84,38 +84,46 @@ func doTestResponse(t *testing.T, packageType PackageType, responseStatus byte, 
 	}
 
 	in, _ := EnsureInterface(UnpackPtrValue(EnsurePackValue(body)), nil)
-	out, _ := EnsureInterface(UnpackPtrValue(EnsurePackValue(decodedObject)), nil)
+	out, _ := EnsureInterface(UnpackPtrValue(EnsurePackValue(decodedResponse.RspObj)), nil)
 	assert.Equal(t, in, out)
 }
 
 func TestResponse(t *testing.T) {
 	caseObj := Case{A: "a", B: 1}
+	decodedResponse := &Response{}
 
 	arr := []*Case{&caseObj}
 	var arrRes []interface{}
-	doTestResponse(t, PackageResponse, Response_OK, arr, &arrRes, func() {
+	decodedResponse.RspObj = &arrRes
+	doTestResponse(t, PackageResponse, Response_OK, arr, decodedResponse, func() {
 		assert.Equal(t, 1, len(arrRes))
 		assert.Equal(t, &caseObj, arrRes[0])
 	})
 
-	doTestResponse(t, PackageResponse, Response_OK, &Case{A: "a", B: 1}, &Case{}, nil)
+	decodedResponse.RspObj = &Case{}
+	doTestResponse(t, PackageResponse, Response_OK, &Case{A: "a", B: 1}, decodedResponse, nil)
 
 	s := "ok!!!!!"
 	strObj := ""
-	doTestResponse(t, PackageResponse, Response_OK, s, &strObj, nil)
+	decodedResponse.RspObj = &strObj
+	doTestResponse(t, PackageResponse, Response_OK, s, decodedResponse, nil)
 
 	var intObj int64
-	doTestResponse(t, PackageResponse, Response_OK, int64(3), &intObj, nil)
+	decodedResponse.RspObj = &intObj
+	doTestResponse(t, PackageResponse, Response_OK, int64(3), decodedResponse, nil)
 
 	boolObj := false
-	doTestResponse(t, PackageResponse, Response_OK, true, &boolObj, nil)
+	decodedResponse.RspObj = &boolObj
+	doTestResponse(t, PackageResponse, Response_OK, true, decodedResponse, nil)
 
 	strObj = ""
-	doTestResponse(t, PackageResponse, Response_SERVER_ERROR, "error!!!!!", &strObj, nil)
+	decodedResponse.RspObj = &strObj
+	doTestResponse(t, PackageResponse, Response_SERVER_ERROR, "error!!!!!", decodedResponse, nil)
 
 	mapObj := map[string][]*Case{"key": {&caseObj}}
 	mapRes := map[interface{}]interface{}{}
-	doTestResponse(t, PackageResponse, Response_OK, mapObj, &mapRes, func() {
+	decodedResponse.RspObj = &mapRes
+	doTestResponse(t, PackageResponse, Response_OK, mapObj, decodedResponse, func() {
 		c, ok := mapRes["key"]
 		if !ok {
 			assert.FailNow(t, "no key in decoded response map")
