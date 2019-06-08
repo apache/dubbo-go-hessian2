@@ -94,10 +94,10 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 
 	var err error
 
-	buf, err := h.reader.Peek(HEADER_LENGTH)
-	if err == bufio.ErrBufferFull {
+	if h.reader.Size() < HEADER_LENGTH {
 		return ErrHeaderNotEnough
 	}
+	buf, err := h.reader.Peek(HEADER_LENGTH)
 	if err != nil { // this is impossible
 		return perrors.WithStack(err)
 	}
@@ -165,10 +165,10 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 // ReadBody uses hessian codec to read response body
 func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 
-	buf, err := h.reader.Peek(h.bodyLen)
-	if err == bufio.ErrBufferFull {
-		return ErrBodyNotEnough
+	if h.reader.Buffered() < h.bodyLen {
+		return ErrHeaderNotEnough
 	}
+	buf, err := h.reader.Peek(h.bodyLen)
 	if err != nil {
 		return perrors.WithStack(err)
 	}
@@ -191,7 +191,11 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 
 	case PackageResponse:
 		if rspObj != nil {
-			if err = unpackResponseBody(buf, rspObj); err != nil {
+			rsp, ok := rspObj.(*Response)
+			if !ok {
+				break
+			}
+			if err = unpackResponseBody(buf, rsp); err != nil {
 				return perrors.WithStack(err)
 			}
 		}
