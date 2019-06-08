@@ -23,12 +23,12 @@ import java.util.Date;
 import java.util.HashMap;
 
 
-public class TestHessian {
+public class TestCustomReply {
 
     private Hessian2Output output;
     private HashMap<Class<?>, String> typeMap;
 
-    TestHessian(OutputStream os) {
+    TestCustomReply(OutputStream os) {
         output = new Hessian2Output(os);
 
         typeMap = new HashMap<>();

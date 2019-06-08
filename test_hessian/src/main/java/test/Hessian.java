@@ -32,9 +32,9 @@ public class Hessian {
             output.writeObject(object);
             output.flush();
         } else if (args[0].startsWith("customReply")) {
-            Method method = TestHessian.class.getMethod(args[0]);
-            TestHessian testHessian = new TestHessian(System.out);
-            method.invoke(testHessian);
+            Method method = TestCustomReply.class.getMethod(args[0]);
+            TestCustomReply testCustomReply = new TestCustomReply(System.out);
+            method.invoke(testCustomReply);
         } else if (args[0].startsWith("arg")) {
             Hessian2Input input = new Hessian2Input(System.in);
             Object o = input.readObject();
@@ -43,9 +43,9 @@ public class Hessian {
             TestHessian2Servlet servlet = new TestHessian2Servlet();
             System.out.print(method.invoke(servlet, o));
         } else if (args[0].startsWith("customArg")) {
-            Method method = TestHessianEncode.class.getMethod(args[0]);
-            TestHessianEncode testHessianEncode = new TestHessianEncode(System.in);
-            System.out.print(method.invoke(testHessianEncode));
+            Method method = TestCustomDecode.class.getMethod(args[0]);
+            TestCustomDecode testCustomDecode = new TestCustomDecode(System.in);
+            System.out.print(method.invoke(testCustomDecode));
         } else if (args[0].startsWith("throw_")) {
             Method method = method = TestThrowable.class.getMethod(args[0]);
             TestHessian2Servlet servlet = new TestHessian2Servlet();

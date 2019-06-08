@@ -35,7 +35,7 @@ func encodeTarget(target interface{}) ([]byte, error) {
 	return e.Buffer(), nil
 }
 
-func getArg(method string, target interface{}) (string, error) {
+func javaDecodeValidate(method string, target interface{}) (string, error) {
 	b, e := encodeTarget(target)
 	if e != nil {
 		return "", e
@@ -61,8 +61,8 @@ func getArg(method string, target interface{}) (string, error) {
 	return string(out), nil
 }
 
-func testEncodeFramework(t *testing.T, method string, target interface{}) {
-	r, e := getArg(method, target)
+func testJavaDecode(t *testing.T, method string, target interface{}) {
+	r, e := javaDecodeValidate(method, target)
 	if e != nil {
 		t.Errorf("%s: encode fail with error %v", method, e)
 	}

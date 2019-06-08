@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class TestHessianEncode {
+public class TestCustomDecode {
 
     private Hessian2Input input;
 
-    TestHessianEncode(InputStream is) {
+    TestCustomDecode(InputStream is) {
         input = new Hessian2Input(is);
     }
 

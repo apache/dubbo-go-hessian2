@@ -190,7 +190,7 @@ func (d *Decoder) readTypedList(tag byte) (interface{}, error) {
 			if it != nil {
 				aryValue = reflect.Append(aryValue, EnsureRawValue(it))
 			} else {
-				aryValue = reflect.Append(aryValue, reflect.Zero(reflect.TypeOf((*interface{})(nil)).Elem()))
+				aryValue = reflect.Append(aryValue, NilValue)
 			}
 			holder.change(aryValue)
 		} else {
@@ -241,7 +241,7 @@ func (d *Decoder) readUntypedList(tag byte) (interface{}, error) {
 			if it != nil {
 				aryValue = reflect.Append(aryValue, EnsureRawValue(it))
 			} else {
-				aryValue = reflect.Append(aryValue, reflect.Zero(reflect.TypeOf((*interface{})(nil)).Elem()))
+				aryValue = reflect.Append(aryValue, NilValue)
 			}
 			holder.change(aryValue)
 		} else {
