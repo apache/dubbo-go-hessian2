@@ -67,7 +67,7 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 			encoder.Encode(nil)
 		} else {
 			// com.alibaba.dubbo.rpc.protocol.dubbo.DubboCodec.DubboCodec.java
-			// v2.7.1 line191 encodeRequestData
+			// v2.7.1 line191 encodeResponseData
 
 			atta := isSupportResponseAttachment(attachments[DUBBO_VERSION_KEY])
 
