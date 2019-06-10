@@ -62,43 +62,45 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 	encoder := NewEncoder()
 	encoder.Append(byteArray[:HEADER_LENGTH])
 
-	if hb {
-		encoder.Encode(nil)
-	} else if header.ResponseStatus == Response_OK {
-		// com.alibaba.dubbo.rpc.protocol.dubbo.DubboCodec.DubboCodec.java
-		// v2.7.1 line191 encodeRequestData
-
-		atta := isSupportResponseAttachment(attachments[DUBBO_VERSION_KEY])
-
-		var resWithException, resValue, resNullValue int32
-		if atta {
-			resWithException = RESPONSE_WITH_EXCEPTION_WITH_ATTACHMENTS
-			resValue = RESPONSE_VALUE_WITH_ATTACHMENTS
-			resNullValue = RESPONSE_NULL_VALUE_WITH_ATTACHMENTS
+	if header.ResponseStatus == Response_OK {
+		if hb {
+			encoder.Encode(nil)
 		} else {
-			resWithException = RESPONSE_WITH_EXCEPTION
-			resValue = RESPONSE_VALUE
-			resNullValue = RESPONSE_NULL_VALUE
-		}
+			// com.alibaba.dubbo.rpc.protocol.dubbo.DubboCodec.DubboCodec.java
+			// v2.7.1 line191 encodeRequestData
 
-		if e, ok := ret.(error); ok { // throw error
-			encoder.Encode(resWithException)
-			if t, ok := e.(Throwabler); ok {
-				encoder.Encode(t)
-			} else {
-				encoder.Encode(e.Error())
-			}
-		} else {
-			if ret == nil {
-				encoder.Encode(resNullValue)
-			} else {
-				encoder.Encode(resValue)
-				encoder.Encode(ret) // result
-			}
-		}
+			atta := isSupportResponseAttachment(attachments[DUBBO_VERSION_KEY])
 
-		if atta {
-			encoder.Encode(attachments) // attachments
+			var resWithException, resValue, resNullValue int32
+			if atta {
+				resWithException = RESPONSE_WITH_EXCEPTION_WITH_ATTACHMENTS
+				resValue = RESPONSE_VALUE_WITH_ATTACHMENTS
+				resNullValue = RESPONSE_NULL_VALUE_WITH_ATTACHMENTS
+			} else {
+				resWithException = RESPONSE_WITH_EXCEPTION
+				resValue = RESPONSE_VALUE
+				resNullValue = RESPONSE_NULL_VALUE
+			}
+
+			if e, ok := ret.(error); ok { // throw error
+				encoder.Encode(resWithException)
+				if t, ok := e.(Throwabler); ok {
+					encoder.Encode(t)
+				} else {
+					encoder.Encode(e.Error())
+				}
+			} else {
+				if ret == nil {
+					encoder.Encode(resNullValue)
+				} else {
+					encoder.Encode(resValue)
+					encoder.Encode(ret) // result
+				}
+			}
+
+			if atta {
+				encoder.Encode(attachments) // attachments
+			}
 		}
 	} else {
 		// com.alibaba.dubbo.remoting.exchange.codec.ExchangeCodec

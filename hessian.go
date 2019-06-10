@@ -17,6 +17,7 @@ package hessian
 import (
 	"bufio"
 	"encoding/binary"
+	"reflect"
 	"time"
 )
 
@@ -57,9 +58,10 @@ type Service struct {
 
 // HessianCodec defines hessian codec
 type HessianCodec struct {
-	pkgType PackageType
-	reader  *bufio.Reader
-	bodyLen int
+	pkgType        PackageType
+	responseStatus byte
+	reader         *bufio.Reader
+	bodyLen        int
 }
 
 // NewHessianCodec generate a new hessian codec instance
@@ -131,19 +133,6 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 	} else {
 		header.Type |= PackageResponse
 		header.ResponseStatus = buf[3]
-
-		// Header{status}
-		if buf[3] != Response_OK {
-			err = ErrJavaException
-			header.Type |= PackageError
-			bufSize := h.reader.Buffered()
-			if bufSize > 1 {
-				expBuf, expErr := h.reader.Peek(bufSize)
-				if expErr == nil {
-					err = perrors.Errorf("java exception:%s", string(expBuf[1:bufSize-1]))
-				}
-			}
-		}
 	}
 
 	// Header{req id}
@@ -156,7 +145,12 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 	}
 
 	h.pkgType = header.Type
+	h.responseStatus = header.ResponseStatus
 	h.bodyLen = header.BodyLen
+
+	if h.reader.Buffered() < h.bodyLen {
+		return ErrBodyNotEnough
+	}
 
 	return perrors.WithStack(err)
 
@@ -166,7 +160,7 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 
 	if h.reader.Buffered() < h.bodyLen {
-		return ErrHeaderNotEnough
+		return ErrBodyNotEnough
 	}
 	buf, err := h.reader.Peek(h.bodyLen)
 	if err != nil {
@@ -177,23 +171,33 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 		return perrors.WithStack(err)
 	}
 
+	// response exception
+	if h.responseStatus != Zero && h.responseStatus != Response_OK {
+		rsp, ok := rspObj.(*Response)
+		if !ok {
+			return perrors.Errorf("@rspObj is not *Response, it is %s", reflect.TypeOf(rspObj).String())
+		}
+		rsp.Exception = ErrJavaException
+		if h.bodyLen > 1 {
+			rsp.Exception = perrors.Errorf("java exception:%s", string(buf[1:h.bodyLen-1]))
+		}
+
+		return nil
+	}
+
 	switch h.pkgType & 0x0f {
 	case PackageRequest | PackageHeartbeat, PackageResponse | PackageHeartbeat:
-		return nil
 	case PackageRequest:
 		if rspObj != nil {
 			if err = unpackRequestBody(buf, rspObj); err != nil {
 				return perrors.WithStack(err)
 			}
 		}
-
-		return nil
-
 	case PackageResponse:
 		if rspObj != nil {
 			rsp, ok := rspObj.(*Response)
 			if !ok {
-				break
+				rsp = &Response{RspObj: rspObj}
 			}
 			if err = unpackResponseBody(buf, rsp); err != nil {
 				return perrors.WithStack(err)
