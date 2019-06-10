@@ -14,7 +14,8 @@
 
 package test;
 
-import com.caucho.hessian.io.Hessian2Output;
+import com.alibaba.com.caucho.hessian.io.Hessian2Input;
+import com.alibaba.com.caucho.hessian.io.Hessian2Output;
 import com.caucho.hessian.test.TestHessian2Servlet;
 
 import java.lang.reflect.Method;
@@ -22,18 +23,37 @@ import java.lang.reflect.Method;
 
 public class Hessian {
     public static void main(String[] args) throws Exception {
-        Method method = null;
-        if (args[0].startsWith("throw_")) {
-            method = TestThrowable.class.getMethod(args[0]);
-        } else {
-            method = TestHessian2Servlet.class.getMethod(args[0]);
+        if (args[0].startsWith("reply")) {
+            Method method = TestHessian2Servlet.class.getMethod(args[0]);
+            TestHessian2Servlet servlet = new TestHessian2Servlet();
+            Object object = method.invoke(servlet);
+
+            Hessian2Output output = new Hessian2Output(System.out);
+            output.writeObject(object);
+            output.flush();
+        } else if (args[0].startsWith("customReply")) {
+            Method method = TestCustomReply.class.getMethod(args[0]);
+            TestCustomReply testCustomReply = new TestCustomReply(System.out);
+            method.invoke(testCustomReply);
+        } else if (args[0].startsWith("arg")) {
+            Hessian2Input input = new Hessian2Input(System.in);
+            Object o = input.readObject();
+
+            Method method = TestHessian2Servlet.class.getMethod(args[0], Object.class);
+            TestHessian2Servlet servlet = new TestHessian2Servlet();
+            System.out.print(method.invoke(servlet, o));
+        } else if (args[0].startsWith("customArg")) {
+            Method method = TestCustomDecode.class.getMethod(args[0]);
+            TestCustomDecode testCustomDecode = new TestCustomDecode(System.in);
+            System.out.print(method.invoke(testCustomDecode));
+        } else if (args[0].startsWith("throw_")) {
+            Method method = method = TestThrowable.class.getMethod(args[0]);
+            TestHessian2Servlet servlet = new TestHessian2Servlet();
+            Object object = method.invoke(servlet);
+
+            Hessian2Output output = new Hessian2Output(System.out);
+            output.writeObject(object);
+            output.flush();
         }
-
-        TestHessian2Servlet servlet = new TestHessian2Servlet();
-        Object object = method.invoke(servlet);
-
-        Hessian2Output output = new Hessian2Output(System.out);
-        output.writeObject(object);
-        output.flush();
     }
 }

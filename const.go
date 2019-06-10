@@ -20,6 +20,7 @@ import (
 
 import (
 	perrors "github.com/pkg/errors"
+	"reflect"
 )
 
 const (
@@ -232,3 +233,5 @@ var (
 
 // DescRegex ...
 var DescRegex, _ = regexp.Compile(DESC_REGEX)
+
+var NilValue = reflect.Zero(reflect.TypeOf((*interface{})(nil)).Elem())

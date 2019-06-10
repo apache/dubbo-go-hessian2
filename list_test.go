@@ -43,6 +43,8 @@ func TestEncList(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
+	RegisterPOJOs(new(A0), new(A1))
+
 	testDecodeFramework(t, "replyTypedFixedList_0", []interface{}{})
 	testDecodeFramework(t, "replyTypedFixedList_1", []interface{}{"1"})
 	testDecodeFramework(t, "replyTypedFixedList_7", []interface{}{"1", "2", "3", "4", "5", "6", "7"})
@@ -51,4 +53,18 @@ func TestList(t *testing.T) {
 	testDecodeFramework(t, "replyUntypedFixedList_1", []interface{}{"1"})
 	testDecodeFramework(t, "replyUntypedFixedList_7", []interface{}{"1", "2", "3", "4", "5", "6", "7"})
 	testDecodeFramework(t, "replyUntypedFixedList_8", []interface{}{"1", "2", "3", "4", "5", "6", "7", "8"})
+
+	testDecodeFramework(t, "customReplyTypedFixedListHasNull", []interface{}{new(A0), new(A1), nil})
+	testDecodeFramework(t, "customReplyTypedVariableListHasNull", []interface{}{new(A0), new(A1), nil})
+	testDecodeFramework(t, "customReplyUntypedFixedListHasNull", []interface{}{new(A0), new(A1), nil})
+	testDecodeFramework(t, "customReplyUntypedVariableListHasNull", []interface{}{new(A0), new(A1), nil})
+}
+
+func TestListEncode(t *testing.T) {
+	testJavaDecode(t, "argUntypedFixedList_0", []interface{}{})
+	testJavaDecode(t, "argUntypedFixedList_1", []interface{}{"1"})
+	testJavaDecode(t, "argUntypedFixedList_7", []interface{}{"1", "2", "3", "4", "5", "6", "7"})
+	testJavaDecode(t, "argUntypedFixedList_8", []interface{}{"1", "2", "3", "4", "5", "6", "7", "8"})
+
+	testJavaDecode(t, "customArgUntypedFixedListHasNull", []interface{}{new(A0), new(A1), nil})
 }

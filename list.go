@@ -186,16 +186,15 @@ func (d *Decoder) readTypedList(tag byte) (interface{}, error) {
 			return nil, perrors.WithStack(err)
 		}
 
-		if it == nil {
-			break
-		}
-
-		v := EnsureRawValue(it)
 		if isVariableArr {
-			aryValue = reflect.Append(aryValue, v)
+			if it != nil {
+				aryValue = reflect.Append(aryValue, EnsureRawValue(it))
+			} else {
+				aryValue = reflect.Append(aryValue, NilValue)
+			}
 			holder.change(aryValue)
 		} else {
-			SetValue(aryValue.Index(j), v)
+			arr[j] = it
 		}
 	}
 
@@ -239,7 +238,11 @@ func (d *Decoder) readUntypedList(tag byte) (interface{}, error) {
 		}
 
 		if isVariableArr {
-			aryValue = reflect.Append(aryValue, EnsureRawValue(it))
+			if it != nil {
+				aryValue = reflect.Append(aryValue, EnsureRawValue(it))
+			} else {
+				aryValue = reflect.Append(aryValue, NilValue)
+			}
 			holder.change(aryValue)
 		} else {
 			ary[j] = it
