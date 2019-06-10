@@ -38,6 +38,14 @@ func (c *Case) JavaClassName() string {
 func doTestHessianEncodeHeader(t *testing.T, packageType PackageType, responseStatus byte, body interface{}) ([]byte, error) {
 	RegisterPOJO(&Case{})
 	codecW := NewHessianCodec(nil)
+	header := DubboHeader{
+		Header: Header{
+			ResponseStatus: responseStatus,
+			ID:             1,
+		},
+		Type: packageType,
+	}
+	header.SetSerialID(2)
 	resp, err := codecW.Write(Service{
 		Path:      "/test",
 		Interface: "ITest",
@@ -45,14 +53,7 @@ func doTestHessianEncodeHeader(t *testing.T, packageType PackageType, responseSt
 		Target:    "test",
 		Method:    "test",
 		Timeout:   time.Second * 10,
-	}, DubboHeader{
-		Header: Header{
-			ResponseStatus: responseStatus,
-			ID:             1,
-		},
-		SerialID: 2,
-		Type:     packageType,
-	}, body)
+	}, header, body)
 	assert.Nil(t, err)
 	return resp, err
 }
@@ -71,7 +72,7 @@ func doTestResponse(t *testing.T, packageType PackageType, responseStatus byte, 
 		assert.NotNil(t, err)
 		return
 	}
-	assert.Equal(t, byte(2), h.SerialID)
+	assert.Equal(t, byte(2), h.GetSerialID())
 	assert.Equal(t, packageType, h.Type&(PackageRequest|PackageResponse|PackageHeartbeat))
 	assert.Equal(t, uint64(1), h.ID)
 	assert.Equal(t, responseStatus, h.ResponseStatus)
@@ -148,7 +149,7 @@ func doTestRequest(t *testing.T, packageType PackageType, responseStatus byte, b
 	h := &DubboHeader{}
 	err = codecR.ReadHeader(h)
 	assert.Nil(t, err)
-	assert.Equal(t, byte(2), h.SerialID)
+	assert.Equal(t, byte(2), h.GetSerialID())
 	assert.Equal(t, packageType, h.Type&(PackageRequest|PackageResponse|PackageHeartbeat))
 	assert.Equal(t, uint64(1), h.ID)
 	assert.Equal(t, responseStatus, h.ResponseStatus)

@@ -49,14 +49,14 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 		byteArray = append(byteArray, DubboResponseHeaderBytes[:]...)
 	}
 	// set serialID, identify serialization types, eg: fastjson->6, hessian2->2
-	byteArray[2] |= header.SerialID & SERIAL_MASK
+	byteArray[2] |= header.GetSerialID()
 	// response status
 	if header.ResponseStatus != 0 {
 		byteArray[3] = header.ResponseStatus
 	}
 
 	// request id
-	binary.BigEndian.PutUint64(byteArray[4:], uint64(header.ID))
+	binary.BigEndian.PutUint64(byteArray[4:], header.ID)
 
 	// body
 	encoder := NewEncoder()

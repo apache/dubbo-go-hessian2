@@ -152,9 +152,9 @@ func packRequest(service Service, header DubboHeader, params interface{}) ([]byt
 
 	// serialization id, two way flag, event, request/response flag
 	// SerialID is id of serialization approach in java dubbo
-	byteArray[2] |= header.SerialID & SERIAL_MASK
+	byteArray[2] |= header.GetSerialID()
 	// request id
-	binary.BigEndian.PutUint64(byteArray[4:], uint64(header.ID))
+	binary.BigEndian.PutUint64(byteArray[4:], header.ID)
 
 	encoder := NewEncoder()
 	encoder.Append(byteArray[:HEADER_LENGTH])

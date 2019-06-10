@@ -44,10 +44,17 @@ type Header struct {
 	BodyLen        uint32
 }
 
+func (header *Header) GetSerialID() uint8 {
+	return header.HType & SERIAL_MASK
+}
+
+func (header *Header) SetSerialID(serialID uint8) {
+	header.HType |= serialID
+}
+
 // DubboHeader dubbo header
 type DubboHeader struct {
 	Header
-	SerialID byte
 	Type     PackageType
 }
 
@@ -97,14 +104,9 @@ func (h *HessianCodec) Write(service Service, header DubboHeader, body interface
 
 // ReadHeader uses hessian codec to read dubbo header
 func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
-
-	var err error
-
-	binary.Read(h.reader, binary.BigEndian, &header.Header)
-
-	// Header{serialization id(5 bit), event, two way, req/response}
-	if header.SerialID = header.HType & SERIAL_MASK; header.SerialID == Zero {
-		return perrors.Errorf("serialization ID:%v", header.SerialID)
+	err := binary.Read(h.reader, binary.BigEndian, &header.Header)
+	if err != nil {
+		return perrors.WithStack(err)
 	}
 
 	flag := header.HType & FLAG_EVENT

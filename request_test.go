@@ -24,6 +24,13 @@ import (
 )
 
 func TestPackRequest(t *testing.T) {
+	header := DubboHeader{
+		Header: Header{
+			ID: 123,
+		},
+		Type: PackageRequest,
+	}
+	header.SetSerialID(0)
 	bytes, err := packRequest(Service{
 		Path:      "/test",
 		Interface: "ITest",
@@ -31,13 +38,7 @@ func TestPackRequest(t *testing.T) {
 		Target:    "test",
 		Method:    "test",
 		Timeout:   time.Second * 10,
-	}, DubboHeader{
-		Header: Header{
-			ID: 123,
-		},
-		SerialID: 0,
-		Type:     PackageRequest,
-	}, []interface{}{1, 2})
+	}, header, []interface{}{1, 2})
 
 	assert.Nil(t, err)
 
