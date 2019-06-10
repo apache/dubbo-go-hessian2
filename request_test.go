@@ -32,9 +32,11 @@ func TestPackRequest(t *testing.T) {
 		Method:    "test",
 		Timeout:   time.Second * 10,
 	}, DubboHeader{
+		Header: Header{
+			ID: 123,
+		},
 		SerialID: 0,
 		Type:     PackageRequest,
-		ID:       123,
 	}, []interface{}{1, 2})
 
 	assert.Nil(t, err)

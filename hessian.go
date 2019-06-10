@@ -36,13 +36,19 @@ const (
 // PackageType ...
 type PackageType int
 
+type Header struct {
+	MagicNumber    uint16
+	HType          uint8
+	ResponseStatus uint8
+	ID             uint64
+	BodyLen        uint32
+}
+
 // DubboHeader dubbo header
 type DubboHeader struct {
+	Header
 	SerialID       byte
 	Type           PackageType
-	ID             int64
-	BodyLen        int
-	ResponseStatus byte
 }
 
 // Service defines service instance
@@ -94,46 +100,29 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 
 	var err error
 
-	buf, err := h.reader.Peek(HEADER_LENGTH)
-	if err == bufio.ErrBufferFull {
-		return ErrHeaderNotEnough
-	}
-	if err != nil { // this is impossible
-		return perrors.WithStack(err)
-	}
-	_, err = h.reader.Discard(HEADER_LENGTH)
-	if err != nil { // this is impossible
-		return perrors.WithStack(err)
-	}
-
-	//// read header
-
-	if buf[0] != MAGIC_HIGH && buf[1] != MAGIC_LOW {
-		return ErrIllegalPackage
-	}
+	binary.Read(h.reader, binary.BigEndian, &header.Header)
 
 	// Header{serialization id(5 bit), event, two way, req/response}
-	if header.SerialID = buf[2] & SERIAL_MASK; header.SerialID == Zero {
+	if header.SerialID = header.HType & SERIAL_MASK; header.SerialID == Zero {
 		return perrors.Errorf("serialization ID:%v", header.SerialID)
 	}
 
-	flag := buf[2] & FLAG_EVENT
+	flag := header.HType & FLAG_EVENT
 	if flag != Zero {
 		header.Type |= PackageHeartbeat
 	}
-	flag = buf[2] & FLAG_REQUEST
+	flag = header.HType & FLAG_REQUEST
 	if flag != Zero {
 		header.Type |= PackageRequest
-		flag = buf[2] & FLAG_TWOWAY
+		flag = header.HType & FLAG_TWOWAY
 		if flag != Zero {
 			header.Type |= PackageRequest_TwoWay
 		}
 	} else {
 		header.Type |= PackageResponse
-		header.ResponseStatus = buf[3]
 
 		// Header{status}
-		if buf[3] != Response_OK {
+		if header.ResponseStatus != Response_OK {
 			err = ErrJavaException
 			header.Type |= PackageError
 			bufSize := h.reader.Buffered()
@@ -146,17 +135,8 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 		}
 	}
 
-	// Header{req id}
-	header.ID = int64(binary.BigEndian.Uint64(buf[4:]))
-
-	// Header{body len}
-	header.BodyLen = int(binary.BigEndian.Uint32(buf[12:]))
-	if header.BodyLen < 0 {
-		return ErrIllegalPackage
-	}
-
 	h.pkgType = header.Type
-	h.bodyLen = header.BodyLen
+	h.bodyLen = int(header.BodyLen)
 
 	return perrors.WithStack(err)
 

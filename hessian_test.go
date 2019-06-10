@@ -46,10 +46,12 @@ func doTestHessianEncodeHeader(t *testing.T, packageType PackageType, responseSt
 		Method:    "test",
 		Timeout:   time.Second * 10,
 	}, DubboHeader{
-		SerialID:       2,
-		Type:           packageType,
-		ID:             1,
-		ResponseStatus: responseStatus,
+		Header: Header{
+			ResponseStatus: responseStatus,
+			ID:             1,
+		},
+		SerialID: 2,
+		Type:     packageType,
 	}, body)
 	assert.Nil(t, err)
 	return resp, err
@@ -71,7 +73,7 @@ func doTestResponse(t *testing.T, packageType PackageType, responseStatus byte, 
 	}
 	assert.Equal(t, byte(2), h.SerialID)
 	assert.Equal(t, packageType, h.Type&(PackageRequest|PackageResponse|PackageHeartbeat))
-	assert.Equal(t, int64(1), h.ID)
+	assert.Equal(t, uint64(1), h.ID)
 	assert.Equal(t, responseStatus, h.ResponseStatus)
 
 	err = codecR.ReadBody(decodedObject)
@@ -140,7 +142,7 @@ func doTestRequest(t *testing.T, packageType PackageType, responseStatus byte, b
 	assert.Nil(t, err)
 	assert.Equal(t, byte(2), h.SerialID)
 	assert.Equal(t, packageType, h.Type&(PackageRequest|PackageResponse|PackageHeartbeat))
-	assert.Equal(t, int64(1), h.ID)
+	assert.Equal(t, uint64(1), h.ID)
 	assert.Equal(t, responseStatus, h.ResponseStatus)
 
 	c := make([]interface{}, 7)
