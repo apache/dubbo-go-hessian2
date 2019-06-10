@@ -25,10 +25,11 @@ import (
 
 // used to ref object,list,map
 type _refElem struct {
-	// different kind may share the same address, i.e. slice and its first element
+	// record the kind of target, objects are the same only if the address and kind are the same
 	kind reflect.Kind
 
-	// empty struct may share the same address
+	// Different struct may share the same address and kind,
+	// so using type information to distinguish them.
 	tp reflect.Type
 
 	// ref index
@@ -120,6 +121,9 @@ func (e *Encoder) checkRefMap(v reflect.Value) (int, bool) {
 
 	if elem, ok := e.refMap[addr]; ok {
 		if elem.kind == kind {
+			// If kind is not struct, just return the index. Otherwise,
+			// check whether the types are same, because the different
+			// empty struct may share the same address and kind.
 			if elem.kind != reflect.Struct {
 				return elem.index, ok
 			} else if elem.tp == tp {
