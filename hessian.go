@@ -47,8 +47,8 @@ type Header struct {
 // DubboHeader dubbo header
 type DubboHeader struct {
 	Header
-	SerialID       byte
-	Type           PackageType
+	SerialID byte
+	Type     PackageType
 }
 
 // Service defines service instance
