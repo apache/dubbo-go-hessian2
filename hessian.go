@@ -27,11 +27,12 @@ import (
 
 // enum part
 const (
-	PackageError          = PackageType(0x01)
-	PackageRequest        = PackageType(0x02)
-	PackageResponse       = PackageType(0x04)
-	PackageHeartbeat      = PackageType(0x08)
-	PackageRequest_TwoWay = PackageType(0x10)
+	PackageError              = PackageType(0x01)
+	PackageRequest            = PackageType(0x02)
+	PackageResponse           = PackageType(0x04)
+	PackageHeartbeat          = PackageType(0x08)
+	PackageRequest_TwoWay     = PackageType(0x10)
+	PackageResponse_Exception = PackageType(0x20)
 )
 
 // PackageType ...
@@ -58,10 +59,9 @@ type Service struct {
 
 // HessianCodec defines hessian codec
 type HessianCodec struct {
-	pkgType        PackageType
-	responseStatus byte
-	reader         *bufio.Reader
-	bodyLen        int
+	pkgType PackageType
+	reader  *bufio.Reader
+	bodyLen int
 }
 
 // NewHessianCodec generate a new hessian codec instance
@@ -133,6 +133,9 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 	} else {
 		header.Type |= PackageResponse
 		header.ResponseStatus = buf[3]
+		if header.ResponseStatus != Response_OK {
+			header.Type |= PackageResponse_Exception
+		}
 	}
 
 	// Header{req id}
@@ -145,7 +148,6 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 	}
 
 	h.pkgType = header.Type
-	h.responseStatus = header.ResponseStatus
 	h.bodyLen = header.BodyLen
 
 	if h.reader.Buffered() < h.bodyLen {
@@ -171,8 +173,8 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 		return perrors.WithStack(err)
 	}
 
-	// response exception
-	if h.responseStatus != Zero && h.responseStatus != Response_OK {
+	switch h.pkgType & 0x2f {
+	case PackageResponse | PackageHeartbeat | PackageResponse_Exception, PackageResponse | PackageResponse_Exception:
 		rsp, ok := rspObj.(*Response)
 		if !ok {
 			return perrors.Errorf("@rspObj is not *Response, it is %s", reflect.TypeOf(rspObj).String())
@@ -181,11 +183,7 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 		if h.bodyLen > 1 {
 			rsp.Exception = perrors.Errorf("java exception:%s", string(buf[1:h.bodyLen-1]))
 		}
-
 		return nil
-	}
-
-	switch h.pkgType & 0x0f {
 	case PackageRequest | PackageHeartbeat, PackageResponse | PackageHeartbeat:
 	case PackageRequest:
 		if rspObj != nil {
