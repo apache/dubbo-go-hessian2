@@ -55,7 +55,7 @@ func (header *Header) SetSerialID(serialID uint8) {
 // DubboHeader dubbo header
 type DubboHeader struct {
 	Header
-	Type     PackageType
+	Type PackageType
 }
 
 // Service defines service instance
