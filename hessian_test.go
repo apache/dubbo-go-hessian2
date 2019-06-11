@@ -65,13 +65,8 @@ func doTestResponse(t *testing.T, packageType PackageType, responseStatus byte, 
 
 	h := &DubboHeader{}
 	err = codecR.ReadHeader(h)
-	if responseStatus == Response_OK {
-		assert.Nil(t, err)
-	} else {
-		t.Log(err)
-		assert.NotNil(t, err)
-		return
-	}
+	assert.Nil(t, err)
+
 	assert.Equal(t, byte(2), h.GetSerialID())
 	assert.Equal(t, packageType, h.Type&(PackageRequest|PackageResponse|PackageHeartbeat))
 	assert.Equal(t, uint64(1), h.ID)
@@ -83,6 +78,11 @@ func doTestResponse(t *testing.T, packageType PackageType, responseStatus byte, 
 
 	if assertFunc != nil {
 		assertFunc()
+		return
+	}
+
+	if h.ResponseStatus != Zero && h.ResponseStatus != Response_OK {
+		assert.Equal(t, "java exception:"+body.(string), decodedResponse.Exception.Error())
 		return
 	}
 

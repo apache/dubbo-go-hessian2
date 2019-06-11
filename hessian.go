@@ -17,6 +17,7 @@ package hessian
 import (
 	"bufio"
 	"encoding/binary"
+	"reflect"
 	"time"
 )
 
@@ -26,11 +27,12 @@ import (
 
 // enum part
 const (
-	PackageError          = PackageType(0x01)
-	PackageRequest        = PackageType(0x02)
-	PackageResponse       = PackageType(0x04)
-	PackageHeartbeat      = PackageType(0x08)
-	PackageRequest_TwoWay = PackageType(0x10)
+	PackageError              = PackageType(0x01)
+	PackageRequest            = PackageType(0x02)
+	PackageResponse           = PackageType(0x04)
+	PackageHeartbeat          = PackageType(0x08)
+	PackageRequest_TwoWay     = PackageType(0x10)
+	PackageResponse_Exception = PackageType(0x20)
 )
 
 // PackageType ...
@@ -122,18 +124,8 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 		}
 	} else {
 		header.Type |= PackageResponse
-
-		// Header{status}
 		if header.ResponseStatus != Response_OK {
-			err = ErrJavaException
-			header.Type |= PackageError
-			bufSize := h.reader.Buffered()
-			if bufSize > 1 {
-				expBuf, expErr := h.reader.Peek(bufSize)
-				if expErr == nil {
-					err = perrors.Errorf("java exception:%s", string(expBuf[1:bufSize-1]))
-				}
-			}
+			header.Type |= PackageResponse_Exception
 		}
 	}
 
@@ -148,7 +140,7 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 
 	if h.reader.Buffered() < h.bodyLen {
-		return ErrHeaderNotEnough
+		return ErrBodyNotEnough
 	}
 	buf, err := h.reader.Peek(h.bodyLen)
 	if err != nil {
@@ -159,23 +151,29 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 		return perrors.WithStack(err)
 	}
 
-	switch h.pkgType & 0x0f {
-	case PackageRequest | PackageHeartbeat, PackageResponse | PackageHeartbeat:
+	switch h.pkgType & 0x2f {
+	case PackageResponse | PackageHeartbeat | PackageResponse_Exception, PackageResponse | PackageResponse_Exception:
+		rsp, ok := rspObj.(*Response)
+		if !ok {
+			return perrors.Errorf("@rspObj is not *Response, it is %s", reflect.TypeOf(rspObj).String())
+		}
+		rsp.Exception = ErrJavaException
+		if h.bodyLen > 1 {
+			rsp.Exception = perrors.Errorf("java exception:%s", string(buf[1:h.bodyLen-1]))
+		}
 		return nil
+	case PackageRequest | PackageHeartbeat, PackageResponse | PackageHeartbeat:
 	case PackageRequest:
 		if rspObj != nil {
 			if err = unpackRequestBody(buf, rspObj); err != nil {
 				return perrors.WithStack(err)
 			}
 		}
-
-		return nil
-
 	case PackageResponse:
 		if rspObj != nil {
 			rsp, ok := rspObj.(*Response)
 			if !ok {
-				break
+				rsp = &Response{RspObj: rspObj}
 			}
 			if err = unpackResponseBody(buf, rsp); err != nil {
 				return perrors.WithStack(err)
