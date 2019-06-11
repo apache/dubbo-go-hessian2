@@ -37,13 +37,10 @@ func (c *Case) JavaClassName() string {
 
 func doTestHessianEncodeHeader(t *testing.T, packageType PackageType, responseStatus byte, body interface{}) ([]byte, error) {
 	RegisterPOJO(&Case{})
-	codecW := NewHessianCodec(nil)
+	codecW := NewHessianCodecWithType(nil, packageType)
 	header := DubboHeader{
-		Header: Header{
-			ResponseStatus: responseStatus,
-			ID:             1,
-		},
-		Type: packageType,
+		ResponseStatus: responseStatus,
+		ID:             1,
 	}
 	header.SetSerialID(2)
 	resp, err := codecW.Write(Service{
@@ -68,7 +65,7 @@ func doTestResponse(t *testing.T, packageType PackageType, responseStatus byte, 
 	assert.Nil(t, err)
 
 	assert.Equal(t, byte(2), h.GetSerialID())
-	assert.Equal(t, packageType, h.Type&(PackageRequest|PackageResponse|PackageHeartbeat))
+	assert.Equal(t, packageType, codecR.pkgType&(PackageRequest|PackageResponse|PackageHeartbeat))
 	assert.Equal(t, uint64(1), h.ID)
 	assert.Equal(t, responseStatus, h.ResponseStatus)
 
@@ -150,7 +147,7 @@ func doTestRequest(t *testing.T, packageType PackageType, responseStatus byte, b
 	err = codecR.ReadHeader(h)
 	assert.Nil(t, err)
 	assert.Equal(t, byte(2), h.GetSerialID())
-	assert.Equal(t, packageType, h.Type&(PackageRequest|PackageResponse|PackageHeartbeat))
+	assert.Equal(t, packageType, codecR.pkgType&(PackageRequest|PackageResponse|PackageHeartbeat))
 	assert.Equal(t, uint64(1), h.ID)
 	assert.Equal(t, responseStatus, h.ResponseStatus)
 

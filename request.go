@@ -120,7 +120,7 @@ func getArgsTypeList(args []interface{}) (string, error) {
 // dubbo-remoting/dubbo-remoting-api/src/main/java/com/alibaba/dubbo/remoting/exchange/codec/ExchangeCodec.java
 // v2.5.4 line 204 encodeRequest
 // todo: attachments
-func packRequest(service Service, header DubboHeader, params interface{}) ([]byte, error) {
+func packRequest(packageType PackageType, service Service, header DubboHeader, params interface{}) ([]byte, error) {
 	var (
 		err           error
 		types         string
@@ -135,13 +135,13 @@ func packRequest(service Service, header DubboHeader, params interface{}) ([]byt
 		return nil, perrors.Errorf("@params is not of type: []interface{}")
 	}
 
-	hb := header.Type == PackageHeartbeat
+	hb := packageType == PackageHeartbeat
 
 	//////////////////////////////////////////
 	// byteArray
 	//////////////////////////////////////////
 	// magic
-	switch header.Type {
+	switch packageType {
 	case PackageHeartbeat:
 		byteArray = append(byteArray, DubboRequestHeartbeatHeader[:]...)
 	case PackageRequest_TwoWay:

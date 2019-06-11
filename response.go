@@ -35,12 +35,12 @@ type Response struct {
 // dubbo-remoting/dubbo-remoting-api/src/main/java/com/alibaba/dubbo/remoting/exchange/codec/ExchangeCodec.java
 // v2.7.1 line 256 encodeResponse
 // hessian encode response
-func packResponse(header DubboHeader, attachments map[string]string, ret interface{}) ([]byte, error) {
+func packResponse(packageType PackageType, header DubboHeader, attachments map[string]string, ret interface{}) ([]byte, error) {
 	var (
 		byteArray []byte
 	)
 
-	hb := header.Type == PackageHeartbeat
+	hb := packageType == PackageHeartbeat
 
 	// magic
 	if hb {

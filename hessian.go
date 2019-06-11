@@ -38,7 +38,7 @@ const (
 // PackageType ...
 type PackageType int
 
-type Header struct {
+type DubboHeader struct {
 	MagicNumber    uint16
 	HType          uint8
 	ResponseStatus uint8
@@ -46,18 +46,12 @@ type Header struct {
 	BodyLen        uint32
 }
 
-func (header *Header) GetSerialID() uint8 {
+func (header *DubboHeader) GetSerialID() uint8 {
 	return header.HType & SERIAL_MASK
 }
 
-func (header *Header) SetSerialID(serialID uint8) {
+func (header *DubboHeader) SetSerialID(serialID uint8) {
 	header.HType |= serialID
-}
-
-// DubboHeader dubbo header
-type DubboHeader struct {
-	Header
-	Type PackageType
 }
 
 // Service defines service instance
@@ -84,21 +78,28 @@ func NewHessianCodec(reader *bufio.Reader) *HessianCodec {
 	}
 }
 
+func NewHessianCodecWithType(reader *bufio.Reader, packageType PackageType) *HessianCodec {
+	return &HessianCodec{
+		pkgType: packageType,
+		reader:  reader,
+	}
+}
+
 func (h *HessianCodec) Write(service Service, header DubboHeader, body interface{}) ([]byte, error) {
-	switch header.Type {
+	switch h.pkgType {
 	case PackageHeartbeat:
 		if header.ResponseStatus == Zero {
-			return packRequest(service, header, body)
+			return packRequest(h.pkgType, service, header, body)
 		}
-		return packResponse(header, map[string]string{}, body)
+		return packResponse(h.pkgType, header, map[string]string{}, body)
 	case PackageRequest, PackageRequest_TwoWay:
-		return packRequest(service, header, body)
+		return packRequest(h.pkgType, service, header, body)
 
 	case PackageResponse:
-		return packResponse(header, map[string]string{}, body)
+		return packResponse(h.pkgType, header, map[string]string{}, body)
 
 	default:
-		return nil, perrors.Errorf("Unrecognised message type: %v", header.Type)
+		return nil, perrors.Errorf("Unrecognised message type: %v", h.pkgType)
 	}
 
 	// unreachable return nil, nil
@@ -106,30 +107,29 @@ func (h *HessianCodec) Write(service Service, header DubboHeader, body interface
 
 // ReadHeader uses hessian codec to read dubbo header
 func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
-	err := binary.Read(h.reader, binary.BigEndian, &header.Header)
+	err := binary.Read(h.reader, binary.BigEndian, header)
 	if err != nil {
 		return perrors.WithStack(err)
 	}
 
 	flag := header.HType & FLAG_EVENT
 	if flag != Zero {
-		header.Type |= PackageHeartbeat
+		h.pkgType |= PackageHeartbeat
 	}
 	flag = header.HType & FLAG_REQUEST
 	if flag != Zero {
-		header.Type |= PackageRequest
+		h.pkgType |= PackageRequest
 		flag = header.HType & FLAG_TWOWAY
 		if flag != Zero {
-			header.Type |= PackageRequest_TwoWay
+			h.pkgType |= PackageRequest_TwoWay
 		}
 	} else {
-		header.Type |= PackageResponse
+		h.pkgType |= PackageResponse
 		if header.ResponseStatus != Response_OK {
-			header.Type |= PackageResponse_Exception
+			h.pkgType |= PackageResponse_Exception
 		}
 	}
 
-	h.pkgType = header.Type
 	h.bodyLen = int(header.BodyLen)
 
 	return perrors.WithStack(err)

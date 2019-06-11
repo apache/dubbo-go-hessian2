@@ -25,13 +25,10 @@ import (
 
 func TestPackRequest(t *testing.T) {
 	header := DubboHeader{
-		Header: Header{
-			ID: 123,
-		},
-		Type: PackageRequest,
+		ID: 123,
 	}
 	header.SetSerialID(0)
-	bytes, err := packRequest(Service{
+	bytes, err := packRequest(PackageRequest, Service{
 		Path:      "/test",
 		Interface: "ITest",
 		Version:   "v1.0",
