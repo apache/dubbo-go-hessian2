@@ -65,7 +65,7 @@ func doTestResponse(t *testing.T, packageType PackageType, responseStatus byte, 
 	assert.Nil(t, err)
 
 	assert.Equal(t, byte(2), h.GetSerialID())
-	assert.Equal(t, packageType, codecR.pkgType&(PackageRequest|PackageResponse|PackageHeartbeat))
+	assert.Equal(t, packageType, codecR.PkgType&(PackageRequest|PackageResponse|PackageHeartbeat))
 	assert.Equal(t, uint64(1), h.ID)
 	assert.Equal(t, responseStatus, h.ResponseStatus)
 
@@ -147,7 +147,7 @@ func doTestRequest(t *testing.T, packageType PackageType, responseStatus byte, b
 	err = codecR.ReadHeader(h)
 	assert.Nil(t, err)
 	assert.Equal(t, byte(2), h.GetSerialID())
-	assert.Equal(t, packageType, codecR.pkgType&(PackageRequest|PackageResponse|PackageHeartbeat))
+	assert.Equal(t, packageType, codecR.PkgType&(PackageRequest|PackageResponse|PackageHeartbeat))
 	assert.Equal(t, uint64(1), h.ID)
 	assert.Equal(t, responseStatus, h.ResponseStatus)
 

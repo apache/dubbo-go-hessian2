@@ -66,7 +66,7 @@ type Service struct {
 
 // HessianCodec defines hessian codec
 type HessianCodec struct {
-	pkgType PackageType
+	PkgType PackageType
 	reader  *bufio.Reader
 	bodyLen int
 }
@@ -80,26 +80,26 @@ func NewHessianCodec(reader *bufio.Reader) *HessianCodec {
 
 func NewHessianCodecWithType(reader *bufio.Reader, packageType PackageType) *HessianCodec {
 	return &HessianCodec{
-		pkgType: packageType,
+		PkgType: packageType,
 		reader:  reader,
 	}
 }
 
 func (h *HessianCodec) Write(service Service, header DubboHeader, body interface{}) ([]byte, error) {
-	switch h.pkgType {
+	switch h.PkgType {
 	case PackageHeartbeat:
 		if header.ResponseStatus == Zero {
-			return packRequest(h.pkgType, service, header, body)
+			return packRequest(h.PkgType, service, header, body)
 		}
-		return packResponse(h.pkgType, header, map[string]string{}, body)
+		return packResponse(h.PkgType, header, map[string]string{}, body)
 	case PackageRequest, PackageRequest_TwoWay:
-		return packRequest(h.pkgType, service, header, body)
+		return packRequest(h.PkgType, service, header, body)
 
 	case PackageResponse:
-		return packResponse(h.pkgType, header, map[string]string{}, body)
+		return packResponse(h.PkgType, header, map[string]string{}, body)
 
 	default:
-		return nil, perrors.Errorf("Unrecognised message type: %v", h.pkgType)
+		return nil, perrors.Errorf("Unrecognised message type: %v", h.PkgType)
 	}
 
 	// unreachable return nil, nil
@@ -114,19 +114,19 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 
 	flag := header.HType & FLAG_EVENT
 	if flag != Zero {
-		h.pkgType |= PackageHeartbeat
+		h.PkgType |= PackageHeartbeat
 	}
 	flag = header.HType & FLAG_REQUEST
 	if flag != Zero {
-		h.pkgType |= PackageRequest
+		h.PkgType |= PackageRequest
 		flag = header.HType & FLAG_TWOWAY
 		if flag != Zero {
-			h.pkgType |= PackageRequest_TwoWay
+			h.PkgType |= PackageRequest_TwoWay
 		}
 	} else {
-		h.pkgType |= PackageResponse
+		h.PkgType |= PackageResponse
 		if header.ResponseStatus != Response_OK {
-			h.pkgType |= PackageResponse_Exception
+			h.PkgType |= PackageResponse_Exception
 		}
 	}
 
@@ -151,7 +151,7 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 		return perrors.WithStack(err)
 	}
 
-	switch h.pkgType & 0x2f {
+	switch h.PkgType & 0x2f {
 	case PackageResponse | PackageHeartbeat | PackageResponse_Exception, PackageResponse | PackageResponse_Exception:
 		rsp, ok := rspObj.(*Response)
 		if !ok {
