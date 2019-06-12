@@ -41,7 +41,7 @@ func encInt64(b []byte, v int64) []byte {
 		return encByte(b, byte(int64(BC_LONG_BYTE_ZERO)+(v>>8)), byte(v))
 	} else if int64(LONG_SHORT_MIN) <= v && v <= int64(LONG_SHORT_MAX) {
 		return encByte(b, byte(int64(BC_LONG_SHORT_ZERO)+(v>>16)), byte(v>>8), byte(v))
-	} else if 0x80000000 <= v && v <= 0x7fffffff {
+	} else if -0x80000000 <= v && v <= 0x7fffffff {
 		return encByte(b, BC_LONG_INT, byte(v>>24), byte(v>>16), byte(v>>8), byte(v))
 	}
 
