@@ -17,9 +17,9 @@ package hessian
 import (
 	"bufio"
 	"encoding/binary"
+	"io"
 	"reflect"
 	"time"
-	"io"
 )
 
 import (

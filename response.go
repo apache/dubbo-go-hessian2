@@ -15,12 +15,12 @@
 package hessian
 
 import (
+	"bytes"
 	"encoding/binary"
 	"math"
 	"reflect"
 	"strconv"
 	"strings"
-	"bytes"
 )
 
 import (
