@@ -41,7 +41,7 @@ type PackageType int
 
 type DubboHeader struct {
 	MagicNumber    uint16
-	Type          uint8
+	Type           uint8
 	ResponseStatus uint8
 	ID             uint64
 	BodyLen        uint32
