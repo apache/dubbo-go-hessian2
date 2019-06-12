@@ -41,36 +41,36 @@ type PackageType int
 
 type DubboHeader struct {
 	MagicNumber    uint16
-	HType          uint8
+	Type          uint8
 	ResponseStatus uint8
 	ID             uint64
 	BodyLen        uint32
 }
 
 func (header *DubboHeader) GetSerialID() uint8 {
-	return header.HType & SERIAL_MASK
+	return header.Type & SERIAL_MASK
 }
 
 func (header *DubboHeader) SetSerialID(serialID uint8) {
-	header.HType |= serialID
+	header.Type |= serialID
 }
 
 func (header *DubboHeader) SetPackageType(isRequest bool, packageType PackageType) {
 	if isRequest {
 		switch packageType {
 		case PackageHeartbeat:
-			header.HType |= FLAG_REQUEST | FLAG_TWOWAY | FLAG_EVENT
+			header.Type |= FLAG_REQUEST | FLAG_TWOWAY | FLAG_EVENT
 		case PackageRequest_TwoWay:
-			header.HType |= FLAG_REQUEST | FLAG_TWOWAY
+			header.Type |= FLAG_REQUEST | FLAG_TWOWAY
 		default:
-			header.HType |= FLAG_REQUEST
+			header.Type |= FLAG_REQUEST
 		}
 	} else {
 		switch packageType {
 		case PackageHeartbeat:
-			header.HType |= FLAG_EVENT
+			header.Type |= FLAG_EVENT
 		default:
-			header.HType |= Zero
+			header.Type |= Zero
 			if header.ResponseStatus == 0 {
 				header.ResponseStatus = Response_OK
 			}
@@ -136,14 +136,14 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 		return perrors.WithStack(err)
 	}
 
-	flag := header.HType & FLAG_EVENT
+	flag := header.Type & FLAG_EVENT
 	if flag != Zero {
 		h.PkgType |= PackageHeartbeat
 	}
-	flag = header.HType & FLAG_REQUEST
+	flag = header.Type & FLAG_REQUEST
 	if flag != Zero {
 		h.PkgType |= PackageRequest
-		flag = header.HType & FLAG_TWOWAY
+		flag = header.Type & FLAG_TWOWAY
 		if flag != Zero {
 			h.PkgType |= PackageRequest_TwoWay
 		}
