@@ -162,6 +162,9 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 
 // ReadBody uses hessian codec to read response body
 func (h *HessianCodec) ReadBody(rspObj interface{}) error {
+	if h.reader.Buffered() < h.bodyLen {
+		return ErrBodyNotEnough
+	}
 	buf := make([]byte, h.bodyLen)
 	_, err := io.ReadFull(h.reader, buf)
 	if err != nil {
