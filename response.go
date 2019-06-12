@@ -87,7 +87,7 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 				if t, ok := e.(Throwabler); ok {
 					encoder.Encode(t)
 				} else {
-					encoder.Encode(e.Error())
+					encoder.Encode(NewThrowable(e.Error()))
 				}
 			} else {
 				if ret == nil {
