@@ -37,10 +37,8 @@ type Encoder struct {
 
 // NewEncoder generate an encoder instance
 func NewEncoder() *Encoder {
-	var buffer = make([]byte, 64)
-
 	return &Encoder{
-		buffer: buffer[:0],
+		buffer: make([]byte, 0, 64),
 		refMap: make(map[unsafe.Pointer]_refElem, 7),
 	}
 }

@@ -189,7 +189,7 @@ const (
 	HEADER_LENGTH = 16
 
 	// magic header
-	MAGIC      = uint16(0xdabb)
+	MAGIC      = 0xdabb
 	MAGIC_HIGH = byte(0xda)
 	MAGIC_LOW  = byte(0xbb)
 

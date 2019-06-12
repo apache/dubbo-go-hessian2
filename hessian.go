@@ -19,6 +19,7 @@ import (
 	"encoding/binary"
 	"reflect"
 	"time"
+	"io"
 )
 
 import (
@@ -52,6 +53,29 @@ func (header *DubboHeader) GetSerialID() uint8 {
 
 func (header *DubboHeader) SetSerialID(serialID uint8) {
 	header.HType |= serialID
+}
+
+func (header *DubboHeader) SetPackageType(isRequest bool, packageType PackageType) {
+	if isRequest {
+		switch packageType {
+		case PackageHeartbeat:
+			header.HType |= FLAG_REQUEST | FLAG_TWOWAY | FLAG_EVENT
+		case PackageRequest_TwoWay:
+			header.HType |= FLAG_REQUEST | FLAG_TWOWAY
+		default:
+			header.HType |= FLAG_REQUEST
+		}
+	} else {
+		switch packageType {
+		case PackageHeartbeat:
+			header.HType |= FLAG_EVENT
+		default:
+			header.HType |= Zero
+			if header.ResponseStatus == 0 {
+				header.ResponseStatus = Response_OK
+			}
+		}
+	}
 }
 
 // Service defines service instance
@@ -138,16 +162,9 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 
 // ReadBody uses hessian codec to read response body
 func (h *HessianCodec) ReadBody(rspObj interface{}) error {
-
-	if h.reader.Buffered() < h.bodyLen {
-		return ErrBodyNotEnough
-	}
-	buf, err := h.reader.Peek(h.bodyLen)
+	buf := make([]byte, h.bodyLen)
+	_, err := io.ReadFull(h.reader, buf)
 	if err != nil {
-		return perrors.WithStack(err)
-	}
-	_, err = h.reader.Discard(h.bodyLen)
-	if err != nil { // this is impossible
 		return perrors.WithStack(err)
 	}
 

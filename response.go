@@ -20,6 +20,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"bytes"
 )
 
 import (
@@ -40,29 +41,19 @@ func packResponse(packageType PackageType, header DubboHeader, attachments map[s
 		byteArray []byte
 	)
 
-	hb := packageType == PackageHeartbeat
+	header.MagicNumber = MAGIC
+	header.SetPackageType(false, packageType)
 
-	// magic
-	if hb {
-		byteArray = append(byteArray, DubboResponseHeartbeatHeader[:]...)
-	} else {
-		byteArray = append(byteArray, DubboResponseHeaderBytes[:]...)
-	}
-	// set serialID, identify serialization types, eg: fastjson->6, hessian2->2
-	byteArray[2] |= header.GetSerialID()
-	// response status
-	if header.ResponseStatus != 0 {
-		byteArray[3] = header.ResponseStatus
-	}
-
-	// request id
-	binary.BigEndian.PutUint64(byteArray[4:], header.ID)
+	buf := bytes.NewBuffer(make([]byte, 0, HEADER_LENGTH))
+	binary.Write(buf, binary.BigEndian, header)
+	byteArray = buf.Bytes()
 
 	// body
 	encoder := NewEncoder()
-	encoder.Append(byteArray[:HEADER_LENGTH])
+	encoder.Append(byteArray)
 
 	if header.ResponseStatus == Response_OK {
+		hb := packageType == PackageHeartbeat
 		if hb {
 			encoder.Encode(nil)
 		} else {

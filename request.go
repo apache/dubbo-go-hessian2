@@ -20,6 +20,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"bytes"
 )
 
 import (
@@ -135,34 +136,21 @@ func packRequest(packageType PackageType, service Service, header DubboHeader, p
 		return nil, perrors.Errorf("@params is not of type: []interface{}")
 	}
 
-	hb := packageType == PackageHeartbeat
+	header.MagicNumber = MAGIC
+	header.SetPackageType(true, packageType)
 
-	//////////////////////////////////////////
-	// byteArray
-	//////////////////////////////////////////
-	// magic
-	switch packageType {
-	case PackageHeartbeat:
-		byteArray = append(byteArray, DubboRequestHeartbeatHeader[:]...)
-	case PackageRequest_TwoWay:
-		byteArray = append(byteArray, DubboRequestHeaderBytesTwoWay[:]...)
-	default:
-		byteArray = append(byteArray, DubboRequestHeaderBytes[:]...)
-	}
-
-	// serialization id, two way flag, event, request/response flag
-	// SerialID is id of serialization approach in java dubbo
-	byteArray[2] |= header.GetSerialID()
-	// request id
-	binary.BigEndian.PutUint64(byteArray[4:], header.ID)
+	buf := bytes.NewBuffer(make([]byte, 0, HEADER_LENGTH))
+	binary.Write(buf, binary.BigEndian, header)
+	byteArray = buf.Bytes()
 
 	encoder := NewEncoder()
-	encoder.Append(byteArray[:HEADER_LENGTH])
+	encoder.Append(byteArray)
 
 	// com.alibaba.dubbo.rpc.protocol.dubbo.DubboCodec.DubboCodec.java line144 encodeRequestData
 	//////////////////////////////////////////
 	// body
 	//////////////////////////////////////////
+	hb := packageType == PackageHeartbeat
 	if hb {
 		encoder.Encode(nil)
 		goto END
