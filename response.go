@@ -16,6 +16,7 @@ package hessian
 
 import (
 	"encoding/binary"
+	"github.com/dubbogo/hessian2/java_exception"
 	"math"
 	"reflect"
 	"strconv"
@@ -87,7 +88,7 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 				if t, ok := e.(Throwabler); ok {
 					encoder.Encode(t)
 				} else {
-					encoder.Encode(NewThrowable(e.Error()))
+					encoder.Encode(java_exception.NewThrowable(e.Error()))
 				}
 			} else {
 				if ret == nil {
