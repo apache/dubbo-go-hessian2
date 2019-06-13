@@ -47,7 +47,7 @@ func encFloat(b []byte, v float64) []byte {
 		if iv >= -0x80 && iv < 0x80 {
 			return encByte(b, BC_DOUBLE_BYTE, byte(iv))
 		} else if iv >= -0x8000 && iv < 0x8000 {
-			return encByte(b, BC_DOUBLE_BYTE, byte(iv>>8), byte(iv))
+			return encByte(b, BC_DOUBLE_SHORT, byte(iv>>8), byte(iv))
 		}
 
 		goto END

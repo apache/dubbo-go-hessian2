@@ -68,8 +68,18 @@ func (e *Encoder) Encode(v interface{}) error {
 	case bool:
 		e.buffer = encBool(e.buffer, val)
 
-	case int8, int16, int32:
-		e.buffer = encInt32(e.buffer, v.(int32))
+	case uint8:
+		e.buffer = encInt32(e.buffer, int32(val))
+	case int8:
+		e.buffer = encInt32(e.buffer, int32(val))
+	case int16:
+		e.buffer = encInt32(e.buffer, int32(val))
+	case uint16:
+		e.buffer = encInt32(e.buffer, int32(val))
+	case int32:
+		e.buffer = encInt32(e.buffer, int32(val))
+	case uint32:
+		e.buffer = encInt64(e.buffer, int64(val))
 
 	case int:
 		// if v.(int) >= -2147483648 && v.(int) <= 2147483647 {
@@ -83,6 +93,8 @@ func (e *Encoder) Encode(v interface{}) error {
 
 	case int64:
 		e.buffer = encInt64(e.buffer, val)
+	case uint64:
+		e.buffer = encInt64(e.buffer, int64(val))
 
 	case time.Time:
 		e.buffer = encDateInMs(e.buffer, val)
