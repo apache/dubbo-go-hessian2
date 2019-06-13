@@ -1,4 +1,4 @@
-// Copyright 2016-2019 Yincheng Fang
+// Copyright 2016-2019 Jimmy zha
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,20 +14,22 @@
 
 package hessian
 
-import (
-	"github.com/stretchr/testify/assert"
-	"testing"
-)
-
-func TestThrowable(t *testing.T) {
-	testDecodeFrameworkFunc(t, "throw_throwable", func(r interface{}) {
-		assert.Equal(t, "exception", r.(error).Error())
-	})
+type IOException struct {
+	SerialVersionUID     int64
+	DetailMessage        string
+	SuppressedExceptions []IOException
+	StackTrace           []StackTraceElement
+	Cause                *IOException
 }
 
-func TestException(t *testing.T) {
-	testDecodeFrameworkFunc(t, "throw_exception", func(r interface{}) {
-		assert.Equal(t, "exception", r.(error).Error())
-	})
+func NewIOException(detailMessage string) *IOException {
+	return &IOException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
 }
 
+func (e IOException) Error() string {
+	return e.DetailMessage
+}
+
+func (IOException) JavaClassName() string {
+	return "java.io.IOException"
+}

@@ -1,4 +1,4 @@
-// Copyright 2016-2019 Yincheng Fang
+// Copyright 2016-2019 Jimmy zha
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,15 +19,8 @@ import (
 	"testing"
 )
 
-func TestThrowable(t *testing.T) {
-	testDecodeFrameworkFunc(t, "throw_throwable", func(r interface{}) {
-		assert.Equal(t, "exception", r.(error).Error())
+func TestIOException(t *testing.T) {
+	testDecodeFrameworkFunc(t, "throw_IOException", func(r interface{}) {
+		assert.Equal(t, "IOException", r.(error).Error())
 	})
 }
-
-func TestException(t *testing.T) {
-	testDecodeFrameworkFunc(t, "throw_exception", func(r interface{}) {
-		assert.Equal(t, "exception", r.(error).Error())
-	})
-}
-

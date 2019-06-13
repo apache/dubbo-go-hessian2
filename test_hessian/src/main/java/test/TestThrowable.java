@@ -15,10 +15,57 @@
 package test;
 
 public class TestThrowable {
-    public static Object throw_exception()  {
+    public static Object throw_exception() {
         return new Exception("exception");
     }
-    public static Object throw_throwable()  {
+
+    public static Object throw_throwable() {
         return new Throwable("exception");
+    }
+
+    public static Object throw_uncheckedIOException() {
+        return new java.io.UncheckedIOException("uncheckedIOException", getIOException());
+    }
+
+    public static Object throw_runtimeException() {
+        return new RuntimeException("runtimeException");
+    }
+
+    public static Object throw_illegalStateException() {
+        return new IllegalStateException("illegalStateException");
+    }
+
+    public static Object throw_illegalMonitorStateException() {
+        return new IllegalMonitorStateException("illegalMonitorStateException");
+    }
+
+    public static Object throw_enumConstantNotPresentException() {
+        return new EnumConstantNotPresentException(TestEnum.class, "enumConstantNotPresentException");
+    }
+
+    public static Object throw_classCastException() {
+        return new ClassCastException("classCastException");
+    }
+
+    public static Object throw_arrayStoreException() {
+        return new ArrayStoreException("arrayStoreException");
+    }
+
+    public static Object throw_IOException() {
+        return new ArrayStoreException("IOException");
+    }
+
+    private static java.io.IOException getIOException() {
+        try {
+            Class clz = Class.forName("java.io.IOException");
+            return (java.io.IOException)clz.newInstance();
+        } catch (java.lang.Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    enum TestEnum {
+        PASS
     }
 }
