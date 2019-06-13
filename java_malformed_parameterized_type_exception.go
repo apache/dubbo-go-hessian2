@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package exception
+package hessian
 
-import (
-	hessian "github.com/dubbogo/hessian2"
-)
-func init(){
-	hessian.RegisterPOJO(&MalformedParameterizedTypeException{})
+func init() {
+	RegisterPOJO(&MalformedParameterizedTypeException{})
 }
+
 type MalformedParameterizedTypeException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []hessian.Exception
-	StackTrace           []hessian.StackTraceElement
+	SuppressedExceptions []Exception
+	StackTrace           []StackTraceElement
 	Cause                *MalformedParameterizedTypeException
 }
+
 func (e MalformedParameterizedTypeException) Error() string {
 	return "MalformedParameterizedType"
 }
@@ -37,4 +36,3 @@ func (MalformedParameterizedTypeException) JavaClassName() string {
 func NewMalformedParameterizedTypeException(detailMessage string) *MalformedParameterizedTypeException {
 	return &MalformedParameterizedTypeException{DetailMessage: detailMessage}
 }
-

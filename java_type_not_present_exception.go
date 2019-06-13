@@ -12,23 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package exception
+package hessian
 
-import (
-	hessian "github.com/dubbogo/hessian2"
-)
-func init(){
-	hessian.RegisterPOJO(&TypeNotPresentException{})
+func init() {
+	RegisterPOJO(&TypeNotPresentException{})
 }
+
 type TypeNotPresentException struct {
-	TypeName         string
+	TypeName             string
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []hessian.Exception
-	StackTrace           []hessian.StackTraceElement
-	Cause                *hessian.Throwable
-
+	SuppressedExceptions []Exception
+	StackTrace           []StackTraceElement
+	Cause                *Throwable
 }
+
 func (e TypeNotPresentException) Error() string {
 	return e.DetailMessage
 }
@@ -36,6 +34,6 @@ func (e TypeNotPresentException) Error() string {
 func (TypeNotPresentException) JavaClassName() string {
 	return "java.lang.TypeNotPresentException"
 }
-func NewTypeNotPresentException(typeName string,detailMessage string) *TypeNotPresentException {
-	return &TypeNotPresentException{TypeName: typeName,DetailMessage:detailMessage}
+func NewTypeNotPresentException(typeName string, detailMessage string) *TypeNotPresentException {
+	return &TypeNotPresentException{TypeName: typeName, DetailMessage: detailMessage}
 }

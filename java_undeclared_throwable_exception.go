@@ -12,30 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package exception
+package hessian
 
-
-import (
-	hessian "github.com/dubbogo/hessian2"
-)
-func init(){
-	hessian.RegisterPOJO(&MalformedParametersException{})
+func init() {
+	RegisterPOJO(&UndeclaredThrowableException{})
 }
-type MalformedParametersException struct {
+
+type UndeclaredThrowableException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []hessian.Exception
-	StackTrace           []hessian.StackTraceElement
-	Cause                *MalformedParametersException
+	SuppressedExceptions []Exception
+	StackTrace           []StackTraceElement
+	Cause                *Throwable
+	UndeclaredThrowable  Throwable
 }
-func (e MalformedParametersException) Error() string {
+
+func (e UndeclaredThrowableException) Error() string {
 	return e.DetailMessage
 }
 
-func (MalformedParametersException) JavaClassName() string {
-	return "java.lang.reflect.MalformedParametersException"
+func (UndeclaredThrowableException) JavaClassName() string {
+	return "java.lang.reflect.UndeclaredThrowableException"
 }
-func NewMalformedParametersException(detailMessage string) *MalformedParametersException {
-	return &MalformedParametersException{DetailMessage: detailMessage}
+func NewUndeclaredThrowableException(detailMessage string) *UndeclaredThrowableException {
+	return &UndeclaredThrowableException{DetailMessage: detailMessage, UndeclaredThrowable: Throwable{}}
 }
-

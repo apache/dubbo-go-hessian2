@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package exception
+package hessian
 
-import (
-hessian "github.com/dubbogo/hessian2"
-)
-func init(){
-	hessian.RegisterPOJO(&WrongMethodTypeException{})
+func init() {
+	RegisterPOJO(&WrongMethodTypeException{})
 }
+
 type WrongMethodTypeException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []hessian.Exception
-	StackTrace           []hessian.StackTraceElement
+	SuppressedExceptions []Exception
+	StackTrace           []StackTraceElement
 	Cause                *WrongMethodTypeException
 }
+
 func (e WrongMethodTypeException) Error() string {
 	return e.DetailMessage
 }

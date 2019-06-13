@@ -31,4 +31,3 @@ func TestException(t *testing.T) {
 		assert.Equal(t, "exception", r.(error).Error())
 	})
 }
-

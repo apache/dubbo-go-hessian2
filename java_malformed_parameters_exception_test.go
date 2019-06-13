@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package exception
+package hessian
 
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func TestTypeNotPresentException(t *testing.T) {
-	testDecodeFrameworkFunc(t, "throw_TypeNotPresentException", func(r interface{}) {
-		assert.Equal(t, "Type exceptiontype1 not present", r.(error).Error())
+func TestMalformedParametersException(t *testing.T) {
+	testDecodeFrameworkFunc(t, "throw_MalformedParametersException", func(r interface{}) {
+		assert.Equal(t, "MalformedParametersException", r.(error).Error())
 	})
 }

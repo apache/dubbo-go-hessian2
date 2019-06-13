@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package exception
+package hessian
+
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func TestWrongMethodTypeException(t *testing.T) {
-	testDecodeFrameworkFunc(t, "throw_WrongMethodTypeException", func(r interface{}) {
-		assert.Equal(t, "WrongMethodTypeException", r.(error).Error())
+func TestUndeclaredThrowableException(t *testing.T) {
+	testDecodeFrameworkFunc(t, "throw_UndeclaredThrowableException", func(r interface{}) {
+		assert.Equal(t, "UndeclaredThrowableException", r.(error).Error())
 	})
 }
