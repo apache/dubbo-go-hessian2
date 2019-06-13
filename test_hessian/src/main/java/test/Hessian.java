@@ -23,6 +23,11 @@ import java.lang.reflect.Method;
 
 public class Hessian {
     public static void main(String[] args) throws Exception {
+        if (args.length > 1) {
+            testCustomClassMethod(args[0], args[1]);
+            return;
+        }
+
         if (args[0].startsWith("reply")) {
             Method method = TestHessian2Servlet.class.getMethod(args[0]);
             TestHessian2Servlet servlet = new TestHessian2Servlet();
@@ -55,5 +60,15 @@ public class Hessian {
             output.writeObject(object);
             output.flush();
         }
+    }
+
+    private static void testCustomClassMethod(String methodName, String className) throws Exception {
+        Class<?> clazz = Class.forName(className);
+        Method method = clazz.getMethod(methodName);
+        Object target = clazz.newInstance();
+        Object result = method.invoke(target);
+        Hessian2Output output = new Hessian2Output(System.out);
+        output.writeObject(result);
+        output.flush();
     }
 }
