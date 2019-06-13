@@ -19,14 +19,12 @@ import (
 	"testing"
 )
 
-func TestThrowable(t *testing.T) {
-	testDecodeFrameworkFunc(t, "throw_throwable", func(r interface{}) {
-		assert.Equal(t, "exception", r.(error).Error())
-	})
-}
+func TestThrowable(t *testing.T) { doTest(t, "throw_throwable", "exception") }
 
-func TestException(t *testing.T) {
-	testDecodeFrameworkFunc(t, "throw_exception", func(r interface{}) {
-		assert.Equal(t, "exception", r.(error).Error())
+func TestException(t *testing.T) { doTest(t, "throw_exception", "exception") }
+
+func doTest(t *testing.T, method, content string) {
+	testDecodeFrameworkFunc(t, method, func(r interface{}) {
+		assert.Equal(t, content, r.(error).Error())
 	})
 }
