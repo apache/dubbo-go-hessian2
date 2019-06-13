@@ -15,8 +15,9 @@
 package hessian
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestThrowable(t *testing.T) {
@@ -30,3 +31,4 @@ func TestException(t *testing.T) {
 		assert.Equal(t, "exception", r.(error).Error())
 	})
 }
+
