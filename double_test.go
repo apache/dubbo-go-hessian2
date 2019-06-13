@@ -54,3 +54,19 @@ func TestDouble(t *testing.T) {
 	testDecodeFramework(t, "replyDouble_m129_0", -129.0)
 	testDecodeFramework(t, "replyDouble_m32768_0", -32768.0)
 }
+
+func TestDoubleEncode(t *testing.T) {
+	testJavaDecode(t, "argDouble_0_0", 0.0)
+	testJavaDecode(t, "argDouble_0_001", 0.001)
+	testJavaDecode(t, "argDouble_1_0", 1.0)
+	testJavaDecode(t, "argDouble_127_0", 127.0)
+	testJavaDecode(t, "argDouble_128_0", 128.0)
+	testJavaDecode(t, "argDouble_2_0", 2.0)
+	testJavaDecode(t, "argDouble_3_14159", 3.14159)
+	testJavaDecode(t, "argDouble_32767_0", 32767.0)
+	testJavaDecode(t, "argDouble_65_536", 65.536)
+	testJavaDecode(t, "argDouble_m0_001", -0.001)
+	testJavaDecode(t, "argDouble_m128_0", -128.0)
+	testJavaDecode(t, "argDouble_m129_0", -129.0)
+	testJavaDecode(t, "argDouble_m32768_0", -32768.0)
+}
