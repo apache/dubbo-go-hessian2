@@ -178,9 +178,12 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 			return perrors.Errorf("@rspObj is not *Response, it is %s", reflect.TypeOf(rspObj).String())
 		}
 		rsp.Exception = ErrJavaException
-		if h.bodyLen > 1 {
-			rsp.Exception = perrors.Errorf("java exception:%s", string(buf[1:h.bodyLen-1]))
+		decoder := NewDecoder(buf[:])
+		exception, err := decoder.Decode()
+		if err != nil {
+			return perrors.WithStack(err)
 		}
+		rsp.Exception = perrors.Errorf("java exception:%s", exception.(string))
 		return nil
 	case PackageRequest | PackageHeartbeat, PackageResponse | PackageHeartbeat:
 	case PackageRequest:
