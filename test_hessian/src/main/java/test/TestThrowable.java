@@ -20,15 +20,31 @@ import java.lang.reflect.MalformedParametersException;
 import java.lang.reflect.UndeclaredThrowableException;
 
 public class TestThrowable {
-    public static Object throw_exception()  {
+    public static Object throw_exception() {
         return new Exception("exception");
     }
-    public static Object throw_throwable()  {
+
+    public static Object throw_throwable() {
         return new Throwable("exception");
     }
-    public static Object throw_TypeNotPresentException(){return new TypeNotPresentException("exceptiontype1",new Throwable("exception"));}
-    public static Object throw_UndeclaredThrowableException(){return new UndeclaredThrowableException(new Throwable(),"UndeclaredThrowableException");}
-    public static Object throw_MalformedParametersException(){return new MalformedParametersException("MalformedParametersException");}
-    public static Object throw_WrongMethodTypeException(){return new WrongMethodTypeException("WrongMethodTypeException");}
-    public static Object throw_MalformedParameterizedTypeException(){return new MalformedParameterizedTypeException();}
+
+    public static Object throw_TypeNotPresentException() {
+        return new TypeNotPresentException("exceptiontype1", new Throwable("exception"));
     }
+
+    public static Object throw_UndeclaredThrowableException() {
+        return new UndeclaredThrowableException(new Throwable(), "UndeclaredThrowableException");
+    }
+
+    public static Object throw_MalformedParametersException() {
+        return new MalformedParametersException("MalformedParametersException");
+    }
+
+    public static Object throw_WrongMethodTypeException() {
+        return new WrongMethodTypeException("WrongMethodTypeException");
+    }
+
+    public static Object throw_MalformedParameterizedTypeException() {
+        return new MalformedParameterizedTypeException();
+    }
+}
