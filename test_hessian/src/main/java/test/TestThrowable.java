@@ -24,7 +24,7 @@ public class TestThrowable {
     }
 
     public static Object throw_uncheckedIOException() {
-        return new java.io.UncheckedIOException("uncheckedIOException", getIOException());
+        return new java.io.UncheckedIOException("uncheckedIOException", new java.io.IOException("io exception"));
     }
 
     public static Object throw_runtimeException() {
@@ -53,16 +53,6 @@ public class TestThrowable {
 
     public static Object throw_IOException() {
         return new ArrayStoreException("IOException");
-    }
-
-    private static java.io.IOException getIOException() {
-        try {
-            Class clz = Class.forName("java.io.IOException");
-            return (java.io.IOException)clz.newInstance();
-        } catch (java.lang.Exception e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     enum TestEnum {
