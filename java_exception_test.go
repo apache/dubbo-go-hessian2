@@ -23,13 +23,18 @@ import (
 func TestException(t *testing.T) {
 	doTestException(t, "throw_throwable", "exception")
 	doTestException(t, "throw_exception", "exception")
-	doTestException(t, "throw_exception", "exception")
 	doTestException(t, "throw_MalformedParameterizedTypeException", "MalformedParameterizedType")
 	doTestException(t, "throw_MalformedParametersException", "MalformedParametersException")
 	doTestException(t, "throw_TypeNotPresentException", "Type exceptiontype1 not present")
 	doTestException(t, "throw_WrongMethodTypeException", "WrongMethodTypeException")
 	doTestException(t, "throw_UndeclaredThrowableException", "UndeclaredThrowableException")
-
+	doTestException(t, "throw_runtimeException", "runtimeException")
+	doTestException(t, "throw_arrayStoreException", "arrayStoreException")
+	doTestException(t, "throw_classCastException", "classCastException")
+	doTestException(t, "throw_enumConstantNotPresentException", "test.TestThrowable$TestEnum.enumConstantNotPresentException")
+	doTestException(t, "throw_illegalMonitorStateException", "illegalMonitorStateException")
+	doTestException(t, "throw_illegalStateException", "illegalStateException")
+	doTestException(t, "throw_IOException", "IOException")
 }
 
 func doTestException(t *testing.T, method, content string) {

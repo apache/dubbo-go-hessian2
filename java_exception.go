@@ -26,10 +26,18 @@ type Throwabler interface {
 }
 
 func init() {
+	RegisterPOJO(&java_exception.Class{})
 	RegisterPOJO(&java_exception.Throwable{})
 	RegisterPOJO(&java_exception.Exception{})
+	RegisterPOJO(&java_exception.IOException{})
+	RegisterPOJO(&java_exception.RuntimeException{})
 	RegisterPOJO(&java_exception.StackTraceElement{})
-	RegisterPOJO(&java_exception.MalformedParameterizedTypeException{})
+	RegisterPOJO(&java_exception.ClassCastException{})
+	RegisterPOJO(&java_exception.ArrayStoreException{})
+	RegisterPOJO(&java_exception.IllegalStateException{})
+	RegisterPOJO(&java_exception.IllegalMonitorStateException{})
+	RegisterPOJO(&java_exception.EnumConstantNotPresentException{})
+  RegisterPOJO(&java_exception.MalformedParameterizedTypeException{})
 	RegisterPOJO(&java_exception.MalformedParametersException{})
 	RegisterPOJO(&java_exception.TypeNotPresentException{})
 	RegisterPOJO(&java_exception.UndeclaredThrowableException{})
