@@ -76,3 +76,11 @@ type StackTraceElement struct {
 func (StackTraceElement) JavaClassName() string {
 	return "java.lang.StackTraceElement"
 }
+
+type Class struct {
+	Name string
+}
+
+func (Class) JavaClassName() string {
+	return "java.lang.Class"
+}
