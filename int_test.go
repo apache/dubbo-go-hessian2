@@ -99,3 +99,22 @@ func TestInt(t *testing.T) {
 	testDecodeFramework(t, "replyInt_m16", int32(-16))
 	testDecodeFramework(t, "replyInt_m17", int32(-17))
 }
+
+func TestIntEncode(t *testing.T) {
+	testJavaDecode(t, "argInt_0", int32(0))
+	testJavaDecode(t, "argInt_0x30", int32(0x30))
+	testJavaDecode(t, "argInt_0x3ffff", int32(0x3ffff))
+	testJavaDecode(t, "argInt_0x40000", int32(0x40000))
+	testJavaDecode(t, "argInt_0x7ff", int32(0x7ff))
+	testJavaDecode(t, "argInt_0x7fffffff", int32(0x7fffffff))
+	testJavaDecode(t, "argInt_0x800", int32(0x800))
+	testJavaDecode(t, "argInt_1", int32(1))
+	testJavaDecode(t, "argInt_47", int32(47))
+	testJavaDecode(t, "argInt_m0x40000", int32(-0x40000))
+	testJavaDecode(t, "argInt_m0x40001", int32(-0x40001))
+	testJavaDecode(t, "argInt_m0x800", int32(-0x800))
+	testJavaDecode(t, "argInt_m0x80000000", int32(-0x80000000))
+	testJavaDecode(t, "argInt_m0x801", int32(-0x801))
+	testJavaDecode(t, "argInt_m16", int32(-16))
+	testJavaDecode(t, "argInt_m17", int32(-17))
+}

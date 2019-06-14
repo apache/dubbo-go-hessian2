@@ -330,15 +330,15 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 		fldRawValue := UnpackPtrValue(field)
 
 		kind := fldTyp.Kind()
-		switch {
-		case kind == reflect.String:
+		switch kind {
+		case reflect.String:
 			str, err := d.decString(TAG_READ)
 			if err != nil {
 				return nil, perrors.Wrapf(err, "decInstance->ReadString: %s", fieldName)
 			}
 			fldRawValue.SetString(str)
 
-		case kind == reflect.Int32 || kind == reflect.Int16:
+		case reflect.Int32, reflect.Int16, reflect.Int8:
 			num, err := d.decInt32(TAG_READ)
 			if err != nil {
 				// java enum
@@ -351,13 +351,17 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 					enumValue, _ := s.(JavaEnum)
 					num = int32(enumValue)
 				} else {
-					return nil, perrors.Wrapf(err, "decInstance->ParseInt, field name:%s", fieldName)
+					return nil, perrors.Wrapf(err, "decInstance->decInt32, field name:%s", fieldName)
 				}
 			}
-
 			fldRawValue.SetInt(int64(num))
-
-		case kind == reflect.Int || kind == reflect.Int64 || kind == reflect.Uint64:
+		case reflect.Uint16, reflect.Uint8:
+			num, err := d.decInt32(TAG_READ)
+			if err != nil {
+				return nil, perrors.Wrapf(err, "decInstance->decInt32, field name:%s", fieldName)
+			}
+			fldRawValue.SetUint(uint64(num))
+		case reflect.Uint, reflect.Int, reflect.Int64:
 			num, err := d.decInt64(TAG_READ)
 			if err != nil {
 				if fldTyp.Implements(javaEnumType) {
@@ -374,29 +378,34 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 			}
 
 			fldRawValue.SetInt(num)
-
-		case kind == reflect.Bool:
+		case reflect.Uint32, reflect.Uint64:
+			num, err := d.decInt64(TAG_READ)
+			if err != nil {
+				return nil, perrors.Wrapf(err, "decInstance->decInt64, field name:%s", fieldName)
+			}
+			fldRawValue.SetUint(uint64(num))
+		case reflect.Bool:
 			b, err := d.Decode()
 			if err != nil {
 				return nil, perrors.Wrapf(err, "decInstance->Decode field name:%s", fieldName)
 			}
 			fldRawValue.SetBool(b.(bool))
 
-		case kind == reflect.Float32 || kind == reflect.Float64:
+		case reflect.Float32, reflect.Float64:
 			num, err := d.decDouble(TAG_READ)
 			if err != nil {
 				return nil, perrors.Wrapf(err, "decInstance->decDouble field name:%s", fieldName)
 			}
 			fldRawValue.SetFloat(num.(float64))
 
-		case kind == reflect.Map:
+		case reflect.Map:
 			// decode map should use the original field value for correct value setting
 			err := d.decMapByValue(field)
 			if err != nil {
 				return nil, perrors.Wrapf(err, "decInstance->decMapByValue field name: %s", fieldName)
 			}
 
-		case kind == reflect.Slice || kind == reflect.Array:
+		case reflect.Slice, reflect.Array:
 			m, err := d.decList(TAG_READ)
 			if err != nil {
 				if err == io.EOF {
@@ -410,7 +419,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 			if err != nil {
 				return nil, err
 			}
-		case kind == reflect.Struct:
+		case reflect.Struct:
 			var (
 				err error
 				s   interface{}

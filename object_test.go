@@ -15,6 +15,7 @@
 package hessian
 
 import (
+	"math"
 	"reflect"
 	"testing"
 )
@@ -364,4 +365,101 @@ func TestObject(t *testing.T) {
 	cons.First = "a"
 	cons.Rest = &cons
 	testDecodeFramework(t, "replyObject_3", &cons)
+}
+
+type Tuple struct {
+	Byte    int8
+	Short   int16
+	Integer int32
+	Long    int64
+	Double  float32
+	B       uint8
+	S       uint16
+	I       uint32
+	L       uint64
+	D       float64
+}
+
+func (t Tuple) JavaClassName() string {
+	return "test.tuple.Tuple"
+}
+
+func TestDecodeJavaTupleObject(t *testing.T) {
+	tuple := &Tuple{
+		Byte:    1,
+		Short:   1,
+		Integer: 1,
+		Long:    1,
+		Double:  1.23,
+		B:       0x01,
+		S:       1,
+		I:       1,
+		L:       1,
+		D:       1.23,
+	}
+
+	RegisterPOJO(tuple)
+
+	testDecodeJavaData(t, "getTheTuple", "test.tuple.TupleProviderImpl", tuple)
+}
+
+func TestEncodeDecodeTuple(t *testing.T) {
+	doTestEncodeDecodeTuple(t, &Tuple{
+		Byte:    1,
+		Short:   1,
+		Integer: 1,
+		Long:    1,
+		Double:  1.23,
+		B:       0x01,
+		S:       1,
+		I:       1,
+		L:       1,
+		D:       1.23,
+	})
+
+	doTestEncodeDecodeTuple(t, &Tuple{
+		Byte:    math.MinInt8,
+		Short:   math.MinInt16,
+		Integer: math.MinInt32,
+		Long:    math.MinInt64,
+		Double:  -99.99,
+		B:       0x00,
+		S:       0,
+		I:       0,
+		L:       0,
+		D:       -9999.9999,
+	})
+
+	doTestEncodeDecodeTuple(t, &Tuple{
+		Byte:    math.MaxInt8,
+		Short:   math.MaxInt16,
+		Integer: math.MaxInt32,
+		Long:    math.MaxInt64,
+		Double:  math.MaxFloat32,
+		B:       0xFF,
+		S:       0xFFFF,
+		I:       0xFFFFFFFF,
+		L:       0xFFFFFFFFFFFFFFFF,
+		D:       math.MaxFloat64,
+	})
+}
+
+func doTestEncodeDecodeTuple(t *testing.T, tuple *Tuple) {
+	e := NewEncoder()
+	err := e.encObject(tuple)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+
+	d := NewDecoder(e.buffer)
+	decObj, err := d.Decode()
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+
+	if !reflect.DeepEqual(tuple, decObj) {
+		t.Errorf("expect: %v, but get: %v", tuple, decObj)
+	}
 }

@@ -142,3 +142,23 @@ func TestLong(t *testing.T) {
 	testDecodeFramework(t, "replyLong_m8", int64(-8))
 	testDecodeFramework(t, "replyLong_m9", int64(-9))
 }
+
+func TestLongEncode(t *testing.T) {
+	testJavaDecode(t, "argLong_0", int64(0))
+	testJavaDecode(t, "argLong_0x10", int64(0x10))
+	testJavaDecode(t, "argLong_0x3ffff", int64(0x3ffff))
+	testJavaDecode(t, "argLong_0x40000", int64(0x40000))
+	testJavaDecode(t, "argLong_0x7ff", int64(0x7ff))
+	testJavaDecode(t, "argLong_0x7fffffff", int64(0x7fffffff))
+	testJavaDecode(t, "argLong_0x800", int64(0x800))
+	testJavaDecode(t, "argLong_1", int64(1))
+	testJavaDecode(t, "argLong_15", int64(15))
+	testJavaDecode(t, "argLong_m0x40000", int64(-0x40000))
+	testJavaDecode(t, "argLong_m0x40001", int64(-0x40001))
+	testJavaDecode(t, "argLong_m0x800", int64(-0x800))
+	testJavaDecode(t, "argLong_m0x80000000", int64(-0x80000000))
+	testJavaDecode(t, "argLong_m0x80000001", int64(-0x80000001))
+	testJavaDecode(t, "argLong_m0x801", int64(-0x801))
+	testJavaDecode(t, "argLong_m8", int64(-8))
+	testJavaDecode(t, "argLong_m9", int64(-9))
+}
