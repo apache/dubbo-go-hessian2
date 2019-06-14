@@ -12,28 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package hessian
+package java_exception
 
-func init() {
-	RegisterPOJO(&ClassCastException{})
-}
-
-type ClassCastException struct {
+type EnumConstantNotPresentException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []ClassCastException
-	Cause                *ClassCastException
+	ConstantName         string
+	EnumType             Class
+	SuppressedExceptions []EnumConstantNotPresentException
+	Cause                *EnumConstantNotPresentException
 }
 
-func NewClassCastException(detailMessage string) *ClassCastException {
-	return &ClassCastException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
+func NewEnumConstantNotPresentException(detailMessage string) *EnumConstantNotPresentException {
+	return &EnumConstantNotPresentException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
 }
 
-func (e ClassCastException) Error() string {
+func (e EnumConstantNotPresentException) Error() string {
 	return e.DetailMessage
 }
 
-func (ClassCastException) JavaClassName() string {
-	return "java.lang.ClassCastException"
+func (EnumConstantNotPresentException) JavaClassName() string {
+	return "java.lang.EnumConstantNotPresentException"
 }

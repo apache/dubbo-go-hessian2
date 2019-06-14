@@ -12,29 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package hessian
+package java_exception
 
-func init() {
-	RegisterPOJO(&IOException{})
-	RegisterPOJO(&UncheckedIOException{})
-}
-
-type UncheckedIOException struct {
+type ClassCastException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []UncheckedIOException
-	Cause                *UncheckedIOException
+	SuppressedExceptions []ClassCastException
+	Cause                *ClassCastException
 }
 
-func NewUncheckedIOException(detailMessage string) *UncheckedIOException {
-	return &UncheckedIOException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
+func NewClassCastException(detailMessage string) *ClassCastException {
+	return &ClassCastException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
 }
 
-func (e UncheckedIOException) Error() string {
+func (e ClassCastException) Error() string {
 	return e.DetailMessage
 }
 
-func (UncheckedIOException) JavaClassName() string {
-	return "java.io.UncheckedIOException"
+func (ClassCastException) JavaClassName() string {
+	return "java.lang.ClassCastException"
 }

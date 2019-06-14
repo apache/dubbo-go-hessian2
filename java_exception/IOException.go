@@ -12,15 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package hessian
+package java_exception
 
-import (
-	"github.com/stretchr/testify/assert"
-	"testing"
-)
+type IOException struct {
+	SerialVersionUID     int64
+	DetailMessage        string
+	SuppressedExceptions []IOException
+	StackTrace           []StackTraceElement
+	Cause                *IOException
+}
 
-func TestIOException(t *testing.T) {
-	testDecodeFrameworkFunc(t, "throw_IOException", func(r interface{}) {
-		assert.Equal(t, "IOException", r.(error).Error())
-	})
+func NewIOException(detailMessage string) *IOException {
+	return &IOException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
+}
+
+func (e IOException) Error() string {
+	return e.DetailMessage
+}
+
+func (IOException) JavaClassName() string {
+	return "java.io.IOException"
 }

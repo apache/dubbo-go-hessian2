@@ -12,15 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package hessian
+package java_exception
 
-import (
-	"github.com/stretchr/testify/assert"
-	"testing"
-)
+type ArrayStoreException struct {
+	SerialVersionUID     int64
+	DetailMessage        string
+	StackTrace           []StackTraceElement
+	SuppressedExceptions []ArrayStoreException
+	Cause                *ArrayStoreException
+}
 
-func TestUncheckedIOException(t *testing.T) {
-	testDecodeFrameworkFunc(t, "throw_uncheckedIOException", func(r interface{}) {
-		assert.Equal(t, "uncheckedIOException", r.(error).Error())
-	})
+func NewArrayStoreException(detailMessage string) *ArrayStoreException {
+	return &ArrayStoreException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
+}
+
+func (e ArrayStoreException) Error() string {
+	return e.DetailMessage
+}
+
+func (ArrayStoreException) JavaClassName() string {
+	return "java.lang.ArrayStoreException"
 }

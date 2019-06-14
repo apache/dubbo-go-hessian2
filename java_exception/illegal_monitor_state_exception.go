@@ -12,28 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package hessian
+package java_exception
 
-func init() {
-	RegisterPOJO(&IllegalStateException{})
-}
-
-type IllegalStateException struct {
+type IllegalMonitorStateException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []IllegalStateException
-	Cause                *IllegalStateException
+	SuppressedExceptions []IllegalMonitorStateException
+	Cause                *IllegalMonitorStateException
 }
 
-func NewIllegalStateException(detailMessage string) *IllegalStateException {
-	return &IllegalStateException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
+func NewIllegalMonitorStateException(detailMessage string) *IllegalMonitorStateException {
+	return &IllegalMonitorStateException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
 }
 
-func (e IllegalStateException) Error() string {
+func (e IllegalMonitorStateException) Error() string {
 	return e.DetailMessage
 }
 
-func (IllegalStateException) JavaClassName() string {
-	return "java.lang.IllegalStateException"
+func (IllegalMonitorStateException) JavaClassName() string {
+	return "java.lang.IllegalMonitorStateException"
 }

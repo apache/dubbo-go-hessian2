@@ -12,15 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package hessian
+package java_exception
 
-import (
-	"github.com/stretchr/testify/assert"
-	"testing"
-)
+type RuntimeException struct {
+	SerialVersionUID     int64
+	DetailMessage        string
+	StackTrace           []StackTraceElement
+	SuppressedExceptions []RuntimeException
+	Cause                *RuntimeException
+}
 
-func TestClassCastException(t *testing.T) {
-	testDecodeFrameworkFunc(t, "throw_classCastException", func(r interface{}) {
-		assert.Equal(t, "classCastException", r.(error).Error())
-	})
+func NewRuntimeException(detailMessage string) *RuntimeException {
+	return &RuntimeException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
+}
+
+func (e RuntimeException) Error() string {
+	return e.DetailMessage
+}
+
+func (RuntimeException) JavaClassName() string {
+	return "java.lang.RuntimeException"
 }
