@@ -20,14 +20,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestThrowable(t *testing.T) {
-	testDecodeFrameworkFunc(t, "throw_throwable", func(r interface{}) {
-		assert.Equal(t, "exception", r.(error).Error())
-	})
+func TestException(t *testing.T) {
+	doTestException(t, "throw_throwable", "exception")
+	doTestException(t, "throw_exception", "exception")
+	doTestException(t, "throw_exception", "exception")
+	doTestException(t, "throw_MalformedParameterizedTypeException", "MalformedParameterizedType")
+	doTestException(t, "throw_MalformedParametersException", "MalformedParametersException")
+	doTestException(t, "throw_TypeNotPresentException", "Type exceptiontype1 not present")
+	doTestException(t, "throw_WrongMethodTypeException", "WrongMethodTypeException")
+	doTestException(t, "throw_UndeclaredThrowableException", "UndeclaredThrowableException")
+
 }
 
-func TestException(t *testing.T) {
-	testDecodeFrameworkFunc(t, "throw_exception", func(r interface{}) {
-		assert.Equal(t, "exception", r.(error).Error())
+func doTestException(t *testing.T, method, content string) {
+	testDecodeFrameworkFunc(t, method, func(r interface{}) {
+		assert.Equal(t, content, r.(error).Error())
 	})
 }

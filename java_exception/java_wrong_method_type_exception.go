@@ -12,15 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package hessian
+package java_exception
 
-import (
-	"github.com/stretchr/testify/assert"
-	"testing"
-)
+type WrongMethodTypeException struct {
+	SerialVersionUID     int64
+	DetailMessage        string
+	SuppressedExceptions []Exception
+	StackTrace           []StackTraceElement
+	Cause                *WrongMethodTypeException
+}
 
-func TestUndeclaredThrowableException(t *testing.T) {
-	testDecodeFrameworkFunc(t, "throw_UndeclaredThrowableException", func(r interface{}) {
-		assert.Equal(t, "UndeclaredThrowableException", r.(error).Error())
-	})
+func (e WrongMethodTypeException) Error() string {
+	return e.DetailMessage
+}
+
+func (WrongMethodTypeException) JavaClassName() string {
+	return "java.lang.invoke.WrongMethodTypeException"
+}
+func NewWrongMethodTypeException(detailMessage string) *WrongMethodTypeException {
+	return &WrongMethodTypeException{DetailMessage: detailMessage}
 }

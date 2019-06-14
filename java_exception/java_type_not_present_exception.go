@@ -12,28 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package hessian
+package java_exception
 
-func init() {
-	RegisterPOJO(&UndeclaredThrowableException{})
-}
-
-type UndeclaredThrowableException struct {
+type TypeNotPresentException struct {
+	TypeName             string
 	SerialVersionUID     int64
 	DetailMessage        string
 	SuppressedExceptions []Exception
 	StackTrace           []StackTraceElement
 	Cause                *Throwable
-	UndeclaredThrowable  Throwable
 }
 
-func (e UndeclaredThrowableException) Error() string {
+func (e TypeNotPresentException) Error() string {
 	return e.DetailMessage
 }
 
-func (UndeclaredThrowableException) JavaClassName() string {
-	return "java.lang.reflect.UndeclaredThrowableException"
+func (TypeNotPresentException) JavaClassName() string {
+	return "java.lang.TypeNotPresentException"
 }
-func NewUndeclaredThrowableException(detailMessage string) *UndeclaredThrowableException {
-	return &UndeclaredThrowableException{DetailMessage: detailMessage, UndeclaredThrowable: Throwable{}}
+func NewTypeNotPresentException(typeName string, detailMessage string) *TypeNotPresentException {
+	return &TypeNotPresentException{TypeName: typeName, DetailMessage: detailMessage}
 }

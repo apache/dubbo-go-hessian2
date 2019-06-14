@@ -12,28 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package hessian
+package java_exception
 
-func init() {
-	RegisterPOJO(&TypeNotPresentException{})
-}
-
-type TypeNotPresentException struct {
-	TypeName             string
+type MalformedParameterizedTypeException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	SuppressedExceptions []Exception
 	StackTrace           []StackTraceElement
-	Cause                *Throwable
+	Cause                *MalformedParameterizedTypeException
 }
 
-func (e TypeNotPresentException) Error() string {
-	return e.DetailMessage
+func (e MalformedParameterizedTypeException) Error() string {
+	return "MalformedParameterizedType"
 }
 
-func (TypeNotPresentException) JavaClassName() string {
-	return "java.lang.TypeNotPresentException"
+func (MalformedParameterizedTypeException) JavaClassName() string {
+	return "java.lang.reflect.MalformedParameterizedTypeException"
 }
-func NewTypeNotPresentException(typeName string, detailMessage string) *TypeNotPresentException {
-	return &TypeNotPresentException{TypeName: typeName, DetailMessage: detailMessage}
+func NewMalformedParameterizedTypeException(detailMessage string) *MalformedParameterizedTypeException {
+	return &MalformedParameterizedTypeException{DetailMessage: detailMessage}
 }

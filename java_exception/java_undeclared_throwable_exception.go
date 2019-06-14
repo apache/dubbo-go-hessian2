@@ -12,27 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package hessian
+package java_exception
 
-func init() {
-	RegisterPOJO(&WrongMethodTypeException{})
-}
-
-type WrongMethodTypeException struct {
+type UndeclaredThrowableException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	SuppressedExceptions []Exception
 	StackTrace           []StackTraceElement
-	Cause                *WrongMethodTypeException
+	Cause                *Throwable
+	UndeclaredThrowable  Throwable
 }
 
-func (e WrongMethodTypeException) Error() string {
+func (e UndeclaredThrowableException) Error() string {
 	return e.DetailMessage
 }
 
-func (WrongMethodTypeException) JavaClassName() string {
-	return "java.lang.invoke.WrongMethodTypeException"
+func (UndeclaredThrowableException) JavaClassName() string {
+	return "java.lang.reflect.UndeclaredThrowableException"
 }
-func NewWrongMethodTypeException(detailMessage string) *WrongMethodTypeException {
-	return &WrongMethodTypeException{DetailMessage: detailMessage}
+func NewUndeclaredThrowableException(detailMessage string) *UndeclaredThrowableException {
+	return &UndeclaredThrowableException{DetailMessage: detailMessage, UndeclaredThrowable: Throwable{}}
 }

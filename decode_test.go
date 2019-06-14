@@ -55,9 +55,13 @@ func genHessianJar() {
 	}
 }
 
-func getReply(method string) []byte {
+func getJavaReply(method, className string) []byte {
 	genHessianJar()
-	cmd := exec.Command("java", "-jar", hessianJar, method)
+	cmdArgs := []string{"-jar", hessianJar, method}
+	if className != "" {
+		cmdArgs = append(cmdArgs, className)
+	}
+	cmd := exec.Command("java", cmdArgs...)
 	out, err := cmd.Output()
 	if err != nil {
 		log.Fatal(err)
@@ -65,8 +69,8 @@ func getReply(method string) []byte {
 	return out
 }
 
-func decodeResponse(method string) (interface{}, error) {
-	b := getReply(method)
+func decodeJavaResponse(method, className string) (interface{}, error) {
+	b := getJavaReply(method, className)
 	d := NewDecoder(b)
 	r, e := d.Decode()
 	if e != nil {
@@ -76,7 +80,11 @@ func decodeResponse(method string) (interface{}, error) {
 }
 
 func testDecodeFramework(t *testing.T, method string, expected interface{}) {
-	r, e := decodeResponse(method)
+	testDecodeJavaData(t, method, "", expected)
+}
+
+func testDecodeJavaData(t *testing.T, method, className string, expected interface{}) {
+	r, e := decodeJavaResponse(method, className)
 	if e != nil {
 		t.Errorf("%s: decode fail with error %v", method, e)
 		return
@@ -92,7 +100,7 @@ func testDecodeFramework(t *testing.T, method string, expected interface{}) {
 }
 
 func testDecodeFrameworkFunc(t *testing.T, method string, expected func(interface{})) {
-	r, e := decodeResponse(method)
+	r, e := decodeJavaResponse(method, "")
 	if e != nil {
 		t.Errorf("%s: decode fail with error %v", method, e)
 		return

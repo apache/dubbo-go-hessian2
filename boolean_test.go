@@ -45,3 +45,8 @@ func TestBoolean(t *testing.T) {
 	testDecodeFramework(t, "replyFalse", false)
 	testDecodeFramework(t, "replyTrue", true)
 }
+
+func TestBooleanEncode(t *testing.T) {
+	testJavaDecode(t, "argFalse", false)
+	testJavaDecode(t, "argTrue", true)
+}

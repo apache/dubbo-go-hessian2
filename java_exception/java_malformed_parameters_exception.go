@@ -12,27 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package hessian
+package java_exception
 
-func init() {
-	RegisterPOJO(&MalformedParameterizedTypeException{})
-}
-
-type MalformedParameterizedTypeException struct {
+type MalformedParametersException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	SuppressedExceptions []Exception
 	StackTrace           []StackTraceElement
-	Cause                *MalformedParameterizedTypeException
+	Cause                *MalformedParametersException
 }
 
-func (e MalformedParameterizedTypeException) Error() string {
-	return "MalformedParameterizedType"
+func (e MalformedParametersException) Error() string {
+	return e.DetailMessage
 }
 
-func (MalformedParameterizedTypeException) JavaClassName() string {
-	return "java.lang.reflect.MalformedParameterizedTypeException"
+func (MalformedParametersException) JavaClassName() string {
+	return "java.lang.reflect.MalformedParametersException"
 }
-func NewMalformedParameterizedTypeException(detailMessage string) *MalformedParameterizedTypeException {
-	return &MalformedParameterizedTypeException{DetailMessage: detailMessage}
+func NewMalformedParametersException(detailMessage string) *MalformedParametersException {
+	return &MalformedParametersException{DetailMessage: detailMessage}
 }
