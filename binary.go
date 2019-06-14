@@ -37,12 +37,12 @@ func encBinary(b []byte, v []byte) []byte {
 		vLength int
 	)
 
-	if len(v) == 0 {
-		return encByte(b, BC_BINARY_DIRECT)
+	if v == nil {
+		return encByte(b, BC_NULL)
 	}
 
 	vLength = len(v)
-	for vLength > 0 {
+	for {
 		if vLength > CHUNK_SIZE {
 			length = CHUNK_SIZE
 			b = encByte(b, BC_BINARY_CHUNK, byte(length>>8), byte(length))
@@ -60,6 +60,10 @@ func encBinary(b []byte, v []byte) []byte {
 		b = append(b, v[:length]...)
 		v = v[length:]
 		vLength = len(v)
+
+		if vLength == 0 {
+			break
+		}
 	}
 
 	return b
