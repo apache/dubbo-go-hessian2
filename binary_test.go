@@ -124,3 +124,27 @@ func TestBinary(t *testing.T) {
 	testDecodeFramework(t, "replyBinary_65536", []byte(s65560[:65536]))
 	testDecodeFramework(t, "replyBinary_null", nil)
 }
+
+func TestBinaryEncode(t *testing.T) {
+	s0 := ""
+	s1 := "0"
+	s16 := "0123456789012345"
+
+	s1024 := ""
+	for i := 0; i < 16; i++ {
+		s1024 += fmt.Sprintf("%02d 456789012345678901234567890123456789012345678901234567890123\n", i)
+	}
+
+	s65560 := ""
+	for i := 0; i < 1024; i++ {
+		s65560 += fmt.Sprintf("%03d 56789012345678901234567890123456789012345678901234567890123\n", i)
+	}
+
+	testJavaDecode(t, "argBinary_0", []byte(s0))
+	testJavaDecode(t, "argBinary_1", []byte(s1))
+	testJavaDecode(t, "argBinary_1023", []byte(s1024[:1023]))
+	testJavaDecode(t, "argBinary_1024", []byte(s1024))
+	testJavaDecode(t, "argBinary_15", []byte(s16[:15]))
+	testJavaDecode(t, "argBinary_16", []byte(s16))
+	testJavaDecode(t, "argBinary_65536", []byte(s65560[:65536]))
+}

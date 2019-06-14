@@ -38,8 +38,7 @@ func encBinary(b []byte, v []byte) []byte {
 	)
 
 	if len(v) == 0 {
-		//return encByte(b, BC_BINARY_DIRECT)
-		return encByte(b, BC_NULL)
+		return encByte(b, BC_BINARY_DIRECT)
 	}
 
 	vLength = len(v)

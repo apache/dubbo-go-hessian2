@@ -65,3 +65,9 @@ func TestDate(t *testing.T) {
 	testDateFramework(t, "replyDate_1", time.Date(1998, 5, 8, 9, 51, 31, 0, time.UTC))
 	testDateFramework(t, "replyDate_2", time.Date(1998, 5, 8, 9, 51, 0, 0, time.UTC))
 }
+
+func TestDateEncode(t *testing.T) {
+	testJavaDecode(t, "argDate_0", time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC))
+	testJavaDecode(t, "argDate_1", time.Date(1998, 5, 8, 9, 51, 31, 0, time.UTC))
+	testJavaDecode(t, "argDate_2", time.Date(1998, 5, 8, 9, 51, 0, 0, time.UTC))
+}
