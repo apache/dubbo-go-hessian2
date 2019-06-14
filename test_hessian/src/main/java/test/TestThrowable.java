@@ -20,15 +20,67 @@ import java.lang.reflect.MalformedParametersException;
 import java.lang.reflect.UndeclaredThrowableException;
 
 public class TestThrowable {
-    public static Object throw_exception()  {
+    public static Object throw_exception() {
         return new Exception("exception");
     }
-    public static Object throw_throwable()  {
+
+    public static Object throw_throwable() {
         return new Throwable("exception");
     }
-    public static Object throw_TypeNotPresentException(){return new TypeNotPresentException("exceptiontype1",new Throwable("exception"));}
-    public static Object throw_UndeclaredThrowableException(){return new UndeclaredThrowableException(new Throwable(),"UndeclaredThrowableException");}
-    public static Object throw_MalformedParametersException(){return new MalformedParametersException("MalformedParametersException");}
-    public static Object throw_WrongMethodTypeException(){return new WrongMethodTypeException("WrongMethodTypeException");}
-    public static Object throw_MalformedParameterizedTypeException(){return new MalformedParameterizedTypeException();}
+
+    public static Object throw_TypeNotPresentException() {
+        return new TypeNotPresentException("exceptiontype1", new Throwable("exception"));
     }
+
+    public static Object throw_UndeclaredThrowableException() {
+        return new UndeclaredThrowableException(new Throwable(), "UndeclaredThrowableException");
+    }
+
+    public static Object throw_MalformedParametersException() {
+        return new MalformedParametersException("MalformedParametersException");
+    }
+
+    public static Object throw_WrongMethodTypeException() {
+        return new WrongMethodTypeException("WrongMethodTypeException");
+    }
+
+    public static Object throw_MalformedParameterizedTypeException() {
+        return new MalformedParameterizedTypeException();
+    }
+
+    public static Object throw_uncheckedIOException() {
+        return new java.io.UncheckedIOException("uncheckedIOException", new java.io.IOException("io exception"));
+    }
+
+    public static Object throw_runtimeException() {
+        return new RuntimeException("runtimeException");
+    }
+
+    public static Object throw_illegalStateException() {
+        return new IllegalStateException("illegalStateException");
+    }
+
+    public static Object throw_illegalMonitorStateException() {
+        return new IllegalMonitorStateException("illegalMonitorStateException");
+    }
+
+    public static Object throw_enumConstantNotPresentException() {
+        return new EnumConstantNotPresentException(TestEnum.class, "enumConstantNotPresentException");
+    }
+
+    public static Object throw_classCastException() {
+        return new ClassCastException("classCastException");
+    }
+
+    public static Object throw_arrayStoreException() {
+        return new ArrayStoreException("arrayStoreException");
+    }
+
+    public static Object throw_IOException() {
+        return new ArrayStoreException("IOException");
+    }
+
+    enum TestEnum {
+        PASS
+    }
+}
