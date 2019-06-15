@@ -29,6 +29,11 @@ func TestException(t *testing.T) {
 	doTestException(t, "throw_illegalMonitorStateException", "illegalMonitorStateException")
 	doTestException(t, "throw_illegalStateException", "illegalStateException")
 	doTestException(t, "throw_IOException", "IOException")
+	doTestException(t, "throw_cloneNotSupportedException", "CloneNotSupportedException")
+	doTestException(t, "throw_interruptedException", "InterruptedException")
+	doTestException(t, "throw_interruptedIOException", "InterruptedIOException")
+	doTestException(t, "throw_lambdaConversionException", "LambdaConversionException")
+	doTestException(t, "throw_unmodifiableClassException", "UnmodifiableClassException")
 }
 
 func doTestException(t *testing.T, method, content string) {

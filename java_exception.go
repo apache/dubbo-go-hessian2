@@ -37,4 +37,9 @@ func init() {
 	RegisterPOJO(&java_exception.IllegalStateException{})
 	RegisterPOJO(&java_exception.IllegalMonitorStateException{})
 	RegisterPOJO(&java_exception.EnumConstantNotPresentException{})
+	RegisterPOJO(&java_exception.CloneNotSupportedException{})
+	RegisterPOJO(&java_exception.InterruptedException{})
+	RegisterPOJO(&java_exception.InterruptedIOException{})
+	RegisterPOJO(&java_exception.LambdaConversionException{})
+	RegisterPOJO(&java_exception.UnmodifiableClassException{})
 }
