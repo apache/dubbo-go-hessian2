@@ -14,7 +14,7 @@
 
 package hessian
 
-import "github.com/dubbogo/hessian2/java_exception"
+import "github.com/ice-summer-bug/hessian2/java_exception"
 
 ////////////////////////////
 // Throwable interface
@@ -36,5 +36,9 @@ func init() {
 	RegisterPOJO(&java_exception.ArrayStoreException{})
 	RegisterPOJO(&java_exception.IllegalStateException{})
 	RegisterPOJO(&java_exception.IllegalMonitorStateException{})
+	RegisterPOJO(&java_exception.EnumConstantNotPresentException{})
+	RegisterPOJO(&java_exception.NullPointerException{})
+	RegisterPOJO(&java_exception.UncheckedIOException{})
+	RegisterPOJO(&java_exception.EnumConstantNotPresentException{})
 	RegisterPOJO(&java_exception.EnumConstantNotPresentException{})
 }
