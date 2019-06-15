@@ -15,14 +15,15 @@
 package java_exception
 
 type NotActiveException struct {
-	ObjectStreamException
+	SerialVersionUID     int64
+	DetailMessage        string
+	StackTrace           []StackTraceElement
 	SuppressedExceptions []NotActiveException
 	Cause                *NotActiveException
 }
 
-func NewNotActiveException(detailMessge string) *NotActiveException {
-	return &NotActiveException{
-		ObjectStreamException: ObjectStreamException{IOException: IOException{DetailMessage: detailMessge}}}
+func NewNotActiveException(detailMessage string) *NotActiveException {
+	return &NotActiveException{DetailMessage: detailMessage}
 }
 
 func (e NotActiveException) Error() string {

@@ -15,15 +15,15 @@
 package java_exception
 
 type StreamCorruptedException struct {
-	ObjectStreamException
+	SerialVersionUID     int64
+	DetailMessage        string
+	StackTrace           []StackTraceElement
 	SuppressedExceptions []StreamCorruptedException
 	Cause                *StreamCorruptedException
 }
 
 func NewStreamCorruptedException(detailMessage string) *StreamCorruptedException {
-	return &StreamCorruptedException{
-		ObjectStreamException:
-		ObjectStreamException{IOException: IOException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}}}
+	return &StreamCorruptedException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
 }
 
 func (e StreamCorruptedException) Error() string {

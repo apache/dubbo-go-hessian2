@@ -15,16 +15,16 @@
 package java_exception
 
 type WriteAbortedException struct {
-	ObjectStreamException
+	SerialVersionUID     int64
+	DetailMessage        string
+	StackTrace           []StackTraceElement
 	Detail               *Exception
 	SuppressedExceptions []WriteAbortedException
 	Cause                *WriteAbortedException
 }
 
 func NewWriteAbortedException(detailMessage string, detail *Exception) *WriteAbortedException {
-	return &WriteAbortedException{
-		ObjectStreamException:
-		ObjectStreamException{IOException: IOException{DetailMessage: detailMessage, StackTrace: nil}},
+	return &WriteAbortedException{DetailMessage: detailMessage, StackTrace: nil,
 		Detail: detail}
 }
 

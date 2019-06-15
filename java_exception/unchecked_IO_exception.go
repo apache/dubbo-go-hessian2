@@ -15,7 +15,9 @@
 package java_exception
 
 type UncheckedIOException struct {
-	IOException
+	SerialVersionUID     int64
+	DetailMessage        string
+	StackTrace           []StackTraceElement
 	SuppressedExceptions []UncheckedIOException
 	Cause                *IOException
 }
@@ -24,8 +26,7 @@ func NewUncheckedIOException(detailMessage string, cause *IOException) (result *
 	if cause == nil {
 		return nil, NullPointerException{}
 	}
-	return &UncheckedIOException{
-		IOException: IOException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}, Cause: cause},
+	return &UncheckedIOException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}, Cause: cause},
 		nil
 }
 

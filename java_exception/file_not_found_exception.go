@@ -15,13 +15,15 @@
 package java_exception
 
 type FileNotFoundException struct {
-	IOException
+	SerialVersionUID     int64
+	DetailMessage        string
+	StackTrace           []StackTraceElement
 	SuppressedExceptions []FileNotFoundException
 	Cause                *FileNotFoundException
 }
 
 func NewFileNotFoundException(detailMessage string) *FileNotFoundException {
-	return &FileNotFoundException{IOException: IOException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}}
+	return &FileNotFoundException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
 }
 
 func (e FileNotFoundException) Error() string {

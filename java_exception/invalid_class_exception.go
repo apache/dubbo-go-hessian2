@@ -17,21 +17,21 @@ package java_exception
 import "fmt"
 
 type InvalidClassException struct {
-	ObjectStreamException
+	SerialVersionUID     int64
+	DetailMessage        string
+	StackTrace           []StackTraceElement
 	Classname            string
 	SuppressedExceptions []InvalidClassException
 	Cause                *InvalidClassException
 }
 
 func NewInvalidClassException(classname string, detailMessage string) *InvalidClassException {
-	return &InvalidClassException{
-		ObjectStreamException:
-		ObjectStreamException{IOException: IOException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}},
+	return &InvalidClassException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{},
 		Classname: classname}
 }
 
 func (e InvalidClassException) Error() string {
-	if e.Classname == "" {
+	if len(e.Classname) <= 0 {
 		return e.DetailMessage
 	}
 	return fmt.Sprintf("%+v; %+v", e.Classname, e.DetailMessage)

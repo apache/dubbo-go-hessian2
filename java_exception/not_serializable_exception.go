@@ -15,14 +15,15 @@
 package java_exception
 
 type NotSerializableException struct {
-	ObjectStreamException
+	SerialVersionUID     int64
+	DetailMessage        string
+	StackTrace           []StackTraceElement
 	SuppressedExceptions []NotSerializableException
 	Cause                *NotSerializableException
 }
 
-func NewNotSerializableException(detailMessge string) *NotActiveException {
-	return &NotActiveException{
-		ObjectStreamException: ObjectStreamException{IOException: IOException{DetailMessage: detailMessge}}}
+func NewNotSerializableException(detailMessage string) *NotActiveException {
+	return &NotActiveException{DetailMessage: detailMessage}
 }
 
 func (e NotSerializableException) Error() string {

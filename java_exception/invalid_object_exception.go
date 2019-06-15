@@ -15,15 +15,15 @@
 package java_exception
 
 type InvalidObjectException struct {
-	ObjectStreamException
+	SerialVersionUID     int64
+	DetailMessage        string
+	StackTrace           []StackTraceElement
 	SuppressedExceptions []InvalidObjectException
 	Cause                *InvalidObjectException
 }
 
 func NewInvalidObjectException(detailMessage string) *InvalidObjectException {
-	return &InvalidObjectException{
-		ObjectStreamException:
-		ObjectStreamException{IOException: IOException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}}}
+	return &InvalidObjectException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
 }
 
 func (e InvalidObjectException) Error() string {

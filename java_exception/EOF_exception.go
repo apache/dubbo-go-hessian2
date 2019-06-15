@@ -15,13 +15,15 @@
 package java_exception
 
 type EOFException struct {
-	IOException
+	SerialVersionUID     int64
+	DetailMessage        string
+	StackTrace           []StackTraceElement
 	SuppressedExceptions []EOFException
 	Cause                *EOFException
 }
 
 func NewEOFException(detailMessage string) *EOFException {
-	return &EOFException{IOException: IOException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}}
+	return &EOFException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
 }
 
 func (e EOFException) Error() string {

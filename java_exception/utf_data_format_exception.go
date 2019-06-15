@@ -15,14 +15,15 @@
 package java_exception
 
 type UTFDataFormatException struct {
-	ObjectStreamException
+	SerialVersionUID     int64
+	DetailMessage        string
+	StackTrace           []StackTraceElement
 	SuppressedExceptions []UTFDataFormatException
 	Cause                *UTFDataFormatException
 }
 
-func NewUTFDataFormatException(detailMesssage string) *UTFDataFormatException {
-	return &UTFDataFormatException{
-		ObjectStreamException: ObjectStreamException{IOException: IOException{DetailMessage: detailMesssage}}}
+func NewUTFDataFormatException(detailMessage string) *UTFDataFormatException {
+	return &UTFDataFormatException{DetailMessage: detailMessage}
 }
 
 func (e UTFDataFormatException) Error() string {

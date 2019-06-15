@@ -15,14 +15,15 @@
 package java_exception
 
 type ObjectStreamException struct {
-	IOException
+	SerialVersionUID     int64
+	DetailMessage        string
+	StackTrace           []StackTraceElement
 	SuppressedExceptions []ObjectStreamException
 	Cause                *ObjectStreamException
 }
 
-
 func NewObjectStreamException(detailMessage string) *ObjectStreamException {
-	return &ObjectStreamException{IOException: IOException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}}
+	return &ObjectStreamException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
 }
 
 func (e ObjectStreamException) Error() string {
@@ -32,5 +33,3 @@ func (e ObjectStreamException) Error() string {
 func (ObjectStreamException) JavaClassName() string {
 	return "java.io.ObjectStreamException"
 }
-
-

@@ -15,13 +15,15 @@
 package java_exception
 
 type SyncFailedException struct {
-	IOException
+	SerialVersionUID     int64
+	DetailMessage        string
+	StackTrace           []StackTraceElement
 	SuppressedExceptions []SyncFailedException
 	Cause                *SyncFailedException
 }
 
 func NewSyncFailedException(detailMessage string) *SyncFailedException {
-	return &SyncFailedException{IOException: IOException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}}
+	return &SyncFailedException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
 }
 
 func (e SyncFailedException) Error() string {

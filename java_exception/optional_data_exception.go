@@ -15,7 +15,9 @@
 package java_exception
 
 type OptionalDataException struct {
-	ObjectStreamException
+	SerialVersionUID     int64
+	DetailMessage        string
+	StackTrace           []StackTraceElement
 	SuppressedExceptions []OptionalDataException
 	Cause                *OptionalDataException
 	Eof                  bool
