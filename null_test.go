@@ -30,3 +30,7 @@ func TestEncNull(t *testing.T) {
 func TestNull(t *testing.T) {
 	testDecodeFramework(t, "replyNull", nil)
 }
+
+func TestNulEncode(t *testing.T) {
+	testJavaDecode(t, "argNull", nil)
+}

@@ -312,7 +312,7 @@ func (*A16) JavaClassName() string {
 }
 
 type TestObjectStruct struct {
-	Value int `hessian:"_value"`
+	Value int32 `hessian:"_value"`
 }
 
 func (*TestObjectStruct) JavaClassName() string {
@@ -365,6 +365,23 @@ func TestObject(t *testing.T) {
 	cons.First = "a"
 	cons.Rest = &cons
 	testDecodeFramework(t, "replyObject_3", &cons)
+}
+
+func TestObjectEncode(t *testing.T) {
+	testJavaDecode(t, "argObject_0", &A0{})
+	testJavaDecode(t, "argObject_1", &TestObjectStruct{Value: 0})
+	testJavaDecode(t, "argObject_16", []interface{}{&A0{}, &A1{}, &A2{}, &A3{}, &A4{}, &A5{}, &A6{}, &A7{}, &A8{}, &A9{}, &A10{}, &A11{}, &A12{}, &A13{}, &A14{}, &A15{}, &A16{}})
+	testJavaDecode(t, "argObject_2", []interface{}{&TestObjectStruct{Value: 0}, &TestObjectStruct{Value: 1}})
+	testJavaDecode(t, "argObject_2b", []interface{}{&TestObjectStruct{Value: 0}, &TestObjectStruct{Value: 0}})
+
+	object := TestObjectStruct{Value: 0}
+	object2a := []interface{}{&object, &object}
+	testJavaDecode(t, "argObject_2a", object2a)
+
+	cons := TestConsStruct{}
+	cons.First = "a"
+	cons.Rest = &cons
+	testJavaDecode(t, "argObject_3", &cons)
 }
 
 type Tuple struct {
