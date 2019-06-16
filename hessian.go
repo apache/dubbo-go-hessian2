@@ -125,8 +125,6 @@ func (h *HessianCodec) Write(service Service, header DubboHeader, body interface
 	default:
 		return nil, perrors.Errorf("Unrecognised message type: %v", h.PkgType)
 	}
-
-	// unreachable return nil, nil
 }
 
 // ReadHeader uses hessian codec to read dubbo header
