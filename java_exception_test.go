@@ -35,6 +35,20 @@ func TestException(t *testing.T) {
 	doTestException(t, "throw_illegalMonitorStateException", "illegalMonitorStateException")
 	doTestException(t, "throw_illegalStateException", "illegalStateException")
 	doTestException(t, "throw_IOException", "IOException")
+	doTestException(t, "throw_NullPointerException", "nullPointerException")
+	doTestException(t, "throw_UncheckedIOException", "uncheckedIOException")
+	doTestException(t, "throw_FileNotFoundException", "fileNotFoundException")
+	doTestException(t, "throw_EOFException", "EOFException")
+	doTestException(t, "throw_SyncFailedException", "syncFailedException")
+	doTestException(t, "throw_ObjectStreamException", "objectStreamException")
+	doTestException(t, "throw_WriteAbortedException", "writeAbortedException")
+	doTestException(t, "throw_InvalidObjectException", "invalidObjectException")
+	doTestException(t, "throw_StreamCorruptedException", "streamCorruptedException")
+	doTestException(t, "throw_InvalidClassException", "null; invalidClassException")
+	doTestException(t, "throw_OptionalDataException", "null")
+	doTestException(t, "throw_NotActiveException", "notActiveException")
+	doTestException(t, "throw_NotSerializableException", "notSerializableException")
+	doTestException(t, "throw_UTFDataFormatException", "UTFDataFormatException")
 }
 
 func doTestException(t *testing.T, method, content string) {
