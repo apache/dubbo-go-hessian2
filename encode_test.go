@@ -45,14 +45,10 @@ func javaDecodeValidate(method string, target interface{}) (string, error) {
 	cmd := exec.Command("java", "-jar", hessianJar, method)
 
 	stdin, _ := cmd.StdinPipe()
-	_, e = stdin.Write(b)
-	if e != nil {
-		return "", e
-	}
-	e = stdin.Close()
-	if e != nil {
-		return "", e
-	}
+	go func() {
+		stdin.Write(b)
+		stdin.Close()
+	}()
 
 	out, e := cmd.Output()
 	if e != nil {

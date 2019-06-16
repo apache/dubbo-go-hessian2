@@ -30,10 +30,6 @@ import (
 // ::= 'M' type (value value)* 'Z'  # key, value map pairs
 // ::= 'H' (value value)* 'Z'       # untyped key, value
 func (e *Encoder) encUntypedMap(m map[interface{}]interface{}) error {
-	if len(m) == 0 {
-		return nil
-	}
-
 	// check ref
 	if n, ok := e.checkRefMap(reflect.ValueOf(m)); ok {
 		e.buffer = encRef(e.buffer, n)

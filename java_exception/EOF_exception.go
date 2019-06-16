@@ -1,4 +1,4 @@
-// Copyright 2016-2019 Alex Stocks
+// Copyright 2016-2019 summerbuger@gmail.com
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,25 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package hessian
+package java_exception
 
-import (
-	"testing"
-)
-
-func TestEncNull(t *testing.T) {
-	var e = NewEncoder()
-	e.Encode(nil)
-	if e.Buffer() == nil {
-		t.Fail()
-	}
-	t.Logf("nil enc result:%s\n", string(e.buffer))
+type EOFException struct {
+	SerialVersionUID     int64
+	DetailMessage        string
+	StackTrace           []StackTraceElement
+	SuppressedExceptions []EOFException
+	Cause                *EOFException
 }
 
-func TestNull(t *testing.T) {
-	testDecodeFramework(t, "replyNull", nil)
+func NewEOFException(detailMessage string) *EOFException {
+	return &EOFException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
 }
 
-func TestNulEncode(t *testing.T) {
-	testJavaDecode(t, "argNull", nil)
+func (e EOFException) Error() string {
+	return e.DetailMessage
+}
+
+func (EOFException) JavaClassName() string {
+	return "java.io.EOFException"
 }

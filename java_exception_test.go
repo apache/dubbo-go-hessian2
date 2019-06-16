@@ -19,14 +19,34 @@ import (
 	"testing"
 )
 
-func TestThrowable(t *testing.T) {
-	testDecodeFrameworkFunc(t, "throw_throwable", func(r interface{}) {
-		assert.Equal(t, "exception", r.(error).Error())
-	})
+func TestException(t *testing.T) {
+	doTestException(t, "throw_throwable", "exception")
+	doTestException(t, "throw_exception", "exception")
+	doTestException(t, "throw_runtimeException", "runtimeException")
+	doTestException(t, "throw_arrayStoreException", "arrayStoreException")
+	doTestException(t, "throw_classCastException", "classCastException")
+	doTestException(t, "throw_enumConstantNotPresentException", "test.TestThrowable$TestEnum.enumConstantNotPresentException")
+	doTestException(t, "throw_illegalMonitorStateException", "illegalMonitorStateException")
+	doTestException(t, "throw_illegalStateException", "illegalStateException")
+	doTestException(t, "throw_IOException", "IOException")
+	doTestException(t, "throw_NullPointerException", "nullPointerException")
+	doTestException(t, "throw_UncheckedIOException", "uncheckedIOException")
+	doTestException(t, "throw_FileNotFoundException", "fileNotFoundException")
+	doTestException(t, "throw_EOFException", "EOFException")
+	doTestException(t, "throw_SyncFailedException", "syncFailedException")
+	doTestException(t, "throw_ObjectStreamException", "objectStreamException")
+	doTestException(t, "throw_WriteAbortedException", "writeAbortedException")
+	doTestException(t, "throw_InvalidObjectException", "invalidObjectException")
+	doTestException(t, "throw_StreamCorruptedException", "streamCorruptedException")
+	doTestException(t, "throw_InvalidClassException", "null; invalidClassException")
+	doTestException(t, "throw_OptionalDataException", "null")
+	doTestException(t, "throw_NotActiveException", "notActiveException")
+	doTestException(t, "throw_NotSerializableException", "notSerializableException")
+	doTestException(t, "throw_UTFDataFormatException", "UTFDataFormatException")
 }
 
-func TestException(t *testing.T) {
-	testDecodeFrameworkFunc(t, "throw_exception", func(r interface{}) {
-		assert.Equal(t, "exception", r.(error).Error())
+func doTestException(t *testing.T, method, content string) {
+	testDecodeFrameworkFunc(t, method, func(r interface{}) {
+		assert.Equal(t, content, r.(error).Error())
 	})
 }

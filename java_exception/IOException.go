@@ -1,4 +1,4 @@
-// Copyright 2016-2019 Alex Stocks
+// Copyright 2016-2019 ckex868@vip.qq.com
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,25 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package hessian
+package java_exception
 
-import (
-	"testing"
-)
-
-func TestEncNull(t *testing.T) {
-	var e = NewEncoder()
-	e.Encode(nil)
-	if e.Buffer() == nil {
-		t.Fail()
-	}
-	t.Logf("nil enc result:%s\n", string(e.buffer))
+type IOException struct {
+	SerialVersionUID     int64
+	DetailMessage        string
+	SuppressedExceptions []IOException
+	StackTrace           []StackTraceElement
+	Cause                *IOException
 }
 
-func TestNull(t *testing.T) {
-	testDecodeFramework(t, "replyNull", nil)
+func NewIOException(detailMessage string) *IOException {
+	return &IOException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
 }
 
-func TestNulEncode(t *testing.T) {
-	testJavaDecode(t, "argNull", nil)
+func (e IOException) Error() string {
+	return e.DetailMessage
+}
+
+func (IOException) JavaClassName() string {
+	return "java.io.IOException"
 }
