@@ -15,13 +15,19 @@
 package hessian
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestException(t *testing.T) {
 	doTestException(t, "throw_throwable", "exception")
 	doTestException(t, "throw_exception", "exception")
+	doTestException(t, "throw_MalformedParameterizedTypeException", "MalformedParameterizedType")
+	doTestException(t, "throw_MalformedParametersException", "MalformedParametersException")
+	doTestException(t, "throw_TypeNotPresentException", "Type exceptiontype1 not present")
+	doTestException(t, "throw_WrongMethodTypeException", "WrongMethodTypeException")
+	doTestException(t, "throw_UndeclaredThrowableException", "UndeclaredThrowableException")
 	doTestException(t, "throw_runtimeException", "runtimeException")
 	doTestException(t, "throw_arrayStoreException", "arrayStoreException")
 	doTestException(t, "throw_classCastException", "classCastException")
