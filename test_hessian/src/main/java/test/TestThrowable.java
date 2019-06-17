@@ -14,10 +14,9 @@
 
 package test;
 
+import java.io.*;
 import java.lang.invoke.WrongMethodTypeException;
-import java.lang.reflect.MalformedParameterizedTypeException;
-import java.lang.reflect.MalformedParametersException;
-import java.lang.reflect.UndeclaredThrowableException;
+import java.lang.reflect.*;
 
 public class TestThrowable {
     public static Object throw_exception() {
@@ -121,7 +120,7 @@ public class TestThrowable {
     }
 
     public static Object throw_OptionalDataException() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        Constructor c1= OptionalDataException.class.getDeclaredConstructor(int.class);
+        Constructor c1 = OptionalDataException.class.getDeclaredConstructor(int.class);
         c1.setAccessible(true);
         return c1.newInstance(1);
     }
