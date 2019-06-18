@@ -26,10 +26,27 @@ import (
 
 var listTypeName = map[string]string{
 	"string": "[string",
+
+	"int8": "[short",
+
+	"int16":  "[short",
+	"uint16": "[short",
+
 	"int32":  "[int",
-	"int":    "[long",
+	"uint32": "[int",
+
+	"int":  "[long",
+	"uint": "[long",
+
 	"int64":  "[long",
-	"bool":   "[boolean",
+	"uint64": "[long",
+
+	"float32": "[float",
+	"float64": "[double",
+
+	"bool": "[boolean",
+
+	"time.Time": "[java.util.Date",
 }
 
 func registerTypeName(gotype, javatype string) {
@@ -103,6 +120,8 @@ func (e *Encoder) Encode(v interface{}) error {
 		// }
 		// use int64 type to handle int, to avoid  panic like :  reflect: Call using int32 as type int64 [recovered]
 		// when decode
+		e.buffer = encInt64(e.buffer, int64(val))
+	case uint:
 		e.buffer = encInt64(e.buffer, int64(val))
 
 	case int64:

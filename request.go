@@ -42,32 +42,54 @@ func getArgType(v interface{}) string {
 		return "V"
 	case bool:
 		return "Z"
+	case []bool:
+		return "[Z"
 	case byte:
 		return "B"
+	case []byte:
+		return "[B"
 	case int8:
 		return "B"
+	case []int8:
+		return "[B"
 	case int16:
 		return "S"
+	case []int16:
+		return "[S"
 	case uint16: // Equivalent to Char of Java
 		return "C"
+	case []uint16:
+		return "[C"
 	// case rune:
 	//	return "C"
 	case int:
-		return "I"
+		return "J"
+	case []int:
+		return "[J"
 	case int32:
 		return "I"
+	case []int32:
+		return "[I"
 	case int64:
 		return "J"
+	case []int64:
+		return "[J"
 	case time.Time:
 		return "java.util.Date"
+	case []time.Time:
+		return "[Ljava.util.Date"
 	case float32:
 		return "F"
+	case []float32:
+		return "[F"
 	case float64:
 		return "D"
+	case []float64:
+		return "[D"
 	case string:
 		return "java.lang.String"
-	case []byte:
-		return "[B"
+	case []string:
+		return "[Ljava.lang.String;"
 	case map[interface{}]interface{}:
 		// return  "java.util.HashMap"
 		return "java.util.Map"
@@ -82,6 +104,9 @@ func getArgType(v interface{}) string {
 		case reflect.Struct:
 			return "java.lang.Object"
 		case reflect.Slice, reflect.Array:
+			if t.Elem().Kind() == reflect.Struct {
+				return "[Ljava.lang.Object;"
+			}
 			// return "java.util.ArrayList"
 			return "java.util.List"
 		case reflect.Map: // Enter here, map may be map[string]int
@@ -108,6 +133,8 @@ func getArgsTypeList(args []interface{}) (string, error) {
 		}
 		if !strings.Contains(typ, ".") {
 			types += typ
+		} else if strings.Index(typ, "[") == 0 {
+			types += strings.Replace(typ, ".", "/", -1)
 		} else {
 			// java.util.List -> Ljava/util/List;
 			types += "L" + strings.Replace(typ, ".", "/", -1) + ";"
