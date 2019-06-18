@@ -24,6 +24,18 @@ import (
 	perrors "github.com/pkg/errors"
 )
 
+var listTypeName = map[string]string{
+	"string": "[string",
+	"int32":  "[int",
+	"int":    "[long",
+	"int64":  "[long",
+	"bool":   "[boolean",
+}
+
+func registerTypeName(gotype, javatype string) {
+	listTypeName[gotype] = "[" + javatype
+}
+
 // nil bool int8 int32 int64 float32 float64 time.Time
 // string []byte []interface{} map[interface{}]interface{}
 // array object struct
@@ -127,7 +139,7 @@ func (e *Encoder) Encode(v interface{}) error {
 
 			return perrors.Errorf("struct type not Support! %s[%v] is not a instance of POJO!", t.String(), v)
 		case reflect.Slice, reflect.Array:
-			return e.encUntypedList(v)
+			return e.encList(v)
 		case reflect.Map: // the type must be map[string]int
 			return e.encMap(v)
 		default:

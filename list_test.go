@@ -68,3 +68,33 @@ func TestListEncode(t *testing.T) {
 
 	testJavaDecode(t, "customArgUntypedFixedListHasNull", []interface{}{new(A0), new(A1), nil})
 }
+
+func TestStringTypedList(t *testing.T) {
+	testJavaDecode(t, "argTypedFixedList_0", []string{})
+	testJavaDecode(t, "argTypedFixedList_1", []string{"1"})
+	testJavaDecode(t, "argTypedFixedList_7", []string{"1", "2", "3", "4", "5", "6", "7"})
+	testJavaDecode(t, "argTypedFixedList_8", []string{"1", "2", "3", "4", "5", "6", "7", "8"})
+}
+
+func TestIntTypedList(t *testing.T) {
+	testJavaDecode(t, "customArgTypedFixedList_long_0", []int{})
+	testJavaDecode(t, "customArgTypedFixedList_long_1", []int{1})
+	testJavaDecode(t, "customArgTypedFixedList_long_7", []int{1, 2, 3, 4, 5, 6, 7})
+}
+
+func TestInt32TypedList(t *testing.T) {
+	testJavaDecode(t, "customArgTypedFixedList_int_0", []int32{})
+	testJavaDecode(t, "customArgTypedFixedList_int_1", []int32{1})
+	testJavaDecode(t, "customArgTypedFixedList_int_7", []int32{1, 2, 3, 4, 5, 6, 7})
+}
+
+func TestBoolTypedList(t *testing.T) {
+	testJavaDecode(t, "customArgTypedFixedList_boolean_0", []bool{})
+	testJavaDecode(t, "customArgTypedFixedList_boolean_1", []bool{true})
+	testJavaDecode(t, "customArgTypedFixedList_boolean_7", []bool{true, false, true, false, true, false, true})
+}
+
+func TestObjectTypedList(t *testing.T) {
+	RegisterPOJOs(new(A0))
+	testJavaDecode(t, "customArgTypedFixedList", []*A0{new(A0)})
+}

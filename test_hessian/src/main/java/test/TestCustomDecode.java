@@ -20,6 +20,7 @@ import com.caucho.hessian.test.A1;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -39,5 +40,65 @@ public class TestCustomDecode {
 
         Object o = input.readObject();
         return list.equals(o);
+    }
+
+    public Object customArgTypedFixedList() throws Exception {
+        A0[] list = new A0[]{new A0()};
+        Object o = input.readObject();
+        return Arrays.equals(list,(A0[])o);
+    }
+
+    public Object customArgTypedFixedList_int_0() throws Exception {
+        int[] list = new int[]{};
+        Object o = input.readObject();
+        return Arrays.equals(list,(int[])o);
+    }
+
+    public Object customArgTypedFixedList_int_1() throws Exception {
+        int[] list = new int[]{1};
+        Object o = input.readObject();
+        return Arrays.equals(list,(int[])o);
+    }
+
+    public Object customArgTypedFixedList_int_7() throws Exception {
+        int[] list = new int[]{1,2,3,4,5,6,7};
+        Object o = input.readObject();
+        return Arrays.equals(list,(int[])o);
+    }
+
+    public Object customArgTypedFixedList_long_0() throws Exception {
+        long[] list = new long[]{};
+        Object o = input.readObject();
+        return Arrays.equals(list,(long[])o);
+    }
+
+    public Object customArgTypedFixedList_long_1() throws Exception {
+        long[] list = new long[]{1};
+        Object o = input.readObject();
+        return Arrays.equals(list,(long[])o);
+    }
+
+    public Object customArgTypedFixedList_long_7() throws Exception {
+        long[] list = new long[]{1,2,3,4,5,6,7};
+        Object o = input.readObject();
+        return Arrays.equals(list,(long[])o);
+    }
+
+    public Object customArgTypedFixedList_boolean_0() throws Exception {
+        boolean[] list = new boolean[]{};
+        Object o = input.readObject();
+        return Arrays.equals(list,(boolean[])o);
+    }
+
+    public Object customArgTypedFixedList_boolean_1() throws Exception {
+        boolean[] list = new boolean[]{true};
+        Object o = input.readObject();
+        return Arrays.equals(list,(boolean[])o);
+    }
+
+    public Object customArgTypedFixedList_boolean_7() throws Exception {
+        boolean[] list = new boolean[]{true,false,true,false,true,false,true};
+        Object o = input.readObject();
+        return Arrays.equals(list,(boolean[])o);
     }
 }

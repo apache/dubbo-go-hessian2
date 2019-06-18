@@ -27,14 +27,58 @@ import (
 // List
 /////////////////////////////////////////
 
-// # list/vector
+// encList write list
+func (e *Encoder) encList(v interface{}) error {
+	if reflect.TypeOf(v).String() != "[]interface {}" {
+		if e.writeTypedList(v) == nil {
+			return nil
+		}
+	}
+	return e.writeUntypedList(v)
+}
+
+// writeTypedList write typed list
+// Include 3 formats:
 // ::= x55 type value* 'Z'   # variable-length list
 // ::= 'V' type int value*   # fixed-length list
+// ::= [x70-77] type value*  # fixed-length typed list
+func (e *Encoder) writeTypedList(v interface{}) error {
+	var (
+		err error
+	)
+
+	value := reflect.ValueOf(v)
+
+	// check ref
+	if n, ok := e.checkRefMap(value); ok {
+		e.buffer = encRef(e.buffer, n)
+		return nil
+	}
+
+	value = UnpackPtrValue(value)
+	var typeName = listTypeName[UnpackPtrType(value.Type().Elem()).String()]
+	if typeName == "" {
+		return perrors.New("no type name.")
+	}
+
+	e.buffer = encByte(e.buffer, BC_LIST_FIXED) // 'V'
+	e.buffer = encString(e.buffer, typeName)
+	e.buffer = encInt32(e.buffer, int32(value.Len()))
+	for i := 0; i < value.Len(); i++ {
+		if err = e.Encode(value.Index(i).Interface()); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// writeUntypedList write untyped list
+// Include 3 formats:
 // ::= x57 value* 'Z'        # variable-length untyped list
 // ::= x58 int value*        # fixed-length untyped list
-// ::= [x70-77] type value*  # fixed-length typed list
 // ::= [x78-7f] value*       # fixed-length untyped list
-func (e *Encoder) encUntypedList(v interface{}) error {
+func (e *Encoder) writeUntypedList(v interface{}) error {
 	var (
 		err error
 	)
