@@ -15,6 +15,9 @@
 package hessian
 
 import (
+	"fmt"
+	"github.com/stretchr/testify/assert"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -31,25 +34,33 @@ func TestEncList(t *testing.T) {
 	e = NewEncoder()
 	list = []interface{}{100, 10.001, "hello", []byte{0, 2, 4, 6, 8, 10}, true, nil, false}
 	e.Encode(list)
-	if len(e.Buffer()) == 0 {
-		t.Fail()
-	}
+	assert.NotEqual(t, 0, len(e.Buffer()))
 
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
-	if err != nil {
-		t.Errorf("Decode() = %+v", err)
-	}
-	t.Logf("decode(%v) = %v, %v\n", list, res, err)
+	assert.NoError(t, err)
+	assert.Equal(t, fmt.Sprintf("%v", list), fmt.Sprintf("%v", res))
+
+	// typed list - int32
+	e = NewEncoder()
+	list_1 := []int32{1, 2, 3}
+	e.Encode(list_1)
+	assert.NotEqual(t, 0, len(e.Buffer()))
+
+	d = NewDecoder(e.Buffer())
+	res, err = d.Decode()
+	assert.NoError(t, err)
+	assert.True(t, reflect.DeepEqual(res, list_1))
+
 }
 
 func TestList(t *testing.T) {
 	RegisterPOJOs(new(A0), new(A1))
 
-	testDecodeFramework(t, "replyTypedFixedList_0", []interface{}{})
-	testDecodeFramework(t, "replyTypedFixedList_1", []interface{}{"1"})
-	testDecodeFramework(t, "replyTypedFixedList_7", []interface{}{"1", "2", "3", "4", "5", "6", "7"})
-	testDecodeFramework(t, "replyTypedFixedList_8", []interface{}{"1", "2", "3", "4", "5", "6", "7", "8"})
+	testDecodeFramework(t, "replyTypedFixedList_0", []string{})
+	testDecodeFramework(t, "replyTypedFixedList_1", []string{"1"})
+	testDecodeFramework(t, "replyTypedFixedList_7", []string{"1", "2", "3", "4", "5", "6", "7"})
+	testDecodeFramework(t, "replyTypedFixedList_8", []string{"1", "2", "3", "4", "5", "6", "7", "8"})
 	testDecodeFramework(t, "replyUntypedFixedList_0", []interface{}{})
 	testDecodeFramework(t, "replyUntypedFixedList_1", []interface{}{"1"})
 	testDecodeFramework(t, "replyUntypedFixedList_7", []interface{}{"1", "2", "3", "4", "5", "6", "7"})
@@ -59,6 +70,35 @@ func TestList(t *testing.T) {
 	testDecodeFramework(t, "customReplyTypedVariableListHasNull", []interface{}{new(A0), new(A1), nil})
 	testDecodeFramework(t, "customReplyUntypedFixedListHasNull", []interface{}{new(A0), new(A1), nil})
 	testDecodeFramework(t, "customReplyUntypedVariableListHasNull", []interface{}{new(A0), new(A1), nil})
+
+	testDecodeFramework(t, "customReplyTypedFixedList_A0", []*A0{new(A0), new(A0), nil})
+	testDecodeFramework(t, "customReplyTypedVariableList_A0", []*A0{new(A0), new(A0), nil})
+
+	testDecodeFramework(t, "customReplyTypedFixedList_int", []int32{1, 2, 3})
+	testDecodeFramework(t, "customReplyTypedVariableList_int", []int32{1, 2, 3})
+
+	testDecodeFramework(t, "customReplyTypedFixedList_long", []int64{1, 2, 3})
+	testDecodeFramework(t, "customReplyTypedVariableList_long", []int64{1, 2, 3})
+
+	testDecodeFramework(t, "customReplyTypedFixedList_float", []float64{1, 2, 3})
+	testDecodeFramework(t, "customReplyTypedVariableList_float", []float64{1, 2, 3})
+
+	testDecodeFramework(t, "customReplyTypedFixedList_double", []float64{1, 2, 3})
+	testDecodeFramework(t, "customReplyTypedVariableList_double", []float64{1, 2, 3})
+
+	testDecodeFramework(t, "customReplyTypedFixedList_short", []int32{1, 2, 3})
+	testDecodeFramework(t, "customReplyTypedVariableList_short", []int32{1, 2, 3})
+
+	testDecodeFramework(t, "customReplyTypedFixedList_char", []string{"1", "2", "3"})
+	testDecodeFramework(t, "customReplyTypedVariableList_char", []string{"1", "2", "3"})
+
+	testDecodeFramework(t, "customReplyTypedFixedList_boolean", []bool{true, false, true})
+	testDecodeFramework(t, "customReplyTypedVariableList_boolean", []bool{true, false, true})
+
+	testDecodeFramework(t, "customReplyTypedFixedList_date", []time.Time{time.Unix(1560864, 0),
+		time.Unix(1560864, 0), time.Unix(1560864, 0)})
+	testDecodeFramework(t, "customReplyTypedVariableList_date", []time.Time{time.Unix(1560864, 0),
+		time.Unix(1560864, 0), time.Unix(1560864, 0)})
 }
 
 func TestListEncode(t *testing.T) {

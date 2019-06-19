@@ -129,9 +129,9 @@ func TestResponse(t *testing.T) {
 			assert.FailNow(t, "no key in decoded response map")
 		}
 
-		mapValueArr, ok := c.([]interface{})
+		mapValueArr, ok := c.([]*Case)
 		if !ok {
-			assert.FailNow(t, "invalid decoded response map value", "expect []interface{}, but get %v", reflect.TypeOf(c))
+			assert.FailNow(t, "invalid decoded response map value", "expect []*Case, but get %v", reflect.TypeOf(c))
 		}
 		assert.Equal(t, 1, len(mapValueArr))
 		assert.Equal(t, &caseObj, mapValueArr[0])

@@ -24,35 +24,6 @@ import (
 	perrors "github.com/pkg/errors"
 )
 
-var listTypeName = map[string]string{
-	"string": "[string",
-
-	"int8": "[short",
-
-	"int16":  "[short",
-	"uint16": "[short",
-
-	"int32":  "[int",
-	"uint32": "[int",
-
-	"int":  "[long",
-	"uint": "[long",
-
-	"int64":  "[long",
-	"uint64": "[long",
-
-	"float32": "[float",
-	"float64": "[double",
-
-	"bool": "[boolean",
-
-	"time.Time": "[java.util.Date",
-}
-
-func registerTypeName(gotype, javatype string) {
-	listTypeName[gotype] = "[" + javatype
-}
-
 // nil bool int8 int32 int64 float32 float64 time.Time
 // string []byte []interface{} map[interface{}]interface{}
 // array object struct
