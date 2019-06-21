@@ -24,6 +24,8 @@ import (
 
 import (
 	"github.com/stretchr/testify/assert"
+	"os/exec"
+	"log"
 )
 
 type Case struct {
@@ -167,4 +169,39 @@ func TestRequest(t *testing.T) {
 	doTestRequest(t, PackageRequest, Zero, []interface{}{"a", 3, true, &Case{A: "a", B: 3}})
 	doTestRequest(t, PackageRequest, Zero, []interface{}{"a", 3, true, []*Case{{A: "a", B: 3}}})
 	doTestRequest(t, PackageRequest, Zero, []interface{}{map[string][]*Case{"key": {{A: "a", B: 3}}}})
+}
+
+func getDubboReply() []byte {
+	cmd := exec.Command("java", "-jar", "test_dubbo/target/test_dubbo-1.0.0.jar", "replyRequest")
+	out, err := cmd.Output()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return out
+}
+
+func TestReq(t *testing.T) {
+	var err error
+
+	resp := getDubboReply()
+	codecR := NewHessianCodec(bufio.NewReader(bytes.NewReader(resp)))
+
+	h := &DubboHeader{}
+	err = codecR.ReadHeader(h)
+	assert.Nil(t, err)
+	assert.Equal(t, uint16(MAGIC), h.MagicNumber)
+	assert.Equal(t, PackageRequest|PackageRequest_TwoWay, codecR.PkgType)
+	assert.Equal(t, uint8(0), h.ResponseStatus)
+	assert.Equal(t, uint64(1), h.ID)
+
+	c := make([]interface{}, 7)
+	err = codecR.ReadBody(c)
+	assert.Nil(t, err)
+	assert.Equal(t, "2.7.1", c[0])
+	assert.Equal(t, "dubbo-x/dubbo.DubboService", c[1])
+	assert.Equal(t, "1.0.0", c[2])
+	assert.Equal(t, "echo", c[3])
+	assert.Equal(t, "Ljava/lang/String;", c[4])
+	assert.Equal(t, []interface{}{"hello world"}, c[5])
+	assert.Equal(t, map[interface{}]interface{}{"path": "dubbo-x/dubbo.DubboService", "interface": "dubbo.DubboService", "version": "1.0.0"}, c[6])
 }
