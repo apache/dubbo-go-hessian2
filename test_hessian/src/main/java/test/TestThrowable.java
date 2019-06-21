@@ -15,8 +15,8 @@
 package test;
 
 import java.io.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.invoke.WrongMethodTypeException;
+import java.lang.reflect.*;
 
 public class TestThrowable {
     public static Object throw_exception() {
@@ -25,6 +25,26 @@ public class TestThrowable {
 
     public static Object throw_throwable() {
         return new Throwable("exception");
+    }
+
+    public static Object throw_TypeNotPresentException() {
+        return new TypeNotPresentException("exceptiontype1", new Throwable("exception"));
+    }
+
+    public static Object throw_UndeclaredThrowableException() {
+        return new UndeclaredThrowableException(new Throwable(), "UndeclaredThrowableException");
+    }
+
+    public static Object throw_MalformedParametersException() {
+        return new MalformedParametersException("MalformedParametersException");
+    }
+
+    public static Object throw_WrongMethodTypeException() {
+        return new WrongMethodTypeException("WrongMethodTypeException");
+    }
+
+    public static Object throw_MalformedParameterizedTypeException() {
+        return new MalformedParameterizedTypeException();
     }
 
     public static Object throw_uncheckedIOException() {
@@ -100,7 +120,7 @@ public class TestThrowable {
     }
 
     public static Object throw_OptionalDataException() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        Constructor c1= OptionalDataException.class.getDeclaredConstructor(int.class);
+        Constructor c1 = OptionalDataException.class.getDeclaredConstructor(int.class);
         c1.setAccessible(true);
         return c1.newInstance(1);
     }
