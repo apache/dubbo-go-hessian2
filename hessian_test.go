@@ -24,8 +24,8 @@ import (
 
 import (
 	"github.com/stretchr/testify/assert"
-	"os/exec"
 	"log"
+	"os/exec"
 )
 
 type Case struct {
@@ -205,9 +205,9 @@ func TestReq(t *testing.T) {
 	assert.Equal(t, []interface{}{"hello world"}, c[5])
 
 	attachments := map[interface{}]interface{}{
-		"path": "dubbo-x/dubbo.DubboService",
+		"path":      "dubbo-x/dubbo.DubboService",
 		"interface": "dubbo.DubboService",
-		"version": "1.0.0",
+		"version":   "1.0.0",
 	}
 	assert.Equal(t, attachments, c[6])
 }
