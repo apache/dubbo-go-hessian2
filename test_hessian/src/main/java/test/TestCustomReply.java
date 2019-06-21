@@ -119,16 +119,7 @@ public class TestCustomReply {
 
     public void customReplyTypedFixedList_A0() throws Exception {
         A0[] o = new A0[]{new A0(), new A0(), null};
-        if (output.addRef(o)) {
-            return;
-        }
-        boolean hasEnd = output.writeListBegin(o.length, "[com.caucho.hessian.test.A0");
-        for (Object tmp: o) {
-            output.writeObject(tmp);
-        }
-        if (hasEnd) {
-            output.writeListEnd();
-        }
+        output.writeObject(o);
         output.flush();
     }
 
@@ -149,16 +140,7 @@ public class TestCustomReply {
 
     public void customReplyTypedFixedList_int() throws Exception {
         int[] o = new int[]{1, 2, 3};
-        if (output.addRef(o)) {
-            return;
-        }
-        boolean hasEnd = output.writeListBegin(o.length, typeMap.get(o.getClass()));
-        for (Object tmp: o) {
-            output.writeObject(tmp);
-        }
-        if (hasEnd) {
-            output.writeListEnd();
-        }
+        output.writeObject(o);
         output.flush();
     }
 
@@ -179,16 +161,7 @@ public class TestCustomReply {
 
     public void customReplyTypedFixedList_long() throws Exception {
         long[] o = new long[]{1, 2, 3};
-        if (output.addRef(o)) {
-            return;
-        }
-        boolean hasEnd = output.writeListBegin(o.length, typeMap.get(o.getClass()));
-        for (Object tmp: o) {
-            output.writeObject(tmp);
-        }
-        if (hasEnd) {
-            output.writeListEnd();
-        }
+        output.writeObject(o);
         output.flush();
     }
 
@@ -209,16 +182,7 @@ public class TestCustomReply {
 
     public void customReplyTypedFixedList_float() throws Exception {
         float[] o = new float[]{1, 2, 3};
-        if (output.addRef(o)) {
-            return;
-        }
-        boolean hasEnd = output.writeListBegin(o.length, typeMap.get(o.getClass()));
-        for (Object tmp: o) {
-            output.writeObject(tmp);
-        }
-        if (hasEnd) {
-            output.writeListEnd();
-        }
+        output.writeObject(o);
         output.flush();
     }
 
@@ -239,16 +203,7 @@ public class TestCustomReply {
 
     public void customReplyTypedFixedList_double() throws Exception {
         double[] o = new double[]{1, 2, 3};
-        if (output.addRef(o)) {
-            return;
-        }
-        boolean hasEnd = output.writeListBegin(o.length, typeMap.get(o.getClass()));
-        for (Object tmp: o) {
-            output.writeObject(tmp);
-        }
-        if (hasEnd) {
-            output.writeListEnd();
-        }
+        output.writeObject(o);
         output.flush();
     }
 
@@ -269,16 +224,7 @@ public class TestCustomReply {
 
     public void customReplyTypedFixedList_short() throws Exception {
         short[] o = new short[]{1, 2, 3};
-        if (output.addRef(o)) {
-            return;
-        }
-        boolean hasEnd = output.writeListBegin(o.length, typeMap.get(o.getClass()));
-        for (Object tmp: o) {
-            output.writeObject(tmp);
-        }
-        if (hasEnd) {
-            output.writeListEnd();
-        }
+        output.writeObject(o);
         output.flush();
     }
 
@@ -299,16 +245,7 @@ public class TestCustomReply {
 
     public void customReplyTypedFixedList_char() throws Exception {
         char[] o = new char[]{'1', '2', '3'};
-        if (output.addRef(o)) {
-            return;
-        }
-        boolean hasEnd = output.writeListBegin(o.length, typeMap.get(o.getClass()));
-        for (Object tmp: o) {
-            output.writeObject(tmp);
-        }
-        if (hasEnd) {
-            output.writeListEnd();
-        }
+        output.writeObject(o);
         output.flush();
     }
 
@@ -329,16 +266,7 @@ public class TestCustomReply {
 
     public void customReplyTypedFixedList_boolean() throws Exception {
         boolean[] o = new boolean[]{true, false, true};
-        if (output.addRef(o)) {
-            return;
-        }
-        boolean hasEnd = output.writeListBegin(o.length, typeMap.get(o.getClass()));
-        for (Object tmp: o) {
-            output.writeObject(tmp);
-        }
-        if (hasEnd) {
-            output.writeListEnd();
-        }
+        output.writeObject(o);
         output.flush();
     }
 
@@ -359,16 +287,7 @@ public class TestCustomReply {
 
     public void customReplyTypedFixedList_date() throws Exception {
         Date[] o = new Date[]{new Date(1560864000), new Date(1560864000), new Date(1560864000)};
-        if (output.addRef(o)) {
-            return;
-        }
-        boolean hasEnd = output.writeListBegin(o.length, typeMap.get(o.getClass()));
-        for (Object tmp: o) {
-            output.writeObject(tmp);
-        }
-        if (hasEnd) {
-            output.writeListEnd();
-        }
+        output.writeObject(o);
         output.flush();
     }
 

@@ -69,6 +69,7 @@ var (
 func registerTypeName(gotype, javatype string) {
 	listTypeNameMapper[gotype] = "[" + javatype
 }
+
 func getType(javalistname string) reflect.Type {
 	sliceTy := listTypeMapper[javalistname]
 	if sliceTy == nil {
@@ -93,10 +94,11 @@ func getType(javalistname string) reflect.Type {
 // encList write list
 func (e *Encoder) encList(v interface{}) error {
 	if reflect.TypeOf(v).String() != "[]interface {}" {
-		// when err != @noType, @v doesn't be support to decode to typedList
-		if err := e.writeTypedList(v); err != noType {
-			return err
-		}
+		//if err := e.writeTypedList(v); err != noType {
+		//	return err
+		//}
+		// todo support multidimensional arrays? object?
+		return e.writeTypedList(v)
 	}
 	return e.writeUntypedList(v)
 }
