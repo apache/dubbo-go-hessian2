@@ -203,5 +203,11 @@ func TestReq(t *testing.T) {
 	assert.Equal(t, "echo", c[3])
 	assert.Equal(t, "Ljava/lang/String;", c[4])
 	assert.Equal(t, []interface{}{"hello world"}, c[5])
-	assert.Equal(t, map[interface{}]interface{}{"path": "dubbo-x/dubbo.DubboService", "interface": "dubbo.DubboService", "version": "1.0.0"}, c[6])
+
+	attachments := map[interface{}]interface{}{
+		"path": "dubbo-x/dubbo.DubboService",
+		"interface": "dubbo.DubboService",
+		"version": "1.0.0",
+	}
+	assert.Equal(t, attachments, c[6])
 }
