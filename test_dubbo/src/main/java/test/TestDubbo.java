@@ -25,10 +25,12 @@ public class TestDubbo {
         rpcInvocation.setMethodName("echo");
         rpcInvocation.setParameterTypes(new Class[]{String.class});
         rpcInvocation.setArguments(new Object[]{"hello world"});
-        rpcInvocation.setAttachment("path", "dubbo-x/dubbo.DubboService");
         rpcInvocation.setAttachment("interface", "dubbo.DubboService");
+        rpcInvocation.setAttachment("path", "dubbo-x/dubbo.DubboService");
+        rpcInvocation.setAttachment("version", "1.0.0");
 
         Request request = new Request(1);
+        request.setVersion("2.7.1");
         request.setData(rpcInvocation);
 
         return request;
