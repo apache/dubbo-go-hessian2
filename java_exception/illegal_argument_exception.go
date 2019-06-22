@@ -20,6 +20,7 @@ type IllegalArgumentException struct {
 	SuppressedExceptions []IllegalArgumentException
 	Cause                *IllegalArgumentException
 }
+
 func NewIllegalArgumentException(detailMessage string) *IllegalArgumentException {
 	return &IllegalArgumentException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
 }
