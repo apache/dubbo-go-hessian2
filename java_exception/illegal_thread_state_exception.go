@@ -14,22 +14,22 @@
 
 package java_exception
 
-type IllegalArgumentException struct {
+type IllegalThreadStateException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []IllegalArgumentException
-	Cause                *IllegalArgumentException
+	SuppressedExceptions []IllegalThreadStateException
+	Cause                *IllegalThreadStateException
 }
 
-func NewIllegalArgumentException(detailMessage string) *IllegalArgumentException {
-	return &IllegalArgumentException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
+func NewIllegalThreadStateException(detailMessage string) *IllegalThreadStateException {
+	return &IllegalThreadStateException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
 }
 
-func (e IllegalArgumentException) Error() string {
+func (e IllegalThreadStateException) Error() string {
 	return e.DetailMessage
 }
 
-func (IllegalArgumentException) JavaClassName() string {
-	return "java.lang.IllegalArgumentException"
+func (IllegalThreadStateException) JavaClassName() string {
+	return "java.lang.IllegalThreadStateException"
 }
