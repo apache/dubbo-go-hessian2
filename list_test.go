@@ -89,7 +89,7 @@ func TestList(t *testing.T) {
 	testDecodeFramework(t, "customReplyTypedFixedList_short", []int32{1, 2, 3})
 	testDecodeFramework(t, "customReplyTypedVariableList_short", []int32{1, 2, 3})
 
-	testDecodeFramework(t, "customReplyTypedFixedList_char", []string{"1", "2", "3"})
+	testDecodeFramework(t, "customReplyTypedFixedList_char", "123")
 	testDecodeFramework(t, "customReplyTypedVariableList_char", []string{"1", "2", "3"})
 
 	testDecodeFramework(t, "customReplyTypedFixedList_boolean", []bool{true, false, true})
@@ -99,6 +99,11 @@ func TestList(t *testing.T) {
 		time.Unix(1560864, 0), time.Unix(1560864, 0)})
 	testDecodeFramework(t, "customReplyTypedVariableList_date", []time.Time{time.Unix(1560864, 0),
 		time.Unix(1560864, 0), time.Unix(1560864, 0)})
+
+	testDecodeFramework(t, "customReplyTypedFixedList_arrays", [][][]int32{{{1, 2, 3}, {4, 5, 6, 7}}, {{8, 9, 10}, {11, 12, 13, 14}}})
+	testDecodeFramework(t, "customReplyTypedFixedList_A0arrays", [][][]*A0{{{new(A0), new(A0), new(A0)}, {new(A0), new(A0), new(A0), nil}},
+		{{new(A0)}, {new(A0)}}})
+
 }
 
 func TestListEncode(t *testing.T) {

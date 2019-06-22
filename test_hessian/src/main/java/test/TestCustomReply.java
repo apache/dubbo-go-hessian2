@@ -305,4 +305,17 @@ public class TestCustomReply {
         }
         output.flush();
     }
+
+    public void customReplyTypedFixedList_arrays() throws Exception {
+        int[][][] o = new int[][][]{{{1, 2, 3}, {4, 5, 6, 7}}, {{8, 9, 10}, {11, 12, 13, 14}}};
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_A0arrays() throws Exception {
+        A0[][][] o = new A0[][][]{{{new A0(), new A0(), new A0()}, {new A0(), new A0(), new A0(), null}}, {{new A0()}, {new A0()}}};
+        output.writeObject(o);
+        output.flush();
+    }
+
 }

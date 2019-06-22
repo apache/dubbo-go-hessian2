@@ -27,8 +27,11 @@ import (
 
 // Decoder struct
 type Decoder struct {
-	reader        *bufio.Reader
-	refs          []interface{}
+	reader *bufio.Reader
+	refs   []interface{}
+	// record type refs, both list and map need it
+	// todo: map
+	typeRefs      []reflect.Type
 	classInfoList []classInfo
 }
 
@@ -209,4 +212,14 @@ func (d *Decoder) DecodeValue() (interface{}, error) {
 	default:
 		return nil, perrors.Errorf("Invalid type: %v,>>%v<<<", string(tag), d.peek(d.len()))
 	}
+}
+
+// appendTypeRefs add list or map type ref
+func (d *Decoder) appendTypeRefs(p reflect.Type) {
+	for i := 0; i < len(d.typeRefs); i++ {
+		if d.typeRefs[i] == p {
+			return
+		}
+	}
+	d.typeRefs = append(d.typeRefs, p)
 }

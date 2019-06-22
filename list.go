@@ -17,6 +17,7 @@ package hessian
 import (
 	"io"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -51,17 +52,17 @@ var (
 		"time.Time": "[date",
 	}
 	listTypeMapper = map[string]reflect.Type{
-		"[string":           reflect.TypeOf([]string{""}),
-		"[java.lang.String": reflect.TypeOf([]string{""}),
-		"[char":             reflect.TypeOf([]string{""}),
-		"[short":            reflect.TypeOf([]int32{0}),
-		"[int":              reflect.TypeOf([]int32{0}),
-		"[long":             reflect.TypeOf([]int64{0}),
-		"[float":            reflect.TypeOf([]float64{0}),
-		"[double":           reflect.TypeOf([]float64{0}),
-		"[boolean":          reflect.TypeOf([]bool{true}),
-		"[java.util.Date":   reflect.TypeOf([]time.Time{{}}),
-		"[date":             reflect.TypeOf([]time.Time{{}}),
+		"string":           reflect.TypeOf(""),
+		"java.lang.String": reflect.TypeOf(""),
+		"char":             reflect.TypeOf(""),
+		"short":            reflect.TypeOf(int32(0)),
+		"int":              reflect.TypeOf(int32(0)),
+		"long":             reflect.TypeOf(int64(0)),
+		"float":            reflect.TypeOf(float64(0)),
+		"double":           reflect.TypeOf(float64(0)),
+		"boolean":          reflect.TypeOf(true),
+		"java.util.Date":   reflect.TypeOf(time.Time{}),
+		"date":             reflect.TypeOf(time.Time{}),
 	}
 	noType = perrors.New("no type name.")
 )
@@ -71,9 +72,21 @@ func registerTypeName(gotype, javatype string) {
 }
 
 func getType(javalistname string) reflect.Type {
-	sliceTy := listTypeMapper[javalistname]
+	javaname := javalistname
+	if strings.Index(javaname, "[") == 0 {
+		javaname = javaname[1:]
+	}
+	if strings.Index(javaname, "[") == 0 {
+		return reflect.SliceOf(getType(javaname))
+	}
+
+	var sliceTy reflect.Type
+	ltm := listTypeMapper[javaname]
+	if ltm != nil {
+		sliceTy = reflect.SliceOf(ltm)
+	}
+
 	if sliceTy == nil {
-		javaname := strings.Trim(javalistname, "[")
 		tpStructInfo, _ := getStructInfo(javaname)
 		tp := tpStructInfo.typ
 		if tp == nil {
@@ -283,15 +296,24 @@ func (d *Decoder) readTypedList(tag byte) (interface{}, error) {
 		return nil, nil
 	}
 
-	var aryValue reflect.Value
-	arrType := getType(listTyp)
+	var (
+		aryValue reflect.Value
+		arrType  reflect.Type
+	)
+	t, err := strconv.Atoi(listTyp)
+	if err == nil {
+		arrType = d.typeRefs[t]
+	} else {
+		arrType = getType(listTyp)
+	}
+
 	if arrType != nil {
 		aryValue = reflect.MakeSlice(arrType, length, length)
+		d.appendTypeRefs(arrType)
 	} else {
 		aryValue = reflect.ValueOf(make([]interface{}, length, length))
 	}
 	holder := d.appendRefs(aryValue)
-
 	for j := 0; j < length || isVariableArr; j++ {
 		it, err := d.DecodeValue()
 		if err != nil {
@@ -360,7 +382,7 @@ func (d *Decoder) readUntypedList(tag byte) (interface{}, error) {
 			if it != nil {
 				aryValue = reflect.Append(aryValue, EnsureRawValue(it))
 			} else {
-				aryValue = reflect.Append(aryValue, NilValue)
+				aryValue = reflect.Append(aryValue, reflect.Zero(aryValue.Type().Elem()))
 			}
 			holder.change(aryValue)
 		} else {
