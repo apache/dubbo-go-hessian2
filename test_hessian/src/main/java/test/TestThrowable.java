@@ -16,7 +16,7 @@ package test;
 
 import java.io.*;
 import java.lang.invoke.WrongMethodTypeException;
-import java.lang.*;
+import java.lang.reflect.*;
 
 public class TestThrowable {
     public static Object throw_exception() {
