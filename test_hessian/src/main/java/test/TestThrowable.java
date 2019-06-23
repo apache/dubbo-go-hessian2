@@ -16,7 +16,7 @@ package test;
 
 import java.io.*;
 import java.lang.invoke.WrongMethodTypeException;
-import java.lang.reflect.*;
+import java.lang.*;
 
 public class TestThrowable {
     public static Object throw_exception() {
@@ -135,6 +135,34 @@ public class TestThrowable {
 
     public static Object throw_UTFDataFormatException() {
         return new UTFDataFormatException("UTFDataFormatException");
+    }
+
+    public static Object throw_SecurityException() {
+        return new SecurityException("SecurityException");
+    }
+
+    public static Object throw_IllegalArgumentException() {
+        return new IllegalArgumentException("IllegalArgumentException");
+    }
+
+    public static Object throw_IllegalThreadStateException() {
+        return new IllegalThreadStateException("IllegalThreadStateException");
+    }
+
+    public static Object throw_NumberFormatException() {
+        return new NumberFormatException("NumberFormatException");
+    }
+
+    public static Object throw_IndexOutOfBoundsException() {
+        return new IndexOutOfBoundsException("IndexOutOfBoundsException");
+    }
+
+    public static Object throw_ArrayIndexOutOfBoundsException() {
+        return new ArrayIndexOutOfBoundsException("ArrayIndexOutOfBoundsException");
+    }
+
+    public static Object throw_StringIndexOutOfBoundsException() {
+        return new StringIndexOutOfBoundsException("StringIndexOutOfBoundsException");
     }
 
     enum TestEnum {
