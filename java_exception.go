@@ -57,4 +57,10 @@ func init() {
 	RegisterPOJO(&java_exception.NotSerializableException{})
 	RegisterPOJO(&java_exception.UTFDataFormatException{})
 	RegisterPOJO(&java_exception.IllegalArgumentException{})
+	RegisterPOJO(&java_exception.IllegalThreadStateException{})
+	RegisterPOJO(&java_exception.SecurityException{})
+	RegisterPOJO(&java_exception.NumberFormatException{})
+	RegisterPOJO(&java_exception.IndexOutOfBoundsException{})
+	RegisterPOJO(&java_exception.ArrayIndexOutOfBoundsException{})
+	RegisterPOJO(&java_exception.StringIndexOutOfBoundsException{})
 }
