@@ -218,15 +218,3 @@ public class TestThrowable {
     return new NoSuchElementException("NoSuchElementException");
   }
 }
-/*
-IllegalFormatWidthException
-IllegalFormatConversionException
-DuplicateFormatFlagsException
-MissingResourceException
-ConcurrentModificationException
-RejectedExecutionException
-CompletionException
-EmptyStackException
-IllformedLocaleException
-NoSuchElementException
-*/
