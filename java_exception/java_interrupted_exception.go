@@ -21,9 +21,9 @@ package java_exception
 type InterruptedException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []Exception
+	SuppressedExceptions []InterruptedException
 	StackTrace           []StackTraceElement
-	Cause                *Exception
+	Cause                *InterruptedException
 }
 
 func NewInterruptedException(detailMessage string) *InterruptedException {

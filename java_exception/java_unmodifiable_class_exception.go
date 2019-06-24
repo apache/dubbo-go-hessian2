@@ -21,9 +21,9 @@ package java_exception
 type UnmodifiableClassException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []Exception
+	SuppressedExceptions []UnmodifiableClassException
 	StackTrace           []StackTraceElement
-	Cause                *Exception
+	Cause                *UnmodifiableClassException
 }
 
 func NewUnmodifiableClassException(detailMessage string) *UnmodifiableClassException {

@@ -16,6 +16,8 @@ package test;
 
 import java.io.*;
 import java.lang.invoke.WrongMethodTypeException;
+import java.lang.invoke.LambdaConversionException;
+import java.lang.instrument.UnmodifiableClassException;
 import java.lang.reflect.*;
 
 public class TestThrowable {
