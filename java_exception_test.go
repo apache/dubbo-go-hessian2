@@ -54,6 +54,13 @@ func TestException(t *testing.T) {
 	doTestException(t, "throw_NotActiveException", "notActiveException")
 	doTestException(t, "throw_NotSerializableException", "notSerializableException")
 	doTestException(t, "throw_UTFDataFormatException", "UTFDataFormatException")
+	doTestException(t, "throw_SecurityException", "SecurityException")
+	doTestException(t, "throw_IllegalArgumentException", "IllegalArgumentException")
+	doTestException(t, "throw_IllegalThreadStateException", "IllegalThreadStateException")
+	doTestException(t, "throw_NumberFormatException", "NumberFormatException")
+	doTestException(t, "throw_IndexOutOfBoundsException", "IndexOutOfBoundsException")
+	doTestException(t, "throw_ArrayIndexOutOfBoundsException", "ArrayIndexOutOfBoundsException")
+	doTestException(t, "throw_StringIndexOutOfBoundsException", "StringIndexOutOfBoundsException")
 }
 
 func doTestException(t *testing.T, method, content string) {

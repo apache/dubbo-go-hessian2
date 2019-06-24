@@ -158,6 +158,33 @@ public class TestThrowable {
      public static Object throw_UnmodifiableClassException() {
          return new UnmodifiableClassException("UnmodifiableClassException");
      }
+    public static Object throw_SecurityException() {
+        return new SecurityException("SecurityException");
+    }
+
+    public static Object throw_IllegalArgumentException() {
+        return new IllegalArgumentException("IllegalArgumentException");
+    }
+
+    public static Object throw_IllegalThreadStateException() {
+        return new IllegalThreadStateException("IllegalThreadStateException");
+    }
+
+    public static Object throw_NumberFormatException() {
+        return new NumberFormatException("NumberFormatException");
+    }
+
+    public static Object throw_IndexOutOfBoundsException() {
+        return new IndexOutOfBoundsException("IndexOutOfBoundsException");
+    }
+
+    public static Object throw_ArrayIndexOutOfBoundsException() {
+        return new ArrayIndexOutOfBoundsException("ArrayIndexOutOfBoundsException");
+    }
+
+    public static Object throw_StringIndexOutOfBoundsException() {
+        return new StringIndexOutOfBoundsException("StringIndexOutOfBoundsException");
+    }
 
     enum TestEnum {
         PASS
