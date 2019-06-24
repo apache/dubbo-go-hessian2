@@ -19,6 +19,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -27,31 +28,8 @@ import (
 )
 
 var (
-	listTypeNameMapper = map[string]string{
-		"string": "[string",
-
-		"int8": "[short",
-
-		"int16":  "[short",
-		"uint16": "[short",
-
-		"int32":  "[int",
-		"uint32": "[int",
-
-		"int":  "[long",
-		"uint": "[long",
-
-		"int64":  "[long",
-		"uint64": "[long",
-
-		"float32": "[float",
-		"float64": "[double",
-
-		"bool": "[boolean",
-
-		"time.Time": "[date",
-	}
-	listTypeMapper = map[string]reflect.Type{
+	listTypeNameMapper = &sync.Map{}
+	listTypeMapper     = map[string]reflect.Type{
 		"string":           reflect.TypeOf(""),
 		"java.lang.String": reflect.TypeOf(""),
 		"char":             reflect.TypeOf(""),
@@ -67,8 +45,33 @@ var (
 	noType = perrors.New("no type name.")
 )
 
+func init() {
+	listTypeNameMapper.Store("string", "[string")
+	listTypeNameMapper.Store("int8", "[short")
+	listTypeNameMapper.Store("int16", "[short")
+	listTypeNameMapper.Store("uint16", "[short")
+	listTypeNameMapper.Store("int32", "[int")
+	listTypeNameMapper.Store("uint32", "[int")
+	listTypeNameMapper.Store("int", "[long")
+	listTypeNameMapper.Store("uint", "[long")
+	listTypeNameMapper.Store("int64", "[long")
+	listTypeNameMapper.Store("uint64", "[long")
+	listTypeNameMapper.Store("float32", "[float")
+	listTypeNameMapper.Store("float64", "[double")
+	listTypeNameMapper.Store("bool", "[boolean")
+	listTypeNameMapper.Store("time.Time", "[date")
+}
+
 func registerTypeName(gotype, javatype string) {
-	listTypeNameMapper[gotype] = "[" + javatype
+	listTypeNameMapper.Store(gotype, "["+javatype)
+}
+
+func getTypeName(gotype string) string {
+	v, ok := listTypeNameMapper.Load(gotype)
+	if ok {
+		return v.(string)
+	}
+	return ""
 }
 
 func getType(javalistname string) reflect.Type {
@@ -135,7 +138,7 @@ func (e *Encoder) writeTypedList(v interface{}) error {
 	}
 
 	value = UnpackPtrValue(value)
-	var typeName = listTypeNameMapper[UnpackPtrType(value.Type().Elem()).String()]
+	var typeName = getTypeName(UnpackPtrType(value.Type().Elem()).String())
 	if typeName == "" {
 		return noType
 	}
