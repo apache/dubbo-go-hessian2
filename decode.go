@@ -175,7 +175,7 @@ func (d *Decoder) DecodeValue() (interface{}, error) {
 		(tag >= 0x38 && tag <= 0x3f) || (tag == BC_LONG_INT) || (tag == BC_LONG): //'L': //long
 		return d.decInt64(int32(tag))
 
-	case (tag == BC_DATE_MINUTE) || (tag == BC_DATE): //'d': //date
+	case (tag == BC_DATE_MINUTE) || (tag == BC_DATE): //'d': //datex
 		return d.decDate(int32(tag))
 
 	case (tag == BC_DOUBLE_ZERO) || (tag == BC_DOUBLE_ONE) || (tag == BC_DOUBLE_BYTE) ||
