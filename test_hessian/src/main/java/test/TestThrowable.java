@@ -17,6 +17,8 @@ package test;
 import java.io.*;
 import java.lang.invoke.WrongMethodTypeException;
 import java.lang.reflect.*;
+import java.util.DuplicateFormatFlagsException;
+import java.util.IllegalFormatConversionException;
 import java.util.IllegalFormatWidthException;
 
 public class TestThrowable {
@@ -169,11 +171,22 @@ public class TestThrowable {
     enum TestEnum {
         PASS
     }
+    public static Object throw_IllegalFormatWidthException() {
+        return new IllegalFormatWidthException(1000);
+    }
+
+    public static Object throw_IllegalFormatConversionException() {
+        return new IllegalFormatConversionException('7',TestEnum.class);
+    }
+    public static Object throw_DuplicateFormatFlagsException() {
+        return new DuplicateFormatFlagsException("DuplicateFormatFlagsException");
+    }
 }
 /*
-
-
+IllegalFormatWidthException
+IllegalFormatConversionException
 DuplicateFormatFlagsException
+
 MissingResourceException
 ConcurrentModificationException
 RejectedExecutionException

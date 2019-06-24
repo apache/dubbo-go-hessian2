@@ -63,4 +63,7 @@ func init() {
 	RegisterPOJO(&java_exception.IndexOutOfBoundsException{})
 	RegisterPOJO(&java_exception.ArrayIndexOutOfBoundsException{})
 	RegisterPOJO(&java_exception.StringIndexOutOfBoundsException{})
+	RegisterPOJO(&java_exception.IllegalFormatWidthException{})
+	RegisterPOJO(&java_exception.IllegalFormatConversionException{})
+	RegisterPOJO(&java_exception.DuplicateFormatFlagsException{})
 }

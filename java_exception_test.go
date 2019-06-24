@@ -56,6 +56,12 @@ func TestException(t *testing.T) {
 	doTestException(t, "throw_IndexOutOfBoundsException", "IndexOutOfBoundsException")
 	doTestException(t, "throw_ArrayIndexOutOfBoundsException", "ArrayIndexOutOfBoundsException")
 	doTestException(t, "throw_StringIndexOutOfBoundsException", "StringIndexOutOfBoundsException")
+
+}
+func TestExceptionmytest(t *testing.T) {
+	doTestException(t, "throw_IllegalFormatWidthException", "1000")
+	doTestException(t, "throw_IllegalFormatConversionException", "7 != test.TestThrowable$TestEnum")
+	doTestException(t, "throw_DuplicateFormatFlagsException", "null;DuplicateFormatFlagsException")
 }
 
 func doTestException(t *testing.T, method, content string) {
