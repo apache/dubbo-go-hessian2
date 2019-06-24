@@ -137,6 +137,26 @@ public class TestThrowable {
         return new UTFDataFormatException("UTFDataFormatException");
     }
 
+    public static Object throw_CloneNotSupportedException() {
+        return new CloneNotSupportedException("CloneNotSupportedException");
+    }
+
+    public static Object throw_InterruptedException() {
+        return new InterruptedException("InterruptedException");
+    }
+
+     public static Object throw_InterruptedIOException() {
+         return new InterruptedIOException("InterruptedIOException");
+     }
+
+     public static Object throw_LambdaConversionException() {
+         return new LambdaConversionException("LambdaConversionException");
+     }
+
+     public static Object throw_UnmodifiableClassException() {
+         return new UnmodifiableClassException("UnmodifiableClassException");
+     }
+
     enum TestEnum {
         PASS
     }
