@@ -66,4 +66,11 @@ func init() {
 	RegisterPOJO(&java_exception.IllegalFormatWidthException{})
 	RegisterPOJO(&java_exception.IllegalFormatConversionException{})
 	RegisterPOJO(&java_exception.DuplicateFormatFlagsException{})
+	RegisterPOJO(&java_exception.MissingResourceException{})
+	RegisterPOJO(&java_exception.ConcurrentModificationException{})
+	RegisterPOJO(&java_exception.RejectedExecutionException{})
+	RegisterPOJO(&java_exception.CompletionException{})
+	RegisterPOJO(&java_exception.EmptyStackException{})
+	RegisterPOJO(&java_exception.IllformedLocaleException{})
+	RegisterPOJO(&java_exception.NoSuchElementException{})
 }
