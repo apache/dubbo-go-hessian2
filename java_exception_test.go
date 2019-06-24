@@ -15,13 +15,19 @@
 package hessian
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestException(t *testing.T) {
 	doTestException(t, "throw_throwable", "exception")
 	doTestException(t, "throw_exception", "exception")
+	doTestException(t, "throw_MalformedParameterizedTypeException", "MalformedParameterizedType")
+	doTestException(t, "throw_MalformedParametersException", "MalformedParametersException")
+	doTestException(t, "throw_TypeNotPresentException", "Type exceptiontype1 not present")
+	doTestException(t, "throw_WrongMethodTypeException", "WrongMethodTypeException")
+	doTestException(t, "throw_UndeclaredThrowableException", "UndeclaredThrowableException")
 	doTestException(t, "throw_runtimeException", "runtimeException")
 	doTestException(t, "throw_arrayStoreException", "arrayStoreException")
 	doTestException(t, "throw_classCastException", "classCastException")
@@ -34,6 +40,20 @@ func TestException(t *testing.T) {
 	doTestException(t, "throw_interruptedIOException", "InterruptedIOException")
 	doTestException(t, "throw_lambdaConversionException", "LambdaConversionException")
 	doTestException(t, "throw_unmodifiableClassException", "UnmodifiableClassException")
+	doTestException(t, "throw_NullPointerException", "nullPointerException")
+	doTestException(t, "throw_UncheckedIOException", "uncheckedIOException")
+	doTestException(t, "throw_FileNotFoundException", "fileNotFoundException")
+	doTestException(t, "throw_EOFException", "EOFException")
+	doTestException(t, "throw_SyncFailedException", "syncFailedException")
+	doTestException(t, "throw_ObjectStreamException", "objectStreamException")
+	doTestException(t, "throw_WriteAbortedException", "writeAbortedException")
+	doTestException(t, "throw_InvalidObjectException", "invalidObjectException")
+	doTestException(t, "throw_StreamCorruptedException", "streamCorruptedException")
+	doTestException(t, "throw_InvalidClassException", "null; invalidClassException")
+	doTestException(t, "throw_OptionalDataException", "null")
+	doTestException(t, "throw_NotActiveException", "notActiveException")
+	doTestException(t, "throw_NotSerializableException", "notSerializableException")
+	doTestException(t, "throw_UTFDataFormatException", "UTFDataFormatException")
 }
 
 func doTestException(t *testing.T, method, content string) {
