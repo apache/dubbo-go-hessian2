@@ -56,6 +56,16 @@ func TestException(t *testing.T) {
 	doTestException(t, "throw_IndexOutOfBoundsException", "IndexOutOfBoundsException")
 	doTestException(t, "throw_ArrayIndexOutOfBoundsException", "ArrayIndexOutOfBoundsException")
 	doTestException(t, "throw_StringIndexOutOfBoundsException", "StringIndexOutOfBoundsException")
+	doTestException(t, "throw_IllegalFormatWidthException", "1000")
+	doTestException(t, "throw_IllegalFormatConversionException", "7 != test.TestThrowable$TestEnum")
+	doTestException(t, "throw_DuplicateFormatFlagsException", "flags=DuplicateFormatFlagsException")
+	doTestException(t, "throw_MissingResourceException", "MissingResourceException")
+	doTestException(t, "throw_ConcurrentModificationException", "ConcurrentModificationException")
+	doTestException(t, "throw_RejectedExecutionException", "RejectedExecutionException")
+	doTestException(t, "throw_CompletionException", "java.lang.Throwable: exception")
+	doTestException(t, "throw_EmptyStackException", "EmptyStackException")
+	doTestException(t, "throw_IllformedLocaleException", "IllformedLocaleException")
+	doTestException(t, "throw_NoSuchElementException", "NoSuchElementException")
 }
 
 func doTestException(t *testing.T, method, content string) {
