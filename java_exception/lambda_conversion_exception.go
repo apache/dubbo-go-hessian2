@@ -35,5 +35,5 @@ func (e LambdaConversionException) Error() string {
 }
 
 func (LambdaConversionException) JavaClassName() string {
-	return "java.lang.LambdaConversionException"
+	return "java.lang.invoke.LambdaConversionException"
 }

@@ -15,25 +15,26 @@
 package java_exception
 
 ////////////////////////////
-// UnmodifiableClassException
+// InterruptedIOException
 ////////////////////////////
 
-type UnmodifiableClassException struct {
+type InterruptedIOException struct {
 	SerialVersionUID     int64
+	BytesTransferred     int32
 	DetailMessage        string
-	SuppressedExceptions []UnmodifiableClassException
+	SuppressedExceptions []InterruptedIOException
 	StackTrace           []StackTraceElement
-	Cause                *UnmodifiableClassException
+	Cause                *InterruptedIOException
 }
 
-func NewUnmodifiableClassException(detailMessage string) *UnmodifiableClassException {
-	return &UnmodifiableClassException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
+func NewInterruptedIOException(detailMessage string) *InterruptedIOException {
+	return &InterruptedIOException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
 }
 
-func (e UnmodifiableClassException) Error() string {
+func (e InterruptedIOException) Error() string {
 	return e.DetailMessage
 }
 
-func (UnmodifiableClassException) JavaClassName() string {
-	return "java.lang.UnmodifiableClassException"
+func (InterruptedIOException) JavaClassName() string {
+	return "java.io.InterruptedIOException"
 }
