@@ -52,6 +52,10 @@ public class TestThrowable {
       return new MalformedParameterizedTypeException();
     }
 
+    public static Object throw_uncheckedIOException() {
+        return new java.io.UncheckedIOException(
+            "uncheckedIOException", new java.io.IOException("io exception"));
+  }
     public static Object throw_runtimeException() {
       return new RuntimeException("runtimeException");
     }
