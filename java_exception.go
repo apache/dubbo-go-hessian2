@@ -73,4 +73,7 @@ func init() {
 	RegisterPOJO(&java_exception.EmptyStackException{})
 	RegisterPOJO(&java_exception.IllformedLocaleException{})
 	RegisterPOJO(&java_exception.NoSuchElementException{})
+	RegisterPOJO(&java_exception.NegativeArraySizeException{})
+	RegisterPOJO(&java_exception.UnsupportedOperationException{})
+	RegisterPOJO(&java_exception.ArithmeticException{})
 }
