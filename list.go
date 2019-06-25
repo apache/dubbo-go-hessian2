@@ -42,7 +42,6 @@ var (
 		"java.util.Date":   reflect.TypeOf(time.Time{}),
 		"date":             reflect.TypeOf(time.Time{}),
 	}
-	noType = perrors.New("no type name.")
 )
 
 func init() {
@@ -66,7 +65,7 @@ func registerTypeName(gotype, javatype string) {
 	listTypeNameMapper.Store(gotype, "["+javatype)
 }
 
-func getTypeName(gotype string) string {
+func getListTypeName(gotype string) string {
 	v, ok := listTypeNameMapper.Load(gotype)
 	if ok {
 		return v.(string)
@@ -74,13 +73,13 @@ func getTypeName(gotype string) string {
 	return ""
 }
 
-func getType(javalistname string) reflect.Type {
+func getListType(javalistname string) reflect.Type {
 	javaname := javalistname
 	if strings.Index(javaname, "[") == 0 {
 		javaname = javaname[1:]
 	}
 	if strings.Index(javaname, "[") == 0 {
-		return reflect.SliceOf(getType(javaname))
+		return reflect.SliceOf(getListType(javaname))
 	}
 
 	var sliceTy reflect.Type
@@ -110,10 +109,6 @@ func getType(javalistname string) reflect.Type {
 // encList write list
 func (e *Encoder) encList(v interface{}) error {
 	if reflect.TypeOf(v).String() != "[]interface {}" {
-		//if err := e.writeTypedList(v); err != noType {
-		//	return err
-		//}
-		// todo support multidimensional arrays? object?
 		return e.writeTypedList(v)
 	}
 	return e.writeUntypedList(v)
@@ -138,9 +133,10 @@ func (e *Encoder) writeTypedList(v interface{}) error {
 	}
 
 	value = UnpackPtrValue(value)
-	var typeName = getTypeName(UnpackPtrType(value.Type().Elem()).String())
+	totype := UnpackPtrType(value.Type().Elem()).String()
+	var typeName = getListTypeName(totype)
 	if typeName == "" {
-		return noType
+		return perrors.New("no this type name: " + typeName)
 	}
 
 	e.buffer = encByte(e.buffer, BC_LIST_FIXED) // 'V'
@@ -307,7 +303,7 @@ func (d *Decoder) readTypedList(tag byte) (interface{}, error) {
 	if err == nil {
 		arrType = d.typeRefs[t]
 	} else {
-		arrType = getType(listTyp)
+		arrType = getListType(listTyp)
 	}
 
 	if arrType != nil {
