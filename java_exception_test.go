@@ -49,6 +49,7 @@ func TestException(t *testing.T) {
 	doTestException(t, "throw_NotActiveException", "notActiveException")
 	doTestException(t, "throw_NotSerializableException", "notSerializableException")
 	doTestException(t, "throw_UTFDataFormatException", "UTFDataFormatException")
+<<<<<<< HEAD
 	doTestException(t, "throw_SecurityException", "SecurityException")
 	doTestException(t, "throw_IllegalArgumentException", "IllegalArgumentException")
 	doTestException(t, "throw_IllegalThreadStateException", "IllegalThreadStateException")
