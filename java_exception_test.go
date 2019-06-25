@@ -49,6 +49,9 @@ func TestException(t *testing.T) {
 	doTestException(t, "throw_NotActiveException", "notActiveException")
 	doTestException(t, "throw_NotSerializableException", "notSerializableException")
 	doTestException(t, "throw_UTFDataFormatException", "UTFDataFormatException")
+	doTestException(t, "throw_NegativeArraySizeException", "NegativeArraySizeException")
+	doTestException(t, "throw_UnsupportedOperationException", "UnsupportedOperationException")
+	doTestException(t, "throw_ArithmeticException", "ArithmeticException")
 }
 
 func doTestException(t *testing.T, method, content string) {

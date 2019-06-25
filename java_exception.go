@@ -56,4 +56,7 @@ func init() {
 	RegisterPOJO(&java_exception.NotActiveException{})
 	RegisterPOJO(&java_exception.NotSerializableException{})
 	RegisterPOJO(&java_exception.UTFDataFormatException{})
+	RegisterPOJO(&java_exception.NegativeArraySizeException{})
+	RegisterPOJO(&java_exception.UnsupportedOperationException{})
+	RegisterPOJO(&java_exception.ArithmeticException{})
 }

@@ -15,6 +15,8 @@
 package test;
 
 import java.io.*;
+import java.lang.*;
+import java.lang.annotation.*;
 import java.lang.invoke.WrongMethodTypeException;
 import java.lang.reflect.*;
 
@@ -137,6 +139,17 @@ public class TestThrowable {
         return new UTFDataFormatException("UTFDataFormatException");
     }
 
+    public static Object throw_NegativeArraySizeException() {
+        return new NegativeArraySizeException("NegativeArraySizeException");
+    }
+
+    public static Object throw_UnsupportedOperationException() {
+        return new UnsupportedOperationException("UnsupportedOperationException");
+    }
+
+    public static Object throw_ArithmeticException() {
+        return new ArithmeticException("ArithmeticException");
+    }
     enum TestEnum {
         PASS
     }
