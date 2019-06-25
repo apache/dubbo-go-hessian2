@@ -219,6 +219,7 @@ public class TestThrowable {
   public static Object throw_NoSuchElementException() {
     return new NoSuchElementException("NoSuchElementException");
   }
+
   public static Object throw_NegativeArraySizeException() {
     return new NegativeArraySizeException("NegativeArraySizeException");
   }
