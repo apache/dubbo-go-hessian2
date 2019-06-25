@@ -145,18 +145,167 @@ public class TestThrowable {
     return new UTFDataFormatException("UTFDataFormatException");
   }
 
-    public static Object throw_NegativeArraySizeException() {
-        return new NegativeArraySizeException("NegativeArraySizeException");
-    }
+  public static Object throw_SecurityException() {
+    return new SecurityException("SecurityException");
+  }
 
-    public static Object throw_UnsupportedOperationException() {
-        return new UnsupportedOperationException("UnsupportedOperationException");
-    }
+  public static Object throw_IllegalArgumentException() {
+    return new IllegalArgumentException("IllegalArgumentException");
+  }
 
-    public static Object throw_ArithmeticException() {
-        return new ArithmeticException("ArithmeticException");
-    }
-    enum TestEnum {
-        PASS
-    }
+  public static Object throw_IllegalThreadStateException() {
+    return new IllegalThreadStateException("IllegalThreadStateException");
+  }
+
+  public static Object throw_NumberFormatException() {
+    return new NumberFormatException("NumberFormatException");
+  }
+
+  public static Object throw_IndexOutOfBoundsException() {
+    return new IndexOutOfBoundsException("IndexOutOfBoundsException");
+  }
+
+  public static Object throw_ArrayIndexOutOfBoundsException() {
+    return new ArrayIndexOutOfBoundsException("ArrayIndexOutOfBoundsException");
+  }
+
+  public static Object throw_StringIndexOutOfBoundsException() {
+    return new StringIndexOutOfBoundsException("StringIndexOutOfBoundsException");
+  }
+
+  enum TestEnum {
+    PASS
+  }
+
+  public static Object throw_IllegalFormatWidthException() {
+    return new IllegalFormatWidthException(1000);
+  }
+
+  public static Object throw_IllegalFormatConversionException() {
+    return new IllegalFormatConversionException('7', TestEnum.class);
+  }
+
+  public static Object throw_DuplicateFormatFlagsException() {
+    return new DuplicateFormatFlagsException("DuplicateFormatFlagsException");
+  }
+
+  public static Object throw_MissingResourceException() {
+    return new MissingResourceException(
+        "MissingResourceException", "MissingResourceExceptionClass", "MissingResourceExceptionKey");
+  }
+
+  public static Object throw_ConcurrentModificationException() {
+    return new ConcurrentModificationException("ConcurrentModificationException");
+  }
+
+  public static Object throw_RejectedExecutionException() {
+    return new RejectedExecutionException("RejectedExecutionException");
+  }
+
+  public static Object throw_CompletionException() {
+    return new CompletionException(new Throwable("exception"));
+  }
+
+  public static Object throw_EmptyStackException() {
+    EmptyStackException e = new EmptyStackException();
+    return e;
+  }
+
+  public static Object throw_IllformedLocaleException() {
+    IllformedLocaleException e = new IllformedLocaleException("IllformedLocaleException");
+    return e;
+  }
+
+  public static Object throw_NoSuchElementException() {
+    return new NoSuchElementException("NoSuchElementException");
+  }
+  public static Object throw_SecurityException() {
+    return new SecurityException("SecurityException");
+  }
+
+  public static Object throw_IllegalArgumentException() {
+    return new IllegalArgumentException("IllegalArgumentException");
+  }
+
+  public static Object throw_IllegalThreadStateException() {
+    return new IllegalThreadStateException("IllegalThreadStateException");
+  }
+
+  public static Object throw_NumberFormatException() {
+    return new NumberFormatException("NumberFormatException");
+  }
+
+  public static Object throw_IndexOutOfBoundsException() {
+    return new IndexOutOfBoundsException("IndexOutOfBoundsException");
+  }
+
+  public static Object throw_ArrayIndexOutOfBoundsException() {
+    return new ArrayIndexOutOfBoundsException("ArrayIndexOutOfBoundsException");
+  }
+
+  public static Object throw_StringIndexOutOfBoundsException() {
+    return new StringIndexOutOfBoundsException("StringIndexOutOfBoundsException");
+  }
+
+  enum TestEnum {
+    PASS
+  }
+
+  public static Object throw_IllegalFormatWidthException() {
+    return new IllegalFormatWidthException(1000);
+  }
+
+  public static Object throw_IllegalFormatConversionException() {
+    return new IllegalFormatConversionException('7', TestEnum.class);
+  }
+
+  public static Object throw_DuplicateFormatFlagsException() {
+    return new DuplicateFormatFlagsException("DuplicateFormatFlagsException");
+  }
+
+  public static Object throw_MissingResourceException() {
+    return new MissingResourceException(
+        "MissingResourceException", "MissingResourceExceptionClass", "MissingResourceExceptionKey");
+  }
+
+  public static Object throw_ConcurrentModificationException() {
+    return new ConcurrentModificationException("ConcurrentModificationException");
+  }
+
+  public static Object throw_RejectedExecutionException() {
+    return new RejectedExecutionException("RejectedExecutionException");
+  }
+
+  public static Object throw_CompletionException() {
+    return new CompletionException(new Throwable("exception"));
+  }
+
+  public static Object throw_EmptyStackException() {
+    EmptyStackException e = new EmptyStackException();
+    return e;
+  }
+
+  public static Object throw_IllformedLocaleException() {
+    IllformedLocaleException e = new IllformedLocaleException("IllformedLocaleException");
+    return e;
+  }
+
+  public static Object throw_NoSuchElementException() {
+    return new NoSuchElementException("NoSuchElementException");
+  }
+
+  public static Object throw_NegativeArraySizeException() {
+    return new NegativeArraySizeException("NegativeArraySizeException");
+  }
+
+  public static Object throw_UnsupportedOperationException() {
+    return new UnsupportedOperationException("UnsupportedOperationException");
+  }
+
+  public static Object throw_ArithmeticException() {
+    return new ArithmeticException("ArithmeticException");
+  }
+  enum TestEnum {
+    PASS
+  }
 }
