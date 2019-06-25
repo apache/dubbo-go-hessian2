@@ -219,18 +219,19 @@ public class TestThrowable {
   public static Object throw_NoSuchElementException() {
     return new NoSuchElementException("NoSuchElementException");
   }
-    public static Object throw_NegativeArraySizeException() {
-        return new NegativeArraySizeException("NegativeArraySizeException");
-    }
 
-    public static Object throw_UnsupportedOperationException() {
-        return new UnsupportedOperationException("UnsupportedOperationException");
-    }
+  public static Object throw_NegativeArraySizeException() {
+    return new NegativeArraySizeException("NegativeArraySizeException");
+  }
 
-    public static Object throw_ArithmeticException() {
-        return new ArithmeticException("ArithmeticException");
-    }
-    enum TestEnum {
-        PASS
-    }
+  public static Object throw_UnsupportedOperationException() {
+    return new UnsupportedOperationException("UnsupportedOperationException");
+  }
+
+  public static Object throw_ArithmeticException() {
+    return new ArithmeticException("ArithmeticException");
+  }
+  enum TestEnum {
+    PASS
+  }
 }
