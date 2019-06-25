@@ -24,7 +24,12 @@ type DuplicateFormatFlagsException struct {
 }
 
 func (e DuplicateFormatFlagsException) Error() string {
-	return e.DetailMessage + ";" + e.Flags
+	if e.DetailMessage == "" || e.DetailMessage == "null" {
+		return "flags=" + e.Flags
+	} else {
+		return e.DetailMessage + " flags=" + e.Flags
+	}
+
 }
 
 func (DuplicateFormatFlagsException) JavaClassName() string {
