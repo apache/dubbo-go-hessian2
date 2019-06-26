@@ -189,9 +189,7 @@ const (
 	HEADER_LENGTH = 16
 
 	// magic header
-	MAGIC      = 0xdabb
-	MAGIC_HIGH = byte(0xda)
-	MAGIC_LOW  = byte(0xbb)
+	MAGIC = 0xdabb
 
 	// message flag.
 	FLAG_REQUEST = byte(0x80)
@@ -219,7 +217,6 @@ var (
 	ErrHeaderNotEnough = perrors.New("header buffer too short")
 	ErrBodyNotEnough   = perrors.New("body buffer too short")
 	ErrJavaException   = perrors.New("got java exception")
-	ErrIllegalPackage  = perrors.New("illegal package!")
 )
 
 // DescRegex ...

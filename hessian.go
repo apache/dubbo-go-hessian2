@@ -155,7 +155,6 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 	h.bodyLen = int(header.BodyLen)
 
 	return perrors.WithStack(err)
-
 }
 
 // ReadBody uses hessian codec to read response body
