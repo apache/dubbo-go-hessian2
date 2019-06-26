@@ -231,7 +231,4 @@ public class TestThrowable {
   public static Object throw_ArithmeticException() {
     return new ArithmeticException("ArithmeticException");
   }
-  enum TestEnum {
-    PASS
-  }
 }
