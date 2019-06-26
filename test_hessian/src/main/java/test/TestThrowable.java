@@ -18,6 +18,8 @@ import java.io.*;
 import java.lang.*;
 import java.lang.annotation.*;
 import java.lang.invoke.WrongMethodTypeException;
+import java.lang.invoke.LambdaConversionException;
+import java.lang.instrument.UnmodifiableClassException;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.CompletionException;
@@ -231,4 +233,5 @@ public class TestThrowable {
   public static Object throw_ArithmeticException() {
     return new ArithmeticException("ArithmeticException");
   }
+
 }

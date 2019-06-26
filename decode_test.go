@@ -57,6 +57,7 @@ func genHessianJar() {
 
 func getJavaReply(method, className string) []byte {
 	genHessianJar()
+	log.Println("get java reply: ", className, method)
 	cmdArgs := []string{"-jar", hessianJar, method}
 	if className != "" {
 		cmdArgs = append(cmdArgs, className)
