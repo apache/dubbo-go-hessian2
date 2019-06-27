@@ -17,6 +17,8 @@ package hessian
 import (
 	"bufio"
 	"bytes"
+	"log"
+	"os/exec"
 	"reflect"
 	"testing"
 	"time"
@@ -24,8 +26,6 @@ import (
 
 import (
 	"github.com/stretchr/testify/assert"
-	"log"
-	"os/exec"
 )
 
 type Case struct {
