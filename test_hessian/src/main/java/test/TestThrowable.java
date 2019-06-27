@@ -15,7 +15,11 @@
 package test;
 
 import java.io.*;
+import java.lang.*;
+import java.lang.annotation.*;
 import java.lang.invoke.WrongMethodTypeException;
+import java.lang.invoke.LambdaConversionException;
+import java.lang.instrument.UnmodifiableClassException;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.CompletionException;
@@ -143,6 +147,26 @@ public class TestThrowable {
     return new UTFDataFormatException("UTFDataFormatException");
   }
 
+  public static Object throw_CloneNotSupportedException() {
+    return new CloneNotSupportedException("CloneNotSupportedException");
+  }
+
+  public static Object throw_InterruptedException() {
+    return new InterruptedException("InterruptedException");
+  }
+
+  public static Object throw_InterruptedIOException() {
+     return new InterruptedIOException("InterruptedIOException");
+  }
+
+  public static Object throw_LambdaConversionException() {
+     return new LambdaConversionException("LambdaConversionException");
+  }
+
+  public static Object throw_UnmodifiableClassException() {
+     return new UnmodifiableClassException("UnmodifiableClassException");
+  }
+
   public static Object throw_SecurityException() {
     return new SecurityException("SecurityException");
   }
@@ -217,4 +241,17 @@ public class TestThrowable {
   public static Object throw_NoSuchElementException() {
     return new NoSuchElementException("NoSuchElementException");
   }
+
+  public static Object throw_NegativeArraySizeException() {
+    return new NegativeArraySizeException("NegativeArraySizeException");
+  }
+
+  public static Object throw_UnsupportedOperationException() {
+    return new UnsupportedOperationException("UnsupportedOperationException");
+  }
+
+  public static Object throw_ArithmeticException() {
+    return new ArithmeticException("ArithmeticException");
+  }
+
 }

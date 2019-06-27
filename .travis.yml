@@ -8,5 +8,5 @@ script:
   - mvn clean package -f test_hessian/pom.xml
   - mvn clean package -f test_dubbo/pom.xml
   - go fmt && [[ -z `git status -s` ]]
-  - GO111MODULE=on && go mod vendor && go test -race && go test -bench . -race
+  - GO111MODULE=on && go mod vendor && go test -race -v && go test -bench . -race
 

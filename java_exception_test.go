@@ -35,6 +35,11 @@ func TestException(t *testing.T) {
 	doTestException(t, "throw_illegalMonitorStateException", "illegalMonitorStateException")
 	doTestException(t, "throw_illegalStateException", "illegalStateException")
 	doTestException(t, "throw_IOException", "IOException")
+	doTestException(t, "throw_CloneNotSupportedException", "CloneNotSupportedException")
+	doTestException(t, "throw_InterruptedException", "InterruptedException")
+	doTestException(t, "throw_InterruptedIOException", "InterruptedIOException")
+	doTestException(t, "throw_LambdaConversionException", "LambdaConversionException")
+	doTestException(t, "throw_UnmodifiableClassException", "UnmodifiableClassException")
 	doTestException(t, "throw_NullPointerException", "nullPointerException")
 	doTestException(t, "throw_UncheckedIOException", "uncheckedIOException")
 	doTestException(t, "throw_FileNotFoundException", "fileNotFoundException")
@@ -66,6 +71,9 @@ func TestException(t *testing.T) {
 	doTestException(t, "throw_EmptyStackException", "EmptyStackException")
 	doTestException(t, "throw_IllformedLocaleException", "IllformedLocaleException")
 	doTestException(t, "throw_NoSuchElementException", "NoSuchElementException")
+	doTestException(t, "throw_NegativeArraySizeException", "NegativeArraySizeException")
+	doTestException(t, "throw_UnsupportedOperationException", "UnsupportedOperationException")
+	doTestException(t, "throw_ArithmeticException", "ArithmeticException")
 }
 
 func doTestException(t *testing.T, method, content string) {
