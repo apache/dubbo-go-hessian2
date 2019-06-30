@@ -19,6 +19,7 @@ import com.caucho.hessian.test.A0;
 import com.caucho.hessian.test.A1;
 
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -245,7 +246,16 @@ public class TestCustomReply {
 
     public void customReplyTypedFixedList_char() throws Exception {
         char[] o = new char[]{'1', '2', '3'};
-        output.writeObject(o);
+        if (output.addRef(o)) {
+            return;
+        }
+        boolean hasEnd = output.writeListBegin(o.length, typeMap.get(o.getClass()));
+        for (Object tmp: o) {
+            output.writeObject(tmp);
+        }
+        if (hasEnd) {
+            output.writeListEnd();
+        }
         output.flush();
     }
 
@@ -316,6 +326,30 @@ public class TestCustomReply {
         A0[][][] o = new A0[][][]{{{new A0(), new A0(), new A0()}, {new A0(), new A0(), new A0(), null}}, {{new A0()}, {new A0()}}};
         output.writeObject(o);
         output.flush();
+    }
+
+    public void customReplyTypedFixedList_Test() throws Exception {
+        Test o = new Test();
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_Object() throws Exception {
+        Object[] o = new Object[]{new A0()};
+        output.writeObject(o);
+        output.flush();
+    }
+
+}
+
+class Test implements Serializable {
+    public A0 a;
+    public A0[][] list;
+    public A1[][] list1;
+    Test() {
+        this.a = new A0();
+        this.list = new A0[][]{{new A0(), new A0()},{new A0(), new A0()}};
+        this.list1 = new A1[][]{{new A1(), new A1()},{new A1(), new A1()}};
     }
 
 }

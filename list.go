@@ -41,6 +41,8 @@ var (
 		"boolean":          reflect.TypeOf(true),
 		"java.util.Date":   reflect.TypeOf(time.Time{}),
 		"date":             reflect.TypeOf(time.Time{}),
+		"object":           reflect.TypeOf([]Object{}).Elem(),
+		"java.lang.Object": reflect.TypeOf([]Object{}).Elem(),
 	}
 )
 
@@ -59,6 +61,8 @@ func init() {
 	listTypeNameMapper.Store("float64", "[double")
 	listTypeNameMapper.Store("bool", "[boolean")
 	listTypeNameMapper.Store("time.Time", "[date")
+
+	listTypeNameMapper.Store("hessian.Object", "[object")
 }
 
 func registerTypeName(gotype, javatype string) {
@@ -66,9 +70,16 @@ func registerTypeName(gotype, javatype string) {
 }
 
 func getListTypeName(gotype string) string {
-	v, ok := listTypeNameMapper.Load(gotype)
+	buf := strings.Builder{}
+	count := strings.Count(gotype, "[]")
+	for i := 0; i < count; i++ {
+		buf.WriteString("[")
+	}
+	gotype = strings.Replace(gotype, "[]", "", -1)
+	v, ok := listTypeNameMapper.Load(strings.TrimPrefix(gotype, "*"))
 	if ok {
-		return v.(string)
+		buf.WriteString(v.(string))
+		return buf.String()
 	}
 	return ""
 }
@@ -79,7 +90,11 @@ func getListType(javalistname string) reflect.Type {
 		javaname = javaname[1:]
 	}
 	if strings.Index(javaname, "[") == 0 {
-		return reflect.SliceOf(getListType(javaname))
+		lt := getListType(javaname)
+		if lt == nil {
+			return nil
+		}
+		return reflect.SliceOf(lt)
 	}
 
 	var sliceTy reflect.Type
@@ -102,13 +117,16 @@ func getListType(javalistname string) reflect.Type {
 	return sliceTy
 }
 
+// Object is equal to Object of java When encoding
+type Object interface{}
+
 /////////////////////////////////////////
 // List
 /////////////////////////////////////////
 
 // encList write list
 func (e *Encoder) encList(v interface{}) error {
-	if reflect.TypeOf(v).String() != "[]interface {}" {
+	if !strings.Contains(reflect.TypeOf(v).String(), "interface {}") {
 		return e.writeTypedList(v)
 	}
 	return e.writeUntypedList(v)
@@ -136,7 +154,7 @@ func (e *Encoder) writeTypedList(v interface{}) error {
 	totype := UnpackPtrType(value.Type().Elem()).String()
 	var typeName = getListTypeName(totype)
 	if typeName == "" {
-		return perrors.New("no this type name: " + typeName)
+		return perrors.New("no this type name: " + totype)
 	}
 
 	e.buffer = encByte(e.buffer, BC_LIST_FIXED) // 'V'
@@ -301,16 +319,17 @@ func (d *Decoder) readTypedList(tag byte) (interface{}, error) {
 	)
 	t, err := strconv.Atoi(listTyp)
 	if err == nil {
-		arrType = d.typeRefs[t]
+		arrType = d.typeRefs.Get(t)
 	} else {
 		arrType = getListType(listTyp)
 	}
 
 	if arrType != nil {
 		aryValue = reflect.MakeSlice(arrType, length, length)
-		d.appendTypeRefs(arrType)
+		d.typeRefs.appendTypeRefs(arrType.String(), arrType)
 	} else {
 		aryValue = reflect.ValueOf(make([]interface{}, length, length))
+		d.typeRefs.appendTypeRefs(strings.Replace(listTyp, "[", "", -1), aryValue.Type())
 	}
 	holder := d.appendRefs(aryValue)
 	for j := 0; j < length || isVariableArr; j++ {

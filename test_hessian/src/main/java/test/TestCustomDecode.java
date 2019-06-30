@@ -20,6 +20,7 @@ import com.caucho.hessian.test.A1;
 
 import javax.xml.crypto.Data;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -132,5 +133,34 @@ public class TestCustomDecode {
         Date[] list = new Date[]{new Date(1560864000), new Date(1560864000), new Date(1560864000)};
         Object o = input.readObject();
         return Arrays.equals(list,(Date[])o);
+    }
+
+    public Object customArgTypedFixedList_arrays() throws Exception {
+        int[][][] list = new int[][][]{{{1, 2, 3}, {4, 5, 6, 7}}, {{8, 9, 10}, {11, 12, 13, 14}}};
+        try {
+            Object o = input.readObject();
+            return Arrays.deepEquals(list, (int[][][])o);
+        } catch (Exception e){
+            return e.toString();
+        }
+    }
+
+    public Object customArgTypedFixedList_A0arrays() throws Exception {
+        A0[][][] list = new A0[][][]{{{new A0(), new A0(), new A0()}, {new A0(), new A0(), new A0(), null}}, {{new A0()}, {new A0()}}};
+        Object o = input.readObject();
+        return Arrays.deepEquals(list, (A0[][][])o);
+    }
+
+    public Object customArgTypedFixedList_Test() throws Exception {
+        Test t = new Test();
+        Object o = input.readObject();
+        Test t2 = (Test)o;
+        return t.a.equals(t.a) && Arrays.deepEquals(t.list, t2.list) && Arrays.deepEquals(t.list1, t2.list1);
+    }
+
+    public Object customArgTypedFixedList_Object() throws Exception {
+        Object[] list = new Object[]{new A0()};
+        Object o = input.readObject();
+        return Arrays.deepEquals(list, (Object[])o);
     }
 }

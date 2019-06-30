@@ -16,10 +16,13 @@ package hessian
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
 	"time"
+)
+
+import (
+	"github.com/stretchr/testify/assert"
 )
 
 func TestEncList(t *testing.T) {
@@ -52,10 +55,21 @@ func TestEncList(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, reflect.DeepEqual(res, list_1))
 
+	// typed list - [][][]int32
+	e = NewEncoder()
+	list_2 := [][][]int32{{{1, 2, 3}, {4, 5, 6, 7}}, {{8, 9, 10}, {11, 12, 13, 14}}}
+	e.Encode(list_2)
+	assert.NotEqual(t, 0, len(e.Buffer()))
+
+	d = NewDecoder(e.Buffer())
+	res, err = d.Decode()
+	assert.NoError(t, err)
+	assert.True(t, reflect.DeepEqual(res, list_2))
+
 }
 
 func TestList(t *testing.T) {
-	RegisterPOJOs(new(A0), new(A1))
+	RegisterPOJOs(new(A0), new(A1), new(Test))
 
 	testDecodeFramework(t, "replyTypedFixedList_0", []string{})
 	testDecodeFramework(t, "replyTypedFixedList_1", []string{"1"})
@@ -66,8 +80,8 @@ func TestList(t *testing.T) {
 	testDecodeFramework(t, "replyUntypedFixedList_7", []interface{}{"1", "2", "3", "4", "5", "6", "7"})
 	testDecodeFramework(t, "replyUntypedFixedList_8", []interface{}{"1", "2", "3", "4", "5", "6", "7", "8"})
 
-	testDecodeFramework(t, "customReplyTypedFixedListHasNull", []interface{}{new(A0), new(A1), nil})
-	testDecodeFramework(t, "customReplyTypedVariableListHasNull", []interface{}{new(A0), new(A1), nil})
+	testDecodeFramework(t, "customReplyTypedFixedListHasNull", []Object{new(A0), new(A1), nil})
+	testDecodeFramework(t, "customReplyTypedVariableListHasNull", []Object{new(A0), new(A1), nil})
 	testDecodeFramework(t, "customReplyUntypedFixedListHasNull", []interface{}{new(A0), new(A1), nil})
 	testDecodeFramework(t, "customReplyUntypedVariableListHasNull", []interface{}{new(A0), new(A1), nil})
 
@@ -89,7 +103,7 @@ func TestList(t *testing.T) {
 	testDecodeFramework(t, "customReplyTypedFixedList_short", []int32{1, 2, 3})
 	testDecodeFramework(t, "customReplyTypedVariableList_short", []int32{1, 2, 3})
 
-	testDecodeFramework(t, "customReplyTypedFixedList_char", "123")
+	testDecodeFramework(t, "customReplyTypedFixedList_char", []string{"1", "2", "3"})
 	testDecodeFramework(t, "customReplyTypedVariableList_char", []string{"1", "2", "3"})
 
 	testDecodeFramework(t, "customReplyTypedFixedList_boolean", []bool{true, false, true})
@@ -104,6 +118,9 @@ func TestList(t *testing.T) {
 	testDecodeFramework(t, "customReplyTypedFixedList_A0arrays", [][][]*A0{{{new(A0), new(A0), new(A0)}, {new(A0), new(A0), new(A0), nil}},
 		{{new(A0)}, {new(A0)}}})
 
+	testDecodeFramework(t, "customReplyTypedFixedList_Test", &Test{A: &A0{}, List: [][]*A0{{new(A0), new(A0)}, {new(A0), new(A0)}}, List1: [][]*A1{{new(A1), new(A1)}, {new(A1), new(A1)}}})
+
+	testDecodeFramework(t, "customReplyTypedFixedList_Object", []Object{new(A0)})
 }
 
 func TestListEncode(t *testing.T) {
@@ -153,4 +170,21 @@ func TestListEncode(t *testing.T) {
 	testJavaDecode(t, "customArgTypedFixedList_date_3", []time.Time{time.Unix(1560864, 0),
 		time.Unix(1560864, 0), time.Unix(1560864, 0)})
 
+	testJavaDecode(t, "customArgTypedFixedList_arrays", [][][]int32{{{1, 2, 3}, {4, 5, 6, 7}}, {{8, 9, 10}, {11, 12, 13, 14}}})
+	testJavaDecode(t, "customArgTypedFixedList_A0arrays", [][][]*A0{{{new(A0), new(A0), new(A0)}, {new(A0), new(A0), new(A0), nil}},
+		{{new(A0)}, {new(A0)}}})
+
+	testJavaDecode(t, "customArgTypedFixedList_Test", &Test{A: new(A0), List: [][]*A0{{new(A0), new(A0)}, {new(A0), new(A0)}}, List1: [][]*A1{{new(A1), new(A1)}, {new(A1), new(A1)}}})
+
+	testJavaDecode(t, "customArgTypedFixedList_Object", []Object{new(A0)})
+}
+
+type Test struct {
+	A     *A0
+	List  [][]*A0
+	List1 [][]*A1
+}
+
+func (*Test) JavaClassName() string {
+	return "test.Test"
 }

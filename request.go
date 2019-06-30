@@ -90,6 +90,8 @@ func getArgType(v interface{}) string {
 		return "java.lang.String"
 	case []string:
 		return "[Ljava.lang.String;"
+	case []Object:
+		return "[Ljava.lang.Object;"
 	case map[interface{}]interface{}:
 		// return  "java.util.HashMap"
 		return "java.util.Map"

@@ -301,8 +301,6 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 	}
 
 	vRef := reflect.New(typ)
-	// add type ref
-	d.appendTypeRefs(vRef.Type())
 	// add pointer ref so that ref the same object
 	d.appendRefs(vRef.Interface())
 
@@ -421,7 +419,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 			if err != nil {
 				return nil, err
 			}
-		case reflect.Struct:
+		case reflect.Struct, reflect.Interface:
 			var (
 				err error
 				s   interface{}

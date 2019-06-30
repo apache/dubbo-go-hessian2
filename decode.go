@@ -31,7 +31,7 @@ type Decoder struct {
 	refs   []interface{}
 	// record type refs, both list and map need it
 	// todo: map
-	typeRefs      []reflect.Type
+	typeRefs      *TypeRefs
 	classInfoList []classInfo
 }
 
@@ -43,7 +43,7 @@ var (
 
 // NewDecoder generate a decoder instance
 func NewDecoder(b []byte) *Decoder {
-	return &Decoder{reader: bufio.NewReader(bytes.NewReader(b))}
+	return &Decoder{reader: bufio.NewReader(bytes.NewReader(b)), typeRefs: &TypeRefs{records: map[string]bool{}}}
 }
 
 /////////////////////////////////////////
@@ -214,12 +214,23 @@ func (d *Decoder) DecodeValue() (interface{}, error) {
 	}
 }
 
+/////////////////////////////////////////
+// typeRefs
+/////////////////////////////////////////
+type TypeRefs struct {
+	typeRefs []reflect.Type
+	records  map[string]bool // record if existing for type
+}
+
 // appendTypeRefs add list or map type ref
-func (d *Decoder) appendTypeRefs(p reflect.Type) {
-	for i := 0; i < len(d.typeRefs); i++ {
-		if d.typeRefs[i] == p {
-			return
-		}
+func (t *TypeRefs) appendTypeRefs(name string, p reflect.Type) {
+	if t.records[name] {
+		return
 	}
-	d.typeRefs = append(d.typeRefs, p)
+	t.records[name] = true
+	t.typeRefs = append(t.typeRefs, p)
+}
+
+func (t *TypeRefs) Get(index int) reflect.Type {
+	return t.typeRefs[index]
 }
