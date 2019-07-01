@@ -69,7 +69,7 @@ func TestEncList(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
-	RegisterPOJOs(new(A0), new(A1), new(Test))
+	RegisterPOJOs(new(A0), new(A1), new(TypedListTest))
 
 	testDecodeFramework(t, "replyTypedFixedList_0", []string{})
 	testDecodeFramework(t, "replyTypedFixedList_1", []string{"1"})
@@ -118,7 +118,7 @@ func TestList(t *testing.T) {
 	testDecodeFramework(t, "customReplyTypedFixedList_A0arrays", [][][]*A0{{{new(A0), new(A0), new(A0)}, {new(A0), new(A0), new(A0), nil}},
 		{{new(A0)}, {new(A0)}}})
 
-	testDecodeFramework(t, "customReplyTypedFixedList_Test", &Test{A: &A0{}, List: [][]*A0{{new(A0), new(A0)}, {new(A0), new(A0)}}, List1: [][]*A1{{new(A1), new(A1)}, {new(A1), new(A1)}}})
+	testDecodeFramework(t, "customReplyTypedFixedList_Test", &TypedListTest{A: &A0{}, List: [][]*A0{{new(A0), new(A0)}, {new(A0), new(A0)}}, List1: [][]*A1{{new(A1), new(A1)}, {new(A1), new(A1)}}})
 
 	testDecodeFramework(t, "customReplyTypedFixedList_Object", []Object{new(A0)})
 }
@@ -174,17 +174,17 @@ func TestListEncode(t *testing.T) {
 	testJavaDecode(t, "customArgTypedFixedList_A0arrays", [][][]*A0{{{new(A0), new(A0), new(A0)}, {new(A0), new(A0), new(A0), nil}},
 		{{new(A0)}, {new(A0)}}})
 
-	testJavaDecode(t, "customArgTypedFixedList_Test", &Test{A: new(A0), List: [][]*A0{{new(A0), new(A0)}, {new(A0), new(A0)}}, List1: [][]*A1{{new(A1), new(A1)}, {new(A1), new(A1)}}})
+	testJavaDecode(t, "customArgTypedFixedList_Test", &TypedListTest{A: new(A0), List: [][]*A0{{new(A0), new(A0)}, {new(A0), new(A0)}}, List1: [][]*A1{{new(A1), new(A1)}, {new(A1), new(A1)}}})
 
 	testJavaDecode(t, "customArgTypedFixedList_Object", []Object{new(A0)})
 }
 
-type Test struct {
+type TypedListTest struct {
 	A     *A0
 	List  [][]*A0
 	List1 [][]*A1
 }
 
-func (*Test) JavaClassName() string {
-	return "test.Test"
+func (*TypedListTest) JavaClassName() string {
+	return "test.TypedListTest"
 }

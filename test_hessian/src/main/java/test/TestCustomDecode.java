@@ -152,9 +152,9 @@ public class TestCustomDecode {
     }
 
     public Object customArgTypedFixedList_Test() throws Exception {
-        Test t = new Test();
+        TypedListTest t = new TypedListTest();
         Object o = input.readObject();
-        Test t2 = (Test)o;
+        TypedListTest t2 = (TypedListTest)o;
         return t.a.equals(t.a) && Arrays.deepEquals(t.list, t2.list) && Arrays.deepEquals(t.list1, t2.list1);
     }
 

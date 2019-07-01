@@ -329,7 +329,7 @@ public class TestCustomReply {
     }
 
     public void customReplyTypedFixedList_Test() throws Exception {
-        Test o = new Test();
+        TypedListTest o = new TypedListTest();
         output.writeObject(o);
         output.flush();
     }
@@ -342,11 +342,11 @@ public class TestCustomReply {
 
 }
 
-class Test implements Serializable {
+class TypedListTest implements Serializable {
     public A0 a;
     public A0[][] list;
     public A1[][] list1;
-    Test() {
+    TypedListTest() {
         this.a = new A0();
         this.list = new A0[][]{{new A0(), new A0()},{new A0(), new A0()}};
         this.list1 = new A1[][]{{new A1(), new A1()},{new A1(), new A1()}};
