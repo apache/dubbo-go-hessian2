@@ -17,6 +17,7 @@ package hessian
 import (
 	"bufio"
 	"encoding/binary"
+	"fmt"
 	"reflect"
 	"time"
 )
@@ -51,8 +52,8 @@ type DubboHeader struct {
 type Service struct {
 	Path      string
 	Interface string
+	Group     string
 	Version   string
-	Target    string // Service Name
 	Method    string
 	Timeout   time.Duration // request timeout
 }
@@ -200,6 +201,7 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 			if !ok {
 				rsp = &Response{RspObj: rspObj}
 			}
+			fmt.Println(reflect.TypeOf(rsp.RspObj))
 			if err = unpackResponseBody(buf, rsp); err != nil {
 				return perrors.WithStack(err)
 			}

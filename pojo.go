@@ -144,6 +144,7 @@ func RegisterPOJO(o POJO) int {
 	structInfo.javaName = o.JavaClassName()
 	structInfo.inst = o
 	pojoRegistry.j2g[structInfo.javaName] = structInfo.goName
+	registerTypeName(structInfo.goName, structInfo.javaName)
 
 	// prepare fields info of objectDef
 	for i := 0; i < structInfo.typ.NumField(); i++ {

@@ -419,7 +419,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 			if err != nil {
 				return nil, err
 			}
-		case reflect.Struct:
+		case reflect.Struct, reflect.Interface:
 			var (
 				err error
 				s   interface{}
