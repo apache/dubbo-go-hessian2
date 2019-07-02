@@ -199,7 +199,7 @@ func packRequest(service Service, header DubboHeader, params interface{}) ([]byt
 
 	// dubbo version + path + version + method
 	encoder.Encode(DUBBO_VERSION)
-	encoder.Encode(service.Target)
+	encoder.Encode(service.Path)
 	encoder.Encode(service.Version)
 	encoder.Encode(service.Method)
 
@@ -214,6 +214,7 @@ func packRequest(service Service, header DubboHeader, params interface{}) ([]byt
 
 	serviceParams = make(map[string]string)
 	serviceParams[PATH_KEY] = service.Path
+	serviceParams[GROUP_KEY] = service.Group
 	serviceParams[INTERFACE_KEY] = service.Interface
 	if len(version) != 0 {
 		serviceParams[VERSION_KEY] = version

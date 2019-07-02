@@ -39,10 +39,9 @@ func doTestHessianEncodeHeader(t *testing.T, packageType PackageType, responseSt
 	RegisterPOJO(&Case{})
 	codecW := NewHessianCodec(nil)
 	resp, err := codecW.Write(Service{
-		Path:      "/test",
+		Path:      "test",
 		Interface: "ITest",
 		Version:   "v1.0",
-		Target:    "test",
 		Method:    "test",
 		Timeout:   time.Second * 10,
 	}, DubboHeader{

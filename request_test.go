@@ -25,10 +25,9 @@ import (
 
 func TestPackRequest(t *testing.T) {
 	bytes, err := packRequest(Service{
-		Path:      "/test",
+		Path:      "test",
 		Interface: "ITest",
 		Version:   "v1.0",
-		Target:    "test",
 		Method:    "test",
 		Timeout:   time.Second * 10,
 	}, DubboHeader{
