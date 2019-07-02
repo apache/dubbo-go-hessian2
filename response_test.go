@@ -95,6 +95,17 @@ func TestReflectResponse(t *testing.T) {
 	s3 := []interface{}{rr{"dubbo", 666}, 123, "hello"}
 	var s3r []interface{}
 	doTestReflectResponse(t, s3, &s3r)
+
+	// ------ interface test -------
+	in1 := []interface{}{rr{"dubbo", 666}, 123, "hello"}
+	var inr1 *interface{}
+	doTestReflectResponse(t, in1, reflect.New(reflect.TypeOf(inr1).Elem()).Interface())
+
+	in2 := make(map[string]rr)
+	var inr2 map[string]rr
+	m3["dubbo"] = rr{"hello", 123}
+	m3["go"] = rr{"world", 456}
+	doTestReflectResponse(t, in2, &inr2)
 }
 
 // separately test copy normal map to map[interface{}]interface{}

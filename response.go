@@ -246,6 +246,12 @@ func ReflectResponse(in interface{}, out interface{}) error {
 	inValue := EnsurePackValue(in)
 	outValue := EnsurePackValue(out)
 
+	outType := outValue.Type().String()
+	if outType == "interface {}" || outType == "*interface {}" {
+		SetValue(outValue, inValue)
+		return nil
+	}
+
 	switch inValue.Type().Kind() {
 	case reflect.Slice, reflect.Array:
 		return CopySlice(inValue, outValue)

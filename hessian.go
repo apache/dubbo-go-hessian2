@@ -17,6 +17,7 @@ package hessian
 import (
 	"bufio"
 	"encoding/binary"
+	"fmt"
 	"reflect"
 	"time"
 )
@@ -200,6 +201,7 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 			if !ok {
 				rsp = &Response{RspObj: rspObj}
 			}
+			fmt.Println(reflect.TypeOf(rsp.RspObj))
 			if err = unpackResponseBody(buf, rsp); err != nil {
 				return perrors.WithStack(err)
 			}
