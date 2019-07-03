@@ -18,9 +18,9 @@ type DuplicateFormatFlagsException struct {
 	SerialVersionUID     int64
 	Flags                string
 	DetailMessage        string
-	SuppressedExceptions []Exception
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *DuplicateFormatFlagsException
+	Cause                Throwabler
 }
 
 func (e DuplicateFormatFlagsException) Error() string {

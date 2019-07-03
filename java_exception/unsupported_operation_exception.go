@@ -18,8 +18,8 @@ type UnsupportedOperationException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []UnsupportedOperationException
-	Cause                *UnsupportedOperationException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewUnsupportedOperationException(detailMessage string) *UnsupportedOperationException {

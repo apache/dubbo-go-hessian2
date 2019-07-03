@@ -18,8 +18,8 @@ type StreamCorruptedException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []StreamCorruptedException
-	Cause                *StreamCorruptedException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewStreamCorruptedException(detailMessage string) *StreamCorruptedException {

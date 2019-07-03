@@ -18,8 +18,8 @@ type SecurityException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []SecurityException
-	Cause                *SecurityException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewSecurityException(detailMessage string) *SecurityException {

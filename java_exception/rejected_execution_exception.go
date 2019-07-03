@@ -17,9 +17,9 @@ package java_exception
 type RejectedExecutionException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []Exception
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *RejectedExecutionException
+	Cause                Throwabler
 }
 
 func (e RejectedExecutionException) Error() string {

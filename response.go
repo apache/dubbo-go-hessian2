@@ -79,7 +79,7 @@ func packResponse(packageType PackageType, header DubboHeader, attachments map[s
 
 			if e, ok := ret.(error); ok { // throw error
 				encoder.Encode(resWithException)
-				if t, ok := e.(Throwabler); ok {
+				if t, ok := e.(java_exception.Throwabler); ok {
 					encoder.Encode(t)
 				} else {
 					encoder.Encode(java_exception.NewThrowable(e.Error()))
@@ -239,6 +239,12 @@ func ReflectResponse(in interface{}, out interface{}) error {
 
 	inValue := EnsurePackValue(in)
 	outValue := EnsurePackValue(out)
+
+	outType := outValue.Type().String()
+	if outType == "interface {}" || outType == "*interface {}" {
+		SetValue(outValue, inValue)
+		return nil
+	}
 
 	switch inValue.Type().Kind() {
 	case reflect.Slice, reflect.Array:

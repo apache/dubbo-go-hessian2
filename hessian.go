@@ -82,8 +82,8 @@ func (header *DubboHeader) SetPackageType(isRequest bool, packageType PackageTyp
 type Service struct {
 	Path      string
 	Interface string
+	Group     string
 	Version   string
-	Target    string // Service Name
 	Method    string
 	Timeout   time.Duration // request timeout
 }

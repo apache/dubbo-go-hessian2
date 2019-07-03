@@ -18,8 +18,8 @@ type SyncFailedException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []SyncFailedException
-	Cause                *SyncFailedException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewSyncFailedException(detailMessage string) *SyncFailedException {

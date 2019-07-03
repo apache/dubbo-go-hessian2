@@ -142,6 +142,7 @@ const (
 	ARRAY_LONG       = "[long"
 
 	PATH_KEY      = "path"
+	GROUP_KEY     = "group"
 	INTERFACE_KEY = "interface"
 	VERSION_KEY   = "version"
 	TIMEOUT_KEY   = "timeout"

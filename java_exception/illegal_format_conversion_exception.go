@@ -21,9 +21,9 @@ type IllegalFormatConversionException struct {
 	C                    string
 	Arg                  Class
 	DetailMessage        string
-	SuppressedExceptions []Exception
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *IllegalFormatConversionException
+	Cause                Throwabler
 }
 
 func (e IllegalFormatConversionException) Error() string {

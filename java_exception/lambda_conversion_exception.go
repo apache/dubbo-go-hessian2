@@ -21,9 +21,9 @@ package java_exception
 type LambdaConversionException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []LambdaConversionException
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *LambdaConversionException
+	Cause                Throwabler
 }
 
 func NewLambdaConversionException(detailMessage string) *LambdaConversionException {

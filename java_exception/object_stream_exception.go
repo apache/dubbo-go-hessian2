@@ -18,8 +18,8 @@ type ObjectStreamException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []ObjectStreamException
-	Cause                *ObjectStreamException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewObjectStreamException(detailMessage string) *ObjectStreamException {

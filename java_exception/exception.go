@@ -15,15 +15,24 @@
 package java_exception
 
 ////////////////////////////
+// Throwable interface
+////////////////////////////
+
+type Throwabler interface {
+	Error() string
+	JavaClassName() string
+}
+
+////////////////////////////
 // Throwable
 ////////////////////////////
 
 type Throwable struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []Throwable
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *Throwable
+	Cause                Throwabler
 }
 
 func NewThrowable(detailMessage string) *Throwable {
@@ -45,9 +54,9 @@ func (Throwable) JavaClassName() string {
 type Exception struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []Exception
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *Exception
+	Cause                Throwabler
 }
 
 func NewException(detailMessage string) *Exception {

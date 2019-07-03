@@ -17,9 +17,9 @@ package java_exception
 type IOException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []IOException
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *IOException
+	Cause                Throwabler
 }
 
 func NewIOException(detailMessage string) *IOException {

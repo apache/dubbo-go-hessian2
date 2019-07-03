@@ -18,8 +18,8 @@ type RuntimeException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []RuntimeException
-	Cause                *RuntimeException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewRuntimeException(detailMessage string) *RuntimeException {

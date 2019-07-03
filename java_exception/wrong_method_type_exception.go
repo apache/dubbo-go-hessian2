@@ -17,9 +17,9 @@ package java_exception
 type WrongMethodTypeException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []Exception
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *WrongMethodTypeException
+	Cause                Throwabler
 }
 
 func (e WrongMethodTypeException) Error() string {
