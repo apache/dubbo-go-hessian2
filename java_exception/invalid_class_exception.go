@@ -21,8 +21,8 @@ type InvalidClassException struct {
 	DetailMessage        string
 	StackTrace           []StackTraceElement
 	Classname            string
-	SuppressedExceptions []InvalidClassException
-	Cause                *InvalidClassException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewInvalidClassException(classname string, detailMessage string) *InvalidClassException {

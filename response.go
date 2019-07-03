@@ -85,7 +85,7 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 
 			if e, ok := ret.(error); ok { // throw error
 				encoder.Encode(resWithException)
-				if t, ok := e.(Throwabler); ok {
+				if t, ok := e.(java_exception.Throwabler); ok {
 					encoder.Encode(t)
 				} else {
 					encoder.Encode(java_exception.NewThrowable(e.Error()))

@@ -18,8 +18,8 @@ type UTFDataFormatException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []UTFDataFormatException
-	Cause                *UTFDataFormatException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewUTFDataFormatException(detailMessage string) *UTFDataFormatException {

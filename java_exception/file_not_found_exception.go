@@ -18,8 +18,8 @@ type FileNotFoundException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []FileNotFoundException
-	Cause                *FileNotFoundException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewFileNotFoundException(detailMessage string) *FileNotFoundException {

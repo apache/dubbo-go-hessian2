@@ -18,8 +18,8 @@ type NegativeArraySizeException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []NegativeArraySizeException
-	Cause                *NegativeArraySizeException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewNegativeArraySizeException(detailMessage string) *NegativeArraySizeException {

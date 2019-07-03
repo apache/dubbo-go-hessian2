@@ -18,8 +18,8 @@ type ArrayStoreException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []ArrayStoreException
-	Cause                *ArrayStoreException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewArrayStoreException(detailMessage string) *ArrayStoreException {

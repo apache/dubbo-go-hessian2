@@ -16,15 +16,6 @@ package hessian
 
 import "github.com/dubbogo/hessian2/java_exception"
 
-////////////////////////////
-// Throwable interface
-////////////////////////////
-
-type Throwabler interface {
-	Error() string
-	JavaClassName() string
-}
-
 func init() {
 	RegisterPOJO(&java_exception.Class{})
 	RegisterPOJO(&java_exception.Throwable{})
@@ -81,4 +72,36 @@ func init() {
 	RegisterPOJO(&java_exception.NegativeArraySizeException{})
 	RegisterPOJO(&java_exception.UnsupportedOperationException{})
 	RegisterPOJO(&java_exception.ArithmeticException{})
+	RegisterPOJO(&java_exception.InputMismatchException{})
+	RegisterPOJO(&java_exception.ExecutionException{})
+	RegisterPOJO(&java_exception.InvalidPreferencesFormatException{})
+	RegisterPOJO(&java_exception.TimeoutException{})
+	RegisterPOJO(&java_exception.BackingStoreException{})
+	RegisterPOJO(&java_exception.DataFormatException{})
+	RegisterPOJO(&java_exception.BrokenBarrierException{})
+	RegisterPOJO(&java_exception.TooManyListenersException{})
+	RegisterPOJO(&java_exception.InvalidPropertiesFormatException{})
+	RegisterPOJO(&java_exception.ZipException{})
+	RegisterPOJO(&java_exception.JarException{})
+	RegisterPOJO(&java_exception.IllegalClassFormatException{})
+	RegisterPOJO(&java_exception.ReflectiveOperationException{})
+	RegisterPOJO(&java_exception.InvocationTargetException{})
+	RegisterPOJO(&java_exception.NoSuchMethodException{})
+	RegisterPOJO(&java_exception.NoSuchFieldException{})
+	RegisterPOJO(&java_exception.IllegalAccessException{})
+	RegisterPOJO(&java_exception.ClassNotFoundException{})
+	RegisterPOJO(&java_exception.InstantiationException{})
+	RegisterPOJO(&java_exception.DateTimeException{})
+	RegisterPOJO(&java_exception.UnsupportedTemporalTypeException{})
+	RegisterPOJO(&java_exception.ZoneRulesException{})
+	RegisterPOJO(&java_exception.DateTimeParseException{})
+	RegisterPOJO(&java_exception.FormatterClosedException{})
+	RegisterPOJO(&java_exception.CancellationException{})
+	RegisterPOJO(&java_exception.UnknownFormatConversionException{})
+	RegisterPOJO(&java_exception.UnknownFormatFlagsException{})
+	RegisterPOJO(&java_exception.IllegalFormatFlagsException{})
+	RegisterPOJO(&java_exception.IllegalFormatPrecisionException{})
+	RegisterPOJO(&java_exception.IllegalFormatCodePointException{})
+	RegisterPOJO(&java_exception.MissingFormatArgumentException{})
+	RegisterPOJO(&java_exception.MissingFormatWidthException{})
 }

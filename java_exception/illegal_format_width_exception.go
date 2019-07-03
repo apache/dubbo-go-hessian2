@@ -20,9 +20,9 @@ type IllegalFormatWidthException struct {
 	SerialVersionUID     int64
 	W                    int
 	DetailMessage        string
-	SuppressedExceptions []Exception
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *IllegalFormatWidthException
+	Cause                Throwabler
 }
 
 func (e IllegalFormatWidthException) Error() string {

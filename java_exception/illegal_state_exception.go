@@ -18,8 +18,8 @@ type IllegalStateException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []IllegalStateException
-	Cause                *IllegalStateException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewIllegalStateException(detailMessage string) *IllegalStateException {

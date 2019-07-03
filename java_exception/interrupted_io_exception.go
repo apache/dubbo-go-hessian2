@@ -22,9 +22,9 @@ type InterruptedIOException struct {
 	SerialVersionUID     int64
 	BytesTransferred     int32
 	DetailMessage        string
-	SuppressedExceptions []InterruptedIOException
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *InterruptedIOException
+	Cause                Throwabler
 }
 
 func NewInterruptedIOException(detailMessage string) *InterruptedIOException {

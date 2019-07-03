@@ -18,8 +18,8 @@ type NotSerializableException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []NotSerializableException
-	Cause                *NotSerializableException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewNotSerializableException(detailMessage string) *NotActiveException {

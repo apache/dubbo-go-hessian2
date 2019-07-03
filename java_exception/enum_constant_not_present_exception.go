@@ -20,8 +20,8 @@ type EnumConstantNotPresentException struct {
 	StackTrace           []StackTraceElement
 	ConstantName         string
 	EnumType             Class
-	SuppressedExceptions []EnumConstantNotPresentException
-	Cause                *EnumConstantNotPresentException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewEnumConstantNotPresentException(detailMessage string) *EnumConstantNotPresentException {

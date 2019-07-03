@@ -18,8 +18,8 @@ type ArithmeticException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []ArithmeticException
-	Cause                *ArithmeticException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewArithmeticException(detailMessage string) *ArithmeticException {

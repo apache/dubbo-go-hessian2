@@ -17,9 +17,9 @@ package java_exception
 type NoSuchElementException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []Exception
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *NoSuchElementException
+	Cause                Throwabler
 }
 
 func (e NoSuchElementException) Error() string {

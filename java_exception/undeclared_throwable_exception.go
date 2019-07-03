@@ -17,10 +17,10 @@ package java_exception
 type UndeclaredThrowableException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []Exception
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *Throwable
-	UndeclaredThrowable  Throwable
+	Cause                Throwabler
+	UndeclaredThrowable  Throwabler
 }
 
 func (e UndeclaredThrowableException) Error() string {
@@ -30,6 +30,7 @@ func (e UndeclaredThrowableException) Error() string {
 func (UndeclaredThrowableException) JavaClassName() string {
 	return "java.lang.reflect.UndeclaredThrowableException"
 }
+
 func NewUndeclaredThrowableException(detailMessage string) *UndeclaredThrowableException {
 	return &UndeclaredThrowableException{DetailMessage: detailMessage, UndeclaredThrowable: Throwable{}}
 }
