@@ -21,9 +21,9 @@ package java_exception
 type CloneNotSupportedException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []CloneNotSupportedException
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *CloneNotSupportedException
+	Cause                Throwabler
 }
 
 func NewCloneNotSupportedException(detailMessage string) *CloneNotSupportedException {

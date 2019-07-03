@@ -19,9 +19,9 @@ type MissingResourceException struct {
 	Key                  string
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []Exception
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *MissingResourceException
+	Cause                Throwabler
 }
 
 func (e MissingResourceException) Error() string {

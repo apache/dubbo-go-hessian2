@@ -18,8 +18,8 @@ type ArrayIndexOutOfBoundsException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []ArrayIndexOutOfBoundsException
-	Cause                *ArrayIndexOutOfBoundsException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewArrayIndexOutOfBoundsException(detailMessage string) *ArrayIndexOutOfBoundsException {

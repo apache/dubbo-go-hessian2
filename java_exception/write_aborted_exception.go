@@ -18,12 +18,12 @@ type WriteAbortedException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	Detail               *Exception
-	SuppressedExceptions []WriteAbortedException
-	Cause                *WriteAbortedException
+	Detail               Throwabler
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
-func NewWriteAbortedException(detailMessage string, detail *Exception) *WriteAbortedException {
+func NewWriteAbortedException(detailMessage string, detail Throwabler) *WriteAbortedException {
 	return &WriteAbortedException{DetailMessage: detailMessage, StackTrace: nil,
 		Detail: detail}
 }

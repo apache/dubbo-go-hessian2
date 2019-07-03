@@ -17,9 +17,9 @@ package java_exception
 type MalformedParameterizedTypeException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []Exception
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *MalformedParameterizedTypeException
+	Cause                Throwabler
 }
 
 func (e MalformedParameterizedTypeException) Error() string {

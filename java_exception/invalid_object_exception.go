@@ -18,8 +18,8 @@ type InvalidObjectException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []InvalidObjectException
-	Cause                *InvalidObjectException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewInvalidObjectException(detailMessage string) *InvalidObjectException {

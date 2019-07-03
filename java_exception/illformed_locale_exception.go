@@ -18,9 +18,9 @@ type IllformedLocaleException struct {
 	_errIdx              int
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []Exception
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *IllformedLocaleException
+	Cause                Throwabler
 }
 
 func (e IllformedLocaleException) Error() string {

@@ -18,8 +18,8 @@ type IllegalArgumentException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []IllegalArgumentException
-	Cause                *IllegalArgumentException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewIllegalArgumentException(detailMessage string) *IllegalArgumentException {

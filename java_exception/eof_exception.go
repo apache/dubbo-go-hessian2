@@ -18,8 +18,8 @@ type EOFException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []EOFException
-	Cause                *EOFException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewEOFException(detailMessage string) *EOFException {

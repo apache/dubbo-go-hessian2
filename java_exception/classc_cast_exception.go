@@ -18,8 +18,8 @@ type ClassCastException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []ClassCastException
-	Cause                *ClassCastException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewClassCastException(detailMessage string) *ClassCastException {

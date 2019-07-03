@@ -18,11 +18,11 @@ type UncheckedIOException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []UncheckedIOException
-	Cause                *IOException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
-func NewUncheckedIOException(detailMessage string, cause *IOException) (result *UncheckedIOException, err error) {
+func NewUncheckedIOException(detailMessage string, cause Throwabler) (result *UncheckedIOException, err error) {
 	if cause == nil {
 		return nil, NullPointerException{}
 	}

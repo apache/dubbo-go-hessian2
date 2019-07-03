@@ -18,8 +18,8 @@ type NotActiveException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []NotActiveException
-	Cause                *NotActiveException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewNotActiveException(detailMessage string) *NotActiveException {
