@@ -61,6 +61,7 @@ func init() {
 	listTypeNameMapper.Store("float64", "[double")
 	listTypeNameMapper.Store("bool", "[boolean")
 	listTypeNameMapper.Store("time.Time", "[date")
+	listTypeNameMapper.Store("java_exception.Throwabler", "[java.lang.Throwable")
 
 	listTypeNameMapper.Store("hessian.Object", "[object")
 }
