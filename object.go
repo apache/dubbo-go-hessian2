@@ -442,7 +442,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 			}
 
 		default:
-			return nil, perrors.Errorf("unknown struct member type: %v", kind)
+			return nil, perrors.Errorf("unknown struct member type: %v %v", kind, typ.Name()+"."+typ.Field(index).Name)
 		}
 	} // end for
 
