@@ -7,7 +7,16 @@
 
 ---
 
-It's a golang hessian library used by dubbogo.
+It's a golang hessian library used by [Apache/dubbo-go](github.com/apache/dubbo-go).
+
+## Feature List
+
+* [All JDK Exceptions](https://github.com/dubbogo/hessian2/issues/59)
+* [Function Alias By Alias](https://github.com/dubbogo/hessian2/issues/19)
+* [Java Bigdecimal](https://github.com/dubbogo/hessian2/issues/89)
+* [Java Date & Time](https://github.com/dubbogo/hessian2/issues/90)
+* [Java Generic Invokation](https://github.com/dubbogo/hessian2/issues/84)
+* [Dubbo Attachements](https://github.com/dubbogo/hessian2/issues/49)
 
 ## Basic Usage Examples
 
