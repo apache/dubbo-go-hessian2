@@ -22,7 +22,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
-
+import java.math.BigDecimal;
 
 public class TestCustomReply {
 
