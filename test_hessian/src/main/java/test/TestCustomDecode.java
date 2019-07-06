@@ -165,10 +165,4 @@ public class TestCustomDecode {
         return Arrays.deepEquals(list, (Object[])o);
     }
 
-    public void customReplyTypedFixedDecimal() throws Exception {
-        BigDecimal decimal = new BigDecimal("100.256");
-        output.writeObject(decimal);
-        output.flush();
-    }
-
 }

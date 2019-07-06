@@ -340,6 +340,12 @@ public class TestCustomReply {
         output.flush();
     }
 
+    public void customReplyTypedFixedDecimal() throws Exception {
+        BigDecimal decimal = new BigDecimal("100.256");
+        output.writeObject(decimal);
+        output.flush();
+    }
+
 }
 
 class TypedListTest implements Serializable {
