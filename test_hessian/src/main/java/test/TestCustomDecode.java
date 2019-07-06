@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.math.BigDecimal;
 
 
 public class TestCustomDecode {
@@ -163,4 +164,11 @@ public class TestCustomDecode {
         Object o = input.readObject();
         return Arrays.deepEquals(list, (Object[])o);
     }
+
+    public void customReplyTypedFixedDecimal() throws Exception {
+        BigDecimal decimal = new BigDecimal("100.256");
+        output.writeObject(decimal);
+        output.flush();
+    }
+
 }

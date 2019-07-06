@@ -32,6 +32,22 @@ var (
 	_zeroValue      = reflect.ValueOf(_zeroBoolPinter).Elem()
 )
 
+type Codec interface {
+	encObject(*Encoder, POJO) error
+	decObject(*Decoder) (interface{}, error)
+}
+
+var CodecMap = make(map[string]Codec, 16)
+
+func SetCodec(key string, codec Codec) {
+	CodecMap[key] = codec
+}
+
+func GetCodec(key string) (Codec, bool) {
+	codec, ok := CodecMap[key]
+	return codec, ok
+}
+
 func encByte(b []byte, t ...byte) []byte {
 	return append(b, t...)
 }
