@@ -7,11 +7,11 @@ type Serializer interface {
 
 var CodecMap = make(map[string]Serializer, 16)
 
-func SetCodec(key string, codec Serializer) {
+func SetSerializer(key string, codec Serializer) {
 	CodecMap[key] = codec
 }
 
-func GetCodec(key string) (Serializer, bool) {
+func GetSerializer(key string) (Serializer, bool) {
 	codec, ok := CodecMap[key]
 	return codec, ok
 }

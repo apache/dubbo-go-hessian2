@@ -522,7 +522,7 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 		cls, _ = clsDef.(classInfo)
 		//add to slice
 		d.appendClsDef(cls)
-		if c, ok := GetCodec(cls.javaName); ok {
+		if c, ok := GetSerializer(cls.javaName); ok {
 			return c.deserializeObject(d)
 		}
 		return d.DecodeValue()

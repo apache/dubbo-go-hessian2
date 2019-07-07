@@ -8,7 +8,7 @@ type DecimalCodec struct{}
 
 func init() {
 	RegisterPOJO(&big.Decimal{})
-	SetCodec("java.math.BigDecimal", DecimalCodec{})
+	SetSerializer("java.math.BigDecimal", DecimalCodec{})
 }
 
 func (DecimalCodec) serializeObject(e *Encoder, v POJO) error {

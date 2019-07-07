@@ -130,7 +130,7 @@ func (e *Encoder) Encode(v interface{}) error {
 				if vv.IsValid() {
 					clazz = p.JavaClassName()
 				}
-				if c, ok := GetCodec(clazz); ok {
+				if c, ok := GetSerializer(clazz); ok {
 					return c.serializeObject(e, p)
 				}
 				return e.encObject(p)
