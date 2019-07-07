@@ -13,7 +13,7 @@ func init() {
 
 func (DecimalCodec) encObject(e *Encoder, v POJO) error {
 	decimal, ok := v.(big.Decimal)
-	if ok {
+	if !ok {
 		return e.encObject(v)
 	}
 	decimal.Value = string(decimal.ToString())
