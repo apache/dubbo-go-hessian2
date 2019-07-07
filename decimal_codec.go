@@ -11,7 +11,7 @@ func init() {
 	SetCodec("java.math.BigDecimal", DecimalCodec{})
 }
 
-func (DecimalCodec) encObject(e *Encoder, v POJO) error {
+func (DecimalCodec) serializeObject(e *Encoder, v POJO) error {
 	decimal, ok := v.(big.Decimal)
 	if !ok {
 		return e.encObject(v)
@@ -20,7 +20,7 @@ func (DecimalCodec) encObject(e *Encoder, v POJO) error {
 	return e.encObject(decimal)
 }
 
-func (DecimalCodec) decObject(d *Decoder) (interface{}, error) {
+func (DecimalCodec) deserializeObject(d *Decoder) (interface{}, error) {
 	dec, err := d.DecodeValue()
 	if err != nil {
 		return nil, err
