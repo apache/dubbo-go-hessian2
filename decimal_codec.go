@@ -10,10 +10,14 @@ func init() {
 	RegisterPOJO(&big.Decimal{})
 	SetCodec("java.math.BigDecimal", DecimalCodec{})
 }
+
 func (DecimalCodec) encObject(e *Encoder, v POJO) error {
-	d := v.(big.Decimal)
-	d.Value = string(d.ToString())
-	return e.encObject(d)
+	decimal, ok := v.(big.Decimal)
+	if ok {
+		return e.encObject(v)
+	}
+	decimal.Value = string(decimal.ToString())
+	return e.encObject(decimal)
 }
 
 func (DecimalCodec) decObject(d *Decoder) (interface{}, error) {

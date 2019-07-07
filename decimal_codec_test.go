@@ -1,13 +1,13 @@
 package hessian
 
 import (
-	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
 )
 
 import (
 	big "github.com/dubbogo/gost/math/big"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestEncodeDecodeDecimal(t *testing.T) {
