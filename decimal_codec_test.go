@@ -32,11 +32,18 @@ func TestEncodeDecodeDecimal(t *testing.T) {
 	}
 }
 
-func TestDecimalFromJava(t *testing.T) {
+func TestDecimalGoDecode(t *testing.T) {
 	var d big.Decimal
 	_ = d.FromString([]byte("100.256"))
 	d.Value = string(d.ToString())
 	doTestDecimal(t, "customReplyTypedFixedDecimal", "100.256")
+}
+
+func TestDecimalJavaDecode(t *testing.T) {
+	var d big.Decimal
+	_ = d.FromString([]byte("100.256"))
+	d.Value = string(d.ToString())
+	testJavaDecode(t, "customArgTypedFixedList_Decimal", d)
 }
 
 func doTestDecimal(t *testing.T, method, content string) {
