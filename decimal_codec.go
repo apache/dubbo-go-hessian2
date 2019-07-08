@@ -18,14 +18,16 @@ import (
 	big "github.com/dubbogo/gost/math/big"
 )
 
-type DecimalCodec struct{}
+type DecimalSerializer struct{}
+type DecimalDeSerializer struct{}
 
 func init() {
 	RegisterPOJO(&big.Decimal{})
-	SetSerializer("java.math.BigDecimal", DecimalCodec{})
+	SetSerializer("java.math.BigDecimal", DecimalSerializer{})
+	SetDeSerializer("java.math.BigDecimal", DecimalDeSerializer{})
 }
 
-func (DecimalCodec) serializeObject(e *Encoder, v POJO) error {
+func (DecimalSerializer) serializeObject(e *Encoder, v POJO) error {
 	decimal, ok := v.(big.Decimal)
 	if !ok {
 		return e.encObject(v)
@@ -34,7 +36,7 @@ func (DecimalCodec) serializeObject(e *Encoder, v POJO) error {
 	return e.encObject(decimal)
 }
 
-func (DecimalCodec) deserializeObject(d *Decoder) (interface{}, error) {
+func (DecimalDeSerializer) deserializeObject(d *Decoder) (interface{}, error) {
 	dec, err := d.DecodeValue()
 	if err != nil {
 		return nil, err
