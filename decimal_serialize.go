@@ -41,7 +41,7 @@ func (DecimalSerializer) Deserialize(d *Decoder) (interface{}, error) {
 	}
 	result, ok := dec.(*big.Decimal)
 	if !ok {
-		panic("result is not decimal")
+		panic("result type is not decimal,please check the whether the conversion is ok")
 	}
 	err = result.FromString([]byte(result.Value))
 	if err != nil {
