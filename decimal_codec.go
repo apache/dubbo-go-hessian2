@@ -19,15 +19,13 @@ import (
 )
 
 type DecimalSerializer struct{}
-type DecimalDeSerializer struct{}
 
 func init() {
 	RegisterPOJO(&big.Decimal{})
 	SetSerializer("java.math.BigDecimal", DecimalSerializer{})
-	SetDeSerializer("java.math.BigDecimal", DecimalDeSerializer{})
 }
 
-func (DecimalSerializer) serializeObject(e *Encoder, v POJO) error {
+func (DecimalSerializer) Serialize(e *Encoder, v POJO) error {
 	decimal, ok := v.(big.Decimal)
 	if !ok {
 		return e.encObject(v)
@@ -36,7 +34,7 @@ func (DecimalSerializer) serializeObject(e *Encoder, v POJO) error {
 	return e.encObject(decimal)
 }
 
-func (DecimalDeSerializer) deserializeObject(d *Decoder) (interface{}, error) {
+func (DecimalSerializer) Deserialize(d *Decoder) (interface{}, error) {
 	dec, err := d.DecodeValue()
 	if err != nil {
 		return nil, err
