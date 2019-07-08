@@ -39,7 +39,10 @@ func (DecimalSerializer) Deserialize(d *Decoder) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	result := dec.(*big.Decimal)
+	result, ok := dec.(*big.Decimal)
+	if !ok {
+		panic("result is not decimal")
+	}
 	err = result.FromString([]byte(result.Value))
 	if err != nil {
 		return nil, err
