@@ -346,7 +346,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 					d.unreadByte() // Enum parsing, decInt64 above has read a byte, so you need to return a byte here
 					s, err := d.DecodeValue()
 					if err != nil {
-						return nil, perrors.Wrapf(err, "decInstance->DecObject field name:%s", fieldName)
+						return nil, perrors.Wrapf(err, "decInstance->decObject field name:%s", fieldName)
 					}
 					enumValue, _ := s.(JavaEnum)
 					num = int32(enumValue)
@@ -368,7 +368,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 					d.unreadByte() // Enum parsing, decInt64 above has read a byte, so you need to return a byte here
 					s, err := d.Decode()
 					if err != nil {
-						return nil, perrors.Wrapf(err, "decInstance->DecObject field name:%s", fieldName)
+						return nil, perrors.Wrapf(err, "decInstance->decObject field name:%s", fieldName)
 					}
 					enumValue, _ := s.(JavaEnum)
 					num = int64(enumValue)
