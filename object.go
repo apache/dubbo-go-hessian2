@@ -346,7 +346,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 					d.unreadByte() // Enum parsing, decInt64 above has read a byte, so you need to return a byte here
 					s, err := d.DecodeValue()
 					if err != nil {
-						return nil, perrors.Wrapf(err, "decInstance->Deserialize field name:%s", fieldName)
+						return nil, perrors.Wrapf(err, "decInstance->DecObject field name:%s", fieldName)
 					}
 					enumValue, _ := s.(JavaEnum)
 					num = int32(enumValue)
@@ -368,7 +368,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 					d.unreadByte() // Enum parsing, decInt64 above has read a byte, so you need to return a byte here
 					s, err := d.Decode()
 					if err != nil {
-						return nil, perrors.Wrapf(err, "decInstance->Deserialize field name:%s", fieldName)
+						return nil, perrors.Wrapf(err, "decInstance->DecObject field name:%s", fieldName)
 					}
 					enumValue, _ := s.(JavaEnum)
 					num = int64(enumValue)
@@ -517,13 +517,13 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 	case tag == BC_OBJECT_DEF:
 		clsDef, err := d.decClassDef()
 		if err != nil {
-			return nil, perrors.Wrap(err, "Deserialize->decClassDef byte double")
+			return nil, perrors.Wrap(err, "DecObject->decClassDef byte double")
 		}
 		cls, _ = clsDef.(classInfo)
 		//add to slice
 		d.appendClsDef(cls)
 		if c, ok := GetSerializer(cls.javaName); ok {
-			return c.Deserialize(d)
+			return c.DecObject(d)
 		}
 		return d.DecodeValue()
 
@@ -555,6 +555,6 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 		return d.decInstance(typ, cls)
 
 	default:
-		return nil, perrors.Errorf("Deserialize illegal object type tag:%+v", tag)
+		return nil, perrors.Errorf("DecObject illegal object type tag:%+v", tag)
 	}
 }

@@ -24,8 +24,8 @@ func init() {
 }
 
 type Serializer interface {
-	Serialize(*Encoder, POJO) error
-	Deserialize(*Decoder) (interface{}, error)
+	EncObject(*Encoder, POJO) error
+	DecObject(*Decoder) (interface{}, error)
 }
 
 var serializerMap = make(map[string]Serializer, 16)
@@ -41,7 +41,7 @@ func GetSerializer(key string) (Serializer, bool) {
 
 type DecimalSerializer struct{}
 
-func (DecimalSerializer) Serialize(e *Encoder, v POJO) error {
+func (DecimalSerializer) EncObject(e *Encoder, v POJO) error {
 	decimal, ok := v.(big.Decimal)
 	if !ok {
 		return e.encObject(v)
@@ -50,7 +50,7 @@ func (DecimalSerializer) Serialize(e *Encoder, v POJO) error {
 	return e.encObject(decimal)
 }
 
-func (DecimalSerializer) Deserialize(d *Decoder) (interface{}, error) {
+func (DecimalSerializer) DecObject(d *Decoder) (interface{}, error) {
 	dec, err := d.DecodeValue()
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func (DecimalSerializer) Deserialize(d *Decoder) (interface{}, error) {
 	if !ok {
 		panic("result type is not decimal,please check the whether the conversion is ok")
 	}
-	err = result.FromString([]byte(result.Value))
+	err = result.FromString(result.Value)
 	if err != nil {
 		return nil, err
 	}
