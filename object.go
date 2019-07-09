@@ -517,7 +517,7 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 	case tag == BC_OBJECT_DEF:
 		clsDef, err := d.decClassDef()
 		if err != nil {
-			return nil, perrors.Wrap(err, "DecObject->decClassDef byte double")
+			return nil, perrors.Wrap(err, "decObject->decClassDef byte double")
 		}
 		cls, _ = clsDef.(classInfo)
 		//add to slice
@@ -555,6 +555,6 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 		return d.decInstance(typ, cls)
 
 	default:
-		return nil, perrors.Errorf("DecObject illegal object type tag:%+v", tag)
+		return nil, perrors.Errorf("decObject illegal object type tag:%+v", tag)
 	}
 }
