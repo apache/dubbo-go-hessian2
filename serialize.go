@@ -14,6 +14,14 @@
 
 package hessian
 
+import (
+	big "github.com/dubbogo/gost/math/big"
+)
+
+func init() {
+	RegisterPOJO(&big.Decimal{})
+}
+
 type Serializer interface {
 	Serialize(*Encoder, POJO) error
 	Deserialize(*Decoder) (interface{}, error)
