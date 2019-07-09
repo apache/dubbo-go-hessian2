@@ -20,6 +20,7 @@ import (
 
 func init() {
 	RegisterPOJO(&big.Decimal{})
+	SetSerializer("java.math.BigDecimal", DecimalSerializer{})
 }
 
 type Serializer interface {
@@ -27,13 +28,40 @@ type Serializer interface {
 	Deserialize(*Decoder) (interface{}, error)
 }
 
-var SerializerMap = make(map[string]Serializer, 16)
+var serializerMap = make(map[string]Serializer, 16)
 
 func SetSerializer(key string, codec Serializer) {
-	SerializerMap[key] = codec
+	serializerMap[key] = codec
 }
 
 func GetSerializer(key string) (Serializer, bool) {
-	codec, ok := SerializerMap[key]
+	codec, ok := serializerMap[key]
 	return codec, ok
+}
+
+type DecimalSerializer struct{}
+
+func (DecimalSerializer) Serialize(e *Encoder, v POJO) error {
+	decimal, ok := v.(big.Decimal)
+	if !ok {
+		return e.encObject(v)
+	}
+	decimal.Value = string(decimal.ToString())
+	return e.encObject(decimal)
+}
+
+func (DecimalSerializer) Deserialize(d *Decoder) (interface{}, error) {
+	dec, err := d.DecodeValue()
+	if err != nil {
+		return nil, err
+	}
+	result, ok := dec.(*big.Decimal)
+	if !ok {
+		panic("result type is not decimal,please check the whether the conversion is ok")
+	}
+	err = result.FromString([]byte(result.Value))
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
