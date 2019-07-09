@@ -129,9 +129,9 @@ func (e *Encoder) Encode(v interface{}) error {
 				vv = UnpackPtr(vv)
 				if vv.IsValid() {
 					clazz = p.JavaClassName()
-				}
-				if c, ok := GetSerializer(clazz); ok {
-					return c.EncObject(e, p)
+					if c, ok := GetSerializer(clazz); ok {
+						return c.EncObject(e, p)
+					}
 				}
 				return e.encObject(p)
 			}
