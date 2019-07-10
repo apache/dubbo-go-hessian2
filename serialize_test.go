@@ -49,7 +49,7 @@ func TestEncodeDecodeDecimal(t *testing.T) {
 func TestDecimalGoDecode(t *testing.T) {
 	var d big.Decimal
 	_ = d.FromString("100.256")
-	d.Value = string(d.ToString())
+	d.Value = d.String()
 	doTestDecimal(t, "customReplyTypedFixedDecimal", "100.256")
 }
 
