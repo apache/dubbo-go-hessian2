@@ -56,7 +56,7 @@ func TestDecimalGoDecode(t *testing.T) {
 func TestDecimalJavaDecode(t *testing.T) {
 	var d big.Decimal
 	_ = d.FromString("100.256")
-	d.Value = string(d.ToString())
+	d.Value = d.String()
 	testJavaDecode(t, "customArgTypedFixedList_Decimal", d)
 }
 
