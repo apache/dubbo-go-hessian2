@@ -124,6 +124,15 @@ func (e *Encoder) Encode(v interface{}) error {
 		switch t.Kind() {
 		case reflect.Struct:
 			if p, ok := v.(POJO); ok {
+				var clazz string
+				vv := reflect.ValueOf(v)
+				vv = UnpackPtr(vv)
+				if vv.IsValid() {
+					clazz = p.JavaClassName()
+					if c, ok := GetSerializer(clazz); ok {
+						return c.EncObject(e, p)
+					}
+				}
 				return e.encObject(p)
 			}
 

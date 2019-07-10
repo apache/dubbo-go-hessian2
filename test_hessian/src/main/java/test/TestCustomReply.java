@@ -22,7 +22,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
-
+import java.math.BigDecimal;
 
 public class TestCustomReply {
 
@@ -337,6 +337,12 @@ public class TestCustomReply {
     public void customReplyTypedFixedList_Object() throws Exception {
         Object[] o = new Object[]{new A0()};
         output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedDecimal() throws Exception {
+        BigDecimal decimal = new BigDecimal("100.256");
+        output.writeObject(decimal);
         output.flush();
     }
 
