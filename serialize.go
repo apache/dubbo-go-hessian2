@@ -46,7 +46,7 @@ func (DecimalSerializer) EncObject(e *Encoder, v POJO) error {
 	if !ok {
 		return e.encObject(v)
 	}
-	decimal.Value = string(decimal.ToString())
+	decimal.Value = decimal.String()
 	return e.encObject(decimal)
 }
 

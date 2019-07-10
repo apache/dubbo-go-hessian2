@@ -41,7 +41,7 @@ func TestEncodeDecodeDecimal(t *testing.T) {
 		t.FailNow()
 	}
 
-	if !reflect.DeepEqual(dec.ToString(), decObj.(*big.Decimal).ToString()) {
+	if !reflect.DeepEqual(dec.String(), decObj.(*big.Decimal).String()) {
 		t.Errorf("expect: %v, but get: %v", dec, decObj)
 	}
 }
@@ -63,6 +63,6 @@ func TestDecimalJavaDecode(t *testing.T) {
 func doTestDecimal(t *testing.T, method, content string) {
 	testDecodeFrameworkFunc(t, method, func(r interface{}) {
 		t.Logf("%#v", r)
-		assert.Equal(t, content, string(r.(*big.Decimal).ToString()))
+		assert.Equal(t, content, r.(*big.Decimal).String())
 	})
 }
