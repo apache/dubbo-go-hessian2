@@ -146,20 +146,43 @@ func getArgsTypeList(args []interface{}) (string, error) {
 	return types, nil
 }
 
+type Request struct {
+	Params      interface{}
+	Attachments map[string]string
+}
+
+// Pls just use NewRequest to get a Request.
+func NewRequest(params interface{}, atta map[string]string) *Request {
+	if atta == nil {
+		atta = make(map[string]string)
+	}
+	return &Request{
+		Params:      params,
+		Attachments: atta,
+	}
+}
+
+func EnsureRequest(body interface{}) *Request {
+	if req, ok := body.(*Request); ok {
+		return req
+	}
+	return NewRequest(body, nil)
+}
+
 // dubbo-remoting/dubbo-remoting-api/src/main/java/com/alibaba/dubbo/remoting/exchange/codec/ExchangeCodec.java
 // v2.5.4 line 204 encodeRequest
-// todo: attachments
-func packRequest(service Service, header DubboHeader, params interface{}) ([]byte, error) {
+func packRequest(service Service, header DubboHeader, req interface{}) ([]byte, error) {
 	var (
-		err           error
-		types         string
-		byteArray     []byte
-		version       string
-		pkgLen        int
-		serviceParams map[string]string
+		err       error
+		types     string
+		byteArray []byte
+		version   string
+		pkgLen    int
 	)
 
-	args, ok := params.([]interface{})
+	request := EnsureRequest(req)
+
+	args, ok := request.Params.([]interface{})
 	if !ok {
 		return nil, perrors.Errorf("@params is not of type: []interface{}")
 	}
@@ -212,18 +235,17 @@ func packRequest(service Service, header DubboHeader, params interface{}) ([]byt
 		encoder.Encode(v)
 	}
 
-	serviceParams = make(map[string]string)
-	serviceParams[PATH_KEY] = service.Path
-	serviceParams[GROUP_KEY] = service.Group
-	serviceParams[INTERFACE_KEY] = service.Interface
+	request.Attachments[PATH_KEY] = service.Path
+	request.Attachments[GROUP_KEY] = service.Group
+	request.Attachments[INTERFACE_KEY] = service.Interface
 	if len(version) != 0 {
-		serviceParams[VERSION_KEY] = version
+		request.Attachments[VERSION_KEY] = version
 	}
 	if service.Timeout != 0 {
-		serviceParams[TIMEOUT_KEY] = strconv.Itoa(int(service.Timeout / time.Millisecond))
+		request.Attachments[TIMEOUT_KEY] = strconv.Itoa(int(service.Timeout / time.Millisecond))
 	}
 
-	encoder.Encode(serviceParams)
+	encoder.Encode(request.Attachments)
 
 END:
 	byteArray = encoder.Buffer()

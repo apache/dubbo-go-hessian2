@@ -28,18 +28,42 @@ import (
 )
 
 type Response struct {
-	RspObj    interface{}
-	Exception error
-	//Attachments map[string]string
+	RspObj      interface{}
+	Exception   error
+	Attachments map[string]string
+}
+
+// Pls just use NewResponse to get a Response.
+func NewResponse(rspObj interface{}, exp error, atta map[string]string) *Response {
+	if atta == nil {
+		atta = make(map[string]string)
+	}
+	return &Response{
+		RspObj:      rspObj,
+		Exception:   exp,
+		Attachments: atta,
+	}
+}
+
+func EnsureResponse(body interface{}) *Response {
+	if res, ok := body.(*Response); ok {
+		return res
+	}
+	if exp, ok := body.(error); ok {
+		return NewResponse(nil, exp, nil)
+	}
+	return NewResponse(body, nil, nil)
 }
 
 // dubbo-remoting/dubbo-remoting-api/src/main/java/com/alibaba/dubbo/remoting/exchange/codec/ExchangeCodec.java
 // v2.7.1 line 256 encodeResponse
 // hessian encode response
-func packResponse(header DubboHeader, attachments map[string]string, ret interface{}) ([]byte, error) {
+func packResponse(header DubboHeader, ret interface{}) ([]byte, error) {
 	var (
 		byteArray []byte
 	)
+
+	response := EnsureResponse(ret)
 
 	hb := header.Type == PackageHeartbeat
 
@@ -70,7 +94,7 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 			// com.alibaba.dubbo.rpc.protocol.dubbo.DubboCodec.DubboCodec.java
 			// v2.7.1 line191 encodeResponseData
 
-			atta := isSupportResponseAttachment(attachments[DUBBO_VERSION_KEY])
+			atta := isSupportResponseAttachment(response.Attachments[DUBBO_VERSION_KEY])
 
 			var resWithException, resValue, resNullValue int32
 			if atta {
@@ -83,35 +107,33 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 				resNullValue = RESPONSE_NULL_VALUE
 			}
 
-			if e, ok := ret.(error); ok { // throw error
+			if response.Exception != nil { // throw error
 				encoder.Encode(resWithException)
-				if t, ok := e.(java_exception.Throwabler); ok {
+				if t, ok := response.Exception.(java_exception.Throwabler); ok {
 					encoder.Encode(t)
 				} else {
-					encoder.Encode(java_exception.NewThrowable(e.Error()))
+					encoder.Encode(java_exception.NewThrowable(response.Exception.Error()))
 				}
 			} else {
-				if ret == nil {
+				if response.RspObj == nil {
 					encoder.Encode(resNullValue)
 				} else {
 					encoder.Encode(resValue)
-					encoder.Encode(ret) // result
+					encoder.Encode(response.RspObj) // result
 				}
 			}
 
 			if atta {
-				encoder.Encode(attachments) // attachments
+				encoder.Encode(response.Attachments) // attachments
 			}
 		}
 	} else {
 		// com.alibaba.dubbo.remoting.exchange.codec.ExchangeCodec
 		// v2.6.5 line280 encodeResponse
-		if e, ok := ret.(error); ok { // throw error
-			encoder.Encode(e.Error())
-		} else if e, ok := ret.(string); ok {
-			encoder.Encode(e)
+		if response.Exception != nil { // throw error
+			encoder.Encode(response.Exception.Error())
 		} else {
-			return nil, perrors.New("Ret must be error or string!")
+			encoder.Encode(response.RspObj)
 		}
 	}
 
@@ -129,13 +151,15 @@ func packResponse(header DubboHeader, attachments map[string]string, ret interfa
 
 // hessian decode response body
 // todo: need to read attachments
-func unpackResponseBody(buf []byte, response *Response) error {
+func unpackResponseBody(buf []byte, resp interface{}) error {
 	// body
 	decoder := NewDecoder(buf[:])
 	rspType, err := decoder.Decode()
 	if err != nil {
 		return perrors.WithStack(err)
 	}
+
+	response := EnsureResponse(resp)
 
 	switch rspType {
 	case RESPONSE_WITH_EXCEPTION, RESPONSE_WITH_EXCEPTION_WITH_ATTACHMENTS:
