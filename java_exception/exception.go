@@ -90,6 +90,10 @@ type Class struct {
 	Name string
 }
 
+type Method struct {
+	Name string
+}
+
 func (Class) JavaClassName() string {
 	return "java.lang.Class"
 }

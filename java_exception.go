@@ -105,4 +105,6 @@ func init() {
 	RegisterPOJO(&java_exception.MissingFormatArgumentException{})
 	RegisterPOJO(&java_exception.MissingFormatWidthException{})
 	RegisterPOJO(&java_exception.DubboGenericException{})
+	RegisterPOJO(&java_exception.IncompleteAnnotationException{})
+	RegisterPOJO(&java_exception.AnnotationTypeMismatchException{})
 }
