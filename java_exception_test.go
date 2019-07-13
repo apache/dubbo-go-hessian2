@@ -106,6 +106,8 @@ func TestException(t *testing.T) {
 	doTestException(t, "throw_IllegalFormatCodePointException", "Code point = 0x1")
 	doTestException(t, "throw_MissingFormatArgumentException", "Format specifier 'MissingFormatArgumentException'")
 	doTestException(t, "throw_MissingFormatWidthException", "MissingFormatWidthException")
+	doTestException(t, "throw_IncompleteAnnotationException", "test.projo.TestAnnotation missing element IncompleteAnnotationException")
+	doTestException(t, "throw_AnnotationTypeMismatchException", "Incorrectly typed data found for annotation element null (Found data of type AnnotationTypeMismatchException)")
 }
 
 func doTestException(t *testing.T, method, content string) {

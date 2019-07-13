@@ -14,6 +14,8 @@
 
 package test;
 
+import test.projo.TestAnnotation;
+
 import java.io.*;
 import java.lang.*;
 import java.lang.annotation.*;
@@ -390,4 +392,14 @@ public class TestThrowable {
   public static Object throw_MissingFormatWidthException() {
     return new MissingFormatWidthException("MissingFormatWidthException");
   }
+
+   public static Object throw_IncompleteAnnotationException() {
+      return new IncompleteAnnotationException(new TestAnnotation(Override.class, "Override").getClass(), "IncompleteAnnotationException");
+   }
+
+
+  public static Object throw_AnnotationTypeMismatchException() {
+    return new AnnotationTypeMismatchException(TestAnnotation.class.getEnclosingMethod(), "AnnotationTypeMismatchException");
+  }
+
 }
