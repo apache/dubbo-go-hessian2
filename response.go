@@ -34,14 +34,14 @@ type Response struct {
 }
 
 // NewResponse create a new Response
-func NewResponse(rspObj interface{}, exp error, atta map[string]string) *Response {
-	if atta == nil {
-		atta = make(map[string]string)
+func NewResponse(rspObj interface{}, exception error, attachments map[string]string) *Response {
+	if attachments == nil {
+		attachments = make(map[string]string)
 	}
 	return &Response{
 		RspObj:      rspObj,
-		Exception:   exp,
-		Attachments: atta,
+		Exception:   exception,
+		Attachments: attachments,
 	}
 }
 
