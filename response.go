@@ -33,7 +33,7 @@ type Response struct {
 	Attachments map[string]string
 }
 
-// Pls just use NewResponse to get a Response.
+// NewResponse create a new Response
 func NewResponse(rspObj interface{}, exp error, atta map[string]string) *Response {
 	if atta == nil {
 		atta = make(map[string]string)
@@ -150,7 +150,6 @@ func packResponse(header DubboHeader, ret interface{}) ([]byte, error) {
 }
 
 // hessian decode response body
-// todo: need to read attachments
 func unpackResponseBody(buf []byte, resp interface{}) error {
 	// body
 	decoder := NewDecoder(buf[:])
@@ -167,11 +166,24 @@ func unpackResponseBody(buf []byte, resp interface{}) error {
 		if err != nil {
 			return perrors.WithStack(err)
 		}
+		if rspType == RESPONSE_WITH_EXCEPTION_WITH_ATTACHMENTS {
+			attachments, err := decoder.Decode()
+			if err != nil {
+				return perrors.WithStack(err)
+			}
+			atta, ok := attachments.(map[string]string)
+			if ok {
+				response.Attachments = atta
+			} else {
+				return perrors.Errorf("get wrong attachments: %+v", atta)
+			}
+		}
+
 		if e, ok := expt.(error); ok {
 			response.Exception = e
-			return nil
+		} else {
+			response.Exception = perrors.Errorf("got exception: %+v", expt)
 		}
-		response.Exception = perrors.Errorf("got exception: %+v", expt)
 		return nil
 
 	case RESPONSE_VALUE, RESPONSE_VALUE_WITH_ATTACHMENTS:
@@ -179,9 +191,34 @@ func unpackResponseBody(buf []byte, resp interface{}) error {
 		if err != nil {
 			return perrors.WithStack(err)
 		}
+		if rspType == RESPONSE_VALUE_WITH_ATTACHMENTS {
+			attachments, err := decoder.Decode()
+			if err != nil {
+				return perrors.WithStack(err)
+			}
+			atta, ok := attachments.(map[string]string)
+			if ok {
+				response.Attachments = atta
+			} else {
+				return perrors.Errorf("get wrong attachments: %+v", atta)
+			}
+		}
+
 		return perrors.WithStack(ReflectResponse(rsp, response.RspObj))
 
 	case RESPONSE_NULL_VALUE, RESPONSE_NULL_VALUE_WITH_ATTACHMENTS:
+		if rspType == RESPONSE_NULL_VALUE_WITH_ATTACHMENTS {
+			attachments, err := decoder.Decode()
+			if err != nil {
+				return perrors.WithStack(err)
+			}
+			atta, ok := attachments.(map[string]string)
+			if ok {
+				response.Attachments = atta
+			} else {
+				return perrors.Errorf("get wrong attachments: %+v", atta)
+			}
+		}
 		return nil
 	}
 

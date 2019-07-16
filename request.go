@@ -151,7 +151,7 @@ type Request struct {
 	Attachments map[string]string
 }
 
-// Pls just use NewRequest to get a Request.
+// NewRequest create a new Request
 func NewRequest(params interface{}, atta map[string]string) *Request {
 	if atta == nil {
 		atta = make(map[string]string)
