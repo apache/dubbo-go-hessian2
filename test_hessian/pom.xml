@@ -25,6 +25,11 @@
             <version>9.4.16.v20190411</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>dubbo</artifactId>
+            <version>2.6.5</version>
+        </dependency>
     </dependencies>
 
     <build>
