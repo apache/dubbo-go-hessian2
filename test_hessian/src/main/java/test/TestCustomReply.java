@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.math.BigDecimal;
+import test.model.DateDemo;
 
 public class TestCustomReply {
 
@@ -343,6 +344,12 @@ public class TestCustomReply {
     public void customReplyTypedFixedDecimal() throws Exception {
         BigDecimal decimal = new BigDecimal("100.256");
         output.writeObject(decimal);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedDateNull() throws Exception {
+        DateDemo demo = new DateDemo("zhangshan",null);
+        output.writeObject(demo);
         output.flush();
     }
 

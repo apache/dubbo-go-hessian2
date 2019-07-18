@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.math.BigDecimal;
+import test.model.DateDemo;
 
 public class TestCustomDecode {
 
@@ -167,5 +168,10 @@ public class TestCustomDecode {
     public Object customArgTypedFixedList_Decimal() throws Exception {
         BigDecimal o = (BigDecimal) input.readObject();
         return o.toString().equals( "100.256");
+    }
+
+    public Object customArgTypedFixedList_DateNull() throws Exception {
+        DateDemo o = (DateDemo) input.readObject();
+        return o.getDate() == null;
     }
 }

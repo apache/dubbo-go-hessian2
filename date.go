@@ -26,6 +26,8 @@ import (
 // Date
 /////////////////////////////////////////
 
+var ZeroDate = time.Time{}
+
 // # time in UTC encoded as 64-bit long milliseconds since epoch
 // ::= x4a b7 b6 b5 b4 b3 b2 b1 b0
 // ::= x4b b3 b2 b1 b0       # minutes since epoch
@@ -46,7 +48,7 @@ func encDateInMimute(b []byte, v time.Time) []byte {
 // # time in UTC encoded as 64-bit long milliseconds since epoch
 // ::= x4a b7 b6 b5 b4 b3 b2 b1 b0
 // ::= x4b b3 b2 b1 b0       # minutes since epoch
-func (d *Decoder) decDate(flag int32) (interface{}, error) {
+func (d *Decoder) decDate(flag int32) (time.Time, error) {
 	var (
 		err error
 		l   int
@@ -65,7 +67,7 @@ func (d *Decoder) decDate(flag int32) (interface{}, error) {
 
 	switch {
 	case tag == BC_NULL:
-		return nil, nil
+		return ZeroDate, nil
 	case tag == BC_DATE: //'d': //date
 		s = buf[:8]
 		l, err = d.next(s)

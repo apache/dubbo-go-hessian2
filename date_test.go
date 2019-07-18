@@ -15,9 +15,23 @@
 package hessian
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
+
+func init() {
+	RegisterPOJO(&DateDemo{})
+}
+
+type DateDemo struct {
+	Name string
+	Date time.Time
+}
+
+func (DateDemo) JavaClassName() string {
+	return "test.model.DateDemo"
+}
 
 func TestEncDate(t *testing.T) {
 	var (
@@ -70,4 +84,44 @@ func TestDateEncode(t *testing.T) {
 	testJavaDecode(t, "argDate_0", time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC))
 	testJavaDecode(t, "argDate_1", time.Date(1998, 5, 8, 9, 51, 31, 0, time.UTC))
 	testJavaDecode(t, "argDate_2", time.Date(1998, 5, 8, 9, 51, 0, 0, time.UTC))
+}
+
+func TestEncDateNull(t *testing.T) {
+	var (
+		e   *Encoder
+		d   *Decoder
+		res interface{}
+	)
+	date := DateDemo{
+		Name: "s",
+		Date: ZeroDate,
+	}
+	e = NewEncoder()
+	e.Encode(date)
+	if len(e.Buffer()) == 0 {
+		t.Fail()
+	}
+	d = NewDecoder(e.Buffer())
+	res, _ = d.Decode()
+	assert.Equal(t, ZeroDate, res.(*DateDemo).Date)
+}
+
+func TestDateNulJavaDecode(t *testing.T) {
+	date := DateDemo{
+		Name: "s",
+		Date: ZeroDate,
+	}
+	testJavaDecode(t, "customArgTypedFixedList_DateNull", date)
+}
+
+func TestDateNullDecode(t *testing.T) {
+
+	doTestDateNull(t, "customReplyTypedFixedDateNull")
+}
+
+func doTestDateNull(t *testing.T, method string) {
+	testDecodeFrameworkFunc(t, method, func(r interface{}) {
+		t.Logf("%#v", r)
+		assert.Equal(t, ZeroDate, r.(*DateDemo).Date)
+	})
 }
