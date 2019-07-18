@@ -25,8 +25,9 @@ func init() {
 }
 
 type DateDemo struct {
-	Name string
-	Date time.Time
+	Name  string
+	Date  time.Time
+	Date1 *time.Time
 }
 
 func (DateDemo) JavaClassName() string {
@@ -93,8 +94,9 @@ func TestEncDateNull(t *testing.T) {
 		res interface{}
 	)
 	date := DateDemo{
-		Name: "s",
-		Date: ZeroDate,
+		Name:  "s",
+		Date:  ZeroDate,
+		Date1: nil,
 	}
 	e = NewEncoder()
 	e.Encode(date)
@@ -104,6 +106,7 @@ func TestEncDateNull(t *testing.T) {
 	d = NewDecoder(e.Buffer())
 	res, _ = d.Decode()
 	assert.Equal(t, ZeroDate, res.(*DateDemo).Date)
+	assert.Equal(t, true, res.(*DateDemo).Date1 == nil)
 }
 
 func TestDateNulJavaDecode(t *testing.T) {
@@ -114,7 +117,7 @@ func TestDateNulJavaDecode(t *testing.T) {
 	testJavaDecode(t, "customArgTypedFixedList_DateNull", date)
 }
 
-func TestDateNullDecode(t *testing.T) {
+func TestDateNilDecode(t *testing.T) {
 
 	doTestDateNull(t, "customReplyTypedFixedDateNull")
 }
@@ -123,5 +126,6 @@ func doTestDateNull(t *testing.T, method string) {
 	testDecodeFrameworkFunc(t, method, func(r interface{}) {
 		t.Logf("%#v", r)
 		assert.Equal(t, ZeroDate, r.(*DateDemo).Date)
+		assert.Equal(t, true, r.(*DateDemo).Date1 == nil)
 	})
 }

@@ -6,6 +6,7 @@ import java.util.Date;
 public class DateDemo implements Serializable {
     private String name;
     private Date date;
+    private Date date1;
 
     public String getName() {
         return name;
@@ -13,9 +14,10 @@ public class DateDemo implements Serializable {
 
     public DateDemo() {}
 
-    public DateDemo(String name,Date date) {
+    public DateDemo(String name,Date date,Date date1) {
         this.name = name;
         this.date = date;
+        this.date1 = date1;
     }
 
     public void setName(String name) {
@@ -27,6 +29,13 @@ public class DateDemo implements Serializable {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+    public Date getDate1() {
+        return date1;
+    }
+
+    public void setDate1(Date date1) {
+        this.date1 = date1;
     }
 
 }

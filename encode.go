@@ -104,9 +104,13 @@ func (e *Encoder) Encode(v interface{}) error {
 		if ZeroDate == val {
 			e.buffer = encNull(e.buffer)
 		} else {
-			e.buffer = encDateInMs(e.buffer, val)
+			e.buffer = encDateInMs(e.buffer, &val)
 			// e.buffer = encDateInMimute(v.(time.Time), e.buffer)
 		}
+
+	case *time.Time:
+		e.buffer = encDateInMs(e.buffer, val)
+
 	case float32:
 		e.buffer = encFloat(e.buffer, float64(val))
 

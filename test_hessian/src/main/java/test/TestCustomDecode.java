@@ -172,6 +172,6 @@ public class TestCustomDecode {
 
     public Object customArgTypedFixedList_DateNull() throws Exception {
         DateDemo o = (DateDemo) input.readObject();
-        return o.getDate() == null;
+        return o.getDate() == null && o.getDate1() == null;
     }
 }

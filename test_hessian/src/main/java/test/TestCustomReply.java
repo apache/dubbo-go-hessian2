@@ -348,7 +348,7 @@ public class TestCustomReply {
     }
 
     public void customReplyTypedFixedDateNull() throws Exception {
-        DateDemo demo = new DateDemo("zhangshan",null);
+        DateDemo demo = new DateDemo("zhangshan",null,null);
         output.writeObject(demo);
         output.flush();
     }
