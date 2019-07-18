@@ -14,15 +14,13 @@
 
 package test;
 
-import test.projo.TestAnnotation;
-
 import java.io.*;
-import java.lang.*;
-import java.lang.annotation.*;
+import java.lang.annotation.AnnotationTypeMismatchException;
+import java.lang.annotation.IncompleteAnnotationException;
 import java.lang.instrument.IllegalClassFormatException;
-import java.lang.invoke.WrongMethodTypeException;
-import java.lang.invoke.LambdaConversionException;
 import java.lang.instrument.UnmodifiableClassException;
+import java.lang.invoke.LambdaConversionException;
+import java.lang.invoke.WrongMethodTypeException;
 import java.lang.reflect.*;
 import java.time.DateTimeException;
 import java.time.format.DateTimeParseException;
@@ -394,12 +392,12 @@ public class TestThrowable {
   }
 
    public static Object throw_IncompleteAnnotationException() {
-      return new IncompleteAnnotationException(new TestAnnotation(Override.class, "Override").getClass(), "IncompleteAnnotationException");
+      return new IncompleteAnnotationException(Override.class, "IncompleteAnnotationException");
    }
 
 
   public static Object throw_AnnotationTypeMismatchException() {
-    return new AnnotationTypeMismatchException(TestAnnotation.class.getEnclosingMethod(), "AnnotationTypeMismatchException");
+    return new AnnotationTypeMismatchException(TestEnum.class.getEnclosingMethod(), "AnnotationTypeMismatchException");
   }
 
 }
