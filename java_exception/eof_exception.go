@@ -1,4 +1,4 @@
-// Copyright 2016-2019 tianying Pan
+// Copyright 2016-2019 summerbuger@gmail.com
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,22 +14,22 @@
 
 package java_exception
 
-type TypeNotPresentException struct {
-	TypeName             string
+type EOFException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []Exception
 	StackTrace           []StackTraceElement
-	Cause                *Throwable
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
-func (e TypeNotPresentException) Error() string {
+func NewEOFException(detailMessage string) *EOFException {
+	return &EOFException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
+}
+
+func (e EOFException) Error() string {
 	return e.DetailMessage
 }
 
-func (TypeNotPresentException) JavaClassName() string {
-	return "java.lang.TypeNotPresentException"
-}
-func NewTypeNotPresentException(typeName string, detailMessage string) *TypeNotPresentException {
-	return &TypeNotPresentException{TypeName: typeName, DetailMessage: detailMessage}
+func (EOFException) JavaClassName() string {
+	return "java.io.EOFException"
 }

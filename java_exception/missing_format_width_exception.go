@@ -1,4 +1,4 @@
-// Copyright 2016-2019 ckex868@vip.qq.com
+// Copyright 2016-2019 Yincheng Fang
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,22 +14,23 @@
 
 package java_exception
 
-type IOException struct {
+type MissingFormatWidthException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []IOException
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *IOException
+	Cause                Throwabler
+	S                    string
 }
 
-func NewIOException(detailMessage string) *IOException {
-	return &IOException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
+func NewMissingFormatWidthException(s string) *MissingFormatWidthException {
+	return &MissingFormatWidthException{S: s, StackTrace: []StackTraceElement{}}
 }
 
-func (e IOException) Error() string {
-	return e.DetailMessage
+func (e MissingFormatWidthException) Error() string {
+	return e.S
 }
 
-func (IOException) JavaClassName() string {
-	return "java.io.IOException"
+func (MissingFormatWidthException) JavaClassName() string {
+	return "java.util.MissingFormatWidthException"
 }

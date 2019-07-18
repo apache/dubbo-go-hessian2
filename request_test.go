@@ -25,10 +25,9 @@ import (
 
 func TestPackRequest(t *testing.T) {
 	bytes, err := packRequest(Service{
-		Path:      "/test",
+		Path:      "test",
 		Interface: "ITest",
 		Version:   "v1.0",
-		Target:    "test",
 		Method:    "test",
 		Timeout:   time.Second * 10,
 	}, DubboHeader{
@@ -42,6 +41,13 @@ func TestPackRequest(t *testing.T) {
 	if bytes != nil {
 		t.Logf("pack request: %s", string(bytes))
 	}
+}
+
+func TestGetArgsTypeList(t *testing.T) {
+	type Test struct{}
+	str, err := getArgsTypeList([]interface{}{nil, 1, []int{2}, true, []bool{false}, "a", []string{"b"}, Test{}, &Test{}, []Test{}, map[string]Test{}})
+	assert.NoError(t, err)
+	assert.Equal(t, "VJ[JZ[ZLjava/lang/String;[Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;[Ljava/lang/Object;Ljava/util/Map;", str)
 }
 
 func TestDescRegex(t *testing.T) {

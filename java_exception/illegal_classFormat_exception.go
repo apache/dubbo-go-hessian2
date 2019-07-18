@@ -1,4 +1,4 @@
-// Copyright 2016-2019 tianying Pan
+// Copyright 2016-2019 Yincheng Fang
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,21 +14,22 @@
 
 package java_exception
 
-type WrongMethodTypeException struct {
+type IllegalClassFormatException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []Exception
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *WrongMethodTypeException
+	Cause                Throwabler
 }
 
-func (e WrongMethodTypeException) Error() string {
+func NewIllegalClassFormatException(detailMessage string) *IllegalClassFormatException {
+	return &IllegalClassFormatException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
+}
+
+func (e IllegalClassFormatException) Error() string {
 	return e.DetailMessage
 }
 
-func (WrongMethodTypeException) JavaClassName() string {
-	return "java.lang.invoke.WrongMethodTypeException"
-}
-func NewWrongMethodTypeException(detailMessage string) *WrongMethodTypeException {
-	return &WrongMethodTypeException{DetailMessage: detailMessage}
+func (IllegalClassFormatException) JavaClassName() string {
+	return "java.lang.instrument.IllegalClassFormatException"
 }

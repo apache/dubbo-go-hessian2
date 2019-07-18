@@ -18,8 +18,8 @@ type IllegalMonitorStateException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []IllegalMonitorStateException
-	Cause                *IllegalMonitorStateException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewIllegalMonitorStateException(detailMessage string) *IllegalMonitorStateException {

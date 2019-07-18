@@ -18,8 +18,8 @@ type IllegalThreadStateException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []IllegalThreadStateException
-	Cause                *IllegalThreadStateException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewIllegalThreadStateException(detailMessage string) *IllegalThreadStateException {

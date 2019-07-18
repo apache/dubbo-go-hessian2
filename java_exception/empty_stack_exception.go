@@ -17,9 +17,9 @@ package java_exception
 type EmptyStackException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []Exception
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *EmptyStackException
+	Cause                Throwabler
 }
 
 func (e EmptyStackException) Error() string {

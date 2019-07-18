@@ -1,4 +1,4 @@
-// Copyright 2016-2019 tianying Pan
+// Copyright 2016-2019 Yincheng Fang
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,21 +14,22 @@
 
 package java_exception
 
-type MalformedParametersException struct {
+type ZoneRulesException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []Exception
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *MalformedParametersException
+	Cause                Throwabler
 }
 
-func (e MalformedParametersException) Error() string {
+func NewZoneRulesException(detailMessage string) *ZoneRulesException {
+	return &ZoneRulesException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
+}
+
+func (e ZoneRulesException) Error() string {
 	return e.DetailMessage
 }
 
-func (MalformedParametersException) JavaClassName() string {
-	return "java.lang.reflect.MalformedParametersException"
-}
-func NewMalformedParametersException(detailMessage string) *MalformedParametersException {
-	return &MalformedParametersException{DetailMessage: detailMessage}
+func (ZoneRulesException) JavaClassName() string {
+	return "java.time.zone.ZoneRulesException"
 }

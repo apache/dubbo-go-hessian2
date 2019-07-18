@@ -276,7 +276,7 @@ func EnsureRawValue(in interface{}) reflect.Value {
 		return v
 	}
 	if v, ok := in.(*_refHolder); ok {
-		in = v.value
+		return v.value
 	}
 	return reflect.ValueOf(in)
 }

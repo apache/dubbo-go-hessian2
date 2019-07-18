@@ -15,11 +15,24 @@
 package test;
 
 import java.io.*;
+import java.lang.*;
+import java.lang.annotation.*;
+import java.lang.instrument.IllegalClassFormatException;
 import java.lang.invoke.WrongMethodTypeException;
+import java.lang.invoke.LambdaConversionException;
+import java.lang.instrument.UnmodifiableClassException;
 import java.lang.reflect.*;
+import java.time.DateTimeException;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.UnsupportedTemporalTypeException;
+import java.time.zone.ZoneRulesException;
 import java.util.*;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.*;
+import java.util.jar.JarException;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.InvalidPreferencesFormatException;
+import java.util.zip.DataFormatException;
+import java.util.zip.ZipException;
 
 public class TestThrowable {
   public static Object throw_exception() {
@@ -52,7 +65,7 @@ public class TestThrowable {
 
   public static Object throw_uncheckedIOException() {
     return new java.io.UncheckedIOException(
-        "uncheckedIOException", new java.io.IOException("io exception"));
+            "uncheckedIOException", new java.io.IOException("io exception"));
   }
 
   public static Object throw_runtimeException() {
@@ -124,7 +137,7 @@ public class TestThrowable {
   }
 
   public static Object throw_OptionalDataException()
-      throws InvocationTargetException, NoSuchMethodException, IllegalAccessException,
+          throws InvocationTargetException, NoSuchMethodException, IllegalAccessException,
           InstantiationException {
     Constructor c1 = OptionalDataException.class.getDeclaredConstructor(int.class);
     c1.setAccessible(true);
@@ -141,6 +154,26 @@ public class TestThrowable {
 
   public static Object throw_UTFDataFormatException() {
     return new UTFDataFormatException("UTFDataFormatException");
+  }
+
+  public static Object throw_CloneNotSupportedException() {
+    return new CloneNotSupportedException("CloneNotSupportedException");
+  }
+
+  public static Object throw_InterruptedException() {
+    return new InterruptedException("InterruptedException");
+  }
+
+  public static Object throw_InterruptedIOException() {
+    return new InterruptedIOException("InterruptedIOException");
+  }
+
+  public static Object throw_LambdaConversionException() {
+    return new LambdaConversionException("LambdaConversionException");
+  }
+
+  public static Object throw_UnmodifiableClassException() {
+    return new UnmodifiableClassException("UnmodifiableClassException");
   }
 
   public static Object throw_SecurityException() {
@@ -189,7 +222,7 @@ public class TestThrowable {
 
   public static Object throw_MissingResourceException() {
     return new MissingResourceException(
-        "MissingResourceException", "MissingResourceExceptionClass", "MissingResourceExceptionKey");
+            "MissingResourceException", "MissingResourceExceptionClass", "MissingResourceExceptionKey");
   }
 
   public static Object throw_ConcurrentModificationException() {
@@ -216,5 +249,145 @@ public class TestThrowable {
 
   public static Object throw_NoSuchElementException() {
     return new NoSuchElementException("NoSuchElementException");
+  }
+
+  public static Object throw_NegativeArraySizeException() {
+    return new NegativeArraySizeException("NegativeArraySizeException");
+  }
+
+  public static Object throw_UnsupportedOperationException() {
+    return new UnsupportedOperationException("UnsupportedOperationException");
+  }
+
+  public static Object throw_ArithmeticException() {
+    return new ArithmeticException("ArithmeticException");
+  }
+
+  public static Object throw_InputMismatchException() {
+    return new InputMismatchException("InputMismatchException");
+  }
+
+  public static Object throw_ExecutionException() {
+    return new ExecutionException("ExecutionException", new Throwable("exception"));
+  }
+
+  public static Object throw_InvalidPreferencesFormatException() {
+    return new InvalidPreferencesFormatException("InvalidPreferencesFormatException", new Throwable("exception"));
+  }
+
+  public static Object throw_TimeoutException() {
+    return new TimeoutException("TimeoutException");
+  }
+
+  public static Object throw_BackingStoreException() {
+    return new BackingStoreException("BackingStoreException");
+  }
+
+  public static Object throw_DataFormatException() {
+    return new DataFormatException("DataFormatException");
+  }
+
+  public static Object throw_BrokenBarrierException() {
+    return new BrokenBarrierException("BrokenBarrierException");
+  }
+
+  public static Object throw_TooManyListenersException() {
+    return new TooManyListenersException("TooManyListenersException");
+  }
+
+  public static Object throw_InvalidPropertiesFormatException() {
+    return new InvalidPropertiesFormatException("InvalidPropertiesFormatException");
+  }
+
+  public static Object throw_ZipException() {
+    return new ZipException("ZipException");
+  }
+
+  public static Object throw_JarException() {
+    return new JarException("JarException");
+  }
+
+  public static Object throw_IllegalClassFormatException() {
+    return new IllegalClassFormatException("IllegalClassFormatException");
+  }
+
+  public static Object throw_ReflectiveOperationException() {
+    return new ReflectiveOperationException("ReflectiveOperationException", new Throwable("exception"));
+  }
+
+  public static Object throw_InvocationTargetException() {
+    return new InvocationTargetException(new Throwable("exception"), "InvocationTargetException");
+  }
+
+  public static Object throw_NoSuchMethodException() {
+    return new NoSuchMethodException("NoSuchMethodException");
+  }
+
+  public static Object throw_NoSuchFieldException() {
+    return new NoSuchFieldException("NoSuchFieldException");
+  }
+
+  public static Object throw_IllegalAccessException() {
+    return new IllegalAccessException("IllegalAccessException");
+  }
+
+  public static Object throw_ClassNotFoundException() {
+    return new ClassNotFoundException("ClassNotFoundException", new Throwable("exception"));
+  }
+
+  public static Object throw_InstantiationException() {
+    return new InstantiationException("InstantiationException");
+  }
+
+  public static Object throw_DateTimeException() {
+    return new DateTimeException("DateTimeException", new Throwable("exception"));
+  }
+
+  public static Object throw_UnsupportedTemporalTypeException() {
+    return new UnsupportedTemporalTypeException("UnsupportedTemporalTypeException", new Throwable("exception"));
+  }
+
+  public static Object throw_ZoneRulesException() {
+    return new ZoneRulesException("ZoneRulesException", new Throwable("exception"));
+  }
+
+  public static Object throw_DateTimeParseException() {
+    return new DateTimeParseException("DateTimeParseException", "CharSequence", 1, new Throwable("exception"));
+  }
+
+  public static Object throw_FormatterClosedException() {
+    return new FormatterClosedException();
+  }
+
+  public static Object throw_CancellationException() {
+    return new CancellationException("CancellationException");
+  }
+
+  public static Object throw_UnknownFormatConversionException() {
+    return new UnknownFormatConversionException("UnknownFormatConversionException");
+  }
+
+  public static Object throw_UnknownFormatFlagsException() {
+    return new UnknownFormatFlagsException("UnknownFormatFlagsException");
+  }
+
+  public static Object throw_IllegalFormatFlagsException() {
+    return new IllegalFormatFlagsException("IllegalFormatFlagsException");
+  }
+
+  public static Object throw_IllegalFormatPrecisionException() {
+    return new IllegalFormatPrecisionException(1);
+  }
+
+  public static Object throw_IllegalFormatCodePointException() {
+    return new IllegalFormatCodePointException(1);
+  }
+
+  public static Object throw_MissingFormatArgumentException() {
+    return new MissingFormatArgumentException("MissingFormatArgumentException");
+  }
+
+  public static Object throw_MissingFormatWidthException() {
+    return new MissingFormatWidthException("MissingFormatWidthException");
   }
 }

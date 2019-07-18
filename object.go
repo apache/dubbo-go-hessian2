@@ -419,7 +419,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 			if err != nil {
 				return nil, err
 			}
-		case reflect.Struct:
+		case reflect.Struct, reflect.Interface:
 			var (
 				err error
 				s   interface{}
@@ -442,7 +442,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 			}
 
 		default:
-			return nil, perrors.Errorf("unknown struct member type: %v", kind)
+			return nil, perrors.Errorf("unknown struct member type: %v %v", kind, typ.Name()+"."+typ.Field(index).Name)
 		}
 	} // end for
 
@@ -522,7 +522,9 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 		cls, _ = clsDef.(classInfo)
 		//add to slice
 		d.appendClsDef(cls)
-
+		if c, ok := GetSerializer(cls.javaName); ok {
+			return c.DecObject(d)
+		}
 		return d.DecodeValue()
 
 	case tag == BC_OBJECT:

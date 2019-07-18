@@ -18,8 +18,8 @@ type NumberFormatException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []NumberFormatException
-	Cause                *NumberFormatException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewNumberFormatException(detailMessage string) *NumberFormatException {

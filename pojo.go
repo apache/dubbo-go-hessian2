@@ -144,6 +144,7 @@ func RegisterPOJO(o POJO) int {
 	structInfo.javaName = o.JavaClassName()
 	structInfo.inst = o
 	pojoRegistry.j2g[structInfo.javaName] = structInfo.goName
+	registerTypeName(structInfo.goName, structInfo.javaName)
 
 	// prepare fields info of objectDef
 	for i := 0; i < structInfo.typ.NumField(); i++ {
@@ -295,7 +296,10 @@ func getStructDefByIndex(idx int) (reflect.Type, classInfo, error) {
 		return nil, cls, perrors.Errorf("illegal class index @idx %d", idx)
 	}
 	cls = pojoRegistry.classInfoList[idx]
-	clsName = pojoRegistry.j2g[cls.javaName]
+	clsName, ok = pojoRegistry.j2g[cls.javaName]
+	if !ok {
+		return nil, cls, perrors.Errorf("can not find java type name %s in registry", cls.javaName)
+	}
 	s, ok = pojoRegistry.registry[clsName]
 	if !ok {
 		return nil, cls, perrors.Errorf("can not find go type name %s in registry", clsName)

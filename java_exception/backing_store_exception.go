@@ -1,4 +1,4 @@
-// Copyright 2016-2019 tianying Pan
+// Copyright 2016-2019 Yincheng Fang
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,22 +14,22 @@
 
 package java_exception
 
-type UndeclaredThrowableException struct {
+type BackingStoreException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []Exception
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *Throwable
-	UndeclaredThrowable  Throwable
+	Cause                Throwabler
 }
 
-func (e UndeclaredThrowableException) Error() string {
+func NewBackingStoreException(detailMessage string) *BackingStoreException {
+	return &BackingStoreException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
+}
+
+func (e BackingStoreException) Error() string {
 	return e.DetailMessage
 }
 
-func (UndeclaredThrowableException) JavaClassName() string {
-	return "java.lang.reflect.UndeclaredThrowableException"
-}
-func NewUndeclaredThrowableException(detailMessage string) *UndeclaredThrowableException {
-	return &UndeclaredThrowableException{DetailMessage: detailMessage, UndeclaredThrowable: Throwable{}}
+func (BackingStoreException) JavaClassName() string {
+	return "java.util.prefs.BackingStoreException"
 }

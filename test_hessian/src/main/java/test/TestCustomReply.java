@@ -19,9 +19,10 @@ import com.caucho.hessian.test.A0;
 import com.caucho.hessian.test.A1;
 
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
-
+import java.math.BigDecimal;
 
 public class TestCustomReply {
 
@@ -63,6 +64,7 @@ public class TestCustomReply {
         typeMap.put(char[].class, "[char");
         typeMap.put(String[].class, "[string");
         typeMap.put(Object[].class, "[object");
+        typeMap.put(Date[].class, "[date");
     }
 
     public void customReplyTypedFixedListHasNull() throws Exception {
@@ -115,4 +117,245 @@ public class TestCustomReply {
         }
         output.flush();
     }
+
+    public void customReplyTypedFixedList_A0() throws Exception {
+        A0[] o = new A0[]{new A0(), new A0(), null};
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyTypedVariableList_A0() throws Exception {
+        A0[] o = new A0[]{new A0(), new A0(), null};
+        if (output.addRef(o)) {
+            return;
+        }
+        boolean hasEnd = output.writeListBegin(-1, "[com.caucho.hessian.test.A0");
+        for (Object tmp: o) {
+            output.writeObject(tmp);
+        }
+        if (hasEnd) {
+            output.writeListEnd();
+        }
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_int() throws Exception {
+        int[] o = new int[]{1, 2, 3};
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyTypedVariableList_int() throws Exception {
+        int[] o = new int[]{1, 2, 3};
+        if (output.addRef(o)) {
+            return;
+        }
+        boolean hasEnd = output.writeListBegin(-1, typeMap.get(o.getClass()));
+        for (Object tmp: o) {
+            output.writeObject(tmp);
+        }
+        if (hasEnd) {
+            output.writeListEnd();
+        }
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_long() throws Exception {
+        long[] o = new long[]{1, 2, 3};
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyTypedVariableList_long() throws Exception {
+        long[] o = new long[]{1, 2, 3};
+        if (output.addRef(o)) {
+            return;
+        }
+        boolean hasEnd = output.writeListBegin(-1, typeMap.get(o.getClass()));
+        for (Object tmp: o) {
+            output.writeObject(tmp);
+        }
+        if (hasEnd) {
+            output.writeListEnd();
+        }
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_float() throws Exception {
+        float[] o = new float[]{1, 2, 3};
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyTypedVariableList_float() throws Exception {
+        float[] o = new float[]{1, 2, 3};
+        if (output.addRef(o)) {
+            return;
+        }
+        boolean hasEnd = output.writeListBegin(-1, typeMap.get(o.getClass()));
+        for (Object tmp: o) {
+            output.writeObject(tmp);
+        }
+        if (hasEnd) {
+            output.writeListEnd();
+        }
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_double() throws Exception {
+        double[] o = new double[]{1, 2, 3};
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyTypedVariableList_double() throws Exception {
+        double[] o = new double[]{1, 2, 3};
+        if (output.addRef(o)) {
+            return;
+        }
+        boolean hasEnd = output.writeListBegin(-1, typeMap.get(o.getClass()));
+        for (Object tmp: o) {
+            output.writeObject(tmp);
+        }
+        if (hasEnd) {
+            output.writeListEnd();
+        }
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_short() throws Exception {
+        short[] o = new short[]{1, 2, 3};
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyTypedVariableList_short() throws Exception {
+        short[] o = new short[]{1, 2, 3};
+        if (output.addRef(o)) {
+            return;
+        }
+        boolean hasEnd = output.writeListBegin(-1, typeMap.get(o.getClass()));
+        for (Object tmp: o) {
+            output.writeObject(tmp);
+        }
+        if (hasEnd) {
+            output.writeListEnd();
+        }
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_char() throws Exception {
+        char[] o = new char[]{'1', '2', '3'};
+        if (output.addRef(o)) {
+            return;
+        }
+        boolean hasEnd = output.writeListBegin(o.length, typeMap.get(o.getClass()));
+        for (Object tmp: o) {
+            output.writeObject(tmp);
+        }
+        if (hasEnd) {
+            output.writeListEnd();
+        }
+        output.flush();
+    }
+
+    public void customReplyTypedVariableList_char() throws Exception {
+        char[] o = new char[]{'1', '2', '3'};
+        if (output.addRef(o)) {
+            return;
+        }
+        boolean hasEnd = output.writeListBegin(-1, typeMap.get(o.getClass()));
+        for (Object tmp: o) {
+            output.writeObject(tmp);
+        }
+        if (hasEnd) {
+            output.writeListEnd();
+        }
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_boolean() throws Exception {
+        boolean[] o = new boolean[]{true, false, true};
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyTypedVariableList_boolean() throws Exception {
+        boolean[] o = new boolean[]{true, false, true};
+        if (output.addRef(o)) {
+            return;
+        }
+        boolean hasEnd = output.writeListBegin(-1, typeMap.get(o.getClass()));
+        for (Object tmp: o) {
+            output.writeObject(tmp);
+        }
+        if (hasEnd) {
+            output.writeListEnd();
+        }
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_date() throws Exception {
+        Date[] o = new Date[]{new Date(1560864000), new Date(1560864000), new Date(1560864000)};
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyTypedVariableList_date() throws Exception {
+        Date[] o = new Date[]{new Date(1560864000), new Date(1560864000), new Date(1560864000)};
+        if (output.addRef(o)) {
+            return;
+        }
+        boolean hasEnd = output.writeListBegin(-1, typeMap.get(o.getClass()));
+        for (Object tmp: o) {
+            output.writeObject(tmp);
+        }
+        if (hasEnd) {
+            output.writeListEnd();
+        }
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_arrays() throws Exception {
+        int[][][] o = new int[][][]{{{1, 2, 3}, {4, 5, 6, 7}}, {{8, 9, 10}, {11, 12, 13, 14}}};
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_A0arrays() throws Exception {
+        A0[][][] o = new A0[][][]{{{new A0(), new A0(), new A0()}, {new A0(), new A0(), new A0(), null}}, {{new A0()}, {new A0()}}};
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_Test() throws Exception {
+        TypedListTest o = new TypedListTest();
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_Object() throws Exception {
+        Object[] o = new Object[]{new A0()};
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedDecimal() throws Exception {
+        BigDecimal decimal = new BigDecimal("100.256");
+        output.writeObject(decimal);
+        output.flush();
+    }
+
+}
+
+class TypedListTest implements Serializable {
+    public A0 a;
+    public A0[][] list;
+    public A1[][] list1;
+    TypedListTest() {
+        this.a = new A0();
+        this.list = new A0[][]{{new A0(), new A0()},{new A0(), new A0()}};
+        this.list1 = new A1[][]{{new A1(), new A1()},{new A1(), new A1()}};
+    }
+
 }

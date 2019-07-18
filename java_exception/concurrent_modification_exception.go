@@ -17,9 +17,9 @@ package java_exception
 type ConcurrentModificationException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []Exception
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *ConcurrentModificationException
+	Cause                Throwabler
 }
 
 func (e ConcurrentModificationException) Error() string {

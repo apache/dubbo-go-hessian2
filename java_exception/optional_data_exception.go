@@ -18,8 +18,8 @@ type OptionalDataException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []OptionalDataException
-	Cause                *OptionalDataException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 	Eof                  bool
 	Length               int
 }

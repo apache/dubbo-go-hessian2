@@ -1,4 +1,4 @@
-// Copyright 2016-2019 summerbuger@gmail.com
+// Copyright 2016-2019 Yincheng Fang
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,22 +14,22 @@
 
 package java_exception
 
-type EOFException struct {
+type ZipException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []EOFException
-	Cause                *EOFException
+	Cause                Throwabler
 }
 
-func NewEOFException(detailMessage string) *EOFException {
-	return &EOFException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
+func NewZipException(detailMessage string) *ZipException {
+	return &ZipException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
 }
 
-func (e EOFException) Error() string {
+func (e ZipException) Error() string {
 	return e.DetailMessage
 }
 
-func (EOFException) JavaClassName() string {
-	return "java.io.EOFException"
+func (ZipException) JavaClassName() string {
+	return "java.util.zip.ZipException"
 }

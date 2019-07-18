@@ -92,6 +92,8 @@ func (e *Encoder) Encode(v interface{}) error {
 		// use int64 type to handle int, to avoid  panic like :  reflect: Call using int32 as type int64 [recovered]
 		// when decode
 		e.buffer = encInt64(e.buffer, int64(val))
+	case uint:
+		e.buffer = encInt64(e.buffer, int64(val))
 
 	case int64:
 		e.buffer = encInt64(e.buffer, val)
@@ -122,12 +124,21 @@ func (e *Encoder) Encode(v interface{}) error {
 		switch t.Kind() {
 		case reflect.Struct:
 			if p, ok := v.(POJO); ok {
+				var clazz string
+				vv := reflect.ValueOf(v)
+				vv = UnpackPtr(vv)
+				if vv.IsValid() {
+					clazz = p.JavaClassName()
+					if c, ok := GetSerializer(clazz); ok {
+						return c.EncObject(e, p)
+					}
+				}
 				return e.encObject(p)
 			}
 
 			return perrors.Errorf("struct type not Support! %s[%v] is not a instance of POJO!", t.String(), v)
 		case reflect.Slice, reflect.Array:
-			return e.encUntypedList(v)
+			return e.encList(v)
 		case reflect.Map: // the type must be map[string]int
 			return e.encMap(v)
 		default:

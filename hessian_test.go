@@ -39,10 +39,9 @@ func doTestHessianEncodeHeader(t *testing.T, packageType PackageType, responseSt
 	RegisterPOJO(&Case{})
 	codecW := NewHessianCodec(nil)
 	resp, err := codecW.Write(Service{
-		Path:      "/test",
+		Path:      "test",
 		Interface: "ITest",
 		Version:   "v1.0",
-		Target:    "test",
 		Method:    "test",
 		Timeout:   time.Second * 10,
 	}, DubboHeader{
@@ -129,9 +128,9 @@ func TestResponse(t *testing.T) {
 			assert.FailNow(t, "no key in decoded response map")
 		}
 
-		mapValueArr, ok := c.([]interface{})
+		mapValueArr, ok := c.([]*Case)
 		if !ok {
-			assert.FailNow(t, "invalid decoded response map value", "expect []interface{}, but get %v", reflect.TypeOf(c))
+			assert.FailNow(t, "invalid decoded response map value", "expect []*Case, but get %v", reflect.TypeOf(c))
 		}
 		assert.Equal(t, 1, len(mapValueArr))
 		assert.Equal(t, &caseObj, mapValueArr[0])

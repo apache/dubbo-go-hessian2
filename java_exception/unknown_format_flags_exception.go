@@ -1,4 +1,4 @@
-// Copyright 2016-2019 tianying Pan
+// Copyright 2016-2019 Yincheng Fang
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,21 +14,23 @@
 
 package java_exception
 
-type MalformedParameterizedTypeException struct {
+type UnknownFormatFlagsException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
-	SuppressedExceptions []Exception
+	SuppressedExceptions []Throwabler
 	StackTrace           []StackTraceElement
-	Cause                *MalformedParameterizedTypeException
+	Cause                Throwabler
+	Flags                string
 }
 
-func (e MalformedParameterizedTypeException) Error() string {
-	return "MalformedParameterizedType"
+func NewUnknownFormatFlagsException(flags string) *UnknownFormatFlagsException {
+	return &UnknownFormatFlagsException{Flags: flags, StackTrace: []StackTraceElement{}}
 }
 
-func (MalformedParameterizedTypeException) JavaClassName() string {
-	return "java.lang.reflect.MalformedParameterizedTypeException"
+func (e UnknownFormatFlagsException) Error() string {
+	return "Flags = " + e.Flags
 }
-func NewMalformedParameterizedTypeException(detailMessage string) *MalformedParameterizedTypeException {
-	return &MalformedParameterizedTypeException{DetailMessage: detailMessage}
+
+func (UnknownFormatFlagsException) JavaClassName() string {
+	return "java.util.UnknownFormatFlagsException"
 }

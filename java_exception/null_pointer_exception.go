@@ -18,8 +18,8 @@ type NullPointerException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	StackTrace           []StackTraceElement
-	SuppressedExceptions []NullPointerException
-	Cause                *NullPointerException
+	SuppressedExceptions []Throwabler
+	Cause                Throwabler
 }
 
 func NewNullPointerException(detailMessage string) *NullPointerException {
