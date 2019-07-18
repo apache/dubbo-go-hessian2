@@ -15,9 +15,11 @@
 package hessian
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+)
+import (
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {
