@@ -14,6 +14,9 @@
 
 package test;
 
+
+import com.alibaba.dubbo.rpc.service.GenericException;
+
 import java.io.*;
 import java.lang.annotation.AnnotationTypeMismatchException;
 import java.lang.annotation.IncompleteAnnotationException;
@@ -400,4 +403,7 @@ public class TestThrowable {
     return new AnnotationTypeMismatchException(TestEnum.class.getEnclosingMethod(), "AnnotationTypeMismatchException");
   }
 
+  public static Object throw_DubboGenericException() {
+    return new GenericException("DubboGenericExceptionClass","DubboGenericException");
+  }
 }
