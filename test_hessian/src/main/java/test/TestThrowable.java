@@ -14,13 +14,14 @@
 
 package test;
 
+
+import com.alibaba.dubbo.rpc.service.GenericException;
+
 import java.io.*;
-import java.lang.*;
-import java.lang.annotation.*;
 import java.lang.instrument.IllegalClassFormatException;
-import java.lang.invoke.WrongMethodTypeException;
-import java.lang.invoke.LambdaConversionException;
 import java.lang.instrument.UnmodifiableClassException;
+import java.lang.invoke.LambdaConversionException;
+import java.lang.invoke.WrongMethodTypeException;
 import java.lang.reflect.*;
 import java.time.DateTimeException;
 import java.time.format.DateTimeParseException;
@@ -389,5 +390,9 @@ public class TestThrowable {
 
   public static Object throw_MissingFormatWidthException() {
     return new MissingFormatWidthException("MissingFormatWidthException");
+  }
+
+  public static Object throw_DubboGenericException() {
+    return new GenericException("DubboGenericExceptionClass","DubboGenericException");
   }
 }

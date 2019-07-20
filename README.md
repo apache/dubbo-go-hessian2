@@ -7,7 +7,7 @@
 
 ---
 
-It's a golang hessian library used by [Apache/dubbo-go](github.com/apache/dubbo-go).
+It's a golang hessian library used by [Apache/dubbo-go](https://github.com/apache/dubbo-go).
 
 ## Feature List
 
