@@ -15,6 +15,7 @@
 package hessian
 
 import (
+	"reflect"
 	"time"
 )
 
@@ -31,12 +32,12 @@ var ZeroDate = time.Time{}
 // # time in UTC encoded as 64-bit long milliseconds since epoch
 // ::= x4a b7 b6 b5 b4 b3 b2 b1 b0
 // ::= x4b b3 b2 b1 b0       # minutes since epoch
-func encDateInMs(b []byte, v *time.Time) []byte {
-	if v == nil {
-		return append(b, BC_NULL)
-	}
+func encDateInMs(b []byte, i interface{}) []byte {
+
+	value := UnpackPtrValue(reflect.ValueOf(i))
+	vi := value.Interface().(time.Time)
 	b = append(b, BC_DATE)
-	return append(b, PackInt64(v.UnixNano()/1e6)...)
+	return append(b, PackInt64(vi.UnixNano()/1e6)...)
 }
 
 func encDateInMimute(b []byte, v time.Time) []byte {

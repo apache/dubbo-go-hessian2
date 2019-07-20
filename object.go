@@ -424,12 +424,17 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 				err error
 				s   interface{}
 			)
-			if fldRawValue.Type().String() == "time.Time" {
+			typeName := fldRawValue.Type().String()
+			if strings.Contains(typeName, "time.Time") {
 				s, err = d.decDate(TAG_READ)
 				if err != nil {
 					return nil, perrors.WithStack(err)
 				}
-				fldRawValue.Set(reflect.ValueOf(s))
+				tValue := reflect.ValueOf(s)
+				for fldRawValue.Type() != tValue.Type() {
+					tValue = PackPtr(tValue)
+				}
+				fldRawValue.Set(tValue)
 			} else {
 				s, err = d.decObject(TAG_READ)
 				if err != nil {

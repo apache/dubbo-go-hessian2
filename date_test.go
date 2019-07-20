@@ -27,9 +27,12 @@ func init() {
 }
 
 type DateDemo struct {
-	Name  string
-	Date  time.Time
-	Date1 *time.Time
+	Name    string
+	Date    time.Time
+	NilDate *time.Time
+	Date1   *time.Time
+	Date2   **time.Time
+	Date3   ***time.Time
 }
 
 func (DateDemo) JavaClassName() string {
@@ -91,14 +94,26 @@ func TestDateEncode(t *testing.T) {
 
 func TestEncDateNull(t *testing.T) {
 	var (
+		v   string
+		tz  time.Time
 		e   *Encoder
 		d   *Decoder
 		res interface{}
 	)
+	v = "2014-02-09 06:15:23 +0800 CST"
+	tz, _ = time.Parse("2006-01-02 15:04:05 +0800 CST", v)
+	d1 := &tz
+	d2 := &d1
+	d3 := &d2
+
 	date := DateDemo{
-		Name:  "s",
-		Date:  ZeroDate,
-		Date1: nil,
+		Name: "zs",
+		Date: ZeroDate,
+
+		NilDate: nil,
+		Date1:   nil,
+		Date2:   d2,
+		Date3:   d3,
 	}
 	e = NewEncoder()
 	e.Encode(date)
@@ -108,12 +123,17 @@ func TestEncDateNull(t *testing.T) {
 	d = NewDecoder(e.Buffer())
 	res, _ = d.Decode()
 	assert.Equal(t, ZeroDate, res.(*DateDemo).Date)
-	assert.Equal(t, true, res.(*DateDemo).Date1 == nil)
+	assert.Equal(t, true, res.(*DateDemo).Date == ZeroDate)
+	assert.Equal(t, &ZeroDate, res.(*DateDemo).NilDate)
+	assert.Equal(t, ZeroDate, *res.(*DateDemo).Date1)
+	assert.Equal(t, tz.Local().String(), (*res.(*DateDemo).Date2).String())
+	assert.Equal(t, tz.Local().String(), (*(*res.(*DateDemo).Date3)).String())
+
 }
 
 func TestDateNulJavaDecode(t *testing.T) {
 	date := DateDemo{
-		Name: "s",
+		Name: "zs",
 		Date: ZeroDate,
 	}
 	testJavaDecode(t, "customArgTypedFixedList_DateNull", date)
@@ -128,6 +148,6 @@ func doTestDateNull(t *testing.T, method string) {
 	testDecodeFrameworkFunc(t, method, func(r interface{}) {
 		t.Logf("%#v", r)
 		assert.Equal(t, ZeroDate, r.(*DateDemo).Date)
-		assert.Equal(t, true, r.(*DateDemo).Date1 == nil)
+		assert.Equal(t, &ZeroDate, r.(*DateDemo).Date1)
 	})
 }
