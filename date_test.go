@@ -123,7 +123,6 @@ func TestEncDateNull(t *testing.T) {
 	d = NewDecoder(e.Buffer())
 	res, _ = d.Decode()
 	assert.Equal(t, ZeroDate, res.(*DateDemo).Date)
-	assert.Equal(t, true, res.(*DateDemo).Date == ZeroDate)
 	assert.Equal(t, &ZeroDate, res.(*DateDemo).NilDate)
 	assert.Equal(t, ZeroDate, *res.(*DateDemo).Date1)
 	assert.Equal(t, tz.Local().String(), (*res.(*DateDemo).Date2).String())

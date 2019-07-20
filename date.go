@@ -36,6 +36,10 @@ func encDateInMs(b []byte, i interface{}) []byte {
 
 	value := UnpackPtrValue(reflect.ValueOf(i))
 	vi := value.Interface().(time.Time)
+	if vi == ZeroDate {
+		b = append(b, BC_NULL)
+		return nil
+	}
 	b = append(b, BC_DATE)
 	return append(b, PackInt64(vi.UnixNano()/1e6)...)
 }
