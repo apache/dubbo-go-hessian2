@@ -394,22 +394,13 @@ public class TestThrowable {
     return new MissingFormatWidthException("MissingFormatWidthException");
   }
 
-   public static Object throw_IncompleteAnnotationException() {
-      return new IncompleteAnnotationException(Override.class, "IncompleteAnnotationException");
-   }
-
-
-  public static Object throw_AnnotationTypeMismatchException() {
-    return new AnnotationTypeMismatchException(TestEnum.class.getEnclosingMethod(), "AnnotationTypeMismatchException");
-  }
-
   public static Object throw_DubboGenericException() {
     return new GenericException("DubboGenericExceptionClass","DubboGenericException");
   }
 
-   public static Object throw_IncompleteAnnotationException() {
-      return new IncompleteAnnotationException(Override.class, "IncompleteAnnotationException");
-   }
+  public static Object throw_IncompleteAnnotationException() {
+    return new IncompleteAnnotationException(Override.class, "IncompleteAnnotationException");
+  }
 
   public static Object throw_AnnotationTypeMismatchException() {
     return new AnnotationTypeMismatchException(Override.class.getEnclosingMethod(), "AnnotationTypeMismatchException");
