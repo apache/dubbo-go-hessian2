@@ -17,6 +17,7 @@ package hessian
 import "github.com/dubbogo/hessian2/java_exception"
 
 func init() {
+	RegisterPOJO(&java_exception.Method{})
 	RegisterPOJO(&java_exception.Class{})
 	RegisterPOJO(&java_exception.Throwable{})
 	RegisterPOJO(&java_exception.Exception{})
@@ -105,4 +106,6 @@ func init() {
 	RegisterPOJO(&java_exception.MissingFormatArgumentException{})
 	RegisterPOJO(&java_exception.MissingFormatWidthException{})
 	RegisterPOJO(&java_exception.DubboGenericException{})
+	RegisterPOJO(&java_exception.IncompleteAnnotationException{})
+	RegisterPOJO(&java_exception.AnnotationTypeMismatchException{})
 }

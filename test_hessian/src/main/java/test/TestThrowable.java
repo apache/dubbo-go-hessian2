@@ -18,6 +18,8 @@ package test;
 import com.alibaba.dubbo.rpc.service.GenericException;
 
 import java.io.*;
+import java.lang.annotation.AnnotationTypeMismatchException;
+import java.lang.annotation.IncompleteAnnotationException;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.UnmodifiableClassException;
 import java.lang.invoke.LambdaConversionException;
@@ -395,4 +397,13 @@ public class TestThrowable {
   public static Object throw_DubboGenericException() {
     return new GenericException("DubboGenericExceptionClass","DubboGenericException");
   }
+
+  public static Object throw_IncompleteAnnotationException() {
+    return new IncompleteAnnotationException(Override.class, "IncompleteAnnotationException");
+  }
+
+  public static Object throw_AnnotationTypeMismatchException() {
+    return new AnnotationTypeMismatchException(Override.class.getEnclosingMethod(), "AnnotationTypeMismatchException");
+  }
+
 }
