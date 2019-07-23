@@ -17,7 +17,6 @@ package hessian
 import (
 	"bufio"
 	"encoding/binary"
-	"reflect"
 	"time"
 )
 
@@ -77,12 +76,13 @@ func (h *HessianCodec) Write(service Service, header DubboHeader, body interface
 		if header.ResponseStatus == Zero {
 			return packRequest(service, header, body)
 		}
-		return packResponse(header, map[string]string{}, body)
+		return packResponse(header, body)
+
 	case PackageRequest, PackageRequest_TwoWay:
 		return packRequest(service, header, body)
 
 	case PackageResponse:
-		return packResponse(header, map[string]string{}, body)
+		return packResponse(header, body)
 
 	default:
 		return nil, perrors.Errorf("Unrecognised message type: %v", header.Type)
@@ -175,15 +175,14 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 
 	switch h.pkgType & 0x2f {
 	case PackageResponse | PackageHeartbeat | PackageResponse_Exception, PackageResponse | PackageResponse_Exception:
-		rsp, ok := rspObj.(*Response)
-		if !ok {
-			return perrors.Errorf("@rspObj is not *Response, it is %s", reflect.TypeOf(rspObj).String())
-		}
-		rsp.Exception = ErrJavaException
 		decoder := NewDecoder(buf[:])
 		exception, err := decoder.Decode()
 		if err != nil {
 			return perrors.WithStack(err)
+		}
+		rsp, ok := rspObj.(*Response)
+		if !ok {
+			return perrors.Errorf("java exception:%s", exception.(string))
 		}
 		rsp.Exception = perrors.Errorf("java exception:%s", exception.(string))
 		return nil
@@ -196,11 +195,7 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 		}
 	case PackageResponse:
 		if rspObj != nil {
-			rsp, ok := rspObj.(*Response)
-			if !ok {
-				rsp = &Response{RspObj: rspObj}
-			}
-			if err = unpackResponseBody(buf, rsp); err != nil {
+			if err = unpackResponseBody(buf, rspObj); err != nil {
 				return perrors.WithStack(err)
 			}
 		}
