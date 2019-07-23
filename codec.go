@@ -292,8 +292,13 @@ func SetValue(dest, v reflect.Value) {
 			return
 		}
 	}
-	//temporary process for multi-layer ptr,base type must be the same
-	if UnpackPtrType(dest.Type()) == UnpackPtrType(v.Type()) {
+	// zero value not need to set
+	if !v.IsValid() {
+		return
+	}
+	//temporary process for time.Time
+	typ := UnpackPtrType(dest.Type())
+	if typ.String() == "time.Time" {
 		for dest.Type() != v.Type() {
 			v = PackPtr(v)
 		}
@@ -325,11 +330,6 @@ func SetValue(dest, v reflect.Value) {
 		}
 	} else {
 		v = UnpackPtrValue(v)
-	}
-
-	// zero value not need to set
-	if !v.IsValid() {
-		return
 	}
 
 	// set value as required type
