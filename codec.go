@@ -296,7 +296,7 @@ func SetValue(dest, v reflect.Value) {
 	if !v.IsValid() {
 		return
 	}
-	//temporary process for time.Time
+	//temporary process, only handle the same type of situation
 	if UnpackPtrType(dest.Type()) == UnpackPtrType(v.Type()) && dest.Kind() == reflect.Ptr && dest.CanSet() {
 		for dest.Type() != v.Type() {
 			v = PackPtr(v)
