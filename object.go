@@ -424,8 +424,8 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 				err error
 				s   interface{}
 			)
-			typeName := fldRawValue.Type().String()
-			if strings.Contains(typeName, "time.Time") {
+			typ := UnpackPtrType(fldRawValue.Type())
+			if typ.String() == "time.Time" {
 				s, err = d.decDate(TAG_READ)
 				if err != nil {
 					return nil, perrors.WithStack(err)

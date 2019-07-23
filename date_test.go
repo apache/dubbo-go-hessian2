@@ -29,6 +29,7 @@ func init() {
 type DateDemo struct {
 	Name    string
 	Date    time.Time
+	Dates   []time.Time
 	NilDate *time.Time
 	Date1   *time.Time
 	Date2   **time.Time
@@ -107,9 +108,9 @@ func TestEncDateNull(t *testing.T) {
 	d3 := &d2
 
 	date := DateDemo{
-		Name: "zs",
-		Date: ZeroDate,
-
+		Name:    "zs",
+		Date:    ZeroDate,
+		Dates:   []time.Time{tz, tz},
 		NilDate: nil,
 		Date1:   nil,
 		Date2:   d2,
@@ -123,6 +124,8 @@ func TestEncDateNull(t *testing.T) {
 	d = NewDecoder(e.Buffer())
 	res, _ = d.Decode()
 	assert.Equal(t, ZeroDate, res.(*DateDemo).Date)
+	assert.Equal(t, 2, len(res.(*DateDemo).Dates))
+	assert.Equal(t, tz.Local().String(), res.(*DateDemo).Dates[0].String())
 	assert.Equal(t, &ZeroDate, res.(*DateDemo).NilDate)
 	assert.Equal(t, ZeroDate, *res.(*DateDemo).Date1)
 	assert.Equal(t, tz.Local().String(), (*res.(*DateDemo).Date2).String())
