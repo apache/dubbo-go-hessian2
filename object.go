@@ -430,11 +430,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 				if err != nil {
 					return nil, perrors.WithStack(err)
 				}
-				tValue := reflect.ValueOf(s)
-				for fldRawValue.Type() != tValue.Type() {
-					tValue = PackPtr(tValue)
-				}
-				fldRawValue.Set(tValue)
+				SetValue(fldRawValue, EnsurePackValue(s))
 			} else {
 				s, err = d.decObject(TAG_READ)
 				if err != nil {

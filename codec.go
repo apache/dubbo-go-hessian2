@@ -292,7 +292,14 @@ func SetValue(dest, v reflect.Value) {
 			return
 		}
 	}
-
+	//temporary process for multi-layer ptr,base type must be the same
+	if UnpackPtrType(dest.Type()) == UnpackPtrType(v.Type()) {
+		for dest.Type() != v.Type() {
+			v = PackPtr(v)
+		}
+		dest.Set(v)
+		return
+	}
 	// if the kind of dest is Ptr, the original value will be zero value
 	// set value on zero value is not allowed
 	// unpack to one-level pointer
@@ -307,7 +314,6 @@ func SetValue(dest, v reflect.Value) {
 		for v.IsValid() && v.Kind() == reflect.Ptr && v.Elem().Kind() == reflect.Ptr {
 			v = v.Elem()
 		}
-
 		// zero value not need to set
 		if !v.IsValid() {
 			return
