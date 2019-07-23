@@ -297,8 +297,7 @@ func SetValue(dest, v reflect.Value) {
 		return
 	}
 	//temporary process for time.Time
-	typ := UnpackPtrType(dest.Type())
-	if typ.String() == "time.Time" {
+	if UnpackPtrType(dest.Type()) == UnpackPtrType(v.Type()) && dest.Kind() == reflect.Ptr && dest.CanSet() {
 		for dest.Type() != v.Type() {
 			v = PackPtr(v)
 		}
