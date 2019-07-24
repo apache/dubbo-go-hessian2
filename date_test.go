@@ -18,6 +18,27 @@ import (
 	"testing"
 	"time"
 )
+import (
+	"github.com/stretchr/testify/assert"
+)
+
+func init() {
+	RegisterPOJO(&DateDemo{})
+}
+
+type DateDemo struct {
+	Name    string
+	Date    time.Time
+	Dates   []**time.Time
+	NilDate *time.Time
+	Date1   *time.Time
+	Date2   **time.Time
+	Date3   ***time.Time
+}
+
+func (DateDemo) JavaClassName() string {
+	return "test.model.DateDemo"
+}
 
 func TestEncDate(t *testing.T) {
 	var (
@@ -70,4 +91,65 @@ func TestDateEncode(t *testing.T) {
 	testJavaDecode(t, "argDate_0", time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC))
 	testJavaDecode(t, "argDate_1", time.Date(1998, 5, 8, 9, 51, 31, 0, time.UTC))
 	testJavaDecode(t, "argDate_2", time.Date(1998, 5, 8, 9, 51, 0, 0, time.UTC))
+}
+
+func TestEncDateNull(t *testing.T) {
+	var (
+		v   string
+		tz  time.Time
+		e   *Encoder
+		d   *Decoder
+		res interface{}
+	)
+	v = "2014-02-09 06:15:23 +0800 CST"
+	tz, _ = time.Parse("2006-01-02 15:04:05 +0800 CST", v)
+	d1 := &tz
+	d2 := &d1
+	d3 := &d2
+
+	date := DateDemo{
+		Name:    "zs",
+		Date:    ZeroDate,
+		Dates:   []**time.Time{d2, d2},
+		NilDate: nil,
+		Date1:   nil,
+		Date2:   d2,
+		Date3:   d3,
+	}
+	e = NewEncoder()
+	e.Encode(date)
+	if len(e.Buffer()) == 0 {
+		t.Fail()
+	}
+	d = NewDecoder(e.Buffer())
+	res, _ = d.Decode()
+	assert.Equal(t, ZeroDate, res.(*DateDemo).Date)
+	assert.Equal(t, 2, len(res.(*DateDemo).Dates))
+	assert.Equal(t, tz.Local().String(), (*res.(*DateDemo).Dates[0]).String())
+	assert.Equal(t, &ZeroDate, res.(*DateDemo).NilDate)
+	assert.Equal(t, ZeroDate, *res.(*DateDemo).Date1)
+	assert.Equal(t, tz.Local().String(), (*res.(*DateDemo).Date2).String())
+	assert.Equal(t, tz.Local().String(), (*(*res.(*DateDemo).Date3)).String())
+
+}
+
+func TestDateNulJavaDecode(t *testing.T) {
+	date := DateDemo{
+		Name: "zs",
+		Date: ZeroDate,
+	}
+	testJavaDecode(t, "customArgTypedFixedList_DateNull", date)
+}
+
+func TestDateNilDecode(t *testing.T) {
+
+	doTestDateNull(t, "customReplyTypedFixedDateNull")
+}
+
+func doTestDateNull(t *testing.T, method string) {
+	testDecodeFrameworkFunc(t, method, func(r interface{}) {
+		t.Logf("%#v", r)
+		assert.Equal(t, ZeroDate, r.(*DateDemo).Date)
+		assert.Equal(t, &ZeroDate, r.(*DateDemo).Date1)
+	})
 }

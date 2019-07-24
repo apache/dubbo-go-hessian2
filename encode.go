@@ -101,8 +101,12 @@ func (e *Encoder) Encode(v interface{}) error {
 		e.buffer = encInt64(e.buffer, int64(val))
 
 	case time.Time:
-		e.buffer = encDateInMs(e.buffer, val)
-		// e.buffer = encDateInMimute(v.(time.Time), e.buffer)
+		if ZeroDate == val {
+			e.buffer = encNull(e.buffer)
+		} else {
+			e.buffer = encDateInMs(e.buffer, &val)
+			// e.buffer = encDateInMimute(v.(time.Time), e.buffer)
+		}
 
 	case float32:
 		e.buffer = encFloat(e.buffer, float64(val))
@@ -123,15 +127,21 @@ func (e *Encoder) Encode(v interface{}) error {
 		t := UnpackPtrType(reflect.TypeOf(v))
 		switch t.Kind() {
 		case reflect.Struct:
+			vv := reflect.ValueOf(v)
+			vv = UnpackPtr(vv)
+			if !vv.IsValid() {
+				e.buffer = encNull(e.buffer)
+				return nil
+			}
+			if vv.Type().String() == "time.Time" {
+				e.buffer = encDateInMs(e.buffer, v)
+				return nil
+			}
 			if p, ok := v.(POJO); ok {
 				var clazz string
-				vv := reflect.ValueOf(v)
-				vv = UnpackPtr(vv)
-				if vv.IsValid() {
-					clazz = p.JavaClassName()
-					if c, ok := GetSerializer(clazz); ok {
-						return c.EncObject(e, p)
-					}
+				clazz = p.JavaClassName()
+				if c, ok := GetSerializer(clazz); ok {
+					return c.EncObject(e, p)
 				}
 				return e.encObject(p)
 			}
