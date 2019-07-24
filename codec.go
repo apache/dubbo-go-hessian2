@@ -292,6 +292,14 @@ func SetValue(dest, v reflect.Value) {
 			return
 		}
 	}
+	//temporary process, only handle the same type of situation
+	if v.IsValid() && UnpackPtrType(dest.Type()) == UnpackPtrType(v.Type()) && dest.Kind() == reflect.Ptr && dest.CanSet() {
+		for dest.Type() != v.Type() {
+			v = PackPtr(v)
+		}
+		dest.Set(v)
+		return
+	}
 
 	// if the kind of dest is Ptr, the original value will be zero value
 	// set value on zero value is not allowed
@@ -307,7 +315,6 @@ func SetValue(dest, v reflect.Value) {
 		for v.IsValid() && v.Kind() == reflect.Ptr && v.Elem().Kind() == reflect.Ptr {
 			v = v.Elem()
 		}
-
 		// zero value not need to set
 		if !v.IsValid() {
 			return
@@ -320,7 +327,6 @@ func SetValue(dest, v reflect.Value) {
 	} else {
 		v = UnpackPtrValue(v)
 	}
-
 	// zero value not need to set
 	if !v.IsValid() {
 		return
