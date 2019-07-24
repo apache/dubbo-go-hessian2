@@ -292,13 +292,12 @@ func SetValue(dest, v reflect.Value) {
 			return
 		}
 	}
-
+	// zero value not need to set
+	if !v.IsValid() {
+		return
+	}
 	//temporary process, only handle the same type of situation
 	if UnpackPtrType(dest.Type()) == UnpackPtrType(v.Type()) && dest.Kind() == reflect.Ptr && dest.CanSet() {
-		// zero value not need to set
-		if !v.IsValid() {
-			return
-		}
 		for dest.Type() != v.Type() {
 			v = PackPtr(v)
 		}
