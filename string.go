@@ -134,32 +134,6 @@ func (d *Decoder) getStringLength(tag byte) (int32, error) {
 	}
 }
 
-func getRune(reader io.Reader) (rune, int, error) {
-	var (
-		runeNil rune
-		typ     reflect.Type
-	)
-
-	typ = reflect.TypeOf(reader.(interface{}))
-
-	switch {
-	case typ == reflect.TypeOf(&bufio.Reader{}):
-		byteReader := reader.(interface{}).(*bufio.Reader)
-		return byteReader.ReadRune()
-
-	case typ == reflect.TypeOf(&bytes.Buffer{}):
-		byteReader := reader.(interface{}).(*bytes.Buffer)
-		return byteReader.ReadRune()
-
-	case typ == reflect.TypeOf(&bytes.Reader{}):
-		byteReader := reader.(interface{}).(*bytes.Reader)
-		return byteReader.ReadRune()
-
-	default:
-		return runeNil, 0, nil
-	}
-}
-
 // hessian-lite/src/main/java/com/alibaba/com/caucho/hessian/io/Hessian2Input.java : readString
 func (d *Decoder) decString(flag int32) (string, error) {
 	var (
