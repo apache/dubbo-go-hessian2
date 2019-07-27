@@ -15,7 +15,6 @@
 package hessian
 
 import (
-	"bufio"
 	"bytes"
 	"io"
 	"reflect"
