@@ -1,5 +1,8 @@
 language: go
 
+jdk:
+  - oraclejdk8
+
 go:
   - "1.11"
   - "1.12"
