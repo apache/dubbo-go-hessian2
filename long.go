@@ -74,7 +74,7 @@ func (d *Decoder) decInt64(flag int32) (int64, error) {
 
 	switch {
 	case tag == BC_NULL:
-		return int64(0), nil
+		return int64(0), perrors.Errorf("Num is null")
 
 	case tag == BC_FALSE:
 		return int64(0), nil
