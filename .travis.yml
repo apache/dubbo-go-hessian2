@@ -4,7 +4,11 @@ go:
   - "1.11"
   - "1.12"
 
+jdk:
+  - openjdk8
+
 script:
+  - jdk_switcher use openjdk8
   - mvn clean package -f test_hessian/pom.xml
   - mvn clean package -f test_dubbo/pom.xml
   - go fmt && [[ -z `git status -s` ]]
