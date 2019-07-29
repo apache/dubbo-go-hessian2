@@ -19,6 +19,7 @@ import (
 )
 
 import (
+	gxbytes "github.com/dubbogo/gost/bytes"
 	perrors "github.com/pkg/errors"
 )
 
@@ -129,8 +130,12 @@ func (d *Decoder) decBinary(flag int32) ([]byte, error) {
 		return []byte(""), nil
 	}
 
-	data := make([]byte, 0)
-	buf := make([]byte, 65536)
+	data := make([]byte, 0, 128)
+	bufp := gxbytes.GetBytes(65546)
+	buf := *bufp
+
+	defer gxbytes.PutBytes(bufp)
+
 	for {
 		length, err = d.getBinaryLength(tag)
 		if err != nil {
