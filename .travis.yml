@@ -1,7 +1,11 @@
 language: go
 
+matrix:
+  include:
+    - language: java
+      jdk: openjdk8
+
 go:
-  - "1.11"
   - "1.12"
 
 script:
