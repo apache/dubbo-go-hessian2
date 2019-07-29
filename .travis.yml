@@ -1,7 +1,9 @@
 language: go
 
-jdk:
-  - oraclejdk8
+matrix:
+  include:
+    - language: java
+      jdk: openjdk8
 
 go:
   - "1.11"
