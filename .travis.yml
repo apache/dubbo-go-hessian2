@@ -6,7 +6,6 @@ matrix:
       jdk: openjdk8
 
 go:
-  - "1.11"
   - "1.12"
 
 script:
