@@ -276,6 +276,10 @@ func (d *Decoder) decList(flag int32) (interface{}, error) {
 		return d.readTypedList(tag)
 	case untypedListTag(tag):
 		return d.readUntypedList(tag)
+	case tag == BC_BINARY_CHUNK:
+		return d.decBinary(int32(tag))
+	case tag == BC_BINARY:
+		return d.decBinary(int32(tag))
 	default:
 		return nil, perrors.Errorf("error list tag: 0x%x", tag)
 	}

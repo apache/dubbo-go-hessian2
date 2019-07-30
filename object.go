@@ -336,10 +336,22 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 			if err != nil {
 				return nil, perrors.Wrapf(err, "decInstance->ReadString: %s", fieldName)
 			}
-			fldRawValue.SetString(str)
+			if str != "null" {
+				if fldRawValue.Kind() == reflect.Ptr && fldRawValue.CanSet() {
+					fldRawValue.Set(reflect.ValueOf(&str))
+				} else {
+					fldRawValue.SetString(str)
+				}
+
+			} else {
+				if fldRawValue.Kind() != reflect.Ptr {
+					fldRawValue.SetString(str)
+				}
+			}
 
 		case reflect.Int32, reflect.Int16, reflect.Int8:
 			num, err := d.decInt32(TAG_READ)
+			isNull := false
 			if err != nil {
 				// java enum
 				if fldRawValue.Type().Implements(javaEnumType) {
@@ -350,19 +362,70 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 					}
 					enumValue, _ := s.(JavaEnum)
 					num = int32(enumValue)
+				} else if err.Error() == "Num is null" {
+					isNull = true
 				} else {
 					return nil, perrors.Wrapf(err, "decInstance->decInt32, field name:%s", fieldName)
 				}
 			}
-			fldRawValue.SetInt(int64(num))
+			if !isNull {
+				if fldRawValue.Kind() == reflect.Ptr && fldRawValue.CanSet() {
+					switch kind {
+					case reflect.Int32:
+						numPtr := int32(num)
+						field.Set(reflect.ValueOf(&numPtr))
+					case reflect.Int16:
+						numPtr := int16(num)
+						field.Set(reflect.ValueOf(&numPtr))
+					case reflect.Int8:
+						numPtr := int8(num)
+						field.Set(reflect.ValueOf(&numPtr))
+					default:
+						return nil, perrors.Wrapf(err, "decInstance->decInt32, field name:%s", fieldName)
+					}
+				} else {
+					fldRawValue.SetInt(int64(num))
+				}
+			} else {
+				if fldRawValue.Kind() != reflect.Ptr {
+					fldRawValue.SetInt(int64(0))
+				}
+			}
+
 		case reflect.Uint16, reflect.Uint8:
 			num, err := d.decInt32(TAG_READ)
+			isNull := false
 			if err != nil {
-				return nil, perrors.Wrapf(err, "decInstance->decInt32, field name:%s", fieldName)
+				if err.Error() == "Num is null" {
+					isNull = true
+				} else {
+					return nil, perrors.Wrapf(err, "decInstance->decInt32, field name:%s", fieldName)
+				}
 			}
-			fldRawValue.SetUint(uint64(num))
+			if !isNull {
+				if fldRawValue.Kind() == reflect.Ptr && fldRawValue.CanSet() {
+					switch kind {
+					case reflect.Uint16:
+						numPtr := uint16(num)
+						field.Set(reflect.ValueOf(&numPtr))
+					case reflect.Uint8:
+						numPtr := uint8(num)
+						field.Set(reflect.ValueOf(&numPtr))
+					default:
+						return nil, perrors.Wrapf(err, "decInstance->decInt32, field name:%s", fieldName)
+					}
+				} else {
+					fldRawValue.SetUint(uint64(num))
+				}
+			} else {
+				if fldRawValue.Kind() != reflect.Ptr {
+					fldRawValue.SetUint(uint64(0))
+				}
+			}
+
 		case reflect.Uint, reflect.Int, reflect.Int64:
 			num, err := d.decInt64(TAG_READ)
+			isNull := false
 			if err != nil {
 				if fldTyp.Implements(javaEnumType) {
 					d.unreadByte() // Enum parsing, decInt64 above has read a byte, so you need to return a byte here
@@ -372,31 +435,94 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 					}
 					enumValue, _ := s.(JavaEnum)
 					num = int64(enumValue)
+				} else if err.Error() == "Num is null" {
+					isNull = true
 				} else {
 					return nil, perrors.Wrapf(err, "decInstance->decInt64 field name:%s", fieldName)
 				}
 			}
+			if !isNull {
+				if fldRawValue.Kind() == reflect.Ptr && fldRawValue.CanSet() {
+					switch kind {
+					case reflect.Uint:
+						numPtr := uint(num)
+						field.Set(reflect.ValueOf(&numPtr))
+					case reflect.Int:
+						numPtr := int(num)
+						field.Set(reflect.ValueOf(&numPtr))
+					case reflect.Int64:
+						numPtr := int64(num)
+						field.Set(reflect.ValueOf(&numPtr))
+					default:
+						return nil, perrors.Wrapf(err, "decInstance->decInt64, field name:%s", fieldName)
+					}
+				} else {
+					fldRawValue.SetInt(num)
+				}
+			} else {
+				if fldRawValue.Kind() != reflect.Ptr {
+					fldRawValue.SetInt(int64(0))
+				}
+			}
 
-			fldRawValue.SetInt(num)
 		case reflect.Uint32, reflect.Uint64:
 			num, err := d.decInt64(TAG_READ)
+			isNull := false
 			if err != nil {
-				return nil, perrors.Wrapf(err, "decInstance->decInt64, field name:%s", fieldName)
+				if err.Error() == "Num is null" {
+					isNull = true
+				} else {
+					return nil, perrors.Wrapf(err, "decInstance->decInt64, field name:%s", fieldName)
+				}
 			}
-			fldRawValue.SetUint(uint64(num))
+			if !isNull {
+				if fldRawValue.Kind() == reflect.Ptr && fldRawValue.CanSet() {
+					switch kind {
+					case reflect.Uint32:
+						numPtr := uint32(num)
+						field.Set(reflect.ValueOf(&numPtr))
+					case reflect.Uint64:
+						numPtr := uint64(num)
+						field.Set(reflect.ValueOf(&numPtr))
+					default:
+						return nil, perrors.Wrapf(err, "decInstance->decInt64, field name:%s", fieldName)
+					}
+				} else {
+					fldRawValue.SetUint(uint64(num))
+				}
+			} else {
+				if fldRawValue.Kind() != reflect.Ptr {
+					fldRawValue.SetUint(uint64(0))
+				}
+			}
+
 		case reflect.Bool:
 			b, err := d.Decode()
 			if err != nil {
 				return nil, perrors.Wrapf(err, "decInstance->Decode field name:%s", fieldName)
 			}
-			fldRawValue.SetBool(b.(bool))
+			if b != nil {
+				if fldRawValue.Kind() == reflect.Ptr && fldRawValue.CanSet() {
+					boolPtr := b.(bool)
+					field.Set(reflect.ValueOf(&boolPtr))
+				} else {
+					fldRawValue.SetBool(b.(bool))
+				}
+			}
 
 		case reflect.Float32, reflect.Float64:
 			num, err := d.decDouble(TAG_READ)
 			if err != nil {
 				return nil, perrors.Wrapf(err, "decInstance->decDouble field name:%s", fieldName)
 			}
-			fldRawValue.SetFloat(num.(float64))
+			if num != nil {
+				if fldRawValue.Kind() == reflect.Ptr && fldRawValue.CanSet() {
+					floatPtr := num.(float64)
+					field.Set(reflect.ValueOf(&floatPtr))
+				} else {
+					fldRawValue.SetFloat(num.(float64))
+				}
+			}
 
 		case reflect.Map:
 			// decode map should use the original field value for correct value setting

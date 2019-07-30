@@ -98,6 +98,11 @@ func (d *Decoder) decInt32(flag int32) (int32, error) {
 		var i32 int32
 		err = binary.Read(d.reader, binary.BigEndian, &i32)
 		return i32, perrors.WithStack(err)
+	case tag == BC_OBJECT_DEF:
+		return 0, perrors.Errorf("Num is EnumType")
+
+	case tag == BC_NULL:
+		return 0, perrors.Errorf("Num is null")
 
 	default:
 		return 0, perrors.Errorf("decInt32 integer wrong tag:%#x", tag)

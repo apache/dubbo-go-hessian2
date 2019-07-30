@@ -82,6 +82,8 @@ func (d *Decoder) decDouble(flag int32) (interface{}, error) {
 		tag, _ = d.readByte()
 	}
 	switch tag {
+	case BC_NULL:
+		return nil, nil
 	case BC_LONG_INT:
 		return d.decInt32(TAG_READ)
 
