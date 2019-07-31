@@ -14,7 +14,7 @@
 
 package hessian
 
-import "github.com/dubbogo/hessian2/java_exception"
+import "github.com/apache/dubbo-go-hessian2/java_exception"
 
 func init() {
 	RegisterPOJO(&java_exception.Method{})
