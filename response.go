@@ -16,7 +16,7 @@ package hessian
 
 import (
 	"encoding/binary"
-	"github.com/dubbogo/hessian2/java_exception"
+	"github.com/apache/dubbo-go-hessian2/java_exception"
 	"math"
 	"reflect"
 	"strconv"

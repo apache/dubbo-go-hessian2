@@ -94,7 +94,6 @@ type Method struct {
 	Name string
 }
 
-
 func (Method) JavaClassName() string {
 	return "java.lang.reflect.Method"
 }

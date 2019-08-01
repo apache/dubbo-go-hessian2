@@ -15,7 +15,6 @@
 package hessian
 
 import (
-	"bufio"
 	"bytes"
 	"io"
 	"reflect"
@@ -131,32 +130,6 @@ func (d *Decoder) getStringLength(tag byte) (int32, error) {
 
 	default:
 		return -1, perrors.WithStack(err)
-	}
-}
-
-func getRune(reader io.Reader) (rune, int, error) {
-	var (
-		runeNil rune
-		typ     reflect.Type
-	)
-
-	typ = reflect.TypeOf(reader.(interface{}))
-
-	switch {
-	case typ == reflect.TypeOf(&bufio.Reader{}):
-		byteReader := reader.(interface{}).(*bufio.Reader)
-		return byteReader.ReadRune()
-
-	case typ == reflect.TypeOf(&bytes.Buffer{}):
-		byteReader := reader.(interface{}).(*bytes.Buffer)
-		return byteReader.ReadRune()
-
-	case typ == reflect.TypeOf(&bytes.Reader{}):
-		byteReader := reader.(interface{}).(*bytes.Reader)
-		return byteReader.ReadRune()
-
-	default:
-		return runeNil, 0, nil
 	}
 }
 
