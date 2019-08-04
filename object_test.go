@@ -480,3 +480,48 @@ func doTestEncodeDecodeTuple(t *testing.T, tuple *Tuple) {
 		t.Errorf("expect: %v, but get: %v", tuple, decObj)
 	}
 }
+
+type BasePointer struct {
+	A *bool
+}
+
+func (t BasePointer) JavaClassName() string {
+	return "test.base.Base"
+}
+
+func TestBasePointer(t *testing.T) {
+	v := true
+	base := BasePointer{
+		A: &v,
+	}
+	doTestBasePointer(t, &base, &base)
+
+	base = BasePointer{
+		A: nil,
+	}
+	expectedF := false
+	expectedBase := BasePointer{
+		A: &expectedF,
+	}
+	doTestBasePointer(t, &base, &expectedBase)
+}
+
+func doTestBasePointer(t *testing.T, base *BasePointer, expected *BasePointer) {
+	e := NewEncoder()
+	err := e.encObject(base)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+
+	d := NewDecoder(e.buffer)
+	decObj, err := d.Decode()
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+
+	if !reflect.DeepEqual(expected, decObj) {
+		t.Errorf("expect: %v, but get: %v", base, decObj)
+	}
+}
