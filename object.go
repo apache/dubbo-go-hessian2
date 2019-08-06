@@ -389,7 +389,11 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 			if err != nil {
 				return nil, perrors.Wrapf(err, "decInstance->Decode field name:%s", fieldName)
 			}
-			v := b.(bool)
+			v, ok := b.(bool)
+			if !ok {
+				return nil, perrors.Wrapf(err, "value convert to bool failed, field name:%s", fieldName)
+			}
+
 			if fldRawValue.Kind() == reflect.Ptr && fldRawValue.CanSet() {
 				if b != nil {
 					field.Set(reflect.ValueOf(&v))
