@@ -151,6 +151,13 @@ func (e *Encoder) Encode(v interface{}) error {
 			return e.encList(v)
 		case reflect.Map: // the type must be map[string]int
 			return e.encMap(v)
+		case reflect.Bool:
+			vv := v.(*bool)
+			if vv != nil {
+				e.buffer = encBool(e.buffer, *vv)
+			} else {
+				e.buffer = encBool(e.buffer, false)
+			}
 		default:
 			if p, ok := v.(POJOEnum); ok { // JavaEnum
 				return e.encObject(p)
