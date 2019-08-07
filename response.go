@@ -16,7 +16,6 @@ package hessian
 
 import (
 	"encoding/binary"
-	"github.com/apache/dubbo-go-hessian2/java_exception"
 	"math"
 	"reflect"
 	"strconv"
@@ -25,6 +24,10 @@ import (
 
 import (
 	perrors "github.com/pkg/errors"
+)
+
+import (
+	"github.com/apache/dubbo-go-hessian2/java_exception"
 )
 
 type Response struct {
