@@ -15,7 +15,6 @@
 package hessian
 
 import (
-	"fmt"
 	"io"
 	"reflect"
 	"strings"
@@ -339,7 +338,6 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 			}
 			if fldRawValue.Kind() == reflect.Ptr && isNil {
 				var s *string = nil
-				fmt.Println(fldRawValue.Type().String())
 				fldRawValue.Set(reflect.ValueOf(s))
 			} else {
 				SetValue(fldRawValue, EnsurePackValue(str))
