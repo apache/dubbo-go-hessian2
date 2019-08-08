@@ -134,7 +134,8 @@ func (d *Decoder) getStringLength(tag byte) (int32, error) {
 }
 
 // hessian-lite/src/main/java/com/alibaba/com/caucho/hessian/io/Hessian2Input.java : readString
-func (d *Decoder) decString(flag int32) (string, error) {
+// return bool  if value is nil ,return true else false
+func (d *Decoder) decString(flag int32) (string, bool, error) {
 	var (
 		tag    byte
 		length int32
@@ -151,13 +152,13 @@ func (d *Decoder) decString(flag int32) (string, error) {
 
 	switch {
 	case tag == BC_NULL:
-		return STRING_NIL, nil
+		return "", true, nil
 
 	case tag == BC_TRUE:
-		return STRING_TRUE, nil
+		return STRING_TRUE, false, nil
 
 	case tag == BC_FALSE:
-		return STRING_FALSE, nil
+		return STRING_FALSE, false, nil
 
 	case (0x80 <= tag && tag <= 0xbf) || (0xc0 <= tag && tag <= 0xcf) ||
 		(0xd0 <= tag && tag <= 0xd7) || tag == BC_INT ||
@@ -165,24 +166,24 @@ func (d *Decoder) decString(flag int32) (string, error) {
 		(tag >= 0x38 && tag <= 0x3f) || (tag == BC_LONG_INT) || (tag == BC_LONG):
 		i64, err := d.decInt64(int32(tag))
 		if err != nil {
-			return "", perrors.Wrapf(err, "tag:%+v", tag)
+			return "", false, perrors.Wrapf(err, "tag:%+v", tag)
 		}
 
-		return strconv.Itoa(int(i64)), nil
+		return strconv.Itoa(int(i64)), false, nil
 
 	case tag == BC_DOUBLE_ZERO:
-		return STRING_ZERO, nil
+		return STRING_ZERO, false, nil
 
 	case tag == BC_DOUBLE_ONE:
-		return STRING_ONE, nil
+		return STRING_ONE, false, nil
 
 	case tag == BC_DOUBLE_BYTE || tag == BC_DOUBLE_SHORT:
 		f, err := d.decDouble(int32(tag))
 		if err != nil {
-			return "", perrors.Wrapf(err, "tag:%+v", tag)
+			return "", false, perrors.Wrapf(err, "tag:%+v", tag)
 		}
 
-		return strconv.FormatFloat(f.(float64), 'E', -1, 64), nil
+		return strconv.FormatFloat(f.(float64), 'E', -1, 64), false, nil
 	}
 
 	if (tag >= BC_STRING_DIRECT && tag <= STRING_DIRECT_MAX) ||
@@ -197,14 +198,14 @@ func (d *Decoder) decString(flag int32) (string, error) {
 
 		l, err := d.getStringLength(tag)
 		if err != nil {
-			return s, perrors.WithStack(err)
+			return s, false, perrors.WithStack(err)
 		}
 		length = l
 		runeDate := make([]rune, length)
 		for i := 0; ; {
 			if int32(i) == length {
 				if last {
-					return string(runeDate), nil
+					return string(runeDate), false, nil
 				}
 
 				b, _ := d.readByte()
@@ -221,7 +222,7 @@ func (d *Decoder) decString(flag int32) (string, error) {
 
 					l, err := d.getStringLength(b)
 					if err != nil {
-						return s, perrors.WithStack(err)
+						return s, false, perrors.WithStack(err)
 					}
 					length += l
 					bs := make([]rune, length)
@@ -229,13 +230,13 @@ func (d *Decoder) decString(flag int32) (string, error) {
 					runeDate = bs
 
 				default:
-					return s, perrors.WithStack(err)
+					return s, false, perrors.WithStack(err)
 				}
 
 			} else {
 				r, _, err = d.reader.ReadRune()
 				if err != nil {
-					return s, perrors.WithStack(err)
+					return s, false, perrors.WithStack(err)
 				}
 				runeDate[i] = r
 				i++
@@ -246,5 +247,5 @@ func (d *Decoder) decString(flag int32) (string, error) {
 		// return string(runeDate), nil
 	}
 
-	return s, perrors.Errorf("unknown string tag %#x\n", tag)
+	return s, false, perrors.Errorf("unknown string tag %#x\n", tag)
 }

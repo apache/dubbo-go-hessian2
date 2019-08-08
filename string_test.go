@@ -16,6 +16,7 @@ package hessian
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -140,4 +141,31 @@ func TestStringEncode(t *testing.T) {
 	testJavaDecode(t, "argString_31", s32[:31])
 	testJavaDecode(t, "argString_32", s32)
 	testJavaDecode(t, "argString_65536", s65560[:65536])
+}
+
+type Demo struct {
+	Name    *string
+	Address string
+	Age     int
+}
+
+func (Demo) JavaClassName() string {
+	return "Demo"
+}
+func init() {
+	RegisterPOJO(&Demo{})
+}
+func TestNilPointerForStringEncode(t *testing.T) {
+	var s1 *string = nil
+	demo := Demo{
+		Name:    s1,
+		Address: "",
+		Age:     12,
+	}
+	e := NewEncoder()
+	_ = e.Encode(demo)
+	d := NewDecoder(e.buffer)
+	result, _ := d.Decode()
+	assert.Equal(t, true, result.(*Demo).Name == nil)
+	assert.Equal(t, true, result.(*Demo).Address == "")
 }

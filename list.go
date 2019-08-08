@@ -287,7 +287,7 @@ func (d *Decoder) decList(flag int32) (interface{}, error) {
 //      ::= 'V' type int value*   # fixed-length list
 //      ::= [x70-77] type value*  # fixed-length typed list
 func (d *Decoder) readTypedList(tag byte) (interface{}, error) {
-	listTyp, err := d.decString(TAG_READ)
+	listTyp, _, err := d.decString(TAG_READ)
 	if err != nil {
 		return nil, perrors.Errorf("error to read list type[%s]: %v", listTyp, err)
 	}

@@ -242,7 +242,8 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 	case tag == BC_REF:
 		return d.decRef(int32(tag))
 	case tag == BC_MAP:
-		if t, err = d.decType(); err != nil {
+		var isNil bool
+		if t, isNil, err = d.decType(); err != nil || isNil {
 			return nil, err
 		}
 

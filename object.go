@@ -252,7 +252,7 @@ func (d *Decoder) decClassDef() (interface{}, error) {
 		fieldList []string
 	)
 
-	clsName, err = d.decString(TAG_READ)
+	clsName, _, err = d.decString(TAG_READ)
 	if err != nil {
 		return nil, perrors.WithStack(err)
 	}
@@ -262,7 +262,7 @@ func (d *Decoder) decClassDef() (interface{}, error) {
 	}
 	fieldList = make([]string, fieldNum)
 	for i := 0; i < int(fieldNum); i++ {
-		fieldName, err = d.decString(TAG_READ)
+		fieldName, _, err = d.decString(TAG_READ)
 		if err != nil {
 			return nil, perrors.Wrapf(err, "decClassDef->decString, field num:%d, index:%d", fieldNum, i)
 		}
@@ -332,11 +332,16 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 		kind := fldTyp.Kind()
 		switch kind {
 		case reflect.String:
-			str, err := d.decString(TAG_READ)
+			str, isNil, err := d.decString(TAG_READ)
 			if err != nil {
 				return nil, perrors.Wrapf(err, "decInstance->ReadString: %s", fieldName)
 			}
-			fldRawValue.SetString(str)
+			if isNil {
+				var str *string = nil
+				SetValue(fldRawValue, EnsurePackValue(str))
+			} else {
+				SetValue(fldRawValue, EnsurePackValue(str))
+			}
 
 		case reflect.Int32, reflect.Int16, reflect.Int8:
 			num, err := d.decInt32(TAG_READ)
@@ -492,7 +497,7 @@ func (d *Decoder) decEnum(javaName string, flag int32) (JavaEnum, error) {
 		info      structInfo
 		enumValue JavaEnum
 	)
-	enumName, err = d.decString(TAG_READ) // java enum class member is "name"
+	enumName, _, err = d.decString(TAG_READ) // java enum class member is "name"
 	if err != nil {
 		return InvalidJavaEnum, perrors.Wrap(err, "decString for decJavaEnum")
 	}

@@ -114,9 +114,19 @@ func (e *Encoder) Encode(v interface{}) error {
 	case float64:
 		e.buffer = encFloat(e.buffer, val)
 
-	case string:
-		e.buffer = encString(e.buffer, val)
+	case string, *string:
 
+		if reflect.TypeOf(v).Kind() == reflect.Ptr {
+			vv := reflect.ValueOf(v)
+			vv = UnpackPtr(vv)
+			if !vv.IsValid() {
+				e.buffer = encNull(e.buffer)
+			} else {
+				e.buffer = encString(e.buffer, *(val.(*string)))
+			}
+		} else {
+			e.buffer = encString(e.buffer, val.(string))
+		}
 	case []byte:
 		e.buffer = encBinary(e.buffer, val)
 

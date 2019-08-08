@@ -104,7 +104,7 @@ func (d *Decoder) nextRune(s []rune) []rune {
 }
 
 // read the type of data, used to decode list or map
-func (d *Decoder) decType() (string, error) {
+func (d *Decoder) decType() (string, bool, error) {
 	var (
 		err error
 		arr [1]byte
@@ -116,24 +116,25 @@ func (d *Decoder) decType() (string, error) {
 
 	buf = arr[:1]
 	if _, err = io.ReadFull(d.reader, buf); err != nil {
-		return "", perrors.WithStack(err)
+		return "", false, perrors.WithStack(err)
 	}
 	tag = buf[0]
 	if (tag >= BC_STRING_DIRECT && tag <= STRING_DIRECT_MAX) ||
 		(tag >= 0x30 && tag <= 0x33) || (tag == BC_STRING) || (tag == BC_STRING_CHUNK) {
-		return d.decString(int32(tag))
+		s, isNil, err := d.decString(int32(tag))
+		return s, isNil, err
 	}
 
 	if idx, err = d.decInt32(TAG_READ); err != nil {
-		return "", perrors.WithStack(err)
+		return "", false, perrors.WithStack(err)
 	}
 
 	typ, _, err = d.getStructDefByIndex(int(idx))
 	if err == nil {
-		return typ.String(), nil
+		return typ.String(), false, nil
 	}
 
-	return "", err
+	return "", false, err
 }
 
 // Decode parse hessian data, and ensure the reflection value unpacked
@@ -189,7 +190,11 @@ func (d *Decoder) DecodeValue() (interface{}, error) {
 	case (tag == BC_STRING_CHUNK || tag == BC_STRING) ||
 		(tag >= BC_STRING_DIRECT && tag <= STRING_DIRECT_MAX) ||
 		(tag >= 0x30 && tag <= 0x33):
-		return d.decString(int32(tag))
+		s, isNil, err := d.decString(int32(tag))
+		if isNil {
+			return nil, err
+		}
+		return s, err
 
 		// case 'B', 'b': //binary
 	case (tag == BC_BINARY) || (tag == BC_BINARY_CHUNK) || (tag >= 0x20 && tag <= 0x2f) ||
