@@ -156,8 +156,14 @@ type Demo struct {
 }
 
 func (Demo) JavaClassName() string {
-	return "Demo"
+	return "test.model.StringDemo"
 }
+
+func TestStringNilDecode(t *testing.T) {
+
+	doTestStringNull(t, "customReplyTypedFixedStringNull")
+}
+
 func TestNilPointerForStringEncodeAndDecode(t *testing.T) {
 	var s1 *string = nil
 	demo := Demo{
@@ -171,4 +177,12 @@ func TestNilPointerForStringEncodeAndDecode(t *testing.T) {
 	result, _ := d.Decode()
 	assert.Equal(t, true, result.(*Demo).Name == nil)
 	assert.Equal(t, true, result.(*Demo).Address == "")
+}
+
+func doTestStringNull(t *testing.T, method string) {
+	testDecodeFrameworkFunc(t, method, func(r interface{}) {
+		t.Logf("%#v", r)
+		assert.Equal(t, true, r.(*Demo).Name == nil)
+		assert.Equal(t, true, r.(*Demo).Address == "")
+	})
 }

@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.math.BigDecimal;
 import test.model.DateDemo;
+import test.model.StringDemo;
 
 public class TestCustomReply {
 
@@ -349,6 +350,11 @@ public class TestCustomReply {
 
     public void customReplyTypedFixedDateNull() throws Exception {
         DateDemo demo = new DateDemo("zhangshan",null,null);
+        output.writeObject(demo);
+        output.flush();
+    }
+    public void customReplyTypedFixedStringNull() throws Exception {
+        StringDemo demo = new StringDemo(null,null,20);
         output.writeObject(demo);
         output.flush();
     }
