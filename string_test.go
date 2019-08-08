@@ -16,9 +16,15 @@ package hessian
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
+import (
+	"github.com/stretchr/testify/assert"
+)
+
+func init() {
+	RegisterPOJO(&Demo{})
+}
 
 func TestEncString(t *testing.T) {
 	var (
@@ -152,10 +158,7 @@ type Demo struct {
 func (Demo) JavaClassName() string {
 	return "Demo"
 }
-func init() {
-	RegisterPOJO(&Demo{})
-}
-func TestNilPointerForStringEncode(t *testing.T) {
+func TestNilPointerForStringEncodeAndDecode(t *testing.T) {
 	var s1 *string = nil
 	demo := Demo{
 		Name:    s1,
