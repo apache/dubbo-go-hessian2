@@ -142,7 +142,7 @@ public class TestThrowable {
   public static Object throw_OptionalDataException()
           throws InvocationTargetException, NoSuchMethodException, IllegalAccessException,
           InstantiationException {
-    Constructor c1 = √√.class.getDeclaredConstructor(int.class);
+    Constructor c1 = OptionalDataException.class.getDeclaredConstructor(int.class);
     c1.setAccessible(true);
     return c1.newInstance(1);
   }
