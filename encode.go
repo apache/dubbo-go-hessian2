@@ -117,9 +117,8 @@ func (e *Encoder) Encode(v interface{}) error {
 	case string, *string:
 
 		if reflect.TypeOf(v).Kind() == reflect.Ptr {
-			vv := reflect.ValueOf(v)
-			vv = UnpackPtr(vv)
-			if !vv.IsValid() {
+			unpackValue := UnpackPtr(reflect.ValueOf(v))
+			if !unpackValue.IsValid() {
 				e.buffer = encNull(e.buffer)
 			} else {
 				e.buffer = encString(e.buffer, *(val.(*string)))
