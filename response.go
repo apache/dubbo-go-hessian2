@@ -174,12 +174,8 @@ func unpackResponseBody(buf []byte, resp interface{}) error {
 			if err != nil {
 				return perrors.WithStack(err)
 			}
-			atta, ok := attachments.(map[string]string)
-			if ok {
-				response.Attachments = atta
-			} else {
-				return perrors.Errorf("get wrong attachments: %+v", atta)
-			}
+			atta := ToMapStringString(attachments.(map[interface{}]interface{}))
+			response.Attachments = atta
 		}
 
 		if e, ok := expt.(error); ok {
@@ -199,12 +195,8 @@ func unpackResponseBody(buf []byte, resp interface{}) error {
 			if err != nil {
 				return perrors.WithStack(err)
 			}
-			atta, ok := attachments.(map[string]string)
-			if ok {
-				response.Attachments = atta
-			} else {
-				return perrors.Errorf("get wrong attachments: %+v", atta)
-			}
+			atta := ToMapStringString(attachments.(map[interface{}]interface{}))
+			response.Attachments = atta
 		}
 
 		return perrors.WithStack(ReflectResponse(rsp, response.RspObj))
@@ -215,12 +207,8 @@ func unpackResponseBody(buf []byte, resp interface{}) error {
 			if err != nil {
 				return perrors.WithStack(err)
 			}
-			atta, ok := attachments.(map[string]string)
-			if ok {
-				response.Attachments = atta
-			} else {
-				return perrors.Errorf("get wrong attachments: %+v", atta)
-			}
+			atta := ToMapStringString(attachments.(map[interface{}]interface{}))
+			response.Attachments = atta
 		}
 		return nil
 	}

@@ -321,7 +321,19 @@ func unpackRequestBody(buf []byte, reqObj interface{}) error {
 	if err != nil {
 		return perrors.WithStack(err)
 	}
-	req[6] = attachments
+	req[6] = ToMapStringString(attachments.(map[interface{}]interface{}))
 
 	return nil
+}
+
+func ToMapStringString(origin map[interface{}]interface{}) map[string]string {
+	dest := make(map[string]string)
+	for k, v := range origin {
+		if kv, ok := k.(string); ok {
+			if vv, ok := v.(string); ok {
+				dest[kv] = vv
+			}
+		}
+	}
+	return dest
 }
