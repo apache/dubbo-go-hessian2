@@ -232,5 +232,8 @@ func (t *TypeRefs) appendTypeRefs(name string, p reflect.Type) {
 }
 
 func (t *TypeRefs) Get(index int) reflect.Type {
+	if len(t.typeRefs) <= index {
+		return nil
+	}
 	return t.typeRefs[index]
 }

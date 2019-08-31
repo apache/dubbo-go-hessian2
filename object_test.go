@@ -525,3 +525,28 @@ func doTestBasePointer(t *testing.T, base *BasePointer, expected *BasePointer) {
 		t.Errorf("expect: %v, but get: %v", base, decObj)
 	}
 }
+
+func TestSkip(t *testing.T) {
+	testDecodeFramework(t, "replyObject_0", nil)
+	testDecodeFramework(t, "replyObject_1", nil)
+	testDecodeFramework(t, "replyObject_16", make([]interface{}, 17))
+	testDecodeFramework(t, "replyObject_2a", make([]interface{}, 2))
+	testDecodeFramework(t, "replyObject_3", nil)
+
+	testDecodeFramework(t, "replyTypedMap_0", make(map[interface{}]interface{}))
+
+	testDecodeFramework(t, "replyTypedFixedList_0", make([]string, 0))
+	testDecodeFramework(t, "replyUntypedFixedList_0", []interface{}{})
+
+	testDecodeFramework(t, "customReplyTypedFixedListHasNull", make([]Object, 3))
+	testDecodeFramework(t, "customReplyTypedVariableListHasNull", make([]Object, 3))
+	testDecodeFramework(t, "customReplyUntypedFixedListHasNull", make([]interface{}, 3))
+	testDecodeFramework(t, "customReplyUntypedVariableListHasNull", make([]interface{}, 3))
+
+	testDecodeFramework(t, "customReplyTypedFixedList_A0", make([]interface{}, 3))
+	testDecodeFramework(t, "customReplyTypedVariableList_A0", make([]interface{}, 3))
+
+	testDecodeFramework(t, "customReplyTypedFixedList_Test", nil)
+
+	testDecodeFramework(t, "customReplyTypedFixedList_Object", make([]Object, 1))
+}

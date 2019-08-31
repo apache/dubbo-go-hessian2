@@ -203,3 +203,35 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 
 	return nil
 }
+
+// ignore body, but only read attachments
+func (h *HessianCodec) ReadAttachments() (map[string]string, error) {
+	if h.reader.Buffered() < h.bodyLen {
+		return nil, ErrBodyNotEnough
+	}
+	buf, err := h.reader.Peek(h.bodyLen)
+	if err != nil {
+		return nil, perrors.WithStack(err)
+	}
+	_, err = h.reader.Discard(h.bodyLen)
+	if err != nil { // this is impossible
+		return nil, perrors.WithStack(err)
+	}
+
+	switch h.pkgType & 0x2f {
+	case PackageRequest:
+		rspObj := make([]interface{}, 7)
+		if err = unpackRequestBody(buf, rspObj); err != nil {
+			return nil, perrors.WithStack(err)
+		}
+		return rspObj[6].(map[string]string), nil
+	case PackageResponse:
+		rspObj := &Response{}
+		if err = unpackResponseBody(buf, rspObj); err != nil {
+			return nil, perrors.WithStack(err)
+		}
+		return rspObj.Attachments, nil
+	}
+
+	return nil, nil
+}
