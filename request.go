@@ -321,7 +321,11 @@ func unpackRequestBody(buf []byte, reqObj interface{}) error {
 	if err != nil {
 		return perrors.WithStack(err)
 	}
-	req[6] = ToMapStringString(attachments.(map[interface{}]interface{}))
+	if v, ok := attachments.(map[interface{}]interface{}); ok {
+		req[6] = ToMapStringString(v)
+	} else {
+		return perrors.Errorf("get wrong attachments: %+v", attachments)
+	}
 
 	return nil
 }
