@@ -32,6 +32,7 @@ const (
 	PackageHeartbeat          = PackageType(0x08)
 	PackageRequest_TwoWay     = PackageType(0x10)
 	PackageResponse_Exception = PackageType(0x20)
+	PackageType_BitSize       = 0x2f
 )
 
 // PackageType ...
@@ -173,7 +174,7 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 		return perrors.WithStack(err)
 	}
 
-	switch h.pkgType & 0x2f {
+	switch h.pkgType & PackageType_BitSize {
 	case PackageResponse | PackageHeartbeat | PackageResponse_Exception, PackageResponse | PackageResponse_Exception:
 		decoder := NewDecoder(buf[:])
 		exception, err := decoder.Decode()
@@ -218,7 +219,7 @@ func (h *HessianCodec) ReadAttachments() (map[string]string, error) {
 		return nil, perrors.WithStack(err)
 	}
 
-	switch h.pkgType & 0x2f {
+	switch h.pkgType & PackageType_BitSize {
 	case PackageRequest:
 		rspObj := make([]interface{}, 7)
 		if err = unpackRequestBody(buf, rspObj); err != nil {
