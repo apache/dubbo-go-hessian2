@@ -323,11 +323,10 @@ func unpackRequestBody(buf []byte, reqObj interface{}) error {
 	}
 	if v, ok := attachments.(map[interface{}]interface{}); ok {
 		req[6] = ToMapStringString(v)
-	} else {
-		return perrors.Errorf("get wrong attachments: %+v", attachments)
+		return nil
 	}
 
-	return nil
+	return perrors.Errorf("get wrong attachments: %+v", attachments)
 }
 
 func ToMapStringString(origin map[interface{}]interface{}) map[string]string {
