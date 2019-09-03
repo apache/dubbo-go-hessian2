@@ -70,9 +70,14 @@ func getJavaReply(method, className string) []byte {
 	return out
 }
 
-func decodeJavaResponse(method, className string) (interface{}, error) {
+func decodeJavaResponse(method, className string, skip bool) (interface{}, error) {
 	b := getJavaReply(method, className)
-	d := NewDecoder(b)
+	var d *Decoder
+	if skip {
+		d = NewDecoderWithSkip(b)
+	} else {
+		d = NewDecoder(b)
+	}
 	r, e := d.Decode()
 	if e != nil {
 		return nil, e
@@ -81,11 +86,15 @@ func decodeJavaResponse(method, className string) (interface{}, error) {
 }
 
 func testDecodeFramework(t *testing.T, method string, expected interface{}) {
-	testDecodeJavaData(t, method, "", expected)
+	testDecodeJavaData(t, method, "", false, expected)
 }
 
-func testDecodeJavaData(t *testing.T, method, className string, expected interface{}) {
-	r, e := decodeJavaResponse(method, className)
+func testDecodeFrameworkWithSkip(t *testing.T, method string, expected interface{}) {
+	testDecodeJavaData(t, method, "", true, expected)
+}
+
+func testDecodeJavaData(t *testing.T, method, className string, skip bool, expected interface{}) {
+	r, e := decodeJavaResponse(method, className, skip)
 	if e != nil {
 		t.Errorf("%s: decode fail with error %v", method, e)
 		return
@@ -101,7 +110,7 @@ func testDecodeJavaData(t *testing.T, method, className string, expected interfa
 }
 
 func testDecodeFrameworkFunc(t *testing.T, method string, expected func(interface{})) {
-	r, e := decodeJavaResponse(method, "")
+	r, e := decodeJavaResponse(method, "", false)
 	if e != nil {
 		t.Errorf("%s: decode fail with error %v", method, e)
 		return

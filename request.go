@@ -259,7 +259,11 @@ END:
 }
 
 // hessian decode request body
-func unpackRequestBody(buf []byte, reqObj interface{}) error {
+func unpackRequestBody(decoder *Decoder, reqObj interface{}) error {
+
+	if decoder == nil {
+		return perrors.Errorf("@decoder is nil")
+	}
 
 	req, ok := reqObj.([]interface{})
 	if !ok {
@@ -274,7 +278,6 @@ func unpackRequestBody(buf []byte, reqObj interface{}) error {
 		dubboVersion, target, serviceVersion, method, argsTypes interface{}
 		args                                                    []interface{}
 	)
-	decoder := NewDecoder(buf[:])
 
 	dubboVersion, err = decoder.Decode()
 	if err != nil {

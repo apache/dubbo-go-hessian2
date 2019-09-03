@@ -71,6 +71,15 @@ func NewHessianCodec(reader *bufio.Reader) *HessianCodec {
 	}
 }
 
+// NewHessianCodec generate a new hessian codec instance
+func NewHessianCodecCustom(pkgType PackageType, reader *bufio.Reader, bodyLen int) *HessianCodec {
+	return &HessianCodec{
+		pkgType: pkgType,
+		reader:  reader,
+		bodyLen: bodyLen,
+	}
+}
+
 func (h *HessianCodec) Write(service Service, header DubboHeader, body interface{}) ([]byte, error) {
 	switch header.Type {
 	case PackageHeartbeat:
@@ -190,13 +199,13 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 	case PackageRequest | PackageHeartbeat, PackageResponse | PackageHeartbeat:
 	case PackageRequest:
 		if rspObj != nil {
-			if err = unpackRequestBody(buf, rspObj); err != nil {
+			if err = unpackRequestBody(NewDecoder(buf[:]), rspObj); err != nil {
 				return perrors.WithStack(err)
 			}
 		}
 	case PackageResponse:
 		if rspObj != nil {
-			if err = unpackResponseBody(buf, rspObj); err != nil {
+			if err = unpackResponseBody(NewDecoder(buf[:]), rspObj); err != nil {
 				return perrors.WithStack(err)
 			}
 		}
@@ -222,13 +231,13 @@ func (h *HessianCodec) ReadAttachments() (map[string]string, error) {
 	switch h.pkgType & PackageType_BitSize {
 	case PackageRequest:
 		rspObj := make([]interface{}, 7)
-		if err = unpackRequestBody(buf, rspObj); err != nil {
+		if err = unpackRequestBody(NewDecoderWithSkip(buf[:]), rspObj); err != nil {
 			return nil, perrors.WithStack(err)
 		}
 		return rspObj[6].(map[string]string), nil
 	case PackageResponse:
 		rspObj := &Response{}
-		if err = unpackResponseBody(buf, rspObj); err != nil {
+		if err = unpackResponseBody(NewDecoderWithSkip(buf[:]), rspObj); err != nil {
 			return nil, perrors.WithStack(err)
 		}
 		return rspObj.Attachments, nil
