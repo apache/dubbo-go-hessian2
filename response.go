@@ -174,11 +174,11 @@ func unpackResponseBody(buf []byte, resp interface{}) error {
 			if err != nil {
 				return perrors.WithStack(err)
 			}
-			atta, ok := attachments.(map[string]string)
-			if ok {
+			if v, ok := attachments.(map[interface{}]interface{}); ok {
+				atta := ToMapStringString(v)
 				response.Attachments = atta
 			} else {
-				return perrors.Errorf("get wrong attachments: %+v", atta)
+				return perrors.Errorf("get wrong attachments: %+v", attachments)
 			}
 		}
 
@@ -199,11 +199,11 @@ func unpackResponseBody(buf []byte, resp interface{}) error {
 			if err != nil {
 				return perrors.WithStack(err)
 			}
-			atta, ok := attachments.(map[string]string)
-			if ok {
+			if v, ok := attachments.(map[interface{}]interface{}); ok {
+				atta := ToMapStringString(v)
 				response.Attachments = atta
 			} else {
-				return perrors.Errorf("get wrong attachments: %+v", atta)
+				return perrors.Errorf("get wrong attachments: %+v", attachments)
 			}
 		}
 
@@ -215,11 +215,11 @@ func unpackResponseBody(buf []byte, resp interface{}) error {
 			if err != nil {
 				return perrors.WithStack(err)
 			}
-			atta, ok := attachments.(map[string]string)
-			if ok {
+			if v, ok := attachments.(map[interface{}]interface{}); ok {
+				atta := ToMapStringString(v)
 				response.Attachments = atta
 			} else {
-				return perrors.Errorf("get wrong attachments: %+v", atta)
+				return perrors.Errorf("get wrong attachments: %+v", attachments)
 			}
 		}
 		return nil
