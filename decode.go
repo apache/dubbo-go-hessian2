@@ -124,7 +124,6 @@ func (d *Decoder) decType() (string, error) {
 		return d.decString(int32(tag))
 	}
 
-	//if idx, err = d.decInt32(TAG_READ); err != nil {
 	if idx, err = d.decInt32(int32(tag)); err != nil {
 		return "", perrors.WithStack(err)
 	}

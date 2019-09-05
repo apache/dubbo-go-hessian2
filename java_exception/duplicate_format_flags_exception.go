@@ -24,7 +24,7 @@ type DuplicateFormatFlagsException struct {
 }
 
 func (e DuplicateFormatFlagsException) Error() string {
-	if e.DetailMessage == "" || e.DetailMessage == "null" {
+	if e.DetailMessage == "" {
 		return "flags=" + e.Flags
 	} else {
 		return e.DetailMessage + " flags=" + e.Flags
