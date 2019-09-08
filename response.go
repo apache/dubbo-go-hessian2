@@ -153,9 +153,11 @@ func packResponse(header DubboHeader, ret interface{}) ([]byte, error) {
 }
 
 // hessian decode response body
-func unpackResponseBody(buf []byte, resp interface{}) error {
+func unpackResponseBody(decoder *Decoder, resp interface{}) error {
 	// body
-	decoder := NewDecoder(buf[:])
+	if decoder == nil {
+		return perrors.Errorf("@decoder is nil")
+	}
 	rspType, err := decoder.Decode()
 	if err != nil {
 		return perrors.WithStack(err)

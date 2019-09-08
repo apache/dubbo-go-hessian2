@@ -470,6 +470,7 @@ func (d *Decoder) getStructDefByIndex(idx int) (reflect.Type, classInfo, error) 
 		ok  bool
 		cls classInfo
 		s   structInfo
+		err error
 	)
 
 	if len(d.classInfoList) <= idx || idx < 0 {
@@ -478,7 +479,10 @@ func (d *Decoder) getStructDefByIndex(idx int) (reflect.Type, classInfo, error) 
 	cls = d.classInfoList[idx]
 	s, ok = getStructInfo(cls.javaName)
 	if !ok {
-		return nil, cls, perrors.Errorf("can not find go type name %s in registry", cls.javaName)
+		if !d.isSkip {
+			err = perrors.Errorf("can not find go type name %s in registry", cls.javaName)
+		}
+		return nil, cls, err
 	}
 
 	return s.typ, cls, nil
@@ -504,6 +508,15 @@ func (d *Decoder) decEnum(javaName string, flag int32) (JavaEnum, error) {
 	enumValue = info.inst.(POJOEnum).EnumValue(enumName)
 	d.appendRefs(enumValue)
 	return enumValue, nil
+}
+
+// skip this object
+func (d *Decoder) skip(cls classInfo) error {
+	if len(cls.fieldNameList) < 1 {
+		return nil
+	}
+	_, err := d.DecodeValue()
+	return err
 }
 
 func (d *Decoder) decObject(flag int32) (interface{}, error) {
@@ -549,6 +562,9 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 		if err != nil {
 			return nil, err
 		}
+		if typ == nil {
+			return nil, d.skip(cls)
+		}
 		if typ.Implements(javaEnumType) {
 			return d.decEnum(cls.javaName, TAG_READ)
 		}
@@ -559,6 +575,9 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 		typ, cls, err = d.getStructDefByIndex(int(tag - BC_OBJECT_DIRECT))
 		if err != nil {
 			return nil, err
+		}
+		if typ == nil {
+			return nil, d.skip(cls)
 		}
 		if typ.Implements(javaEnumType) {
 			return d.decEnum(cls.javaName, TAG_READ)

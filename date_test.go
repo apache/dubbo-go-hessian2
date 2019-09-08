@@ -64,7 +64,7 @@ func TestEncDate(t *testing.T) {
 }
 
 func testDateFramework(t *testing.T, method string, expected time.Time) {
-	r, e := decodeJavaResponse(method, "")
+	r, e := decodeJavaResponse(method, "", false)
 	if e != nil {
 		t.Errorf("%s: decode fail with error %+v", method, e)
 		return

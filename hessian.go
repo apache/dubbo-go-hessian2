@@ -32,6 +32,7 @@ const (
 	PackageHeartbeat          = PackageType(0x08)
 	PackageRequest_TwoWay     = PackageType(0x10)
 	PackageResponse_Exception = PackageType(0x20)
+	PackageType_BitSize       = 0x2f
 )
 
 // PackageType ...
@@ -67,6 +68,15 @@ type HessianCodec struct {
 func NewHessianCodec(reader *bufio.Reader) *HessianCodec {
 	return &HessianCodec{
 		reader: reader,
+	}
+}
+
+// NewHessianCodec generate a new hessian codec instance
+func NewHessianCodecCustom(pkgType PackageType, reader *bufio.Reader, bodyLen int) *HessianCodec {
+	return &HessianCodec{
+		pkgType: pkgType,
+		reader:  reader,
+		bodyLen: bodyLen,
 	}
 }
 
@@ -173,7 +183,7 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 		return perrors.WithStack(err)
 	}
 
-	switch h.pkgType & 0x2f {
+	switch h.pkgType & PackageType_BitSize {
 	case PackageResponse | PackageHeartbeat | PackageResponse_Exception, PackageResponse | PackageResponse_Exception:
 		decoder := NewDecoder(buf[:])
 		exception, err := decoder.Decode()
@@ -189,17 +199,49 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 	case PackageRequest | PackageHeartbeat, PackageResponse | PackageHeartbeat:
 	case PackageRequest:
 		if rspObj != nil {
-			if err = unpackRequestBody(buf, rspObj); err != nil {
+			if err = unpackRequestBody(NewDecoder(buf[:]), rspObj); err != nil {
 				return perrors.WithStack(err)
 			}
 		}
 	case PackageResponse:
 		if rspObj != nil {
-			if err = unpackResponseBody(buf, rspObj); err != nil {
+			if err = unpackResponseBody(NewDecoder(buf[:]), rspObj); err != nil {
 				return perrors.WithStack(err)
 			}
 		}
 	}
 
 	return nil
+}
+
+// ignore body, but only read attachments
+func (h *HessianCodec) ReadAttachments() (map[string]string, error) {
+	if h.reader.Buffered() < h.bodyLen {
+		return nil, ErrBodyNotEnough
+	}
+	buf, err := h.reader.Peek(h.bodyLen)
+	if err != nil {
+		return nil, perrors.WithStack(err)
+	}
+	_, err = h.reader.Discard(h.bodyLen)
+	if err != nil { // this is impossible
+		return nil, perrors.WithStack(err)
+	}
+
+	switch h.pkgType & PackageType_BitSize {
+	case PackageRequest:
+		rspObj := make([]interface{}, 7)
+		if err = unpackRequestBody(NewDecoderWithSkip(buf[:]), rspObj); err != nil {
+			return nil, perrors.WithStack(err)
+		}
+		return rspObj[6].(map[string]string), nil
+	case PackageResponse:
+		rspObj := &Response{}
+		if err = unpackResponseBody(NewDecoderWithSkip(buf[:]), rspObj); err != nil {
+			return nil, perrors.WithStack(err)
+		}
+		return rspObj.Attachments, nil
+	}
+
+	return nil, nil
 }
