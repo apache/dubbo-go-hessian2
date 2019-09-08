@@ -200,7 +200,6 @@ const (
 	FLAG_EVENT   = byte(0x20) // for heartbeat
 	SERIAL_MASK  = 0x1f
 
-	DUBBO_VERSION                          = "2.5.4"
 	DUBBO_VERSION_KEY                      = "dubbo"
 	DEFAULT_DUBBO_PROTOCOL_VERSION         = "2.0.2" // Dubbo RPC protocol version, for compatibility, it must not be between 2.0.10 ~ 2.6.2
 	LOWEST_VERSION_FOR_RESPONSE_ATTACHMENT = 2000200

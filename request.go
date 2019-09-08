@@ -176,7 +176,6 @@ func packRequest(service Service, header DubboHeader, req interface{}) ([]byte, 
 		err       error
 		types     string
 		byteArray []byte
-		version   string
 		pkgLen    int
 	)
 
@@ -221,7 +220,9 @@ func packRequest(service Service, header DubboHeader, req interface{}) ([]byte, 
 	}
 
 	// dubbo version + path + version + method
-	encoder.Encode(DUBBO_VERSION)
+	// org.apache.dubbo.remoting.exchange.support.header.HeaderExchangeChannel
+	// v2.7.1  Line 92
+	encoder.Encode(DEFAULT_DUBBO_PROTOCOL_VERSION)
 	encoder.Encode(service.Path)
 	encoder.Encode(service.Version)
 	encoder.Encode(service.Method)
@@ -238,9 +239,8 @@ func packRequest(service Service, header DubboHeader, req interface{}) ([]byte, 
 	request.Attachments[PATH_KEY] = service.Path
 	request.Attachments[GROUP_KEY] = service.Group
 	request.Attachments[INTERFACE_KEY] = service.Interface
-	if len(version) != 0 {
-		request.Attachments[VERSION_KEY] = version
-	}
+	request.Attachments[VERSION_KEY] = service.Version
+
 	if service.Timeout != 0 {
 		request.Attachments[TIMEOUT_KEY] = strconv.Itoa(int(service.Timeout / time.Millisecond))
 	}
@@ -325,6 +325,7 @@ func unpackRequestBody(decoder *Decoder, reqObj interface{}) error {
 		return perrors.WithStack(err)
 	}
 	if v, ok := attachments.(map[interface{}]interface{}); ok {
+		v[DUBBO_VERSION_KEY] = dubboVersion
 		req[6] = ToMapStringString(v)
 		return nil
 	}
