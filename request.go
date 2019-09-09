@@ -219,9 +219,8 @@ func packRequest(service Service, header DubboHeader, req interface{}) ([]byte, 
 		goto END
 	}
 
+	// https://github.com/apache/dubbo/blob/dubbo-2.7.1/dubbo-remoting/dubbo-remoting-api/src/main/java/org/apache/dubbo/remoting/exchange/support/header/HeaderExchangeChannel.java#L92
 	// dubbo version + path + version + method
-	// org.apache.dubbo.remoting.exchange.support.header.HeaderExchangeChannel
-	// v2.7.1  Line 92
 	encoder.Encode(DEFAULT_DUBBO_PROTOCOL_VERSION)
 	encoder.Encode(service.Path)
 	encoder.Encode(service.Version)
