@@ -15,10 +15,11 @@
 package hessian
 
 import (
-	"regexp"
-
 	"reflect"
+	"regexp"
+)
 
+import (
 	perrors "github.com/pkg/errors"
 )
 

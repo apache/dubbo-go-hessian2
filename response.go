@@ -20,9 +20,14 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+)
 
-	"github.com/apache/dubbo-go-hessian2/java_exception"
+import (
 	perrors "github.com/pkg/errors"
+)
+
+import (
+	"github.com/apache/dubbo-go-hessian2/java_exception"
 )
 
 type Response struct {

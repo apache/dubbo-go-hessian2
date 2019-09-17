@@ -23,9 +23,10 @@ import (
 	"strconv"
 	"unicode/utf8"
 	"unsafe"
+)
 
+import (
 	gxbytes "github.com/dubbogo/gost/bytes"
-
 	perrors "github.com/pkg/errors"
 )
 

@@ -17,7 +17,9 @@ package hessian
 import (
 	"reflect"
 	"unsafe"
+)
 
+import (
 	perrors "github.com/pkg/errors"
 )
 

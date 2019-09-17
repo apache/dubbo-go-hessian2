@@ -20,7 +20,9 @@ import (
 	"strings"
 	"sync"
 	"unicode"
+)
 
+import (
 	perrors "github.com/pkg/errors"
 )
 

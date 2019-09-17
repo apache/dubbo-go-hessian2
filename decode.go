@@ -19,7 +19,9 @@ import (
 	"bytes"
 	"io"
 	"reflect"
+)
 
+import (
 	perrors "github.com/pkg/errors"
 )
 
