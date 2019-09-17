@@ -17,9 +17,7 @@ package hessian
 import (
 	"encoding/binary"
 	"io"
-)
 
-import (
 	perrors "github.com/pkg/errors"
 )
 

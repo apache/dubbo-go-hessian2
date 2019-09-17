@@ -18,9 +18,7 @@ import (
 	"bufio"
 	"encoding/binary"
 	"time"
-)
 
-import (
 	perrors "github.com/pkg/errors"
 )
 

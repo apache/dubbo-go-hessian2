@@ -20,9 +20,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-)
 
-import (
 	perrors "github.com/pkg/errors"
 )
 

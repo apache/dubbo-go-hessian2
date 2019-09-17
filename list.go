@@ -21,9 +21,7 @@ import (
 	"strings"
 	"sync"
 	"time"
-)
 
-import (
 	perrors "github.com/pkg/errors"
 )
 

@@ -16,11 +16,10 @@ package hessian
 
 import (
 	"regexp"
-)
 
-import (
-	perrors "github.com/pkg/errors"
 	"reflect"
+
+	perrors "github.com/pkg/errors"
 )
 
 const (

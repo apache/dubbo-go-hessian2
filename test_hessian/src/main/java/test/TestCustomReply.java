@@ -17,13 +17,13 @@ package test;
 import com.alibaba.com.caucho.hessian.io.Hessian2Output;
 import com.caucho.hessian.test.A0;
 import com.caucho.hessian.test.A1;
+import test.model.DateDemo;
 
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
-import java.math.BigDecimal;
-import test.model.DateDemo;
 
 public class TestCustomReply {
 
@@ -80,7 +80,7 @@ public class TestCustomReply {
             return;
         }
         boolean hasEnd = output.writeListBegin(-1, typeMap.get(o.getClass()));
-        for (Object tmp: o) {
+        for (Object tmp : o) {
             output.writeObject(tmp);
         }
         if (hasEnd) {
@@ -95,7 +95,7 @@ public class TestCustomReply {
             return;
         }
         boolean hasEnd = output.writeListBegin(o.length, null);
-        for (Object tmp: o) {
+        for (Object tmp : o) {
             output.writeObject(tmp);
         }
         if (hasEnd) {
@@ -110,7 +110,7 @@ public class TestCustomReply {
             return;
         }
         boolean hasEnd = output.writeListBegin(-1, null);
-        for (Object tmp: o) {
+        for (Object tmp : o) {
             output.writeObject(tmp);
         }
         if (hasEnd) {
@@ -131,7 +131,7 @@ public class TestCustomReply {
             return;
         }
         boolean hasEnd = output.writeListBegin(-1, "[com.caucho.hessian.test.A0");
-        for (Object tmp: o) {
+        for (Object tmp : o) {
             output.writeObject(tmp);
         }
         if (hasEnd) {
@@ -152,7 +152,7 @@ public class TestCustomReply {
             return;
         }
         boolean hasEnd = output.writeListBegin(-1, typeMap.get(o.getClass()));
-        for (Object tmp: o) {
+        for (Object tmp : o) {
             output.writeObject(tmp);
         }
         if (hasEnd) {
@@ -173,7 +173,7 @@ public class TestCustomReply {
             return;
         }
         boolean hasEnd = output.writeListBegin(-1, typeMap.get(o.getClass()));
-        for (Object tmp: o) {
+        for (Object tmp : o) {
             output.writeObject(tmp);
         }
         if (hasEnd) {
@@ -194,7 +194,7 @@ public class TestCustomReply {
             return;
         }
         boolean hasEnd = output.writeListBegin(-1, typeMap.get(o.getClass()));
-        for (Object tmp: o) {
+        for (Object tmp : o) {
             output.writeObject(tmp);
         }
         if (hasEnd) {
@@ -215,7 +215,7 @@ public class TestCustomReply {
             return;
         }
         boolean hasEnd = output.writeListBegin(-1, typeMap.get(o.getClass()));
-        for (Object tmp: o) {
+        for (Object tmp : o) {
             output.writeObject(tmp);
         }
         if (hasEnd) {
@@ -236,7 +236,7 @@ public class TestCustomReply {
             return;
         }
         boolean hasEnd = output.writeListBegin(-1, typeMap.get(o.getClass()));
-        for (Object tmp: o) {
+        for (Object tmp : o) {
             output.writeObject(tmp);
         }
         if (hasEnd) {
@@ -251,7 +251,7 @@ public class TestCustomReply {
             return;
         }
         boolean hasEnd = output.writeListBegin(o.length, typeMap.get(o.getClass()));
-        for (Object tmp: o) {
+        for (Object tmp : o) {
             output.writeObject(tmp);
         }
         if (hasEnd) {
@@ -266,7 +266,7 @@ public class TestCustomReply {
             return;
         }
         boolean hasEnd = output.writeListBegin(-1, typeMap.get(o.getClass()));
-        for (Object tmp: o) {
+        for (Object tmp : o) {
             output.writeObject(tmp);
         }
         if (hasEnd) {
@@ -287,7 +287,7 @@ public class TestCustomReply {
             return;
         }
         boolean hasEnd = output.writeListBegin(-1, typeMap.get(o.getClass()));
-        for (Object tmp: o) {
+        for (Object tmp : o) {
             output.writeObject(tmp);
         }
         if (hasEnd) {
@@ -308,7 +308,7 @@ public class TestCustomReply {
             return;
         }
         boolean hasEnd = output.writeListBegin(-1, typeMap.get(o.getClass()));
-        for (Object tmp: o) {
+        for (Object tmp : o) {
             output.writeObject(tmp);
         }
         if (hasEnd) {
@@ -348,8 +348,14 @@ public class TestCustomReply {
     }
 
     public void customReplyTypedFixedDateNull() throws Exception {
-        DateDemo demo = new DateDemo("zhangshan",null,null);
+        DateDemo demo = new DateDemo("zhangshan", null, null);
         output.writeObject(demo);
+        output.flush();
+    }
+
+    public void customReplyStringEmoji() throws Exception {
+        String s = "emoji\uD83E\uDD23";
+        output.writeObject(s);
         output.flush();
     }
 
@@ -359,10 +365,11 @@ class TypedListTest implements Serializable {
     public A0 a;
     public A0[][] list;
     public A1[][] list1;
+
     TypedListTest() {
         this.a = new A0();
-        this.list = new A0[][]{{new A0(), new A0()},{new A0(), new A0()}};
-        this.list1 = new A1[][]{{new A1(), new A1()},{new A1(), new A1()}};
+        this.list = new A0[][]{{new A0(), new A0()}, {new A0(), new A0()}};
+        this.list1 = new A1[][]{{new A1(), new A1()}, {new A1(), new A1()}};
     }
 
 }

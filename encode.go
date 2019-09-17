@@ -18,9 +18,7 @@ import (
 	"reflect"
 	"time"
 	"unsafe"
-)
 
-import (
 	perrors "github.com/pkg/errors"
 )
 
