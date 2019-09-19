@@ -175,7 +175,6 @@ public class TestCustomDecode {
 
     public Object customArgString_emoji() throws Exception {
         String o = (String) input.readObject();
-        String s = "emoji\uD83E\uDD23";
-        return s.equals(o);
+        return TestString.getEmojiTestString().equals(o);
     }
 }

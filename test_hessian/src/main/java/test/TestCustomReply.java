@@ -354,8 +354,7 @@ public class TestCustomReply {
     }
 
     public void customReplyStringEmoji() throws Exception {
-        String s = "emoji\uD83E\uDD23";
-        output.writeObject(s);
+        output.writeObject(TestString.getEmojiTestString());
         output.flush();
     }
 

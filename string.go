@@ -53,6 +53,7 @@ func Slice(s string) (b []byte) {
 // ref:
 // - https://en.wikipedia.org/wiki/UTF-16
 // - https://en.wikipedia.org/wiki/UCS-4
+// - http://www.unicode.org/glossary/#code_point
 func encodeUcs4Rune(b []byte, r rune) (int, int) {
 	if r >= 0x10000 && r <= 0x10FFFF {
 		t := uint32(r) - 0x10000

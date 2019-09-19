@@ -152,7 +152,10 @@ func TestStringEncode(t *testing.T) {
 }
 
 func TestStringEmoji(t *testing.T) {
+	// see: test_hessian/src/main/java/test/TestString.java
 	s0 := "emoji🤣"
+	s0 += ",max" + string(rune(0x10FFFF))
+
 	testDecodeFramework(t, "customReplyStringEmoji", s0)
 	testJavaDecode(t, "customArgString_emoji", s0)
 }
