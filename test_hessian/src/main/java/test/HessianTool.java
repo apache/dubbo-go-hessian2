@@ -20,9 +20,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-/**
- * @author wongoo
- */
 public class HessianTool {
     private static SerializerFactory serializerFactory = new SerializerFactory();
 

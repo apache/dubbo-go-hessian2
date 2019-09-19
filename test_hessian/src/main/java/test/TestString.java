@@ -12,9 +12,6 @@
 
 package test;
 
-/**
- * @author wongoo
- */
 public class TestString {
 
     public static String getEmojiTestString() {

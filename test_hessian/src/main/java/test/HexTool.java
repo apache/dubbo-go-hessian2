@@ -12,9 +12,6 @@
 
 package test;
 
-/**
- * @author wongoo
- */
 public class HexTool {
 
     public static String byteToHex(byte b) {
