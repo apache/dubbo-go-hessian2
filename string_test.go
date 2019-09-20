@@ -19,6 +19,10 @@ import (
 	"testing"
 )
 
+import (
+	"github.com/stretchr/testify/assert"
+)
+
 func TestEncString(t *testing.T) {
 	var (
 		v   string
@@ -51,14 +55,19 @@ func TestEncShortRune(t *testing.T) {
 
 	e = NewEncoder()
 	v = "我化尘埃飞扬，追寻赤裸逆翔"
-	e.Encode(v)
+	err = e.Encode(v)
+	assert.Nil(t, err)
 	if len(e.Buffer()) == 0 {
 		t.Fail()
 	}
 
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
-	t.Logf("decode(%v) = %v, %v\n", v, res, err)
+	assert.Nil(t, err)
+	if err != nil {
+		t.Logf("err:%s", err.Error())
+	}
+	assert.Equal(t, v, res)
 }
 
 func TestEncRune(t *testing.T) {
@@ -140,4 +149,13 @@ func TestStringEncode(t *testing.T) {
 	testJavaDecode(t, "argString_31", s32[:31])
 	testJavaDecode(t, "argString_32", s32)
 	testJavaDecode(t, "argString_65536", s65560[:65536])
+}
+
+func TestStringEmoji(t *testing.T) {
+	// see: test_hessian/src/main/java/test/TestString.java
+	s0 := "emoji🤣"
+	s0 += ",max" + string(rune(0x10FFFF))
+
+	testDecodeFramework(t, "customReplyStringEmoji", s0)
+	testJavaDecode(t, "customArgString_emoji", s0)
 }
