@@ -176,7 +176,6 @@ func packRequest(service Service, header DubboHeader, req interface{}) ([]byte, 
 		err       error
 		types     string
 		byteArray []byte
-		version   string
 		pkgLen    int
 	)
 
@@ -220,8 +219,9 @@ func packRequest(service Service, header DubboHeader, req interface{}) ([]byte, 
 		goto END
 	}
 
+	// https://github.com/apache/dubbo/blob/dubbo-2.7.1/dubbo-remoting/dubbo-remoting-api/src/main/java/org/apache/dubbo/remoting/exchange/support/header/HeaderExchangeChannel.java#L92
 	// dubbo version + path + version + method
-	encoder.Encode(DUBBO_VERSION)
+	encoder.Encode(DEFAULT_DUBBO_PROTOCOL_VERSION)
 	encoder.Encode(service.Path)
 	encoder.Encode(service.Version)
 	encoder.Encode(service.Method)
@@ -238,9 +238,8 @@ func packRequest(service Service, header DubboHeader, req interface{}) ([]byte, 
 	request.Attachments[PATH_KEY] = service.Path
 	request.Attachments[GROUP_KEY] = service.Group
 	request.Attachments[INTERFACE_KEY] = service.Interface
-	if len(version) != 0 {
-		request.Attachments[VERSION_KEY] = version
-	}
+	request.Attachments[VERSION_KEY] = service.Version
+
 	if service.Timeout != 0 {
 		request.Attachments[TIMEOUT_KEY] = strconv.Itoa(int(service.Timeout / time.Millisecond))
 	}
@@ -259,7 +258,11 @@ END:
 }
 
 // hessian decode request body
-func unpackRequestBody(buf []byte, reqObj interface{}) error {
+func unpackRequestBody(decoder *Decoder, reqObj interface{}) error {
+
+	if decoder == nil {
+		return perrors.Errorf("@decoder is nil")
+	}
 
 	req, ok := reqObj.([]interface{})
 	if !ok {
@@ -274,7 +277,6 @@ func unpackRequestBody(buf []byte, reqObj interface{}) error {
 		dubboVersion, target, serviceVersion, method, argsTypes interface{}
 		args                                                    []interface{}
 	)
-	decoder := NewDecoder(buf[:])
 
 	dubboVersion, err = decoder.Decode()
 	if err != nil {
@@ -322,6 +324,7 @@ func unpackRequestBody(buf []byte, reqObj interface{}) error {
 		return perrors.WithStack(err)
 	}
 	if v, ok := attachments.(map[interface{}]interface{}); ok {
+		v[DUBBO_VERSION_KEY] = dubboVersion
 		req[6] = ToMapStringString(v)
 		return nil
 	}

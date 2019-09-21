@@ -16,6 +16,7 @@ package hessian
 
 import (
 	"bytes"
+	"fmt"
 	"os/exec"
 	"testing"
 )
@@ -36,34 +37,40 @@ func encodeTarget(target interface{}) ([]byte, error) {
 }
 
 func javaDecodeValidate(method string, target interface{}) (string, error) {
-	b, e := encodeTarget(target)
-	if e != nil {
-		return "", e
+	b, err := encodeTarget(target)
+	if err != nil {
+		return "", err
 	}
 
 	genHessianJar()
 	cmd := exec.Command("java", "-jar", hessianJar, method)
 
-	stdin, _ := cmd.StdinPipe()
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		fmt.Printf("call java error: %v", err)
+		return "", err
+	}
+
 	go func() {
-		stdin.Write(b)
-		stdin.Close()
+		_, _ = stdin.Write(b)
+		_ = stdin.Close()
 	}()
 
-	out, e := cmd.Output()
-	if e != nil {
-		return "", e
+	out, err := cmd.Output()
+	if err != nil {
+		return "", err
 	}
 	return string(out), nil
 }
 
 func testJavaDecode(t *testing.T, method string, target interface{}) {
-	r, e := javaDecodeValidate(method, target)
-	if e != nil {
-		t.Errorf("%s: encode fail with error %v", method, e)
+	result, err := javaDecodeValidate(method, target)
+	if err != nil {
+		t.Errorf("%s: encode fail with error: %v", method, err)
+		return
 	}
 
-	if r != "true" {
-		t.Errorf("%s: encode %v to bytes wrongly", method, target)
+	if result != "true" {
+		t.Errorf("%s: encode %v to bytes wrongly, result: %s", method, target, result)
 	}
 }

@@ -417,7 +417,7 @@ func TestDecodeJavaTupleObject(t *testing.T) {
 
 	RegisterPOJO(tuple)
 
-	testDecodeJavaData(t, "getTheTuple", "test.tuple.TupleProviderImpl", tuple)
+	testDecodeJavaData(t, "getTheTuple", "test.tuple.TupleProviderImpl", false, tuple)
 }
 
 func TestEncodeDecodeTuple(t *testing.T) {
@@ -524,4 +524,34 @@ func doTestBasePointer(t *testing.T, base *BasePointer, expected *BasePointer) {
 	if !reflect.DeepEqual(expected, decObj) {
 		t.Errorf("expect: %v, but get: %v", base, decObj)
 	}
+}
+
+func TestSkip(t *testing.T) {
+	// clear pojo
+	pojoRegistry = POJORegistry{
+		j2g:      make(map[string]string),
+		registry: make(map[string]structInfo),
+	}
+	testDecodeFrameworkWithSkip(t, "replyObject_0", nil)
+	testDecodeFrameworkWithSkip(t, "replyObject_1", nil)
+	testDecodeFrameworkWithSkip(t, "replyObject_16", make([]interface{}, 17))
+	testDecodeFrameworkWithSkip(t, "replyObject_2a", make([]interface{}, 2))
+	testDecodeFrameworkWithSkip(t, "replyObject_3", nil)
+
+	testDecodeFrameworkWithSkip(t, "replyTypedMap_0", make(map[interface{}]interface{}))
+
+	testDecodeFrameworkWithSkip(t, "replyTypedFixedList_0", make([]string, 0))
+	testDecodeFrameworkWithSkip(t, "replyUntypedFixedList_0", []interface{}{})
+
+	testDecodeFrameworkWithSkip(t, "customReplyTypedFixedListHasNull", make([]Object, 3))
+	testDecodeFrameworkWithSkip(t, "customReplyTypedVariableListHasNull", make([]Object, 3))
+	testDecodeFrameworkWithSkip(t, "customReplyUntypedFixedListHasNull", make([]interface{}, 3))
+	testDecodeFrameworkWithSkip(t, "customReplyUntypedVariableListHasNull", make([]interface{}, 3))
+
+	testDecodeFrameworkWithSkip(t, "customReplyTypedFixedList_A0", make([]interface{}, 3))
+	testDecodeFrameworkWithSkip(t, "customReplyTypedVariableList_A0", make([]interface{}, 3))
+
+	testDecodeFrameworkWithSkip(t, "customReplyTypedFixedList_Test", nil)
+
+	testDecodeFrameworkWithSkip(t, "customReplyTypedFixedList_Object", make([]Object, 1))
 }
