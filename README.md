@@ -17,6 +17,8 @@ It's a golang hessian library used by [Apache/dubbo-go](https://github.com/apach
 * [Java Date & Time](https://github.com/apache/dubbo-go-hessian2/issues/90)
 * [Java Generic Invokation](https://github.com/apache/dubbo-go-hessian2/issues/84)
 * [Dubbo Attachements](https://github.com/apache/dubbo-go-hessian2/issues/49)
+* [Skipping unregistered POJO](https://github.com/apache/dubbo-go-hessian2/pull/128)
+* [Emoji](https://github.com/apache/dubbo-go-hessian2/issues/129)
 
 ## Basic Usage Examples
 
