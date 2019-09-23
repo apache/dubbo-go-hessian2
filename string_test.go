@@ -89,7 +89,9 @@ func TestEncRune(t *testing.T) {
 	v = v + v + v + v + v
 	v = v + v + v + v + v
 	v = v + v + v + v + v
-	fmt.Printf("vlen:%d\n", len(v))
+
+	t.Logf("TestEncRune vlen: %d", len(v))
+
 	e.Encode(v)
 	if len(e.Buffer()) == 0 {
 		t.Fail()
