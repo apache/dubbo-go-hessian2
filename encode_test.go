@@ -16,7 +16,6 @@ package hessian
 
 import (
 	"bytes"
-	"fmt"
 	"os/exec"
 	"testing"
 )
@@ -36,7 +35,7 @@ func encodeTarget(target interface{}) ([]byte, error) {
 	return e.Buffer(), nil
 }
 
-func javaDecodeValidate(method string, target interface{}) (string, error) {
+func javaDecodeValidate(t *testing.T, method string, target interface{}) (string, error) {
 	b, err := encodeTarget(target)
 	if err != nil {
 		return "", err
@@ -47,7 +46,7 @@ func javaDecodeValidate(method string, target interface{}) (string, error) {
 
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
-		fmt.Printf("call java error: %v", err)
+		t.Logf("call java error: %v", err)
 		return "", err
 	}
 
@@ -57,14 +56,16 @@ func javaDecodeValidate(method string, target interface{}) (string, error) {
 	}()
 
 	out, err := cmd.Output()
+
 	if err != nil {
+		t.Logf("get java result error: %v", err)
 		return "", err
 	}
 	return string(out), nil
 }
 
 func testJavaDecode(t *testing.T, method string, target interface{}) {
-	result, err := javaDecodeValidate(method, target)
+	result, err := javaDecodeValidate(t, method, target)
 	if err != nil {
 		t.Errorf("%s: encode fail with error: %v", method, err)
 		return

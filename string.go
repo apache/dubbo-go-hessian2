@@ -151,7 +151,6 @@ func encString(b []byte, v string) []byte {
 	var (
 		byteLen = 0
 		charLen = 0
-		last    = false
 		vBuf    = *bytes.NewBufferString(v)
 
 		byteRead  = 0
@@ -170,12 +169,9 @@ func encString(b []byte, v string) []byte {
 
 		charCount = 0
 		byteCount = 0
-		for charCount <= CHUNK_SIZE {
+		for charCount < CHUNK_SIZE {
 			r, _, err := vBuf.ReadRune()
 			if err != nil {
-				if err == io.EOF {
-					last = true
-				}
 				break
 			}
 
@@ -184,8 +180,12 @@ func encString(b []byte, v string) []byte {
 			byteCount += byteLen
 		}
 
+		if charCount == 0 {
+			break
+		}
+
 		switch {
-		case !last && charCount >= CHUNK_SIZE:
+		case vBuf.Len() > 0 && charCount >= CHUNK_SIZE:
 			b = encByte(b, BC_STRING_CHUNK)
 			b = encByte(b, PackUint16(uint16(charCount))...)
 		case charCount <= int(STRING_DIRECT_MAX):
