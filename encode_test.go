@@ -47,7 +47,7 @@ func javaDecodeValidate(method string, target interface{}) (string, error) {
 
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
-		fmt.Printf("call java error: %v", err)
+		fmt.Printf("call java error: %v\n", err)
 		return "", err
 	}
 
@@ -57,7 +57,9 @@ func javaDecodeValidate(method string, target interface{}) (string, error) {
 	}()
 
 	out, err := cmd.Output()
+
 	if err != nil {
+		fmt.Printf("get java result error: %v\n", err)
 		return "", err
 	}
 	return string(out), nil
