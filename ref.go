@@ -165,7 +165,8 @@ func (d *Decoder) decRef(flag int32) (interface{}, error) {
 		}
 
 		if len(d.refs) <= int(i) {
-			return nil, ErrIllegalRefIndex
+			return nil, nil
+			//return nil, ErrIllegalRefIndex
 		}
 		// return the exact ref object, which maybe a _refHolder
 		return d.refs[i], nil

@@ -1,8 +1,8 @@
 # gohessian
 
-[![Build Status](https://travis-ci.org/dubbogo/hessian2.png?branch=master)](https://travis-ci.org/dubbogo/hessian2)
-[![GoCover](http://gocover.io/_badge/github.com/dubbogo/hessian2)](http://gocover.io/github.com/dubbogo/hessian2)
-[![GoDoc](https://godoc.org/github.com/dubbogo/hessian2?status.svg)](https://godoc.org/github.com/dubbogo/hessian2)
+[![Build Status](https://travis-ci.org/apache/dubbo-go-hessian2.png?branch=master)](https://travis-ci.org/apache/dubbo-go-hessian2)
+[![GoCover](http://gocover.io/_badge/github.com/apache/dubbo-go-hessian2)](http://gocover.io/github.com/apache/dubbo-go-hessian2)
+[![GoDoc](https://godoc.org/github.com/apache/dubbo-go-hessian2?status.svg)](https://godoc.org/github.com/apache/dubbo-go-hessian2)
 
 
 ---
@@ -11,12 +11,14 @@ It's a golang hessian library used by [Apache/dubbo-go](https://github.com/apach
 
 ## Feature List
 
-* [All JDK Exceptions](https://github.com/dubbogo/hessian2/issues/59)
-* [Function Alias By Alias](https://github.com/dubbogo/hessian2/issues/19)
-* [Java Bigdecimal](https://github.com/dubbogo/hessian2/issues/89)
-* [Java Date & Time](https://github.com/dubbogo/hessian2/issues/90)
-* [Java Generic Invokation](https://github.com/dubbogo/hessian2/issues/84)
-* [Dubbo Attachements](https://github.com/dubbogo/hessian2/issues/49)
+* [All JDK Exceptions](https://github.com/apache/dubbo-go-hessian2/issues/59)
+* [Function Alias By Alias](https://github.com/apache/dubbo-go-hessian2/issues/19)
+* [Java Bigdecimal](https://github.com/apache/dubbo-go-hessian2/issues/89)
+* [Java Date & Time](https://github.com/apache/dubbo-go-hessian2/issues/90)
+* [Java Generic Invokation](https://github.com/apache/dubbo-go-hessian2/issues/84)
+* [Dubbo Attachements](https://github.com/apache/dubbo-go-hessian2/issues/49)
+* [Skipping unregistered POJO](https://github.com/apache/dubbo-go-hessian2/pull/128)
+* [Emoji](https://github.com/apache/dubbo-go-hessian2/issues/129)
 
 ## Basic Usage Examples
 

@@ -33,6 +33,7 @@ type Decoder struct {
 	// todo: map
 	typeRefs      *TypeRefs
 	classInfoList []classInfo
+	isSkip        bool
 }
 
 // Error part
@@ -44,6 +45,11 @@ var (
 // NewDecoder generate a decoder instance
 func NewDecoder(b []byte) *Decoder {
 	return &Decoder{reader: bufio.NewReader(bytes.NewReader(b)), typeRefs: &TypeRefs{records: map[string]bool{}}}
+}
+
+// NewDecoder generate a decoder instance with skip
+func NewDecoderWithSkip(b []byte) *Decoder {
+	return &Decoder{reader: bufio.NewReader(bytes.NewReader(b)), typeRefs: &TypeRefs{records: map[string]bool{}}, isSkip: true}
 }
 
 /////////////////////////////////////////
@@ -124,7 +130,7 @@ func (d *Decoder) decType() (string, error) {
 		return d.decString(int32(tag))
 	}
 
-	if idx, err = d.decInt32(TAG_READ); err != nil {
+	if idx, err = d.decInt32(int32(tag)); err != nil {
 		return "", perrors.WithStack(err)
 	}
 
@@ -232,5 +238,8 @@ func (t *TypeRefs) appendTypeRefs(name string, p reflect.Type) {
 }
 
 func (t *TypeRefs) Get(index int) reflect.Type {
+	if len(t.typeRefs) <= index {
+		return nil
+	}
 	return t.typeRefs[index]
 }

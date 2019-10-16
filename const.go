@@ -15,12 +15,12 @@
 package hessian
 
 import (
+	"reflect"
 	"regexp"
 )
 
 import (
 	perrors "github.com/pkg/errors"
-	"reflect"
 )
 
 const (
@@ -147,7 +147,7 @@ const (
 	VERSION_KEY   = "version"
 	TIMEOUT_KEY   = "timeout"
 
-	STRING_NIL   = "null"
+	STRING_NIL   = ""
 	STRING_TRUE  = "true"
 	STRING_FALSE = "false"
 	STRING_ZERO  = "0.0"
