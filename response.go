@@ -58,7 +58,8 @@ func EnsureResponse(body interface{}) *Response {
 	return NewResponse(body, nil, nil)
 }
 
-// https://github.com/apache/dubbo/blob/dubbo-2.7.1/dubbo-remoting/dubbo-remoting-api/src/main/java/org/apache/dubbo/remoting/exchange/codec/ExchangeCodec.java#L256
+// dubbo-remoting/dubbo-remoting-api/src/main/java/com/alibaba/dubbo/remoting/exchange/codec/ExchangeCodec.java
+// v2.7.1 line 256 encodeResponse
 // hessian encode response
 func packResponse(header DubboHeader, ret interface{}) ([]byte, error) {
 	var (
@@ -152,11 +153,9 @@ func packResponse(header DubboHeader, ret interface{}) ([]byte, error) {
 }
 
 // hessian decode response body
-func unpackResponseBody(decoder *Decoder, resp interface{}) error {
+func unpackResponseBody(buf []byte, resp interface{}) error {
 	// body
-	if decoder == nil {
-		return perrors.Errorf("@decoder is nil")
-	}
+	decoder := NewDecoder(buf[:])
 	rspType, err := decoder.Decode()
 	if err != nil {
 		return perrors.WithStack(err)
@@ -175,11 +174,11 @@ func unpackResponseBody(decoder *Decoder, resp interface{}) error {
 			if err != nil {
 				return perrors.WithStack(err)
 			}
-			if v, ok := attachments.(map[interface{}]interface{}); ok {
-				atta := ToMapStringString(v)
+			atta, ok := attachments.(map[string]string)
+			if ok {
 				response.Attachments = atta
 			} else {
-				return perrors.Errorf("get wrong attachments: %+v", attachments)
+				return perrors.Errorf("get wrong attachments: %+v", atta)
 			}
 		}
 
@@ -200,11 +199,11 @@ func unpackResponseBody(decoder *Decoder, resp interface{}) error {
 			if err != nil {
 				return perrors.WithStack(err)
 			}
-			if v, ok := attachments.(map[interface{}]interface{}); ok {
-				atta := ToMapStringString(v)
+			atta, ok := attachments.(map[string]string)
+			if ok {
 				response.Attachments = atta
 			} else {
-				return perrors.Errorf("get wrong attachments: %+v", attachments)
+				return perrors.Errorf("get wrong attachments: %+v", atta)
 			}
 		}
 
@@ -216,11 +215,11 @@ func unpackResponseBody(decoder *Decoder, resp interface{}) error {
 			if err != nil {
 				return perrors.WithStack(err)
 			}
-			if v, ok := attachments.(map[interface{}]interface{}); ok {
-				atta := ToMapStringString(v)
+			atta, ok := attachments.(map[string]string)
+			if ok {
 				response.Attachments = atta
 			} else {
-				return perrors.Errorf("get wrong attachments: %+v", attachments)
+				return perrors.Errorf("get wrong attachments: %+v", atta)
 			}
 		}
 		return nil
@@ -331,8 +330,10 @@ func ReflectResponse(in interface{}, out interface{}) error {
 
 var versionInt = make(map[string]int)
 
-// https://github.com/apache/dubbo/blob/dubbo-2.7.1/dubbo-common/src/main/java/org/apache/dubbo/common/Version.java#L96
 // isSupportResponseAttachment is for compatibility among some dubbo version
+// but we haven't used it yet.
+// dubbo-common/src/main/java/org/apache/dubbo/common/Version.java
+// v2.7.1 line 96
 func isSupportResponseAttachment(version string) bool {
 	if version == "" {
 		return false
