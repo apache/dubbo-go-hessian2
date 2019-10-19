@@ -96,9 +96,6 @@ func packResponse(header DubboHeader, ret interface{}) ([]byte, error) {
 		if hb {
 			encoder.Encode(nil)
 		} else {
-			// com.alibaba.dubbo.rpc.protocol.dubbo.DubboCodec.DubboCodec.java
-			// v2.7.1 line191 encodeResponseData
-
 			atta := isSupportResponseAttachment(response.Attachments[DUBBO_VERSION_KEY])
 
 			var resWithException, resValue, resNullValue int32
@@ -133,8 +130,6 @@ func packResponse(header DubboHeader, ret interface{}) ([]byte, error) {
 			}
 		}
 	} else {
-		// com.alibaba.dubbo.remoting.exchange.codec.ExchangeCodec
-		// v2.6.5 line280 encodeResponse
 		if response.Exception != nil { // throw error
 			encoder.Encode(response.Exception.Error())
 		} else {

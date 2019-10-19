@@ -35,7 +35,6 @@ import (
 // ::= [x80-xbf]             # -x10 to x3f
 // ::= [xc0-xcf] b0          # -x800 to x7ff
 // ::= [xd0-xd7] b1 b0       # -x40000 to x3ffff
-// hessian-lite/src/main/java/com/alibaba/com/alibaba/com/caucho/hessian/io/Hessian2Output.java:642 WriteInt
 func encInt32(b []byte, v int32) []byte {
 	if int32(INT_DIRECT_MIN) <= v && v <= int32(INT_DIRECT_MAX) {
 		return encByte(b, byte(v+int32(BC_INT_ZERO)))
