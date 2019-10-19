@@ -36,7 +36,6 @@ import (
 // ::= [xf0-xff] b0          # -x800 to x7ff
 // ::= [x38-x3f] b1 b0       # -x40000 to x3ffff
 // ::= x59 b3 b2 b1 b0       # 32-bit integer cast to long
-// hessian-lite/src/main/java/com/alibaba/com/alibaba/com/caucho/hessian/io/Hessian2Output.java:642 WriteLong
 func encInt64(b []byte, v int64) []byte {
 	if int64(LONG_DIRECT_MIN) <= v && v <= int64(LONG_DIRECT_MAX) {
 		return encByte(b, byte(v+int64(BC_LONG_ZERO)))

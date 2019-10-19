@@ -33,7 +33,6 @@ import (
 // dubbo
 /////////////////////////////////////////
 
-// com.alibaba.dubbo.common.utils.ReflectUtils.ReflectUtils.java line245 getDesc
 func getArgType(v interface{}) string {
 	if v == nil {
 		return "V"
@@ -172,8 +171,6 @@ func EnsureRequest(body interface{}) *Request {
 	return NewRequest(body, nil)
 }
 
-// dubbo-remoting/dubbo-remoting-api/src/main/java/com/alibaba/dubbo/remoting/exchange/codec/ExchangeCodec.java
-// v2.5.4 line 204 encodeRequest
 func packRequest(service Service, header DubboHeader, req interface{}) ([]byte, error) {
 	var (
 		err       error
@@ -213,7 +210,6 @@ func packRequest(service Service, header DubboHeader, req interface{}) ([]byte, 
 	encoder := NewEncoder()
 	encoder.Append(byteArray[:HEADER_LENGTH])
 
-	// com.alibaba.dubbo.rpc.protocol.dubbo.DubboCodec.DubboCodec.java line144 encodeRequestData
 	//////////////////////////////////////////
 	// body
 	//////////////////////////////////////////
@@ -222,7 +218,6 @@ func packRequest(service Service, header DubboHeader, req interface{}) ([]byte, 
 		goto END
 	}
 
-	// https://github.com/apache/dubbo/blob/dubbo-2.7.1/dubbo-remoting/dubbo-remoting-api/src/main/java/org/apache/dubbo/remoting/exchange/support/header/HeaderExchangeChannel.java#L92
 	// dubbo version + path + version + method
 	encoder.Encode(DEFAULT_DUBBO_PROTOCOL_VERSION)
 	encoder.Encode(service.Path)

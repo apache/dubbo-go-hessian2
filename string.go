@@ -250,7 +250,6 @@ func (d *Decoder) getStringLength(tag byte) (int32, error) {
 	}
 }
 
-// hessian-lite/src/main/java/com/alibaba/com/caucho/hessian/io/Hessian2Input.java : readString
 func (d *Decoder) decString(flag int32) (string, error) {
 	var (
 		tag       byte
