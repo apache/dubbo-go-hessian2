@@ -1,16 +1,19 @@
-// Copyright 2016-2019 Alex Stocks
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package hessian
 
@@ -32,7 +35,6 @@ import (
 // ::= [x80-xbf]             # -x10 to x3f
 // ::= [xc0-xcf] b0          # -x800 to x7ff
 // ::= [xd0-xd7] b1 b0       # -x40000 to x3ffff
-// hessian-lite/src/main/java/com/alibaba/com/alibaba/com/caucho/hessian/io/Hessian2Output.java:642 WriteInt
 func encInt32(b []byte, v int32) []byte {
 	if int32(INT_DIRECT_MIN) <= v && v <= int32(INT_DIRECT_MAX) {
 		return encByte(b, byte(v+int32(BC_INT_ZERO)))
