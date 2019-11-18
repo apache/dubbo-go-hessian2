@@ -1,16 +1,19 @@
-// Copyright 2016-2019 Alex Stocks, Yincheng Fang
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package hessian
 
@@ -93,9 +96,6 @@ func packResponse(header DubboHeader, ret interface{}) ([]byte, error) {
 		if hb {
 			encoder.Encode(nil)
 		} else {
-			// com.alibaba.dubbo.rpc.protocol.dubbo.DubboCodec.DubboCodec.java
-			// v2.7.1 line191 encodeResponseData
-
 			atta := isSupportResponseAttachment(response.Attachments[DUBBO_VERSION_KEY])
 
 			var resWithException, resValue, resNullValue int32
@@ -130,8 +130,6 @@ func packResponse(header DubboHeader, ret interface{}) ([]byte, error) {
 			}
 		}
 	} else {
-		// com.alibaba.dubbo.remoting.exchange.codec.ExchangeCodec
-		// v2.6.5 line280 encodeResponse
 		if response.Exception != nil { // throw error
 			encoder.Encode(response.Exception.Error())
 		} else {
