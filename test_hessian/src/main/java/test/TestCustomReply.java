@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 public class TestCustomReply {
 
@@ -347,6 +348,13 @@ public class TestCustomReply {
     public void customReplyTypedFixedDecimal() throws Exception {
         BigDecimal decimal = new BigDecimal("100.256");
         output.writeObject(decimal);
+        output.flush();
+    }
+    public void customReplyTypedFixedDecimalMap() throws Exception {
+        BigDecimal decimal = new BigDecimal("100.256");
+        HashMap mapDemo = new HashMap<>();
+        mapDemo.put("test_BigDecimal",decimal);
+        output.writeObject(mapDemo);
         output.flush();
     }
 

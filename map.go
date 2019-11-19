@@ -250,7 +250,7 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 		//}
 		t, _ = d.decType()
 		_, ok = checkPOJORegistry(t)
-		if ok {
+		if ok && t != "gxbig.Decimal" {
 			inst = createInstance(t)
 			instValue = reflect.ValueOf(inst)
 			d.appendRefs(inst)
