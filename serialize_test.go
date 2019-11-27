@@ -18,11 +18,10 @@
 package hessian
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
-)
 
-import (
 	big "github.com/dubbogo/gost/math/big"
 	"github.com/stretchr/testify/assert"
 )
@@ -53,21 +52,14 @@ func TestDecimalGoDecode(t *testing.T) {
 	var d big.Decimal
 	_ = d.FromString("100.256")
 	d.Value = d.String()
-	doTestDecimal(t, "customReplyTypedFixedDecimal", "100.256")
+	doTestStringer(t, "customReplyTypedFixedDecimal", "100.256")
 }
 
 func TestDecimalJavaDecode(t *testing.T) {
 	var d big.Decimal
 	_ = d.FromString("100.256")
 	d.Value = d.String()
-	testJavaDecode(t, "customArgTypedFixedList_Decimal", d)
-}
-
-func doTestDecimal(t *testing.T, method, content string) {
-	testDecodeFrameworkFunc(t, method, func(r interface{}) {
-		t.Logf("%#v", r)
-		assert.Equal(t, content, r.(*big.Decimal).String())
-	})
+	testJavaDecode(t, "customArgTypedFixed_Decimal", d)
 }
 
 func TestEncodeDecodeInteger(t *testing.T) {
@@ -96,19 +88,19 @@ func TestIntegerGoDecode(t *testing.T) {
 	var d big.Integer
 	_ = d.FromString("100256")
 	d.Value = d.String()
-	doTestInteger(t, "customReplyTypedFixedInteger", "100256")
+	doTestStringer(t, "customReplyTypedFixedInteger", "100256")
 }
 
 func TestIntegerJavaDecode(t *testing.T) {
 	var d big.Integer
 	_ = d.FromString("100256")
 	d.Value = d.String()
-	testJavaDecode(t, "customArgTypedFixedList_Integer", d)
+	testJavaDecode(t, "customArgTypedFixed_Integer", d)
 }
 
-func doTestInteger(t *testing.T, method, content string) {
+func doTestStringer(t *testing.T, method, content string) {
 	testDecodeFrameworkFunc(t, method, func(r interface{}) {
 		t.Logf("%#v", r)
-		assert.Equal(t, content, r.(*big.Integer).String())
+		assert.Equal(t, content, r.(fmt.Stringer).String())
 	})
 }

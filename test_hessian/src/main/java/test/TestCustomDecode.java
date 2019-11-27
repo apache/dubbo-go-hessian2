@@ -167,17 +167,17 @@ public class TestCustomDecode {
         return Arrays.deepEquals(list, (Object[]) o);
     }
 
-    public Object customArgTypedFixedList_Integer() throws Exception {
+    public Object customArgTypedFixed_Integer() throws Exception {
         BigInteger o = (BigInteger) input.readObject();
         return o.toString().equals("100256");
     }
 
-    public Object customArgTypedFixedList_Decimal() throws Exception {
+    public Object customArgTypedFixed_Decimal() throws Exception {
         BigDecimal o = (BigDecimal) input.readObject();
         return o.toString().equals("100.256");
     }
 
-    public Object customArgTypedFixedList_DateNull() throws Exception {
+    public Object customArgTypedFixed_DateNull() throws Exception {
         DateDemo o = (DateDemo) input.readObject();
         return o.getDate() == null && o.getDate1() == null;
     }
