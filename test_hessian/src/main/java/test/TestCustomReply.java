@@ -25,6 +25,7 @@ import test.model.DateDemo;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -341,6 +342,12 @@ public class TestCustomReply {
     public void customReplyTypedFixedList_Object() throws Exception {
         Object[] o = new Object[]{new A0()};
         output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedInteger() throws Exception {
+        BigInteger decimal = new BigInteger("100256");
+        output.writeObject(decimal);
         output.flush();
     }
 

@@ -23,6 +23,7 @@ import (
 
 func init() {
 	RegisterPOJO(&big.Decimal{})
+	SetSerializer("java.math.BigInteger", IntegerSerializer{})
 	SetSerializer("java.math.BigDecimal", DecimalSerializer{})
 }
 
@@ -40,6 +41,33 @@ func SetSerializer(key string, codec Serializer) {
 func GetSerializer(key string) (Serializer, bool) {
 	codec, ok := serializerMap[key]
 	return codec, ok
+}
+
+type IntegerSerializer struct{}
+
+func (IntegerSerializer) EncObject(e *Encoder, v POJO) error {
+	decimal, ok := v.(big.Integer)
+	if !ok {
+		return e.encObject(v)
+	}
+	decimal.Value = decimal.String()
+	return e.encObject(decimal)
+}
+
+func (IntegerSerializer) DecObject(d *Decoder) (interface{}, error) {
+	dec, err := d.DecodeValue()
+	if err != nil {
+		return nil, err
+	}
+	result, ok := dec.(*big.Integer)
+	if !ok {
+		panic("result type is not decimal,please check the whether the conversion is ok")
+	}
+	err = result.FromString(result.Value)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 type DecimalSerializer struct{}

@@ -69,3 +69,46 @@ func doTestDecimal(t *testing.T, method, content string) {
 		assert.Equal(t, content, r.(*big.Decimal).String())
 	})
 }
+
+func TestEncodeDecodeInteger(t *testing.T) {
+	var dec big.Integer
+	_ = dec.FromString("100256")
+	e := NewEncoder()
+	err := e.Encode(dec)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+
+	d := NewDecoder(e.buffer)
+	decObj, err := d.Decode()
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+
+	if !reflect.DeepEqual(dec.String(), decObj.(*big.Integer).String()) {
+		t.Errorf("expect: %v, but get: %v", dec, decObj)
+	}
+}
+
+func TestIntegerGoDecode(t *testing.T) {
+	var d big.Integer
+	_ = d.FromString("100256")
+	d.Value = d.String()
+	doTestInteger(t, "customReplyTypedFixedInteger", "100256")
+}
+
+func TestIntegerJavaDecode(t *testing.T) {
+	var d big.Integer
+	_ = d.FromString("100256")
+	d.Value = d.String()
+	testJavaDecode(t, "customArgTypedFixedList_Integer", d)
+}
+
+func doTestInteger(t *testing.T, method, content string) {
+	testDecodeFrameworkFunc(t, method, func(r interface{}) {
+		t.Logf("%#v", r)
+		assert.Equal(t, content, r.(*big.Integer).String())
+	})
+}

@@ -24,6 +24,7 @@ import test.model.DateDemo;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -164,6 +165,11 @@ public class TestCustomDecode {
         Object[] list = new Object[]{new A0()};
         Object o = input.readObject();
         return Arrays.deepEquals(list, (Object[]) o);
+    }
+
+    public Object customArgTypedFixedList_Integer() throws Exception {
+        BigInteger o = (BigInteger) input.readObject();
+        return o.toString().equals("100256");
     }
 
     public Object customArgTypedFixedList_Decimal() throws Exception {
