@@ -346,8 +346,8 @@ public class TestCustomReply {
     }
 
     public void customReplyTypedFixedInteger() throws Exception {
-        BigInteger decimal = new BigInteger("100256");
-        output.writeObject(decimal);
+        BigInteger integer = new BigInteger("100256");
+        output.writeObject(integer);
         output.flush();
     }
 
