@@ -22,8 +22,10 @@ import (
 )
 
 func init() {
-	RegisterPOJO(&big.Decimal{})
+	RegisterPOJO(&big.Integer{})
 	SetSerializer("java.math.BigInteger", IntegerSerializer{})
+
+	RegisterPOJO(&big.Decimal{})
 	SetSerializer("java.math.BigDecimal", DecimalSerializer{})
 }
 
@@ -46,20 +48,20 @@ func GetSerializer(key string) (Serializer, bool) {
 type IntegerSerializer struct{}
 
 func (IntegerSerializer) EncObject(e *Encoder, v POJO) error {
-	decimal, ok := v.(big.Integer)
+	bigInt, ok := v.(big.Integer)
 	if !ok {
 		return e.encObject(v)
 	}
-	decimal.Value = decimal.String()
-	return e.encObject(decimal)
+	bigInt.Value = bigInt.String()
+	return e.encObject(bigInt)
 }
 
 func (IntegerSerializer) DecObject(d *Decoder) (interface{}, error) {
-	dec, err := d.DecodeValue()
+	bigInt, err := d.DecodeValue()
 	if err != nil {
 		return nil, err
 	}
-	result, ok := dec.(*big.Integer)
+	result, ok := bigInt.(*big.Integer)
 	if !ok {
 		panic("result type is not decimal,please check the whether the conversion is ok")
 	}
