@@ -63,39 +63,39 @@ func TestDecimalJavaDecode(t *testing.T) {
 }
 
 func TestEncodeDecodeInteger(t *testing.T) {
-	var dec big.Integer
-	_ = dec.FromString("100256")
+	var bigInt big.Integer
+	_ = bigInt.FromString("100256")
 	e := NewEncoder()
-	err := e.Encode(dec)
+	err := e.Encode(bigInt)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
 	}
 
 	d := NewDecoder(e.buffer)
-	decObj, err := d.Decode()
+	bigIntObj, err := d.Decode()
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
 	}
 
-	if !reflect.DeepEqual(dec.String(), decObj.(*big.Integer).String()) {
-		t.Errorf("expect: %v, but get: %v", dec, decObj)
+	if !reflect.DeepEqual(bigInt.String(), bigIntObj.(*big.Integer).String()) {
+		t.Errorf("expect: %v, but get: %v", bigInt, bigIntObj)
 	}
 }
 
 func TestIntegerGoDecode(t *testing.T) {
-	var d big.Integer
-	_ = d.FromString("100256")
-	d.Value = d.String()
+	var i big.Integer
+	_ = i.FromString("100256")
+	i.Value = i.String()
 	doTestStringer(t, "customReplyTypedFixedInteger", "100256")
 }
 
 func TestIntegerJavaDecode(t *testing.T) {
-	var d big.Integer
-	_ = d.FromString("100256")
-	d.Value = d.String()
-	testJavaDecode(t, "customArgTypedFixed_Integer", d)
+	var i big.Integer
+	_ = i.FromString("100256")
+	i.Value = i.String()
+	testJavaDecode(t, "customArgTypedFixed_Integer", i)
 }
 
 func doTestStringer(t *testing.T, method, content string) {
