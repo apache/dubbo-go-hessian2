@@ -20,6 +20,7 @@ package hessian
 import (
 	"encoding/binary"
 	"io"
+	"reflect"
 )
 
 import (
@@ -104,4 +105,13 @@ func (d *Decoder) decInt32(flag int32) (int32, error) {
 	default:
 		return 0, perrors.Errorf("decInt32 integer wrong tag:%#x", tag)
 	}
+}
+
+func (d *Encoder) encTypeInt32(b []byte, p interface{}) []byte {
+	value := reflect.ValueOf(p)
+	value = UnpackPtrValue(value)
+	if value.IsNil() {
+		return encNull(b)
+	}
+	return encInt32(b, int32(value.Int()))
 }
