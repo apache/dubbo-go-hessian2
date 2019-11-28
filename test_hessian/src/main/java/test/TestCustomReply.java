@@ -20,14 +20,14 @@ package test;
 import com.alibaba.com.caucho.hessian.io.Hessian2Output;
 import com.caucho.hessian.test.A0;
 import com.caucho.hessian.test.A1;
-import test.model.DateDemo;
-
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
+import test.model.DateDemo;
+
 
 public class TestCustomReply {
 
@@ -346,7 +346,19 @@ public class TestCustomReply {
     }
 
     public void customReplyTypedFixedInteger() throws Exception {
-        BigInteger integer = new BigInteger("100256");
+        BigInteger integer = new BigInteger("4294967298");
+        output.writeObject(integer);
+        output.flush();
+    }
+    
+    public void customReplyTypedFixedIntegerZero() throws Exception {
+        BigInteger integer = new BigInteger("0");
+        output.writeObject(integer);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedIntegerSigned() throws Exception {
+        BigInteger integer = new BigInteger("-4294967298");
         output.writeObject(integer);
         output.flush();
     }
