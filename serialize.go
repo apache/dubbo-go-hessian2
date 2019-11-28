@@ -21,8 +21,10 @@ import (
 	big "github.com/dubbogo/gost/math/big"
 )
 
+type bigInteger = big.Integer
+
 func init() {
-	RegisterPOJO(&big.Integer{})
+	RegisterPOJO(&bigInteger{})
 	SetSerializer("java.math.BigInteger", IntegerSerializer{})
 
 	RegisterPOJO(&big.Decimal{})
@@ -48,11 +50,11 @@ func GetSerializer(key string) (Serializer, bool) {
 type IntegerSerializer struct{}
 
 func (IntegerSerializer) EncObject(e *Encoder, v POJO) error {
-	bigInt, ok := v.(big.Integer)
+	bigInt, ok := v.(bigInteger)
 	if !ok {
 		return e.encObject(v)
 	}
-	bigInt.Value = bigInt.String()
+	bigInt.Signum, bigInt.Mag = bigInt.GetSignAndMag()
 	return e.encObject(bigInt)
 }
 
@@ -61,14 +63,13 @@ func (IntegerSerializer) DecObject(d *Decoder) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	result, ok := bigInt.(*big.Integer)
+
+	result, ok := bigInt.(*bigInteger)
 	if !ok {
 		panic("result type is not decimal,please check the whether the conversion is ok")
 	}
-	err = result.FromString(result.Value)
-	if err != nil {
-		return nil, err
-	}
+
+	result.FromSignAndMag(result.Signum, result.Mag)
 	return result, nil
 }
 
