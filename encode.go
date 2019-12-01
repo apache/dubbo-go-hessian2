@@ -162,7 +162,11 @@ func (e *Encoder) Encode(v interface{}) error {
 				e.buffer = encBool(e.buffer, false)
 			}
 		case reflect.Int32:
-			e.buffer = e.encTypeInt32(e.buffer, v)
+			var err error
+			e.buffer, err = e.encTypeInt32(e.buffer, v)
+			if err != nil {
+				return err
+			}
 		default:
 			if p, ok := v.(POJOEnum); ok { // JavaEnum
 				return e.encObject(p)

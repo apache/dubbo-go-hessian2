@@ -107,11 +107,14 @@ func (d *Decoder) decInt32(flag int32) (int32, error) {
 	}
 }
 
-func (d *Encoder) encTypeInt32(b []byte, p interface{}) []byte {
+func (d *Encoder) encTypeInt32(b []byte, p interface{}) ([]byte, error) {
 	value := reflect.ValueOf(p)
-	value = UnpackPtrValue(value)
 	if value.IsNil() {
-		return encNull(b)
+		return encNull(b), nil
 	}
-	return encInt32(b, int32(value.Int()))
+	value = UnpackPtrValue(value)
+	if value.Kind() != reflect.Int32 {
+		return nil, perrors.Errorf("encode reflect Int32 integer wrong, it's not int32 pointer")
+	}
+	return encInt32(b, int32(value.Int())), nil
 }
