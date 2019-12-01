@@ -66,7 +66,7 @@ func (IntegerSerializer) DecObject(d *Decoder) (interface{}, error) {
 
 	result, ok := bigInt.(*bigInteger)
 	if !ok {
-		panic("result type is not decimal,please check the whether the conversion is ok")
+		panic("result type is not Integer, please check the whether the conversion is ok")
 	}
 
 	result.FromSignAndMag(result.Signum, result.Mag)
