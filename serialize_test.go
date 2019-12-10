@@ -103,6 +103,58 @@ func TestIntegerJavaDecode(t *testing.T) {
 	testJavaDecode(t, "customArgTypedFixed_IntegerSigned", i)
 }
 
+func TestIntegerListGoDecode(t *testing.T) {
+	data := []string{
+		"1234",
+		"12347890",
+		"123478901234",
+		"1234789012345678",
+		"123478901234567890",
+		"1234789012345678901234",
+		"12347890123456789012345678",
+		"123478901234567890123456781234",
+		"1234789012345678901234567812345678",
+		"12347890123456789012345678123456781234",
+		"0",
+	}
+
+	out, err := decodeJavaResponse(`customReplyTypedFixedList_BigInteger`, ``, false)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Logf("%#v", out)
+	resp := out.([]*big.Integer)
+	for i := range data {
+		gotInteger := resp[i]
+		if gotInteger.String() != data[i] {
+			t.Errorf("java: %s go: %s", gotInteger.String(), data[i])
+		}
+	}
+}
+
+func TestDecimalListGoDecode(t *testing.T) {
+	data := []string{
+		"123.4",
+		"123.45",
+		"123.456",
+	}
+
+	out, err := decodeJavaResponse(`customReplyTypedFixedList_BigDecimal`, ``, false)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	resp := out.([]*big.Decimal)
+	for i := range data {
+		gotDecimal := resp[i]
+		if gotDecimal.String() != data[i] {
+			t.Errorf("java: %s go: %s", gotDecimal.String(), data[i])
+		}
+	}
+}
+
 func doTestStringer(t *testing.T, method, content string) {
 	testDecodeFrameworkFunc(t, method, func(r interface{}) {
 		t.Logf("%#v", r)

@@ -350,7 +350,36 @@ public class TestCustomReply {
         output.writeObject(integer);
         output.flush();
     }
-    
+
+    public void customReplyTypedFixedList_BigInteger() throws Exception {
+        BigInteger[] integers = new BigInteger[] { 
+            new BigInteger("1234"), 
+            new BigInteger("12347890"), 
+            new BigInteger("123478901234"), 
+            new BigInteger("1234789012345678"), 
+            new BigInteger("123478901234567890"), 
+            new BigInteger("1234789012345678901234"), 
+            new BigInteger("12347890123456789012345678"), 
+            new BigInteger("123478901234567890123456781234"), 
+            new BigInteger("1234789012345678901234567812345678"), 
+            new BigInteger("12347890123456789012345678123456781234"), 
+            new BigInteger("-12347890123456789012345678123456781234"), 
+            new BigInteger("0"), 
+        };
+        output.writeObject(integers);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_BigDecimal() throws Exception {
+          BigDecimal[] decimals = new BigDecimal[]{
+            new BigDecimal("123.4"),
+            new BigDecimal("123.45"),
+            new BigDecimal("123.456"),
+        };
+        output.writeObject(decimals);
+        output.flush();
+    }
+
     public void customReplyTypedFixedIntegerZero() throws Exception {
         BigInteger integer = new BigInteger("0");
         output.writeObject(integer);
