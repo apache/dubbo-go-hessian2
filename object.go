@@ -550,9 +550,7 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 		cls, _ = clsDef.(classInfo)
 		//add to slice
 		d.appendClsDef(cls)
-		if c, ok := GetSerializer(cls.javaName); ok {
-			return c.DecObject(d)
-		}
+
 		return d.DecodeValue()
 
 	case tag == BC_OBJECT:
@@ -572,6 +570,10 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 			return d.decEnum(cls.javaName, TAG_READ)
 		}
 
+		if c, ok := GetSerializer(cls.javaName); ok {
+			return c.DecObject(d, typ, cls)
+		}
+
 		return d.decInstance(typ, cls)
 
 	case BC_OBJECT_DIRECT <= tag && tag <= (BC_OBJECT_DIRECT+OBJECT_DIRECT_MAX):
@@ -584,6 +586,10 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 		}
 		if typ.Implements(javaEnumType) {
 			return d.decEnum(cls.javaName, TAG_READ)
+		}
+
+		if c, ok := GetSerializer(cls.javaName); ok {
+			return c.DecObject(d, typ, cls)
 		}
 
 		return d.decInstance(typ, cls)

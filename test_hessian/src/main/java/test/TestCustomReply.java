@@ -350,6 +350,16 @@ public class TestCustomReply {
         output.flush();
     }
 
+    public void customReplyTypedFixedList_BigDecimal() throws Exception {
+        BigDecimal[] decimals = new BigDecimal[]{
+                new BigDecimal("123.4"),
+                new BigDecimal("123.45"),
+                new BigDecimal("123.456"),
+        };
+        output.writeObject(decimals);
+        output.flush();
+    }
+
     public void customReplyTypedFixedDateNull() throws Exception {
         DateDemo demo = new DateDemo("zhangshan", null, null);
         output.writeObject(demo);

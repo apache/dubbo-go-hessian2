@@ -69,3 +69,25 @@ func doTestDecimal(t *testing.T, method, content string) {
 		assert.Equal(t, content, r.(*big.Decimal).String())
 	})
 }
+
+func TestDecimalListGoDecode(t *testing.T) {
+	data := []string{
+		"123.4",
+		"123.45",
+		"123.456",
+	}
+
+	out, err := decodeJavaResponse(`customReplyTypedFixedList_BigDecimal`, ``, false)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	resp := out.([]*big.Decimal)
+	for i := range data {
+		gotDecimal := resp[i]
+		if gotDecimal.String() != data[i] {
+			t.Errorf("java: %s go: %s", gotDecimal.String(), data[i])
+		}
+	}
+}
