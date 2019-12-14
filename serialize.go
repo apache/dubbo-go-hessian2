@@ -18,10 +18,9 @@
 package hessian
 
 import (
+	"log"
 	"reflect"
-)
 
-import (
 	big "github.com/dubbogo/gost/math/big"
 )
 
@@ -33,6 +32,10 @@ func init() {
 
 	RegisterPOJO(&big.Decimal{})
 	SetSerializer("java.math.BigDecimal", DecimalSerializer{})
+}
+
+func init() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 }
 
 type Serializer interface {
@@ -53,17 +56,8 @@ func GetSerializer(key string) (Serializer, bool) {
 
 type IntegerSerializer struct{}
 
-func (IntegerSerializer) EncObject(e *Encoder, v POJO) error {
-	bigInt, ok := v.(bigInteger)
-	if !ok {
-		return e.encObject(v)
-	}
-	bigInt.Signum, bigInt.Mag = bigInt.GetSignAndMag()
-	return e.encObject(bigInt)
-}
-
-func (IntegerSerializer) DecObject(d *Decoder) (interface{}, error) {
-	bigInt, err := d.DecodeValue()
+func (IntegerSerializer) DecObject(d *Decoder, typ reflect.Type, cls classInfo) (interface{}, error) {
+	bigInt, err := d.decInstance(typ, cls)
 	if err != nil {
 		return nil, err
 	}
@@ -75,6 +69,15 @@ func (IntegerSerializer) DecObject(d *Decoder) (interface{}, error) {
 
 	result.FromSignAndMag(result.Signum, result.Mag)
 	return result, nil
+}
+
+func (IntegerSerializer) EncObject(e *Encoder, v POJO) error {
+	bigInt, ok := v.(bigInteger)
+	if !ok {
+		return e.encObject(v)
+	}
+	bigInt.Signum, bigInt.Mag = bigInt.GetSignAndMag()
+	return e.encObject(bigInt)
 }
 
 type DecimalSerializer struct{}
