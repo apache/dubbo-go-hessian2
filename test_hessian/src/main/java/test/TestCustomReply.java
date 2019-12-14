@@ -20,13 +20,14 @@ package test;
 import com.alibaba.com.caucho.hessian.io.Hessian2Output;
 import com.caucho.hessian.test.A0;
 import com.caucho.hessian.test.A1;
-import test.model.DateDemo;
-
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
+import test.model.DateDemo;
+
 
 public class TestCustomReply {
 
@@ -341,6 +342,56 @@ public class TestCustomReply {
     public void customReplyTypedFixedList_Object() throws Exception {
         Object[] o = new Object[]{new A0()};
         output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedInteger() throws Exception {
+        BigInteger integer = new BigInteger("4294967298");
+        output.writeObject(integer);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_BigInteger() throws Exception {
+        BigInteger[] integers = new BigInteger[] { 
+            new BigInteger("1234"), 
+            new BigInteger("12347890"), 
+            new BigInteger("123478901234"), 
+            new BigInteger("1234789012345678"), 
+            new BigInteger("123478901234567890"), 
+            new BigInteger("1234789012345678901234"), 
+            new BigInteger("12347890123456789012345678"), 
+            new BigInteger("123478901234567890123456781234"), 
+            new BigInteger("1234789012345678901234567812345678"), 
+            new BigInteger("12347890123456789012345678123456781234"), 
+            new BigInteger("-12347890123456789012345678123456781234"), 
+            new BigInteger("0"), 
+        };
+        output.writeObject(integers);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_CustomObject() throws Exception {
+        Object[] objects = new Object[] {
+            new BigInteger("1234"),
+            new BigInteger("-12347890"),
+            new BigInteger("0"),
+            new BigDecimal("123.4"),
+            new BigDecimal("-123.45"),
+            new BigDecimal("0"),
+        };
+        output.writeObject(objects);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedIntegerZero() throws Exception {
+        BigInteger integer = new BigInteger("0");
+        output.writeObject(integer);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedIntegerSigned() throws Exception {
+        BigInteger integer = new BigInteger("-4294967298");
+        output.writeObject(integer);
         output.flush();
     }
 

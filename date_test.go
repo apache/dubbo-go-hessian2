@@ -142,7 +142,7 @@ func TestDateNulJavaDecode(t *testing.T) {
 		Name: "zs",
 		Date: ZeroDate,
 	}
-	testJavaDecode(t, "customArgTypedFixedList_DateNull", date)
+	testJavaDecode(t, "customArgTypedFixed_DateNull", date)
 }
 
 func TestDateNilDecode(t *testing.T) {

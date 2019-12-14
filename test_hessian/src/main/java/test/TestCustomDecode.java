@@ -20,14 +20,15 @@ package test;
 import com.caucho.hessian.io.Hessian2Input;
 import com.caucho.hessian.test.A0;
 import com.caucho.hessian.test.A1;
-import test.model.DateDemo;
-
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import test.model.DateDemo;
+
 
 public class TestCustomDecode {
 
@@ -166,12 +167,27 @@ public class TestCustomDecode {
         return Arrays.deepEquals(list, (Object[]) o);
     }
 
-    public Object customArgTypedFixedList_Decimal() throws Exception {
+    public Object customArgTypedFixed_Integer() throws Exception {
+        BigInteger o = (BigInteger) input.readObject();
+        return o.toString().equals("4294967298");
+    }
+
+    public Object customArgTypedFixed_IntegerZero() throws Exception {
+        BigInteger o = (BigInteger) input.readObject();
+        return o.toString().equals("0");
+    }
+
+    public Object customArgTypedFixed_IntegerSigned() throws Exception {
+        BigInteger o = (BigInteger) input.readObject();
+        return o.toString().equals("-4294967298");
+    }
+
+    public Object customArgTypedFixed_Decimal() throws Exception {
         BigDecimal o = (BigDecimal) input.readObject();
         return o.toString().equals("100.256");
     }
 
-    public Object customArgTypedFixedList_DateNull() throws Exception {
+    public Object customArgTypedFixed_DateNull() throws Exception {
         DateDemo o = (DateDemo) input.readObject();
         return o.getDate() == null && o.getDate1() == null;
     }
