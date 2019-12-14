@@ -20,6 +20,40 @@ It's a golang hessian library used by [Apache/dubbo-go](https://github.com/apach
 * [Skipping unregistered POJO](https://github.com/apache/dubbo-go-hessian2/pull/128)
 * [Emoji](https://github.com/apache/dubbo-go-hessian2/issues/129)
 
+## hessian type mapping between Java and Go
+
+Cross languages message definition should be careful, the following situations should be avoided:
+
+- define object that only exists in a special language
+- using various java exceptions (using error code/message instead)
+
+So we can maintain a cross language type mapping:
+
+| hessian type |  java type  |  golang type | 
+| --- | --- | --- | 
+| **null** | null | nil | 
+| **binary** | byte[] | []byte | 
+| **boolean** | boolean | bool |
+| **date** | java.util.Date | time.Time |
+| **double** | double | float64 |
+| **int** | int | int32 |
+| **long** | long | int64 |
+| **string** | java.lang.String | string |
+| **list** | java.util.List | slice |
+| **map** | java.util.Map | map |
+| **object** | custom define object | custom define struct|
+| **OTHER COMMON USING TYPE** | | | 
+| **big decimal** | java.math.BigDecimal | github.com/dubbogo/gost/math/big/Decimal |
+| **big integer** | java.math.BigInteger | github.com/dubbogo/gost/math/big/Integer |
+| **Boolean** | Boolean | \*bool (TODO) |
+| **Integer** | Integer | \*int32 (TODO)|
+| **Long** | Long | \*int64 (TODO)|
+| **Double** | Double | \*float64 (TODO) |
+
+## reference
+
+- [hessian serialization](http://hessian.caucho.com/doc/hessian-serialization.html)
+
 ## Basic Usage Examples
 
 ### Encode To Bytes
@@ -152,6 +186,7 @@ type MyUser struct {
 You can use `hessian.SetTagIdentifier` to customize tag-identifier of hessian, which takes effect to both encoder and decoder.
 
 Example:
+
 ```go
 hessian.SetTagIdentifier("json")
 
@@ -177,6 +212,7 @@ if err != nil {
 ```
 
 The encoded bytes of the struct `MyUser` is as following:
+
 ```text
  00000000  43 12 63 6f 6d 2e 63 6f  6d 70 61 6e 79 2e 6d 79  |C.com.company.my|
  00000010  75 73 65 72 92 0e 75 73  65 72 5f 66 75 6c 6c 5f  |user..user_full_|
