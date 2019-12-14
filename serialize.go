@@ -18,7 +18,6 @@
 package hessian
 
 import (
-	"log"
 	"reflect"
 
 	big "github.com/dubbogo/gost/math/big"
@@ -32,10 +31,6 @@ func init() {
 
 	RegisterPOJO(&big.Decimal{})
 	SetSerializer("java.math.BigDecimal", DecimalSerializer{})
-}
-
-func init() {
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
 }
 
 type Serializer interface {
