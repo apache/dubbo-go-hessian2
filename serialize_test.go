@@ -115,15 +115,16 @@ func TestIntegerListGoDecode(t *testing.T) {
 		"123478901234567890123456781234",
 		"1234789012345678901234567812345678",
 		"12347890123456789012345678123456781234",
+		"-12347890123456789012345678123456781234",
 		"0",
 	}
 
 	out, err := decodeJavaResponse(`customReplyTypedFixedList_BigInteger`, ``, false)
 	if err != nil {
-		t.Error(err)
+		t.Errorf("%#v %v", out, err)
 		return
 	}
-	t.Logf("%#v", out)
+
 	resp := out.([]*big.Integer)
 	for i := range data {
 		gotInteger := resp[i]
@@ -131,6 +132,13 @@ func TestIntegerListGoDecode(t *testing.T) {
 			t.Errorf("java: %s go: %s", gotInteger.String(), data[i])
 		}
 	}
+}
+
+func doTestStringer(t *testing.T, method, content string) {
+	testDecodeFrameworkFunc(t, method, func(r interface{}) {
+		t.Logf("%#v", r)
+		assert.Equal(t, content, r.(fmt.Stringer).String())
+	})
 }
 
 func TestDecimalListGoDecode(t *testing.T) {
@@ -155,9 +163,28 @@ func TestDecimalListGoDecode(t *testing.T) {
 	}
 }
 
-func doTestStringer(t *testing.T, method, content string) {
-	testDecodeFrameworkFunc(t, method, func(r interface{}) {
-		t.Logf("%#v", r)
-		assert.Equal(t, content, r.(fmt.Stringer).String())
-	})
+func TestObjectListGoDecode(t *testing.T) {
+	data := []string{
+		"1234",
+		"-12347890",
+		"0",
+		"123.4",
+		"-123.45",
+		"0",
+	}
+
+	out, err := decodeJavaResponse(`customReplyTypedFixedList_CustomObject`, ``, false)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	resp := out.([]Object)
+	for i := range data {
+		elem := resp[i]
+		if elem.(fmt.Stringer).String() != data[i] {
+			t.Logf("%T %#v", elem, elem)
+			t.Errorf("java: %s go: %s", elem.(fmt.Stringer).String(), data[i])
+		}
+	}
 }
