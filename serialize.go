@@ -18,6 +18,10 @@
 package hessian
 
 import (
+	"reflect"
+)
+
+import (
 	big "github.com/dubbogo/gost/math/big"
 )
 
@@ -33,7 +37,7 @@ func init() {
 
 type Serializer interface {
 	EncObject(*Encoder, POJO) error
-	DecObject(*Decoder) (interface{}, error)
+	DecObject(*Decoder, reflect.Type, classInfo) (interface{}, error)
 }
 
 var serializerMap = make(map[string]Serializer, 16)
@@ -84,8 +88,8 @@ func (DecimalSerializer) EncObject(e *Encoder, v POJO) error {
 	return e.encObject(decimal)
 }
 
-func (DecimalSerializer) DecObject(d *Decoder) (interface{}, error) {
-	dec, err := d.DecodeValue()
+func (DecimalSerializer) DecObject(d *Decoder, typ reflect.Type, cls classInfo) (interface{}, error) {
+	dec, err := d.decInstance(typ, cls)
 	if err != nil {
 		return nil, err
 	}
