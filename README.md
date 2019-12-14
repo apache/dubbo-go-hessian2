@@ -12,7 +12,7 @@ It's a golang hessian library used by [Apache/dubbo-go](https://github.com/apach
 ## Feature List
 
 * [All JDK Exceptions](https://github.com/apache/dubbo-go-hessian2/issues/59)
-* [Function Alias By Alias](https://github.com/apache/dubbo-go-hessian2/issues/19)
+* [Field Alias By Alias](https://github.com/apache/dubbo-go-hessian2/issues/19)
 * [Java Bigdecimal](https://github.com/apache/dubbo-go-hessian2/issues/89)
 * [Java Date & Time](https://github.com/apache/dubbo-go-hessian2/issues/90)
 * [Java Generic Invokation](https://github.com/apache/dubbo-go-hessian2/issues/84)
