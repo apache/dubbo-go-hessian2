@@ -370,13 +370,16 @@ public class TestCustomReply {
         output.flush();
     }
 
-    public void customReplyTypedFixedList_BigDecimal() throws Exception {
-          BigDecimal[] decimals = new BigDecimal[]{
+    public void customReplyTypedFixedList_CustomObject() throws Exception {
+        Object[] objects = new Object[] {
+            new BigInteger("1234"),
+            new BigInteger("-12347890"),
+            new BigInteger("0"),
             new BigDecimal("123.4"),
-            new BigDecimal("123.45"),
-            new BigDecimal("123.456"),
+            new BigDecimal("-123.45"),
+            new BigDecimal("0"),
         };
-        output.writeObject(decimals);
+        output.writeObject(objects);
         output.flush();
     }
 

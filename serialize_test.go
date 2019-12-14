@@ -162,3 +162,29 @@ func TestDecimalListGoDecode(t *testing.T) {
 		}
 	}
 }
+
+func TestObjectListGoDecode(t *testing.T) {
+	data := []string{
+		"1234",
+		"-12347890",
+		"0",
+		"123.4",
+		"-123.45",
+		"0",
+	}
+
+	out, err := decodeJavaResponse(`customReplyTypedFixedList_CustomObject`, ``, false)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	resp := out.([]Object)
+	for i := range data {
+		elem := resp[i]
+		if elem.(fmt.Stringer).String() != data[i] {
+			t.Logf("%T %#v", elem, elem)
+			t.Errorf("java: %s go: %s", elem.(fmt.Stringer).String(), data[i])
+		}
+	}
+}
