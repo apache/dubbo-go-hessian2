@@ -104,3 +104,10 @@ func TestRequest(t *testing.T) {
 	doTest(t, Request, byte(0), []interface{}{"a", 3, true, &Case{A: "a", B: 3}})
 	doTest(t, Request, byte(0), []interface{}{"a", 3, true, []*Case{{A: "a", B: 3}}})
 }
+
+func TestCreateInstanceByJavaName(t *testing.T) {
+	RegisterPOJO(&Case{})
+	a := CreateInstanceByJavaName("com.test.case")
+	a1 := UnpackPtrValue(reflect.ValueOf(a))
+	assert.Equal(t, a1.Type().String(), "hessian.Case")
+}

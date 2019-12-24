@@ -254,6 +254,18 @@ func getStructDefByIndex(idx int) (reflect.Type, classInfo, error) {
 	return s.typ, cls, nil
 }
 
+func CreateInstanceByJavaName(javaName string) interface{} {
+	var (
+		ok   bool
+		info structInfo
+	)
+	info, ok = getStructInfo(javaName)
+	if !ok {
+		return nil
+	}
+	return reflect.New(info.typ).Interface()
+}
+
 // Create a new instance by its struct name is @goName.
 // the return value is nil if @o has been registered.
 func createInstance(goName string) interface{} {
