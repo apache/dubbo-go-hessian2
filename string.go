@@ -161,9 +161,8 @@ func encString(b []byte, v string) []byte {
 		byteCount = 0
 	)
 
-	bufp := gxbytes.GetBytes(CHUNK_SIZE * 3)
-	buf := *bufp
-	defer gxbytes.PutBytes(bufp)
+	buf := gxbytes.AcquireBytes(CHUNK_SIZE * 3)
+	defer gxbytes.ReleaseBytes(buf)
 
 	for {
 		if vBuf.Len() <= 0 {

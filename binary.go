@@ -134,10 +134,8 @@ func (d *Decoder) decBinary(flag int32) ([]byte, error) {
 	}
 
 	data := make([]byte, 0, 128)
-	bufp := gxbytes.GetBytes(65546)
-	buf := *bufp
-
-	defer gxbytes.PutBytes(bufp)
+	buf := gxbytes.AcquireBytes(65536)
+	defer gxbytes.ReleaseBytes(buf)
 
 	for {
 		length, err = d.getBinaryLength(tag)
