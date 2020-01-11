@@ -18,6 +18,7 @@
 package hessian
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -60,6 +61,7 @@ func TestEncInt32Len2B(t *testing.T) {
 	t.Logf("%#v\n", e.buffer)
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
+	assert.Nil(t, err)
 	t.Logf("decode(%#x) = %#x, %v\n", v, res, err)
 }
 
@@ -82,6 +84,7 @@ func TestEncInt32ForAlias(t *testing.T) {
 	}
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
+	assert.Nil(t, err)
 	t.Logf("decode(%v) = %v, %v\n", v, res, err)
 }
 
@@ -103,6 +106,7 @@ func TestEncInt32Len4B(t *testing.T) {
 
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
+	assert.Nil(t, err)
 	t.Logf("decode(%v) = %v, %v\n", v, res, err)
 }
 
