@@ -63,6 +63,28 @@ func TestEncInt32Len2B(t *testing.T) {
 	t.Logf("decode(%#x) = %#x, %v\n", v, res, err)
 }
 
+func TestEncInt32ForAlias(t *testing.T) {
+	type JavaEnum int32
+	var (
+		v   JavaEnum
+		err error
+		e   *Encoder
+		d   *Decoder
+		res interface{}
+	)
+
+	v = 0xe6
+	// var v int32 = 0xf016
+	e = NewEncoder()
+	e.Encode(v)
+	if len(e.Buffer()) == 0 {
+		t.Fail()
+	}
+	d = NewDecoder(e.Buffer())
+	res, err = d.Decode()
+	t.Logf("decode(%v) = %v, %v\n", v, res, err)
+}
+
 func TestEncInt32Len4B(t *testing.T) {
 	var (
 		v   int32

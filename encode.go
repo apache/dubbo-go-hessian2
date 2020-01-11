@@ -126,6 +126,11 @@ func (e *Encoder) Encode(v interface{}) error {
 	case map[interface{}]interface{}:
 		return e.encUntypedMap(val)
 
+	case POJOEnum:
+		if p, ok := v.(POJOEnum); ok {
+			return e.encObject(p)
+		}
+
 	default:
 		t := UnpackPtrType(reflect.TypeOf(v))
 		switch t.Kind() {
@@ -168,9 +173,6 @@ func (e *Encoder) Encode(v interface{}) error {
 				return err
 			}
 		default:
-			if p, ok := v.(POJOEnum); ok { // JavaEnum
-				return e.encObject(p)
-			}
 			return perrors.Errorf("type not supported! %s", t.Kind().String())
 		}
 	}
