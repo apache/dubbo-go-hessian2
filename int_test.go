@@ -18,6 +18,7 @@
 package hessian
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -39,6 +40,7 @@ func TestEncInt32Len1B(t *testing.T) {
 	}
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
+	assert.Equal(t, v, res)
 	t.Logf("decode(%v) = %v, %v\n", v, res, err)
 }
 
@@ -60,7 +62,32 @@ func TestEncInt32Len2B(t *testing.T) {
 	t.Logf("%#v\n", e.buffer)
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
+	assert.Nil(t, err)
+	assert.Equal(t, v, res)
 	t.Logf("decode(%#x) = %#x, %v\n", v, res, err)
+}
+
+func TestEncInt32ForAlias(t *testing.T) {
+	var (
+		v   JavaEnum
+		err error
+		e   *Encoder
+		d   *Decoder
+		res interface{}
+	)
+
+	v = 0xe6
+	// var v int32 = 0xf016
+	e = NewEncoder()
+	e.Encode(v)
+	if len(e.Buffer()) == 0 {
+		t.Fail()
+	}
+	d = NewDecoder(e.Buffer())
+	res, err = d.Decode()
+	assert.Nil(t, err)
+	assert.Equal(t, int32(v), res)
+	t.Logf("decode(%v) = %v, %v\n", v, res, err)
 }
 
 func TestEncInt32Len4B(t *testing.T) {
@@ -81,6 +108,7 @@ func TestEncInt32Len4B(t *testing.T) {
 
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
+	assert.Nil(t, err)
 	t.Logf("decode(%v) = %v, %v\n", v, res, err)
 }
 

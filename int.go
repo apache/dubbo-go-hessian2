@@ -109,7 +109,7 @@ func (d *Decoder) decInt32(flag int32) (int32, error) {
 
 func (d *Encoder) encTypeInt32(b []byte, p interface{}) ([]byte, error) {
 	value := reflect.ValueOf(p)
-	if value.IsNil() {
+	if PackPtr(value).IsNil() {
 		return encNull(b), nil
 	}
 	value = UnpackPtrValue(value)
