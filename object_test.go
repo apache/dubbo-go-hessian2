@@ -558,3 +558,31 @@ func TestSkip(t *testing.T) {
 
 	testDecodeFrameworkWithSkip(t, "customReplyTypedFixedList_Object", make([]Object, 1))
 }
+
+type Animal struct {
+	Name string
+}
+type Dog struct {
+	Animal
+	Gender string
+}
+
+func (dog *Dog) JavaClassName() string {
+	return "test.Dog"
+}
+
+// see https://github.com/apache/dubbo-go-hessian2/issues/149
+func TestIssue149_EmbedStructGoDecode(t *testing.T) {
+	RegisterPOJO(&Dog{})
+
+	got, err := decodeJavaResponse(`customReplyExtendClass`, ``, false)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	want := &Dog{Animal{`a dog`}, `male`}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("want %v got %v", want, got)
+	}
+}

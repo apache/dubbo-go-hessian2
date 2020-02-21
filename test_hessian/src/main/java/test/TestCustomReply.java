@@ -422,6 +422,28 @@ public class TestCustomReply {
         output.flush();
     }
 
+    public void customReplyExtendClass() throws Exception {
+        Dog dog = new Dog();
+        dog.name = "a dog";
+        dog.gender = "male";
+        output.writeObject(dog);
+        output.flush();
+    }
+}
+
+interface Leg {
+    public int legConnt = 4;
+    public String legName = "AAA";
+}
+
+class Animal {
+    public String name;
+}
+
+class Dog extends Animal implements java.io.Serializable, Leg {
+    public String gender;
+
+    private static final long serialVersionUID = 610887488714367777L;
 }
 
 class TypedListTest implements Serializable {

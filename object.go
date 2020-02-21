@@ -275,27 +275,36 @@ func (d *Decoder) decClassDef() (interface{}, error) {
 	return classInfo{javaName: clsName, fieldNameList: fieldList}, nil
 }
 
-func findField(name string, typ reflect.Type) (int, error) {
+func findField(name string, typ reflect.Type) ([]int, error) {
 	for i := 0; i < typ.NumField(); i++ {
 		// matching tag first, then lowerCamelCase, SameCase, lowerCase
 
-		if val, has := typ.Field(i).Tag.Lookup(tagIdentifier); has && strings.Compare(val, name) == 0 {
-			return i, nil
+		typField := typ.Field(i)
+
+		if val, has := typField.Tag.Lookup(tagIdentifier); has && strings.Compare(val, name) == 0 {
+			return []int{i}, nil
 		}
 
-		fieldName := typ.Field(i).Name
+		fieldName := typField.Name
 		switch {
 		case strings.Compare(lowerCamelCase(fieldName), name) == 0:
-			return i, nil
+			return []int{i}, nil
 		case strings.Compare(fieldName, name) == 0:
-			return i, nil
+			return []int{i}, nil
 		case strings.Compare(strings.ToLower(fieldName), name) == 0:
-			return i, nil
+			return []int{i}, nil
 		}
 
+		if typField.Anonymous && typField.Type.Kind() == reflect.Struct {
+			next, _ := findField(name, typField.Type)
+			if len(next) > 0 {
+				pos := []int{i}
+				return append(pos, next...), nil
+			}
+		}
 	}
 
-	return 0, perrors.Errorf("failed to find field %s", name)
+	return []int{}, perrors.Errorf("failed to find field %s", name)
 }
 
 func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, error) {
@@ -317,11 +326,11 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 		}
 
 		// skip unexported anonymous field
-		if vv.Type().Field(index).PkgPath != "" {
+		if vv.Type().FieldByIndex(index).PkgPath != "" {
 			continue
 		}
 
-		field := vv.Field(index)
+		field := vv.FieldByIndex(index)
 		if !field.CanSet() {
 			return nil, perrors.Errorf("decInstance CanSet false for field %s", fieldName)
 		}
@@ -457,7 +466,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 			}
 
 		default:
-			return nil, perrors.Errorf("unknown struct member type: %v %v", kind, typ.Name()+"."+typ.Field(index).Name)
+			return nil, perrors.Errorf("unknown struct member type: %v %v", kind, typ.Name()+"."+typ.FieldByIndex(index).Name)
 		}
 	} // end for
 
