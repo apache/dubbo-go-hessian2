@@ -440,10 +440,8 @@ class Animal {
     public String name;
 }
 
-class Dog extends Animal implements java.io.Serializable, Leg {
+class Dog extends Animal implements Serializable, Leg {
     public String gender;
-
-    private static final long serialVersionUID = 610887488714367777L;
 }
 
 class TypedListTest implements Serializable {
