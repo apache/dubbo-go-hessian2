@@ -429,11 +429,18 @@ public class TestCustomReply {
         output.writeObject(dog);
         output.flush();
     }
+
+    public void customReplyExtendClassToSingleStruct() throws Exception {
+        Dog dog = new DogAll();
+        dog.name = "a dog";
+        dog.gender = "male";
+        output.writeObject(dog);
+        output.flush();
+    }
 }
 
 interface Leg {
     public int legConnt = 4;
-    public String legName = "AAA";
 }
 
 class Animal {
@@ -442,6 +449,10 @@ class Animal {
 
 class Dog extends Animal implements Serializable, Leg {
     public String gender;
+}
+
+class DogAll extends Dog {
+    public boolean all = true;
 }
 
 class TypedListTest implements Serializable {
