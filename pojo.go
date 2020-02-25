@@ -150,21 +150,43 @@ func RegisterPOJO(o POJO) int {
 	registerTypeName(structInfo.goName, structInfo.javaName)
 
 	// prepare fields info of objectDef
-	for i := 0; i < structInfo.typ.NumField(); i++ {
-		// skip unexported anonymous filed
-		if structInfo.typ.Field(i).PkgPath != "" {
-			continue
+	nextStruct := []reflect.Type{structInfo.typ}
+	for len(nextStruct) > 0 {
+		current := nextStruct[0]
+
+		for i := 0; i < current.NumField(); i++ {
+
+			// skip unexported anonymous filed
+			if current.Field(i).PkgPath != "" {
+				continue
+			}
+
+			structField := current.Field(i)
+
+			// skip ignored field
+			tagVal, hasTag := structField.Tag.Lookup(tagIdentifier)
+			if tagVal == `-` {
+				continue
+			}
+
+			// flat anonymous field
+			if structField.Anonymous && structField.Type.Kind() == reflect.Struct {
+				nextStruct = append(nextStruct, structField.Type)
+				continue
+			}
+
+			var fieldName string
+			if hasTag {
+				fieldName = tagVal
+			} else {
+				fieldName = lowerCamelCase(structField.Name)
+			}
+
+			fieldList = append(fieldList, fieldName)
+			bBody = encString(bBody, fieldName)
 		}
 
-		var fieldName string
-		if val, has := structInfo.typ.Field(i).Tag.Lookup(tagIdentifier); has {
-			fieldName = val
-		} else {
-			fieldName = lowerCamelCase(structInfo.typ.Field(i).Name)
-		}
-
-		fieldList = append(fieldList, fieldName)
-		bBody = encString(bBody, fieldName)
+		nextStruct = nextStruct[1:]
 	}
 
 	// prepare header of objectDef

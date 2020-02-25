@@ -160,18 +160,35 @@ func (e *Encoder) encObject(v POJO) error {
 		e.buffer = encString(e.buffer, v.(POJOEnum).String())
 		return nil
 	}
-	num = vv.NumField()
-	for i = 0; i < num; i++ {
-		// skip unexported anonymous field
-		if vv.Type().Field(i).PkgPath != "" {
-			continue
+
+	structs := []reflect.Value{vv}
+	for len(structs) > 0 {
+		vv := structs[0]
+		num = vv.NumField()
+		for i = 0; i < num; i++ {
+			// skip unexported anonymous field
+			if vv.Type().Field(i).PkgPath != "" {
+				continue
+			}
+
+			// skip ignored field
+			if tag, _ := vv.Type().Field(i).Tag.Lookup(tagIdentifier); tag == `-` {
+				continue
+			}
+
+			field := vv.Field(i)
+			if vv.Type().Field(i).Anonymous && field.Kind() == reflect.Struct {
+				structs = append(structs, vv.Field(i))
+				continue
+			}
+
+			if err = e.Encode(field.Interface()); err != nil {
+				fieldName := field.Type().String()
+				return perrors.Wrapf(err, "failed to encode field: %s, %+v", fieldName, field.Interface())
+			}
 		}
 
-		field := vv.Field(i)
-		if err = e.Encode(field.Interface()); err != nil {
-			fieldName := field.Type().String()
-			return perrors.Wrapf(err, "failed to encode field: %s, %+v", fieldName, field.Interface())
-		}
+		structs = structs[1:]
 	}
 
 	return nil

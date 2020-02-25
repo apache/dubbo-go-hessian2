@@ -187,6 +187,11 @@ public class TestCustomDecode {
         return o.toString().equals("100.256");
     }
 
+    public Object customArgTypedFixed_Extends() throws Exception {
+        Dog o = (Dog) input.readObject();
+        return o.name.equals("a dog") && o.gender.equals("male");
+    }
+
     public Object customArgTypedFixed_DateNull() throws Exception {
         DateDemo o = (DateDemo) input.readObject();
         return o.getDate() == null && o.getDate1() == null;
