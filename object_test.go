@@ -532,8 +532,6 @@ func doTestBasePointer(t *testing.T, base *BasePointer, expected *BasePointer) {
 func TestSkip(t *testing.T) {
 	// clear pojo
 	pojoRegistry = POJORegistry{
-		j2g:      make(map[string]string),
-		registry: make(map[string]structInfo),
 	}
 	testDecodeFrameworkWithSkip(t, "replyObject_0", nil)
 	testDecodeFrameworkWithSkip(t, "replyObject_1", nil)
