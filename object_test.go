@@ -558,3 +558,59 @@ func TestSkip(t *testing.T) {
 
 	testDecodeFrameworkWithSkip(t, "customReplyTypedFixedList_Object", make([]Object, 1))
 }
+
+type Animal struct {
+	Name string
+}
+
+func (a Animal) JavaClassName() string {
+	return "test.Animal"
+}
+
+type Dog struct {
+	Animal
+	Gender string
+}
+
+func (dog Dog) JavaClassName() string {
+	return "test.Dog"
+}
+
+type DogAll struct {
+	All    bool
+	Name   string
+	Gender string
+}
+
+func (dog *DogAll) JavaClassName() string {
+	return "test.DogAll"
+}
+
+// see https://github.com/apache/dubbo-go-hessian2/issues/149
+func TestIssue149_EmbedStructGoDecode(t *testing.T) {
+	t.Run(`extends to embed`, func(t *testing.T) {
+		RegisterPOJO(&Dog{})
+		got, err := decodeJavaResponse(`customReplyExtendClass`, ``, false)
+		if err != nil {
+			t.Error(err)
+		}
+
+		want := &Dog{Animal{`a dog`}, `male`}
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("want %v got %v", want, got)
+		}
+	})
+
+	t.Run(`extends to all fields`, func(t *testing.T) {
+		RegisterPOJO(&DogAll{})
+		got, err := decodeJavaResponse(`customReplyExtendClassToSingleStruct`, ``, false)
+		if err != nil {
+			t.Error(err)
+		}
+
+		want := &DogAll{true, `a dog`, `male`}
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("want %v got %v", want, got)
+		}
+	})
+}

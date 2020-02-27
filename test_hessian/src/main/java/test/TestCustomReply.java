@@ -422,6 +422,37 @@ public class TestCustomReply {
         output.flush();
     }
 
+    public void customReplyExtendClass() throws Exception {
+        Dog dog = new Dog();
+        dog.name = "a dog";
+        dog.gender = "male";
+        output.writeObject(dog);
+        output.flush();
+    }
+
+    public void customReplyExtendClassToSingleStruct() throws Exception {
+        Dog dog = new DogAll();
+        dog.name = "a dog";
+        dog.gender = "male";
+        output.writeObject(dog);
+        output.flush();
+    }
+}
+
+interface Leg {
+    public int legConnt = 4;
+}
+
+class Animal {
+    public String name;
+}
+
+class Dog extends Animal implements Serializable, Leg {
+    public String gender;
+}
+
+class DogAll extends Dog {
+    public boolean all = true;
 }
 
 class TypedListTest implements Serializable {
