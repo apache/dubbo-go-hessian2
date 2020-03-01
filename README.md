@@ -61,9 +61,13 @@ So we can maintain a cross language type mapping:
 
 ```go
 type Circular struct {
-	Num      int
+	Value
 	Previous *Circular
 	Next     *Circular
+}
+
+type Value struct {
+	Num int
 }
 
 func (Circular) JavaClassName() string {
