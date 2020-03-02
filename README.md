@@ -16,6 +16,7 @@ It's a golang hessian library used by [Apache/dubbo-go](https://github.com/apach
 * [Java Bigdecimal](https://github.com/apache/dubbo-go-hessian2/issues/89)
 * [Java Date & Time](https://github.com/apache/dubbo-go-hessian2/issues/90)
 * [Java Generic Invokation](https://github.com/apache/dubbo-go-hessian2/issues/84)
+* [Java Extends](https://github.com/apache/dubbo-go-hessian2/issues/157)
 * [Dubbo Attachements](https://github.com/apache/dubbo-go-hessian2/issues/49)
 * [Skipping unregistered POJO](https://github.com/apache/dubbo-go-hessian2/pull/128)
 * [Emoji](https://github.com/apache/dubbo-go-hessian2/issues/129)
@@ -60,9 +61,13 @@ So we can maintain a cross language type mapping:
 
 ```go
 type Circular struct {
-	Num      int
+	Value
 	Previous *Circular
 	Next     *Circular
+}
+
+type Value struct {
+	Num int
 }
 
 func (Circular) JavaClassName() string {

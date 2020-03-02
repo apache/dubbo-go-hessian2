@@ -563,13 +563,19 @@ type Animal struct {
 	Name string
 }
 
+type animal struct {
+	Name string
+}
+
 func (a Animal) JavaClassName() string {
 	return "test.Animal"
 }
 
 type Dog struct {
 	Animal
-	Gender string
+	animal
+	Gender  string
+	DogName string `hessian:"-"`
 }
 
 func (dog Dog) JavaClassName() string {
@@ -595,7 +601,7 @@ func TestIssue149_EmbedStructGoDecode(t *testing.T) {
 			t.Error(err)
 		}
 
-		want := &Dog{Animal{`a dog`}, `male`}
+		want := &Dog{Animal{`a dog`}, animal{}, `male`, ``}
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("want %v got %v", want, got)
 		}
@@ -613,4 +619,14 @@ func TestIssue149_EmbedStructGoDecode(t *testing.T) {
 			t.Errorf("want %v got %v", want, got)
 		}
 	})
+}
+func TestIssue150_EmbedStructJavaDecode(t *testing.T) {
+	RegisterPOJO(&Dog{})
+	RegisterPOJO(&Animal{})
+
+	dog := &Dog{Animal{`a dog`}, animal{}, `male`, `DogName`}
+	bytes, err := encodeTarget(dog)
+	t.Log(string(bytes), err)
+
+	testJavaDecode(t, "customArgTypedFixed_Extends", dog)
 }
