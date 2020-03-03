@@ -65,6 +65,7 @@ type Circular struct {
 	Next     *Circular
 }
 
+//JavaClassName  java fully qualified path
 func (Circular) JavaClassName() string {
 	return "com.company.Circular"
 }
@@ -107,6 +108,7 @@ type MyUser struct {
 	FamilyPhoneNumber string   // default convert to => familyPhoneNumber
 }
 
+//JavaClassName  java fully qualified path
 func (MyUser) JavaClassName() string {
 	return "com.company.myuser"
 }
@@ -195,6 +197,7 @@ type MyUser struct {
 	FamilyPhoneNumber string   // default convert to => familyPhoneNumber
 }
 
+//JavaClassName  java fully qualified path
 func (MyUser) JavaClassName() string {
 	return "com.company.myuser"
 }

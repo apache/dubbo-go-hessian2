@@ -40,6 +40,7 @@ type DateDemo struct {
 	Date3   ***time.Time
 }
 
+//JavaClassName  java fully qualified path
 func (DateDemo) JavaClassName() string {
 	return "test.model.DateDemo"
 }
