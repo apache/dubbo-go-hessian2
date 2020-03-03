@@ -32,6 +32,7 @@ type circular struct {
 	Next     *circular
 }
 
+//JavaClassName  java fully qualified path
 func (circular) JavaClassName() string {
 	return "circular"
 }
@@ -75,6 +76,7 @@ type personT struct {
 	Tags      map[string]*personT
 }
 
+//JavaClassName  java fully qualified path
 func (personT) JavaClassName() string {
 	return "person"
 }

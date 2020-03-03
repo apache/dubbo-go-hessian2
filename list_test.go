@@ -188,6 +188,7 @@ type TypedListTest struct {
 	List1 [][]*A1
 }
 
+//JavaClassName  java fully qualified path
 func (*TypedListTest) JavaClassName() string {
 	return "test.TypedListTest"
 }
