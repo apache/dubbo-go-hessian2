@@ -224,9 +224,9 @@ The encoded bytes of the struct `MyUser` is as following:
 
 ## Notice for inheritance
 
-`go-hessian2` support inheritance struct, but the following situations should be avoided.
+`go-hessian2` supports inheritance struct, but the following situations should be avoided.
 
-### Avoid fields with the same name in multiple parent struct
++ **Avoid fields with the same name in multiple parent struct**
 
 The following struct `C` have inherited field `Name`(default from the first parent), 
 but it's confused in logic.
@@ -240,7 +240,7 @@ type C struct {
 }
 ```
 
-### Avoid inheritance for a pointer of struct
++ **Avoid inheritance for a pointer of struct**
 
 The following definition is valid for golang syntax, 
 but the parent will be nil when create a new Dog, like `dog := Dog{}`, 
