@@ -34,6 +34,7 @@ type Case struct {
 	B int
 }
 
+//JavaClassName  java fully qualified path
 func (c *Case) JavaClassName() string {
 	return "com.test.case"
 }

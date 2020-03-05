@@ -27,6 +27,7 @@ type Department struct {
 	Name string
 }
 
+// JavaClassName  java fully qualified path
 func (Department) JavaClassName() string {
 	return "com.bdt.info.Department"
 }
@@ -43,6 +44,7 @@ type WorkerInfo struct {
 	Dpt               Department
 }
 
+// JavaClassName  java fully qualified path
 func (WorkerInfo) JavaClassName() string {
 	return "com.bdt.info.WorkerInfo"
 }
@@ -134,6 +136,7 @@ type UserName struct {
 	LastName  string
 }
 
+// JavaClassName  java fully qualified path
 func (UserName) JavaClassName() string {
 	return "com.bdt.info.UserName"
 }
@@ -144,6 +147,7 @@ type Person struct {
 	Sex bool
 }
 
+// JavaClassName  java fully qualified path
 func (Person) JavaClassName() string {
 	return "com.bdt.info.Person"
 }
@@ -153,6 +157,7 @@ type JOB struct {
 	Company string
 }
 
+// JavaClassName  java fully qualified path
 func (JOB) JavaClassName() string {
 	return "com.bdt.info.JOB"
 }
@@ -163,6 +168,7 @@ type Worker struct {
 	Jobs   []JOB
 }
 
+// JavaClassName  java fully qualified path
 func (Worker) JavaClassName() string {
 	return "com.bdt.info.Worker"
 }
@@ -214,102 +220,119 @@ func TestIssue6(t *testing.T) {
 
 type A0 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A0) JavaClassName() string {
 	return "com.caucho.hessian.test.A0"
 }
 
 type A1 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A1) JavaClassName() string {
 	return "com.caucho.hessian.test.A1"
 }
 
 type A2 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A2) JavaClassName() string {
 	return "com.caucho.hessian.test.A2"
 }
 
 type A3 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A3) JavaClassName() string {
 	return "com.caucho.hessian.test.A3"
 }
 
 type A4 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A4) JavaClassName() string {
 	return "com.caucho.hessian.test.A4"
 }
 
 type A5 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A5) JavaClassName() string {
 	return "com.caucho.hessian.test.A5"
 }
 
 type A6 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A6) JavaClassName() string {
 	return "com.caucho.hessian.test.A6"
 }
 
 type A7 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A7) JavaClassName() string {
 	return "com.caucho.hessian.test.A7"
 }
 
 type A8 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A8) JavaClassName() string {
 	return "com.caucho.hessian.test.A8"
 }
 
 type A9 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A9) JavaClassName() string {
 	return "com.caucho.hessian.test.A9"
 }
 
 type A10 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A10) JavaClassName() string {
 	return "com.caucho.hessian.test.A10"
 }
 
 type A11 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A11) JavaClassName() string {
 	return "com.caucho.hessian.test.A11"
 }
 
 type A12 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A12) JavaClassName() string {
 	return "com.caucho.hessian.test.A12"
 }
 
 type A13 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A13) JavaClassName() string {
 	return "com.caucho.hessian.test.A13"
 }
 
 type A14 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A14) JavaClassName() string {
 	return "com.caucho.hessian.test.A14"
 }
 
 type A15 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A15) JavaClassName() string {
 	return "com.caucho.hessian.test.A15"
 }
 
 type A16 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A16) JavaClassName() string {
 	return "com.caucho.hessian.test.A16"
 }
@@ -318,6 +341,7 @@ type TestObjectStruct struct {
 	Value int32 `hessian:"_value"`
 }
 
+// JavaClassName  java fully qualified path
 func (*TestObjectStruct) JavaClassName() string {
 	return "com.caucho.hessian.test.TestObject"
 }
@@ -327,6 +351,7 @@ type TestConsStruct struct {
 	Rest  *TestConsStruct `hessian:"_rest"`
 }
 
+// JavaClassName  java fully qualified path
 func (*TestConsStruct) JavaClassName() string {
 	return "com.caucho.hessian.test.TestCons"
 }
@@ -400,6 +425,7 @@ type Tuple struct {
 	D       float64
 }
 
+// JavaClassName  java fully qualified path
 func (t Tuple) JavaClassName() string {
 	return "test.tuple.Tuple"
 }
@@ -488,6 +514,7 @@ type BasePointer struct {
 	A *bool
 }
 
+// JavaClassName  java fully qualified path
 func (t BasePointer) JavaClassName() string {
 	return "test.base.Base"
 }
@@ -578,6 +605,7 @@ type Dog struct {
 	DogName string `hessian:"-"`
 }
 
+//JavaClassName  java fully qualified path
 func (dog Dog) JavaClassName() string {
 	return "test.Dog"
 }
@@ -588,6 +616,7 @@ type DogAll struct {
 	Gender string
 }
 
+//JavaClassName  java fully qualified path
 func (dog *DogAll) JavaClassName() string {
 	return "test.DogAll"
 }
