@@ -46,10 +46,6 @@ So we can maintain a cross language type mapping:
 | **OTHER COMMON USING TYPE** | | | 
 | **big decimal** | java.math.BigDecimal | github.com/dubbogo/gost/math/big/Decimal |
 | **big integer** | java.math.BigInteger | github.com/dubbogo/gost/math/big/Integer |
-| **Boolean** | Boolean | \*bool (TODO) |
-| **Integer** | Integer | \*int32 (TODO)|
-| **Long** | Long | \*int64 (TODO)|
-| **Double** | Double | \*float64 (TODO) |
 
 ## reference
 
@@ -224,4 +220,35 @@ The encoded bytes of the struct `MyUser` is as following:
  00000020  6e 61 6d 65 11 66 61 6d  69 6c 79 50 68 6f 6e 65  |name.familyPhone|
  00000030  4e 75 6d 62 65 72 60 08  75 73 65 72 6e 61 6d 65  |Number`.username|
  00000040  0c 30 31 30 2d 31 32 33  34 35 36 37 38           |.010-12345678|
+```
+
+## Notice for inheritance
+
+`go-hessian2` supports inheritance struct, but the following situations should be avoided.
+
++ **Avoid fields with the same name in multiple parent struct**
+
+The following struct `C` have inherited field `Name`(default from the first parent), 
+but it's confused in logic.
+
+```go
+type A struct { Name string }
+type B struct { Name string }
+type C struct {
+	A
+	B
+}
+```
+
++ **Avoid inheritance for a pointer of struct**
+
+The following definition is valid for golang syntax, 
+but the parent will be nil when create a new Dog, like `dog := Dog{}`, 
+which will not happen in java inheritance, 
+and is also not supported by `go-hessian2`.
+
+```go
+type Dog struct {
+	*Animal
+}
 ```
