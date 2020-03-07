@@ -1,7 +1,7 @@
 # gohessian
 
 [![Build Status](https://travis-ci.org/apache/dubbo-go-hessian2.png?branch=master)](https://travis-ci.org/apache/dubbo-go-hessian2)
-[![GoCover](http://gocover.io/_badge/github.com/apache/dubbo-go-hessian2)](http://gocover.io/github.com/apache/dubbo-go-hessian2)
+[![codecov](https://codecov.io/gh/apache/dubbo-go-hessian2/branch/master/graph/badge.svg)](https://codecov.io/gh/apache/dubbo-go-hessian2)
 [![GoDoc](https://godoc.org/github.com/apache/dubbo-go-hessian2?status.svg)](https://godoc.org/github.com/apache/dubbo-go-hessian2)
 
 
