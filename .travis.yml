@@ -19,3 +19,4 @@ after_success:
 
 notifications:
   webhooks: https://oapi.dingtalk.com/robot/send?access_token=27a5eb4510c8cf913b67a72832549b123a8c44655483d20443515604669de0ae
+  webhooks: https://oapi.dingtalk.com/robot/send?access_token=8250008579ed1defda3a44fb8608a38d81a55700fdfb15466315a90a7dd2045f
