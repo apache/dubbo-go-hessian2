@@ -1,7 +1,7 @@
 # gohessian
 
 [![Build Status](https://travis-ci.org/apache/dubbo-go-hessian2.png?branch=master)](https://travis-ci.org/apache/dubbo-go-hessian2)
-[![GoCover](http://gocover.io/_badge/github.com/apache/dubbo-go-hessian2)](http://gocover.io/github.com/apache/dubbo-go-hessian2)
+[![codecov](https://codecov.io/gh/apache/dubbo-go-hessian2/branch/master/graph/badge.svg)](https://codecov.io/gh/apache/dubbo-go-hessian2)
 [![GoDoc](https://godoc.org/github.com/apache/dubbo-go-hessian2?status.svg)](https://godoc.org/github.com/apache/dubbo-go-hessian2)
 
 
@@ -46,10 +46,6 @@ So we can maintain a cross language type mapping:
 | **OTHER COMMON USING TYPE** | | | 
 | **big decimal** | java.math.BigDecimal | github.com/dubbogo/gost/math/big/Decimal |
 | **big integer** | java.math.BigInteger | github.com/dubbogo/gost/math/big/Integer |
-| **Boolean** | Boolean | \*bool (TODO) |
-| **Integer** | Integer | \*int32 (TODO)|
-| **Long** | Long | \*int64 (TODO)|
-| **Double** | Double | \*float64 (TODO) |
 
 ## reference
 
@@ -227,8 +223,8 @@ The encoded bytes of the struct `MyUser` is as following:
 ```
 
 #### Using Java collections
-By default, the output of Hessian Java impl of a Java collection like java.util.HashSet will be decoded as `[]interface{}` in this Go impl.
-To apply the one-to-one relationship between certain Java collection and your Go struct, examples are as follows:
+By default, the output of Hessian Java impl of a Java collection like java.util.HashSet will be decoded as `[]interface{}` in `go-hessian2`.
+To apply the one-to-one mapping relationship between certain Java collection class and your Go struct, examples are as follows:
 
 ```go
 //use HashSet as example
@@ -256,6 +252,37 @@ func init() {
         //register your struct so that hessian can recognized it when encoding and decoding 
 	SetCollectionSerialize(&JavaHashSet{})
 }
+```
 
 
+
+## Notice for inheritance
+
+`go-hessian2` supports inheritance struct, but the following situations should be avoided.
+
++ **Avoid fields with the same name in multiple parent struct**
+
+The following struct `C` have inherited field `Name`(default from the first parent), 
+but it's confused in logic.
+
+```go
+type A struct { Name string }
+type B struct { Name string }
+type C struct {
+	A
+	B
+}
+```
+
++ **Avoid inheritance for a pointer of struct**
+
+The following definition is valid for golang syntax, 
+but the parent will be nil when create a new Dog, like `dog := Dog{}`, 
+which will not happen in java inheritance, 
+and is also not supported by `go-hessian2`.
+
+```go
+type Dog struct {
+	*Animal
+}
 ```
