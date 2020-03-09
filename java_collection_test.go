@@ -21,6 +21,10 @@ import (
 	"testing"
 )
 
+func init() {
+	SetCollectionSerialize(&JavaHashSet{})
+}
+
 type JavaHashSet struct {
 	value []interface{}
 }
@@ -35,10 +39,6 @@ func (j *JavaHashSet) Set(v []interface{}) {
 
 func (j *JavaHashSet) JavaClassName() string {
 	return "java.util.HashSet"
-}
-
-func init() {
-	SetCollectionSerialize(&JavaHashSet{})
 }
 
 func TestListJavaCollectionEncode(t *testing.T) {
