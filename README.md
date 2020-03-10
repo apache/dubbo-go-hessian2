@@ -3,7 +3,8 @@
 [![Build Status](https://travis-ci.org/apache/dubbo-go-hessian2.png?branch=master)](https://travis-ci.org/apache/dubbo-go-hessian2)
 [![codecov](https://codecov.io/gh/apache/dubbo-go-hessian2/branch/master/graph/badge.svg)](https://codecov.io/gh/apache/dubbo-go-hessian2)
 [![GoDoc](https://godoc.org/github.com/apache/dubbo-go-hessian2?status.svg)](https://godoc.org/github.com/apache/dubbo-go-hessian2)
-
+[![Go Report Card](https://goreportcard.com/badge/github.com/apache/dubbo-go-hessian2)](https://goreportcard.com/report/github.com/apache/dubbo-go-hessian2)
+![license](https://img.shields.io/badge/license-Apache--2.0-green.svg)
 
 ---
 
