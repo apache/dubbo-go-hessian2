@@ -17,8 +17,13 @@
 
 package hessian
 
-import "reflect"
-import perrors "github.com/pkg/errors"
+import (
+	"reflect"
+)
+
+import (
+	perrors "github.com/pkg/errors"
+)
 
 type JavaCollectionObject interface {
 	Get() []interface{}
