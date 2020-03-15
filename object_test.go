@@ -659,3 +659,125 @@ func TestIssue150_EmbedStructJavaDecode(t *testing.T) {
 
 	testJavaDecode(t, "customArgTypedFixed_Extends", dog)
 }
+
+type dubboAttr struct {
+	serviceName  string
+	methodName   string
+	path         string
+	version      string
+	dubboVersion string
+	attachments  map[string]string
+}
+
+func TestDecodeDubboWhenSkipClassFields(t *testing.T) {
+
+	var b, c, d, e = -38, -69, -62, -111
+
+	data := []byte{byte(b), byte(c), byte(d), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 63, 5, 50, 46, 52, 46, 57, 48, 46, 99, 111, 109, 46, 97, 108, 105, 98, 97, 98, 97, 46, 100, 117, 98, 98, 111, 46, 115, 97, 109, 112, 108, 101, 115, 46, 101, 99, 104, 111, 46, 97, 112, 105, 46, 69, 99, 104, 111, 83, 101, 114, 118, 105, 99, 101, 5, 48, 46, 48, 46, 48, 8, 115, 97, 121, 72, 101, 108, 108, 111, 48, 44, 76, 99, 111, 109, 47, 97, 108, 105, 98, 97, 98, 97, 47, 100, 117, 98, 98, 111, 47, 115, 97, 109, 112, 108, 101, 115, 47, 101, 99, 104, 111, 47, 97, 112, 105, 47, 82, 101, 113, 117, 101, 115, 116, 59, 67, 48, 42, 99, 111, 109, 46, 97, 108, 105, 98, 97, 98, 97, 46, 100, 117, 98, 98, 111, 46, 115, 97, 109, 112, 108, 101, 115, 46, 101, 99, 104, 111, 46, 97, 112, 105, 46, 82, 101, 113, 117, 101, 115, 116, byte(e), 4, 110, 97, 109, 101, 96, 11, 104, 101, 108, 108, 111, 45, 106, 105, 121, 106, 105, 72, 4, 112, 97, 116, 104, 48, 46, 99, 111, 109, 46, 97, 108, 105, 98, 97, 98, 97, 46, 100, 117, 98, 98, 111, 46, 115, 97, 109, 112, 108, 101, 115, 46, 101, 99, 104, 111, 46, 97, 112, 105, 46, 69, 99, 104, 111, 83, 101, 114, 118, 105, 99, 101, 9, 105, 110, 116, 101, 114, 102, 97, 99, 101, 48, 46, 99, 111, 109, 46, 97, 108, 105, 98, 97, 98, 97, 46, 100, 117, 98, 98, 111, 46, 115, 97, 109, 112, 108, 101, 115, 46, 101, 99, 104, 111, 46, 97, 112, 105, 46, 69, 99, 104, 111, 83, 101, 114, 118, 105, 99, 101, 7, 118, 101, 114, 115, 105, 111, 110, 5, 48, 46, 48, 46, 48, 5, 103, 114, 111, 117, 112, 6, 103, 114, 111, 117, 112, 65, 90, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+
+	decoder := NewDecoderWithSkip(data[16:])
+
+	var field interface{}
+	var err error
+	var ok bool
+	var str string
+	var attachments map[string]string
+	attr := &dubboAttr{}
+
+	field, err = decoder.Decode()
+	if err != nil {
+		t.Errorf("Failed to decode dubbo framework version, err=%v\n", err)
+	}
+
+	if field != nil {
+		str, ok = field.(string)
+		if !ok {
+			t.Errorf("Failed to decode dubbo framework version, illegal type\n")
+		}
+	}
+	attr.dubboVersion = str
+
+	field, err = decoder.Decode()
+	if err != nil {
+		t.Errorf("Failed to decode dubbo path, err=%v\n", err)
+	}
+
+	// check path is nil ?
+	if str = ""; field != nil {
+		str, ok = field.(string)
+		if !ok {
+			t.Errorf("Failed to decode dubbo path, illegal type\n")
+		}
+	}
+	attr.serviceName = str
+	attr.path = str
+
+	field, err = decoder.Decode()
+	if err != nil {
+		t.Errorf("Failed to decode dubbo version, err=%v\n", err)
+	}
+
+	// check version is nil ?
+	if str = ""; field != nil {
+		str, ok = field.(string)
+		if !ok {
+			t.Errorf("Failed to decode dubbo version, illegal type\n")
+		}
+	}
+	attr.version = str
+
+	field, err = decoder.Decode()
+	if err != nil {
+		t.Errorf("Failed to decode dubbo method, err=%v\n", err)
+	}
+
+	// check method is nil ?
+	if str = ""; field != nil {
+		str, ok = field.(string)
+		if !ok {
+			t.Errorf("Failed to decode dubbo method, illegal type\n")
+		}
+	}
+
+	attr.methodName = str
+
+	field, err = decoder.Decode()
+	if err != nil {
+		t.Errorf("Failed to decode dubbo argsTypes, err=%v\n", err)
+	}
+
+	ats := DescRegex.FindAllString(field.(string), -1)
+	for i := 0; i < len(ats); i++ {
+		_, err = decoder.Decode()
+		if err != nil {
+			t.Errorf("Failed to decode dubbo argsTypes item, err=%v\n", err)
+		}
+	}
+
+	field, err = decoder.Decode()
+	if err != nil {
+		t.Errorf("Failed to decode dubbo attachments, err=%v\n", err)
+	}
+	if v, ok := field.(map[interface{}]interface{}); ok {
+		attachments = ToMapStringString(v)
+		attr.attachments = attachments
+	}
+
+	if attr.attachments == nil {
+		t.Errorf("failed to decode dubbo.")
+	}
+
+	meta := attr.attachments
+
+	if meta["group"] != "groupA" {
+		t.Errorf("failed to decode dubbo group, expected: %s, actual: %s", "groupA", meta["group"])
+	}
+
+	if meta["interface"] != "com.alibaba.dubbo.samples.echo.api.EchoService" {
+		t.Errorf("failed to decode dubbo interface, expected: %s, actual: %s", "com.alibaba.dubbo.samples.echo.api.EchoService", meta["interface"])
+	}
+
+	if meta["path"] != "com.alibaba.dubbo.samples.echo.api.EchoService" {
+		t.Errorf("failed to decode dubbo path, expected: %s, actual: %s", "com.alibaba.dubbo.samples.echo.api.EchoService", meta["path"])
+	}
+}
