@@ -26,6 +26,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 import test.model.DateDemo;
 
 
@@ -435,6 +438,22 @@ public class TestCustomReply {
         dog.name = "a dog";
         dog.gender = "male";
         output.writeObject(dog);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_HashSet() throws Exception {
+        Set<Integer> set = new HashSet<>();
+        set.add(0);
+        set.add(1);
+        output.writeObject(set);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_HashSetCustomObject() throws Exception {
+        Set<Object> set = new HashSet<>();
+        set.add(new BigInteger("1234"));
+        set.add(new BigDecimal("123.4"));
+        output.writeObject(set);
         output.flush();
     }
 }

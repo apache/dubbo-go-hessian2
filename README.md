@@ -223,6 +223,40 @@ The encoded bytes of the struct `MyUser` is as following:
  00000040  0c 30 31 30 2d 31 32 33  34 35 36 37 38           |.010-12345678|
 ```
 
+#### Using Java collections
+By default, the output of Hessian Java impl of a Java collection like java.util.HashSet will be decoded as `[]interface{}` in `go-hessian2`.
+To apply the one-to-one mapping relationship between certain Java collection class and your Go struct, examples are as follows:
+
+```go
+//use HashSet as example
+//define your struct, which should implements hessian.JavaCollectionObject
+type JavaHashSet struct {
+	value []interface{}
+}
+
+//get the inside slice value
+func (j *JavaHashSet) Get() []interface{} {
+	return j.value
+}
+
+//set the inside slice value
+func (j *JavaHashSet) Set(v []interface{}) {
+	j.value = v
+}
+
+//should be the same as the class name of the Java collection 
+func (j *JavaHashSet) JavaClassName() string {
+	return "java.util.HashSet"
+}
+
+func init() {
+        //register your struct so that hessian can recognized it when encoding and decoding 
+	SetCollectionSerialize(&JavaHashSet{})
+}
+```
+
+
+
 ## Notice for inheritance
 
 `go-hessian2` supports inheritance struct, but the following situations should be avoided.
