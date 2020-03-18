@@ -130,18 +130,9 @@ func RegisterPOJO(o POJO) int {
 		fieldList  []string
 		structInfo structInfo
 		clsDef     classInfo
-		v          reflect.Value
 	)
 
-	v = reflect.ValueOf(o)
-	switch v.Kind() {
-	case reflect.Struct:
-		structInfo.typ = v.Type()
-	case reflect.Ptr:
-		structInfo.typ = v.Elem().Type()
-	default:
-		structInfo.typ = reflect.TypeOf(o)
-	}
+	structInfo.typ = obtainValueType(o)
 
 	structInfo.goName = structInfo.typ.String()
 	structInfo.javaName = o.JavaClassName()
@@ -225,15 +216,7 @@ func UnRegisterPOJO(o POJO) int {
 	defer pojoRegistry.Unlock()
 
 	var structInfo structInfo
-	v := reflect.ValueOf(o)
-	switch v.Kind() {
-	case reflect.Struct:
-		structInfo.typ = v.Type()
-	case reflect.Ptr:
-		structInfo.typ = v.Elem().Type()
-	default:
-		structInfo.typ = reflect.TypeOf(o)
-	}
+	structInfo.typ = obtainValueType(o)
 
 	goName := structInfo.typ.String()
 
@@ -248,6 +231,18 @@ func UnRegisterPOJO(o POJO) int {
 	}
 
 	return -1
+}
+
+func obtainValueType(o POJO) reflect.Type {
+	v := reflect.ValueOf(o)
+	switch v.Kind() {
+	case reflect.Struct:
+		return v.Type()
+	case reflect.Ptr:
+		return v.Elem().Type()
+	}
+
+	return reflect.TypeOf(o)
 }
 
 // RegisterPOJOs register a POJO instance arr @os. The return value is @os's
