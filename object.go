@@ -548,7 +548,9 @@ func (d *Decoder) skip(cls classInfo) error {
 
 	for i := 0; i < len; i++ {
 		// skip class fields.
-		d.DecodeValue()
+		if _, err := d.DecodeValue(); err != nil {
+			return err
+		}
 	}
 
 	return nil

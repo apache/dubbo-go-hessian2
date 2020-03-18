@@ -49,10 +49,6 @@ func (c *CaseB) JavaClassName() string {
 	return "com.test.caseb"
 }
 
-//func (c CaseA) JavaClassName() string {
-//	return "com.test.casea"
-//}
-
 func (c CaseA) JavaClassName() string {
 	return "com.test.casea"
 }
