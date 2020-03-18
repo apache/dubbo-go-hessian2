@@ -541,11 +541,19 @@ func (d *Decoder) decEnum(javaName string, flag int32) (JavaEnum, error) {
 
 // skip this object
 func (d *Decoder) skip(cls classInfo) error {
-	if len(cls.fieldNameList) < 1 {
+	len := len(cls.fieldNameList)
+	if len < 1 {
 		return nil
 	}
-	_, err := d.DecodeValue()
-	return err
+
+	for i := 0; i < len; i++ {
+		// skip class fields.
+		if _, err := d.DecodeValue(); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (d *Decoder) decObject(flag int32) (interface{}, error) {
