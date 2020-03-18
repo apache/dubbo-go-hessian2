@@ -200,7 +200,7 @@ func TestHessianCodec_ReadAttachments(t *testing.T) {
 	resp, err := doTestHessianEncodeHeader(t, PackageResponse, Response_OK, body)
 	assert.NoError(t, err)
 
-	UnRegisterPOJOs(&CaseB{}, &CaseA{})
+	unRegisterPOJOs(&CaseB{}, &CaseA{})
 	codecR1 := NewHessianCodec(bufio.NewReader(bytes.NewReader(resp)))
 	codecR2 := NewHessianCodec(bufio.NewReader(bytes.NewReader(resp)))
 	h := &DubboHeader{}

@@ -202,16 +202,16 @@ func RegisterPOJO(o POJO) int {
 }
 
 // easy for test
-func UnRegisterPOJOs(os ...POJO) []int {
+func unRegisterPOJOs(os ...POJO) []int {
 	arr := make([]int, len(os))
 	for i := range os {
-		arr[i] = UnRegisterPOJO(os[i])
+		arr[i] = unRegisterPOJO(os[i])
 	}
 
 	return arr
 }
 
-func UnRegisterPOJO(o POJO) int {
+func unRegisterPOJO(o POJO) int {
 	pojoRegistry.Lock()
 	defer pojoRegistry.Unlock()
 
