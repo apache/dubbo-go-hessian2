@@ -199,8 +199,7 @@ func unpackResponseBody(decoder *Decoder, resp interface{}) error {
 				return perrors.WithStack(err)
 			}
 			if v, ok := attachments.(map[interface{}]interface{}); ok {
-				attachments := ToMapStringString(v)
-				response.Attachments = attachments
+				response.Attachments = ToMapStringString(v)
 			} else {
 				return perrors.Errorf("get wrong attachments: %+v", attachments)
 			}
