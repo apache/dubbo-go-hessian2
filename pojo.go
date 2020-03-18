@@ -215,10 +215,7 @@ func UnRegisterPOJO(o POJO) int {
 	pojoRegistry.Lock()
 	defer pojoRegistry.Unlock()
 
-	var structInfo structInfo
-	structInfo.typ = obtainValueType(o)
-
-	goName := structInfo.typ.String()
+	goName := obtainValueType(o).String()
 
 	if structInfo, ok := pojoRegistry.registry[goName]; ok {
 		delete(pojoRegistry.j2g, structInfo.javaName)
