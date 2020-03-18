@@ -201,10 +201,15 @@ func unpackResponseBody(decoder *Decoder, resp interface{}) error {
 			if v, ok := attachments.(map[interface{}]interface{}); ok {
 				attachments := ToMapStringString(v)
 				response.Attachments = attachments
-				return nil
 			} else {
 				return perrors.Errorf("get wrong attachments: %+v", attachments)
 			}
+		}
+
+		// If the return value is nil,
+		// we should consider it normal
+		if rsp == nil {
+			return nil
 		}
 
 		return perrors.WithStack(ReflectResponse(rsp, response.RspObj))
