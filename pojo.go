@@ -210,6 +210,46 @@ func RegisterPOJO(o POJO) int {
 	return structInfo.index
 }
 
+// easy for test
+func UnRegisterPOJOs(os ...POJO) []int {
+	arr := make([]int, len(os))
+	for i := range os {
+		arr[i] = UnRegisterPOJO(os[i])
+	}
+
+	return arr
+}
+
+func UnRegisterPOJO(o POJO) int {
+	pojoRegistry.Lock()
+	defer pojoRegistry.Unlock()
+
+	var structInfo structInfo
+	v := reflect.ValueOf(o)
+	switch v.Kind() {
+	case reflect.Struct:
+		structInfo.typ = v.Type()
+	case reflect.Ptr:
+		structInfo.typ = v.Elem().Type()
+	default:
+		structInfo.typ = reflect.TypeOf(o)
+	}
+
+	goName := structInfo.typ.String()
+
+	if structInfo, ok := pojoRegistry.registry[goName]; ok {
+		delete(pojoRegistry.j2g, structInfo.javaName)
+		listTypeNameMapper.Delete(structInfo.goName)
+		// remove registry cache.
+		delete(pojoRegistry.registry, structInfo.goName)
+		// don't remove registry classInfoList,
+		// indexes of registered pojo may be affected.
+		return structInfo.index
+	}
+
+	return -1
+}
+
 // RegisterPOJOs register a POJO instance arr @os. The return value is @os's
 // mathching index array, in which "-1" means its matching POJO has been registered.
 func RegisterPOJOs(os ...POJO) []int {
