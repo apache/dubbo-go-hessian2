@@ -33,6 +33,7 @@ import (
 	"github.com/apache/dubbo-go-hessian2/java_exception"
 )
 
+// Response dubbo response
 type Response struct {
 	RspObj      interface{}
 	Exception   error
@@ -51,6 +52,7 @@ func NewResponse(rspObj interface{}, exception error, attachments map[string]str
 	}
 }
 
+// EnsureResponse check body type, make sure it's a Response or package it as a Response
 func EnsureResponse(body interface{}) *Response {
 	if res, ok := body.(*Response); ok {
 		return res
