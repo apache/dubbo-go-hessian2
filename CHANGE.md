@@ -1,5 +1,14 @@
 # Release Notes
 
+## v1.5.0
+
+### New Features
+- support java collection.  [#161](https://github.com/apache/dubbo-go-hessian2/pull/161)
+
+### Bugfixes
+- fix skipping fields bug. [#167](https://github.com/apache/dubbo-go-hessian2/pull/167)
+
+
 ## v1.4.0
 
 ### New Features
