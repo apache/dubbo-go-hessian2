@@ -21,6 +21,7 @@ import (
 	"math"
 	"reflect"
 	"testing"
+	"time"
 )
 
 type Department struct {
@@ -658,4 +659,55 @@ func TestIssue150_EmbedStructJavaDecode(t *testing.T) {
 	t.Log(string(bytes), err)
 
 	testJavaDecode(t, "customArgTypedFixed_Extends", dog)
+}
+
+type Mix struct {
+	A  int
+	B  string
+	CA time.Time
+	CB int64
+	CC string
+	CD []float64
+	D  map[string]interface{}
+}
+
+func (m Mix) JavaClassName() string {
+	return `test.mix`
+}
+
+func init() {
+	RegisterPOJO(new(Mix))
+}
+
+func BenchmarkEncode(b *testing.B) {
+	m := Mix{A: int('a'), B: `hello`}
+	m.CD = []float64{1, 2, 3}
+	m.D = map[string]interface{}{`floats`: m.CD, `A`: m.A, `m`: m}
+
+	for i := 0; i < b.N; i++ {
+		_, err := encodeTarget(&m)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+//
+// BenchmarkDecode-8   	   57723	     17987 ns/op	    7448 B/op	     224 allocs/op
+func BenchmarkDecode(b *testing.B) {
+	m := Mix{A: int('a'), B: `hello`}
+	m.CD = []float64{1, 2, 3}
+	m.D = map[string]interface{}{`floats`: m.CD, `A`: m.A, `m`: m}
+	bytes, err := encodeTarget(&m)
+	if err != nil {
+		b.Error(err)
+	}
+
+	for i := 0; i < b.N; i++ {
+		d := NewDecoder(bytes)
+		_, err := d.Decode()
+		if err != nil {
+			b.Error(err)
+		}
+	}
 }
