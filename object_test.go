@@ -680,7 +680,7 @@ func init() {
 }
 
 //
-// BenchmarkEncode-8   	   78986	     12693 ns/op	    3215 B/op	     122 allocs/op
+// BenchmarkEncode-8   	  105292	     10674 ns/op	    2974 B/op	      94 allocs/op
 func BenchmarkEncode(b *testing.B) {
 	m := Mix{A: int('a'), B: `hello`}
 	m.CD = []float64{1, 2, 3}

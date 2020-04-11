@@ -164,21 +164,23 @@ func (e *Encoder) encObject(v POJO) error {
 	structs := []reflect.Value{vv}
 	for len(structs) > 0 {
 		vv := structs[0]
+		vvt := vv.Type()
 		num = vv.NumField()
 		for i = 0; i < num; i++ {
+			tf := vvt.Field(i)
 			// skip unexported anonymous field
-			if vv.Type().Field(i).PkgPath != "" {
+			if tf.PkgPath != "" {
 				continue
 			}
 
 			// skip ignored field
-			if tag, _ := vv.Type().Field(i).Tag.Lookup(tagIdentifier); tag == `-` {
+			if tag, _ := tf.Tag.Lookup(tagIdentifier); tag == `-` {
 				continue
 			}
 
 			field := vv.Field(i)
-			if vv.Type().Field(i).Anonymous && field.Kind() == reflect.Struct {
-				structs = append(structs, vv.Field(i))
+			if tf.Anonymous && field.Kind() == reflect.Struct {
+				structs = append(structs, field)
 				continue
 			}
 
