@@ -292,36 +292,61 @@ func (d *Decoder) decClassDef() (interface{}, error) {
 	return classInfo{javaName: clsName, fieldNameList: fieldList}, nil
 }
 
-func findField(name string, typ reflect.Type) ([]int, error) {
+var _findFieldCache sync.Map
+
+func findField(name string, typ reflect.Type) (indexes []int, err error) {
+	typCache, _ := _findFieldCache.LoadOrStore(typ, &sync.Map{})
+	iindexes, _ := typCache.(*sync.Map).Load(name)
+	indexes, ok := iindexes.([]int)
+	if ok && len(indexes) == 0 {
+		err = perrors.Errorf("failed to find field %s", name)
+		return
+	}
+
+	if len(indexes) > 0 {
+		return
+	}
+
+	defer func() {
+		typCache.(*sync.Map).Store(name, indexes)
+	}()
+
 	for i := 0; i < typ.NumField(); i++ {
 		// matching tag first, then lowerCamelCase, SameCase, lowerCase
 
 		typField := typ.Field(i)
 
 		if val, has := typField.Tag.Lookup(tagIdentifier); has && strings.Compare(val, name) == 0 {
-			return []int{i}, nil
+			indexes = []int{i}
+			return
 		}
 
 		fieldName := typField.Name
 		switch {
 		case strings.Compare(lowerCamelCase(fieldName), name) == 0:
-			return []int{i}, nil
+			indexes = []int{i}
+			return
 		case strings.Compare(fieldName, name) == 0:
-			return []int{i}, nil
+			indexes = []int{i}
+			return
 		case strings.Compare(strings.ToLower(fieldName), name) == 0:
-			return []int{i}, nil
+			indexes = []int{i}
+			return
 		}
 
 		if typField.Anonymous && typField.Type.Kind() == reflect.Struct {
 			next, _ := findField(name, typField.Type)
 			if len(next) > 0 {
 				pos := []int{i}
-				return append(pos, next...), nil
+				indexes = append(pos, next...)
+				return
 			}
 		}
 	}
 
-	return []int{}, perrors.Errorf("failed to find field %s", name)
+	indexes = []int{}
+	err = perrors.Errorf("failed to find field %s", name)
+	return
 }
 
 func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, error) {
