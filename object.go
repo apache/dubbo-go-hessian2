@@ -21,6 +21,7 @@ import (
 	"io"
 	"reflect"
 	"strings"
+	"sync"
 )
 
 import (
