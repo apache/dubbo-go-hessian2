@@ -679,6 +679,8 @@ func init() {
 	RegisterPOJO(new(Mix))
 }
 
+//
+// BenchmarkEncode-8   	   78986	     12693 ns/op	    3215 B/op	     122 allocs/op
 func BenchmarkEncode(b *testing.B) {
 	m := Mix{A: int('a'), B: `hello`}
 	m.CD = []float64{1, 2, 3}
