@@ -300,6 +300,7 @@ type fieldInfo struct {
 	field   reflect.StructField
 }
 
+// map[rType][fieldName]indexes
 var _findFieldCache sync.Map
 
 func findField(name string, typ reflect.Type) (indexes []int, field reflect.StructField, err error) {
@@ -308,6 +309,7 @@ func findField(name string, typ reflect.Type) (indexes []int, field reflect.Stru
 		typCache = &sync.Map{}
 		_findFieldCache.Store(typ, typCache)
 	}
+
 	iindexes, existCache := typCache.(*sync.Map).Load(name)
 	if existCache && iindexes != nil {
 		finfo := iindexes.(*fieldInfo)
