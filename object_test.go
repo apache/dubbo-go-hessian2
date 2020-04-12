@@ -731,7 +731,7 @@ func BenchmarkJsonDecode(b *testing.B) {
 }
 
 //
-// BenchmarkDecode-8   	   82995	     12272 ns/op	    7224 B/op	     126 allocs/op
+// BenchmarkDecode-8   	  104196	     10924 ns/op	    6424 B/op	      98 allocs/op
 func BenchmarkDecode(b *testing.B) {
 	m := Mix{A: int('a'), B: `hello`}
 	m.CD = []float64{1, 2, 3}

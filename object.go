@@ -295,23 +295,35 @@ func (d *Decoder) decClassDef() (interface{}, error) {
 	return classInfo{javaName: clsName, fieldNameList: fieldList}, nil
 }
 
+type fieldInfo struct {
+	indexes []int
+	field   reflect.StructField
+}
+
 var _findFieldCache sync.Map
 
-func findField(name string, typ reflect.Type) (indexes []int, err error) {
-	typCache, _ := _findFieldCache.LoadOrStore(typ, &sync.Map{})
-	iindexes, _ := typCache.(*sync.Map).Load(name)
-	indexes, ok := iindexes.([]int)
-	if ok && len(indexes) == 0 {
-		err = perrors.Errorf("failed to find field %s", name)
-		return
+func findField(name string, typ reflect.Type) (indexes []int, field reflect.StructField, err error) {
+	typCache, _ := _findFieldCache.Load(typ)
+	if typCache == nil {
+		typCache = &sync.Map{}
+		_findFieldCache.Store(typ, typCache)
 	}
-
-	if len(indexes) > 0 {
+	iindexes, existCache := typCache.(*sync.Map).Load(name)
+	if existCache && iindexes != nil {
+		finfo := iindexes.(*fieldInfo)
+		indexes = finfo.indexes
+		field = finfo.field
+		if len(indexes) == 0 {
+			err = perrors.Errorf("failed to find field %s", name)
+		}
 		return
 	}
 
 	defer func() {
-		typCache.(*sync.Map).Store(name, indexes)
+		typCache.(*sync.Map).Store(name, &fieldInfo{
+			indexes: indexes,
+			field:   field,
+		})
 	}()
 
 	for i := 0; i < typ.NumField(); i++ {
@@ -319,26 +331,23 @@ func findField(name string, typ reflect.Type) (indexes []int, err error) {
 
 		typField := typ.Field(i)
 
-		if val, has := typField.Tag.Lookup(tagIdentifier); has && strings.Compare(val, name) == 0 {
-			indexes = []int{i}
-			return
-		}
+		tagVal, hasTag := typField.Tag.Lookup(tagIdentifier)
 
 		fieldName := typField.Name
 		switch {
-		case strings.Compare(lowerCamelCase(fieldName), name) == 0:
+		case hasTag && tagVal == name,
+			fieldName == name,
+			lowerCamelCase(fieldName) == name,
+			strings.ToLower(fieldName) == name:
+
 			indexes = []int{i}
-			return
-		case strings.Compare(fieldName, name) == 0:
-			indexes = []int{i}
-			return
-		case strings.Compare(strings.ToLower(fieldName), name) == 0:
-			indexes = []int{i}
+			field = typField
 			return
 		}
 
 		if typField.Anonymous && typField.Type.Kind() == reflect.Struct {
-			next, _ := findField(name, typField.Type)
+			var next []int
+			next, field, _ = findField(name, typField.Type)
 			if len(next) > 0 {
 				pos := []int{i}
 				indexes = append(pos, next...)
@@ -365,13 +374,13 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 	for i := 0; i < len(cls.fieldNameList); i++ {
 		fieldName := cls.fieldNameList[i]
 
-		index, err := findField(fieldName, typ)
+		index, fieldStruct, err := findField(fieldName, typ)
 		if err != nil {
 			return nil, perrors.Errorf("can not find field %s", fieldName)
 		}
 
 		// skip unexported anonymous field
-		if vv.Type().FieldByIndex(index).PkgPath != "" {
+		if fieldStruct.PkgPath != "" {
 			continue
 		}
 
@@ -511,7 +520,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 			}
 
 		default:
-			return nil, perrors.Errorf("unknown struct member type: %v %v", kind, typ.Name()+"."+typ.FieldByIndex(index).Name)
+			return nil, perrors.Errorf("unknown struct member type: %v %v", kind, typ.Name()+"."+fieldStruct.Name)
 		}
 	} // end for
 
