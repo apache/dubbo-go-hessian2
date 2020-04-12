@@ -18,6 +18,7 @@
 package hessian
 
 import (
+	"encoding/json"
 	"math"
 	"reflect"
 	"testing"
@@ -680,6 +681,21 @@ func init() {
 }
 
 //
+// BenchmarkJsonEncode-8   	  217354	      4799 ns/op	     832 B/op	      15 allocs/op
+func BenchmarkJsonEncode(b *testing.B) {
+	m := Mix{A: int('a'), B: `hello`}
+	m.CD = []float64{1, 2, 3}
+	m.D = map[string]interface{}{`floats`: m.CD, `A`: m.A, `m`: m}
+
+	for i := 0; i < b.N; i++ {
+		_, err := json.Marshal(&m)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+//
 // BenchmarkEncode-8   	  211452	      5560 ns/op	    1771 B/op	      51 allocs/op
 func BenchmarkEncode(b *testing.B) {
 	m := Mix{A: int('a'), B: `hello`}
@@ -688,6 +704,26 @@ func BenchmarkEncode(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		_, err := encodeTarget(&m)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+//
+// BenchmarkJsonDecode-8   	  123922	      8549 ns/op	    1776 B/op	      51 allocs/op
+func BenchmarkJsonDecode(b *testing.B) {
+	m := Mix{A: int('a'), B: `hello`}
+	m.CD = []float64{1, 2, 3}
+	m.D = map[string]interface{}{`floats`: m.CD, `A`: m.A, `m`: m}
+	bytes, err := json.Marshal(&m)
+	if err != nil {
+		b.Error(err)
+	}
+
+	for i := 0; i < b.N; i++ {
+		m := &Mix{}
+		err := json.Unmarshal(bytes, m)
 		if err != nil {
 			b.Error(err)
 		}
