@@ -336,11 +336,10 @@ func findField(name string, typ reflect.Type) (indexes []int, field reflect.Stru
 		tagVal, hasTag := typField.Tag.Lookup(tagIdentifier)
 
 		fieldName := typField.Name
-		switch {
-		case hasTag && tagVal == name,
-			fieldName == name,
-			lowerCamelCase(fieldName) == name,
-			strings.ToLower(fieldName) == name:
+		if hasTag && tagVal == name ||
+			fieldName == name ||
+			lowerCamelCase(fieldName) == name ||
+			strings.ToLower(fieldName) == name {
 
 			indexes = []int{i}
 			field = typField
