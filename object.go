@@ -303,21 +303,14 @@ type fieldInfo struct {
 // map[rType][fieldName]indexes
 var fieldIndexCache sync.Map
 
-// findField find structField in rType
-//
-// return
-// 	indexes []int
-// 	field reflect.StructField
-// 	err error
-func findField(name string, typ reflect.Type) ([]int, *reflect.StructField, error) {
+func findFieldWithCache(name string, typ reflect.Type) ([]int, *reflect.StructField, error) {
 	typCache, _ := fieldIndexCache.Load(typ)
 	if typCache == nil {
 		typCache = &sync.Map{}
 		fieldIndexCache.Store(typ, typCache)
 	}
-	cache := typCache.(*sync.Map)
 
-	iindexes, existCache := cache.Load(name)
+	iindexes, existCache := typCache.(*sync.Map).Load(name)
 	if existCache && iindexes != nil {
 		finfo := iindexes.(*fieldInfo)
 		var err error
@@ -327,6 +320,18 @@ func findField(name string, typ reflect.Type) ([]int, *reflect.StructField, erro
 		return finfo.indexes, finfo.field, err
 	}
 
+	indexes, field, err := findField(name, typ)
+	typCache.(*sync.Map).Store(name, &fieldInfo{indexes: indexes, field: field})
+	return indexes, field, err
+}
+
+// findField find structField in rType
+//
+// return
+// 	indexes []int
+// 	field reflect.StructField
+// 	err error
+func findField(name string, typ reflect.Type) ([]int, *reflect.StructField, error) {
 	for i := 0; i < typ.NumField(); i++ {
 		// matching tag first, then lowerCamelCase, SameCase, lowerCase
 
@@ -340,7 +345,6 @@ func findField(name string, typ reflect.Type) ([]int, *reflect.StructField, erro
 			lowerCamelCase(fieldName) == name ||
 			strings.ToLower(fieldName) == name {
 
-			cache.Store(name, &fieldInfo{indexes: []int{i}, field: &typField})
 			return []int{i}, &typField, nil
 		}
 
@@ -350,13 +354,11 @@ func findField(name string, typ reflect.Type) ([]int, *reflect.StructField, erro
 				indexes := []int{i}
 				indexes = append(indexes, next...)
 
-				cache.Store(name, &fieldInfo{indexes: indexes, field: field})
 				return indexes, field, nil
 			}
 		}
 	}
 
-	cache.Store(name, &fieldInfo{indexes: []int{}, field: nil})
 	return []int{}, nil, perrors.Errorf("failed to find field %s", name)
 }
 
@@ -373,7 +375,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 	for i := 0; i < len(cls.fieldNameList); i++ {
 		fieldName := cls.fieldNameList[i]
 
-		index, fieldStruct, err := findField(fieldName, typ)
+		index, fieldStruct, err := findFieldWithCache(fieldName, typ)
 		if err != nil {
 			return nil, perrors.Errorf("can not find field %s", fieldName)
 		}
