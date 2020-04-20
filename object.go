@@ -380,10 +380,6 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 			return nil, perrors.Errorf("can not find field %s", fieldName)
 		}
 
-		if fieldStruct == nil {
-			continue
-		}
-
 		// skip unexported anonymous field
 		if fieldStruct.PkgPath != "" {
 			continue
