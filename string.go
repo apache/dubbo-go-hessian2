@@ -411,8 +411,8 @@ func (d *Decoder) decString(flag int32) (string, error) {
 						}
 
 						// copy remaining bytes.
-						n, err := d.next(bytesBuf[offset-remain : offset])
-						if n <= 1 || err != nil {
+						_, err := d.next(bytesBuf[offset-remain : offset])
+						if err != nil {
 							return s, perrors.WithStack(err)
 						}
 					}
