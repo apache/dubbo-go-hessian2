@@ -456,8 +456,8 @@ func (d *Decoder) decString(flag int32) (string, error) {
 					d.peek(2)
 				}
 
-				n, err := d.next(bytesBuf[offset+1 : offset+3])
-				if n <= 1 || err != nil {
+				_, err := d.next(bytesBuf[offset+1 : offset+3])
+				if err != nil {
 					return s, perrors.WithStack(err)
 				}
 				bytesBuf[offset] = ch
