@@ -33,6 +33,7 @@ import (
 
 const (
 	hessianJar = "test_hessian/target/test_hessian-1.0.0.jar"
+	testString = "hello, world! 你好，世界！"
 )
 
 func isFileExist(file string) bool {
@@ -125,4 +126,17 @@ func testDecodeFrameworkFunc(t *testing.T, method string, expected func(interfac
 		r = tmp.value.Interface()
 	}
 	expected(r)
+}
+
+func BenchmarkDecodeStringOptimized(t *testing.B) {
+	e := NewEncoder()
+	e.Encode(testString)
+	buf := e.buffer
+
+	d := NewDecoder(buf)
+
+	for i := 0; i < t.N; i++ {
+		d.DecodeValue()
+		d.Reset(buf)
+	}
 }
