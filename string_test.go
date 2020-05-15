@@ -158,6 +158,19 @@ func TestStringEncode(t *testing.T) {
 	testJavaDecode(t, "argString_65536", s65560[:65536])
 }
 
+func BenchmarkDecodeStringOptimized(t *testing.B) {
+	e := NewEncoder()
+	e.Encode(testString)
+	buf := e.buffer
+
+	d := NewDecoder(buf)
+
+	for i := 0; i < t.N; i++ {
+		d.DecodeValue()
+		d.Reset(buf)
+	}
+}
+
 func TestStringEmoji(t *testing.T) {
 	// see: test_hessian/src/main/java/test/TestString.java
 	s0 := "emoji🤣"

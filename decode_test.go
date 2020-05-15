@@ -127,16 +127,3 @@ func testDecodeFrameworkFunc(t *testing.T, method string, expected func(interfac
 	}
 	expected(r)
 }
-
-func BenchmarkDecodeStringOptimized(t *testing.B) {
-	e := NewEncoder()
-	e.Encode(testString)
-	buf := e.buffer
-
-	d := NewDecoder(buf)
-
-	for i := 0; i < t.N; i++ {
-		d.DecodeValue()
-		d.Reset(buf)
-	}
-}
