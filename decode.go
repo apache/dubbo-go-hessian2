@@ -88,9 +88,13 @@ func (d *Decoder) Reset(b []byte) *Decoder {
 	d.reader.Reset(bytes.NewReader(b))
 	d.typeRefs = &TypeRefs{records: map[string]bool{}}
 
-	if d.refs != nil || d.classInfoList != nil {
-		d.refs, d.classInfoList = nil, nil
+	if d.refs != nil {
+		d.refs = nil
 	}
+	if d.classInfoList != nil {
+		d.classInfoList = nil
+	}
+
 	return d
 }
 

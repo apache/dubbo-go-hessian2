@@ -350,13 +350,11 @@ func (d *Decoder) decString(flag int32) (string, error) {
 					if chunkLen < 0 {
 						chunkLen = 0
 					}
-
 					if charLen < 0 {
 						charLen = 0
 					}
 
 					chunkLen += charLen
-
 					remain, cap := len(bytesBuf)-offset, charLen<<2
 					if remain < cap {
 						grow := len(bytesBuf) + cap
@@ -369,7 +367,7 @@ func (d *Decoder) decString(flag int32) (string, error) {
 				}
 			}
 
-			if buffed := d.Buffered(); chunkLen > 0 {
+			if chunkLen > 0 {
 				nread, err := d.next(bytesBuf[offset : offset+chunkLen])
 				if err != nil {
 					if err == io.EOF {
@@ -404,14 +402,16 @@ func (d *Decoder) decString(flag int32) (string, error) {
 						}
 						bytesBuf[offset-1] = ch
 					} else {
-
-						if buffed = d.Buffered(); buffed < remain {
+						var err error
+						if buffed := d.Buffered(); buffed < remain {
 							// trigger fill data if required
-							d.peek(remain)
+							copy(bytesBuf[offset-remain:offset], d.peek(remain))
+							_, err = d.reader.Discard(remain)
+						} else {
+							// copy remaining bytes.
+							_, err = d.next(bytesBuf[offset-remain : offset])
 						}
 
-						// copy remaining bytes.
-						_, err := d.next(bytesBuf[offset-remain : offset])
 						if err != nil {
 							return s, perrors.WithStack(err)
 						}
@@ -451,12 +451,14 @@ func (d *Decoder) decString(flag int32) (string, error) {
 				bytesBuf[offset+1] = ch1
 				offset += 2
 			} else if (ch & 0xf0) == 0xe0 {
+				var err error
 				if buffed := d.Buffered(); buffed < 2 {
 					// trigger fill data if required
-					d.peek(2)
+					copy(bytesBuf[offset+1:offset+3], d.peek(2))
+					_, err = d.reader.Discard(2)
+				} else {
+					_, err = d.next(bytesBuf[offset+1 : offset+3])
 				}
-
-				_, err := d.next(bytesBuf[offset+1 : offset+3])
 				if err != nil {
 					return s, perrors.WithStack(err)
 				}
