@@ -377,22 +377,22 @@ func (d *Decoder) decString(flag int32) (string, error) {
 				}
 
 				// quickly detect the actual number of bytes
-				prev := offset
-				for i, len := offset, offset+nread; i < len; chunkLen-- {
+				prev, i := offset, offset
+				for len := offset + nread; i < len; chunkLen-- {
 					ch := bytesBuf[i]
 					if ch < 0x80 {
-						offset++
 						i++
 					} else if (ch & 0xe0) == 0xc0 {
-						offset += 2
 						i += 2
 					} else if (ch & 0xf0) == 0xe0 {
-						offset += 3
 						i += 3
 					} else {
-						return s, perrors.Errorf("bad utf-8 encoding, offset=%d\n", offset)
+						return s, perrors.Errorf("bad utf-8 encoding, offset=%d\n", offset+(i-prev))
 					}
 				}
+
+				// update byte offset
+				offset = offset + i - prev
 
 				if remain := offset - prev - nread; remain > 0 {
 					if remain == 1 {
@@ -465,8 +465,6 @@ func (d *Decoder) decString(flag int32) (string, error) {
 				bytesBuf[offset] = ch
 				offset += 3
 			} else {
-				b := bytesBuf[:offset]
-				fmt.Println(*(*string)(unsafe.Pointer(&b)))
 				return s, perrors.Errorf("bad utf-8 encoding, offset=%d\n", offset)
 			}
 
