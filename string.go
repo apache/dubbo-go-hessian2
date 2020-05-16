@@ -420,11 +420,6 @@ func (d *Decoder) decString(flag int32) (string, error) {
 
 				// the expected length string has been processed.
 				if chunkLen <= 0 {
-					if last {
-						b := bytesBuf[:offset]
-						return *(*string)(unsafe.Pointer(&b)), nil
-					}
-
 					// we need to detect next chunk
 					continue
 				}
