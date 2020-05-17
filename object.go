@@ -398,11 +398,18 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 
 		// get field type from type object, not do that from value
 		fldTyp := UnpackPtrType(field.Type())
+		fldTypName := fldTyp.String()
+		log.Println(fldTypName)
 
 		// unpack pointer to enable value setting
 		fldRawValue := UnpackPtrValue(field)
 
-		fldRawValue.Set(reflect.ValueOf(decodedValue))
+		if fldTyp.Kind() == reflect.Slice {
+			SetSlice(fldRawValue, decodedValue)
+			continue
+		}
+
+		SetValue(fldRawValue, EnsurePackValue(decodedValue))
 
 		continue
 
