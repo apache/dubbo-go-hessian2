@@ -19,12 +19,11 @@ package hessian
 
 import (
 	"io"
+	"log"
 	"reflect"
 	"strings"
 	"sync"
-)
 
-import (
 	perrors "github.com/pkg/errors"
 )
 
@@ -375,9 +374,16 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 	for i := 0; i < len(cls.fieldNameList); i++ {
 		fieldName := cls.fieldNameList[i]
 
-		index, fieldStruct, err := findFieldWithCache(fieldName, typ)
+		decodedValue, err := d.DecodeValue()
 		if err != nil {
 			return nil, perrors.Errorf("can not find field %s", fieldName)
+		}
+
+		index, fieldStruct, err := findFieldWithCache(fieldName, typ)
+		if err != nil {
+			log.Printf("SKIP non-exist field:%s", fieldName)
+			continue
+			// return nil, perrors.Errorf("can not find field %s", fieldName)
 		}
 
 		// skip unexported anonymous field
@@ -395,6 +401,12 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 
 		// unpack pointer to enable value setting
 		fldRawValue := UnpackPtrValue(field)
+
+		fldRawValue.Set(reflect.ValueOf(decodedValue))
+
+		continue
+
+		// todo delete below
 
 		kind := fldTyp.Kind()
 		switch kind {
