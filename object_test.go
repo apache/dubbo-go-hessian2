@@ -749,3 +749,21 @@ func BenchmarkDecode(b *testing.B) {
 		}
 	}
 }
+
+type Person183 struct {
+	Name string
+}
+
+func (Person183) JavaClassName() string {
+	return `test.Person183`
+}
+
+func TestIssue183_DecodeExcessStructField(t *testing.T) {
+	RegisterPOJO(&Person183{})
+	got, err := decodeJavaResponse(`customReplyPerson183`, ``, false)
+	if err != nil {
+		t.Error(err)
+	}
+
+	t.Logf("%T %+v", got, got)
+}
