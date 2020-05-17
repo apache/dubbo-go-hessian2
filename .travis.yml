@@ -6,9 +6,7 @@ matrix:
       jdk: openjdk8
 
 go:
-  - "1.12.x"
-  - "1.13.x"
-  - "1.14.x"
+  - "1.12"
 
 script:
   - mvn clean package -f test_hessian/pom.xml
