@@ -23,9 +23,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-)
 
-import (
 	perrors "github.com/pkg/errors"
 )
 
@@ -337,6 +335,11 @@ func ToMapStringString(origin map[interface{}]interface{}) map[string]string {
 	dest := make(map[string]string)
 	for k, v := range origin {
 		if kv, ok := k.(string); ok {
+			if v == nil {
+				dest[kv] = ""
+				continue
+			}
+
 			if vv, ok := v.(string); ok {
 				dest[kv] = vv
 			}
