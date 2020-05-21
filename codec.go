@@ -24,9 +24,7 @@ import (
 	"math"
 	"reflect"
 	"strings"
-)
 
-import (
 	perrors "github.com/pkg/errors"
 )
 
@@ -389,6 +387,59 @@ func SetSlice(dest reflect.Value, objects interface{}) error {
 
 	dest = UnpackPtrValue(dest)
 	destTyp := UnpackPtrType(dest.Type())
+	elemKind := destTyp.Elem().Kind()
+	if elemKind == reflect.Uint8 {
+		// for binary
+		dest.Set(EnsureRawValue(objects))
+		return nil
+	}
+
+	if ref, ok := objects.(*_refHolder); ok {
+		v, err := ConvertSliceValueType(destTyp, ref.value)
+		if err != nil {
+			return err
+		}
+		SetValue(dest, v)
+		ref.change(v) // change finally
+		ref.notify()  // delay set value to all destinations
+		return nil
+	}
+
+	v := EnsurePackValue(objects)
+	if h, ok := v.Interface().(*_refHolder); ok {
+		// if the object is a ref one, just add the destination list to wait delay initialization
+		h.add(dest)
+		return nil
+	}
+
+	v, err := ConvertSliceValueType(destTyp, v)
+	if err != nil {
+		return err
+	}
+	SetValue(dest, v)
+	return nil
+}
+
+// SetMap set value(map[interface{}]interface{}) into map[T]T
+func SetMap(dest reflect.Value, objects interface{}) error {
+	if objects == nil {
+		return nil
+	}
+
+	src := objects.(map[interface{}]interface{})
+	srcv := reflect.ValueOf(src)
+
+	dest = UnpackPtrValue(dest)
+	destTyp := UnpackPtrType(dest.Type())
+	if dest.IsNil() {
+		dest.Set(reflect.MakeMap(destTyp))
+	}
+	for _, keyv := range srcv.MapKeys() {
+		dest.SetMapIndex(reflect.ValueOf(keyv.Interface()), reflect.ValueOf(srcv.MapIndex(keyv).Interface()))
+	}
+
+	return nil
+
 	elemKind := destTyp.Elem().Kind()
 	if elemKind == reflect.Uint8 {
 		// for binary

@@ -404,12 +404,14 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 		// unpack pointer to enable value setting
 		fldRawValue := UnpackPtrValue(field)
 
-		if fldTyp.Kind() == reflect.Slice {
+		switch fldTyp.Kind() {
+		case reflect.Slice:
 			SetSlice(fldRawValue, decodedValue)
-			continue
+		case reflect.Map:
+			SetMap(fldRawValue, decodedValue)
+		default:
+			SetValue(fldRawValue, EnsurePackValue(decodedValue))
 		}
-
-		SetValue(fldRawValue, EnsurePackValue(decodedValue))
 
 		continue
 
