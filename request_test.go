@@ -82,7 +82,7 @@ func TestDescRegex(t *testing.T) {
 	assert.Equal(t, "[I", results[1])
 }
 
-func TestToMapStringString(t *testing.T) {
+func TestIssue192(t *testing.T) {
 	type args struct {
 		origin map[interface{}]interface{}
 	}
