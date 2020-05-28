@@ -176,7 +176,6 @@ func TestStringEmoji(t *testing.T) {
 	s0 := "emoji🤣"
 	s0 += ",max" + string(rune(0x10FFFF))
 
-	// todo 这里正确拿到hessian解码字节数组，但是构造string的时候，不是rune，emoji表情符号显示有点问题，修改assert？？？
 	testDecodeFramework(t, "customReplyStringEmoji", s0)
 	testJavaDecode(t, "customArgString_emoji", s0)
 }
