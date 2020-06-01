@@ -346,15 +346,7 @@ func (d *Decoder) decString(flag int32) (string, error) {
 					if err != nil {
 						return s, perrors.WithStack(err)
 					}
-
-					if chunkLen < 0 {
-						chunkLen = 0
-					}
-					if charLen < 0 {
-						charLen = 0
-					}
-
-					chunkLen += charLen
+					chunkLen = charLen
 					remain, cap := len(bytesBuf)-offset, charLen<<2
 					if remain < cap {
 						grow := len(bytesBuf) + cap
