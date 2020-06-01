@@ -18,6 +18,7 @@
 package hessian
 
 import (
+	"reflect"
 	"testing"
 	"time"
 )
@@ -79,4 +80,38 @@ func TestDescRegex(t *testing.T) {
 	assert.Equal(t, 2, len(results))
 	assert.Equal(t, "[Ljava/lang/String;", results[0])
 	assert.Equal(t, "[I", results[1])
+}
+
+func TestIssue192(t *testing.T) {
+	type args struct {
+		origin map[interface{}]interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[string]string
+	}{
+		{
+			name: "not null",
+			args: args{
+				origin: map[interface{}]interface{}{
+					"1": nil,
+					"2": "3",
+					"":  "",
+				},
+			},
+			want: map[string]string{
+				"1": "",
+				"2": "3",
+				"":  "",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ToMapStringString(tt.args.origin); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ToMapStringString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
