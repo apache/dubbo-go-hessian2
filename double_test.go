@@ -42,6 +42,28 @@ func TestEncDouble(t *testing.T) {
 	t.Logf("decode(%v) = %v, %v\n", v, res, err)
 }
 
+func TestIssue181(t *testing.T) {
+	var (
+		v   float32
+		err error
+		e   *Encoder
+		d   *Decoder
+		res interface{}
+	)
+
+	e = NewEncoder()
+	v = 99.8
+	e.Encode(v)
+	if len(e.Buffer()) == 0 {
+		t.Fail()
+	}
+
+	// res would be '99.800003' without patches in PR #196
+	d = NewDecoder(e.Buffer())
+	res, err = d.Decode()
+	t.Logf("decode(%v) = %v, %v\n", v, res, err)
+}
+
 func TestDouble(t *testing.T) {
 	testDecodeFramework(t, "replyDouble_0_0", 0.0)
 	testDecodeFramework(t, "replyDouble_0_001", 0.001)

@@ -112,6 +112,8 @@ func (e *Encoder) Encode(v interface{}) error {
 			// e.buffer = encDateInMimute(v.(time.Time), e.buffer)
 		}
 
+	// float32 cast to float64 will cause accuracy issue.
+	// float32-->string-->float64, the transformation can solve it.
 	case float32:
 		str := strconv.FormatFloat(float64(val), 'f', -1, 32)
 		d, _ := strconv.ParseFloat(str, 64)
