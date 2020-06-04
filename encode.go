@@ -19,9 +19,9 @@ package hessian
 
 import (
 	"reflect"
+	"strconv"
 	"time"
 	"unsafe"
-	"strconv"
 )
 
 import (
