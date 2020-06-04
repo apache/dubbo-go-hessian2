@@ -21,6 +21,7 @@ import (
 	"reflect"
 	"time"
 	"unsafe"
+	"strconv"
 )
 
 import (
@@ -112,7 +113,9 @@ func (e *Encoder) Encode(v interface{}) error {
 		}
 
 	case float32:
-		e.buffer = encFloat(e.buffer, float64(val))
+		str := strconv.FormatFloat(float64(val), 'f', -1, 32)
+		d, _ := strconv.ParseFloat(str, 64)
+		e.buffer = encFloat(e.buffer, d)
 
 	case float64:
 		e.buffer = encFloat(e.buffer, val)
