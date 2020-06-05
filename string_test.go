@@ -19,6 +19,7 @@ package hessian
 
 import (
 	"fmt"
+	"sync"
 	"testing"
 )
 
@@ -158,17 +159,32 @@ func TestStringEncode(t *testing.T) {
 	testJavaDecode(t, "argString_65536", s65560[:65536])
 }
 
-func BenchmarkDecodeStringOptimized(t *testing.B) {
+var decodePool = &sync.Pool{
+	New: func() interface{} {
+		return NewCheapDecoderWithSkip([]byte{})
+	},
+}
+
+func TestStringWithPool(t *testing.T) {
 	e := NewEncoder()
 	e.Encode(testString)
 	buf := e.buffer
 
-	d := NewDecoder(buf)
-
-	for i := 0; i < t.N; i++ {
-		d.DecodeValue()
+	for i := 0; i < 3; i++ {
+		d := decodePool.Get().(*Decoder)
 		d.Reset(buf)
+
+		v, err := d.Decode()
+		if err != nil {
+			t.Errorf("err:%s", err.Error())
+		}
+		if v != testString {
+			t.Errorf("excpect decode %v, actual %v", testString, v)
+		}
+
+		decodePool.Put(d)
 	}
+
 }
 
 func TestStringEmoji(t *testing.T) {
@@ -176,7 +192,14 @@ func TestStringEmoji(t *testing.T) {
 	s0 := "emoji🤣"
 	s0 += ",max" + string(rune(0x10FFFF))
 
-	// todo 这里正确拿到hessian解码字节数组，但是构造string的时候，不是rune，emoji表情符号显示有点问题，修改assert？？？
 	testDecodeFramework(t, "customReplyStringEmoji", s0)
 	testJavaDecode(t, "customArgString_emoji", s0)
+}
+
+func TestStringComplex(t *testing.T) {
+	// see: test_hessian/src/main/java/test/TestString.java
+	s0 := "킐\u0088中国你好!\u0088\u0088\u0088\u0088\u0088\u0088"
+
+	testDecodeFramework(t, "customReplyComplexString", s0)
+	testJavaDecode(t, "customArgComplexString", s0)
 }
