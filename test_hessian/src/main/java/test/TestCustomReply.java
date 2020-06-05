@@ -425,6 +425,11 @@ public class TestCustomReply {
         output.flush();
     }
 
+    public void customReplyComplexString() throws Exception {
+        output.writeObject(TestString.getComplexString());
+        output.flush();
+    }
+
     public void customReplyExtendClass() throws Exception {
         Dog dog = new Dog();
         dog.name = "a dog";
