@@ -170,18 +170,21 @@ func TestStringWithPool(t *testing.T) {
 	e.Encode(testString)
 	buf := e.buffer
 
-	d := decodePool.Get().(*Decoder)
-	d.Reset(buf)
+	for i := 0; i < 3; i++ {
+		d := decodePool.Get().(*Decoder)
+		d.Reset(buf)
 
-	v, err := d.Decode()
-	if err != nil {
-		t.Errorf("err:%s", err.Error())
-	}
-	if v != testString {
-		t.Errorf("excpect decode %v, actual %v", testString, v)
+		v, err := d.Decode()
+		if err != nil {
+			t.Errorf("err:%s", err.Error())
+		}
+		if v != testString {
+			t.Errorf("excpect decode %v, actual %v", testString, v)
+		}
+
+		decodePool.Put(d)
 	}
 
-	decodePool.Put(d)
 }
 
 func TestStringEmoji(t *testing.T) {
