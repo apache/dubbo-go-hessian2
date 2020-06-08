@@ -218,14 +218,11 @@ func encString(b []byte, v string) []byte {
 // ::= [x00-x1f] <utf8-data>         # string of length 0-31
 // ::= [x30-x34] <utf8-data>         # string of length 0-1023
 func (d *Decoder) getStringLength(tag byte) (int, error) {
-	var (
-		err    error
-		length int
-	)
+	var length int
 
 	switch {
 	case tag >= BC_STRING_DIRECT && tag <= STRING_DIRECT_MAX:
-		return int(tag - 0x00), nil
+		length = int(tag - 0x00)
 
 	case tag >= 0x30 && tag <= 0x33:
 		b, err := d.readByte()
@@ -234,7 +231,6 @@ func (d *Decoder) getStringLength(tag byte) (int, error) {
 		}
 
 		length = int(tag-0x30)<<8 + int(b)
-		return length, nil
 
 	case tag == BC_STRING_CHUNK || tag == BC_STRING:
 		b0, err := d.readByte()
@@ -248,19 +244,23 @@ func (d *Decoder) getStringLength(tag byte) (int, error) {
 		}
 
 		length = int(b0)<<8 + int(b1)
-		return length, nil
 
 	default:
-		return -1, perrors.WithStack(err)
+		return -1, perrors.Errorf("string decode: unknown tag %b", tag)
 	}
+
+	if length < 0 {
+		return -1, perrors.Errorf("string decode: length less than zero")
+	}
+
+	return length, nil
 }
 
 func (d *Decoder) decString(flag int32) (string, error) {
 	var (
-		tag      byte
-		chunkLen int
-		last     bool
-		s        string
+		tag  byte
+		last bool
+		s    string
 	)
 
 	if flag != TAG_READ {
@@ -315,11 +315,10 @@ func (d *Decoder) decString(flag int32) (string, error) {
 			last = true
 		}
 
-		charLen, err := d.getStringLength(tag)
+		chunkLen, err := d.getStringLength(tag)
 		if err != nil {
 			return s, perrors.WithStack(err)
 		}
-		chunkLen = charLen
 		bytesBuf := make([]byte, chunkLen<<2)
 		offset := 0
 
@@ -342,12 +341,11 @@ func (d *Decoder) decString(flag int32) (string, error) {
 						last = true
 					}
 
-					charLen, err = d.getStringLength(b)
+					chunkLen, err = d.getStringLength(b)
 					if err != nil {
 						return s, perrors.WithStack(err)
 					}
-					chunkLen = charLen
-					remain, cap := len(bytesBuf)-offset, charLen<<2
+					remain, cap := len(bytesBuf)-offset, chunkLen<<2
 					if remain < cap {
 						grow := len(bytesBuf) + cap
 						bs := make([]byte, grow)
