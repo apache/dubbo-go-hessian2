@@ -61,7 +61,12 @@ func TestIssue181(t *testing.T) {
 	// res would be '99.800003' without patches in PR #196
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
-	t.Logf("decode(%v) = %v, %v\n", v, res, err)
+	f := res.(float64)
+	if float32(f) != v {
+		t.Errorf("decode(%v) = %v, %v\n", v, res, err)
+		return
+	}
+	t.Logf("decode(%v) = %v\n", v, res)
 }
 
 func TestDouble(t *testing.T) {
