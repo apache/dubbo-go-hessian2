@@ -200,6 +200,11 @@ public class TestCustomDecode {
         return TestString.getEmojiTestString().equals(o);
     }
 
+    public Object customArgComplexString() throws Exception {
+        String o = (String) input.readObject();
+        return TestString.getComplexString().equals(o);
+    }
+
     public Object customArgTypedFixedList_HashSet() throws Exception {
         HashSet o = (HashSet) input.readObject();
         return o.contains(0) && o.contains(1);

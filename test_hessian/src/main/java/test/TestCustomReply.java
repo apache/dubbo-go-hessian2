@@ -430,6 +430,10 @@ public class TestCustomReply {
         p.name = "pname";
         p.age = 13;
         output.writeObject(p);
+    }
+
+    public void customReplyComplexString() throws Exception {
+        output.writeObject(TestString.getComplexString());
         output.flush();
     }
 
