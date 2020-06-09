@@ -222,7 +222,7 @@ func (d *Decoder) getStringLength(tag byte) (int, error) {
 
 	switch {
 	case tag >= BC_STRING_DIRECT && tag <= STRING_DIRECT_MAX:
-		length = int(tag - 0x00)
+		return int(tag - 0x00), nil
 
 	case tag >= 0x30 && tag <= 0x33:
 		b, err := d.readByte()
@@ -231,6 +231,7 @@ func (d *Decoder) getStringLength(tag byte) (int, error) {
 		}
 
 		length = int(tag-0x30)<<8 + int(b)
+		return length, nil
 
 	case tag == BC_STRING_CHUNK || tag == BC_STRING:
 		b0, err := d.readByte()
@@ -244,16 +245,11 @@ func (d *Decoder) getStringLength(tag byte) (int, error) {
 		}
 
 		length = int(b0)<<8 + int(b1)
+		return length, nil
 
 	default:
 		return -1, perrors.Errorf("string decode: unknown tag %b", tag)
 	}
-
-	if length < 0 {
-		return -1, perrors.Errorf("string decode: length less than zero")
-	}
-
-	return length, nil
 }
 
 func (d *Decoder) decString(flag int32) (string, error) {
