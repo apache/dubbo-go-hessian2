@@ -20,7 +20,9 @@ package hessian
 import (
 	"testing"
 	"time"
+)
 
+import (
 	"github.com/stretchr/testify/assert"
 )
 
@@ -129,8 +131,8 @@ func TestEncDateNull(t *testing.T) {
 	assert.Equal(t, ZeroDate, res.(*DateDemo).Date)
 	assert.Equal(t, 2, len(res.(*DateDemo).Dates))
 	assert.Equal(t, tz.Local().String(), (*res.(*DateDemo).Dates[0]).String())
-	assert.Equal(t, (*time.Time)(nil), res.(*DateDemo).NilDate)
-	// assert.Equal(t, ZeroDate, *res.(*DateDemo).Date1)
+	assert.Equal(t, &ZeroDate, res.(*DateDemo).NilDate)
+	assert.Equal(t, ZeroDate, *res.(*DateDemo).Date1)
 	assert.Equal(t, tz.Local().String(), (*res.(*DateDemo).Date2).String())
 	assert.Equal(t, tz.Local().String(), (*(*res.(*DateDemo).Date3)).String())
 

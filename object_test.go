@@ -19,6 +19,7 @@ package hessian
 
 import (
 	"encoding/json"
+	"github.com/stretchr/testify/assert"
 	"math"
 	"reflect"
 	"testing"
@@ -761,9 +762,6 @@ func (Person183) JavaClassName() string {
 func TestIssue183_DecodeExcessStructField(t *testing.T) {
 	RegisterPOJO(&Person183{})
 	got, err := decodeJavaResponse(`customReplyPerson183`, ``, false)
-	if err != nil {
-		t.Error(err)
-	}
-
+	assert.NoError(t, err)
 	t.Logf("%T %+v", got, got)
 }
