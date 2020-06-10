@@ -83,7 +83,7 @@ func encFloat32(b []byte, v float32) []byte {
 	}
 
 END:
-	if float32(int32(v * 1000)) == v * 1000 {
+	if float32(int32(v*1000)) == v*1000 {
 		iv := int32(v * 1000)
 		return encByte(b, BC_DOUBLE_MILL, byte(iv>>24), byte(iv>>16), byte(iv>>8), byte(iv))
 	} else {
