@@ -19,11 +19,14 @@ package hessian
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	"math"
 	"reflect"
 	"testing"
 	"time"
+)
+
+import (
+	"github.com/stretchr/testify/assert"
 )
 
 type Department struct {
