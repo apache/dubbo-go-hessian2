@@ -25,6 +25,10 @@ import (
 	"time"
 )
 
+import (
+	"github.com/stretchr/testify/assert"
+)
+
 type Department struct {
 	Name string
 }
@@ -748,4 +752,19 @@ func BenchmarkDecode(b *testing.B) {
 			b.Error(err)
 		}
 	}
+}
+
+type Person183 struct {
+	Name string
+}
+
+func (Person183) JavaClassName() string {
+	return `test.Person183`
+}
+
+func TestIssue183_DecodeExcessStructField(t *testing.T) {
+	RegisterPOJO(&Person183{})
+	got, err := decodeJavaResponse(`customReplyPerson183`, ``, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
 }

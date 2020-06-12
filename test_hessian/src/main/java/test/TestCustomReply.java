@@ -425,6 +425,18 @@ public class TestCustomReply {
         output.flush();
     }
 
+    public void customReplyPerson183() throws Exception {
+        Person183 p = new Person183();
+        p.name = "pname";
+        p.age = 13;
+        InnerPerson innerPerson = new InnerPerson();
+        innerPerson.name = "pname2";
+        innerPerson.age = 132;
+        p.innerPerson = innerPerson;
+        output.writeObject(p);
+        output.flush();
+    }
+
     public void customReplyComplexString() throws Exception {
         output.writeObject(TestString.getComplexString());
         output.flush();
@@ -490,4 +502,15 @@ class TypedListTest implements Serializable {
         this.list1 = new A1[][]{{new A1(), new A1()}, {new A1(), new A1()}};
     }
 
+}
+
+class Person183 implements Serializable {
+    public String name;
+    public Integer age;
+    public InnerPerson innerPerson;
+}
+
+class InnerPerson implements Serializable {
+    public String name;
+    public Integer age;
 }
