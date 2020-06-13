@@ -10,6 +10,9 @@
 
 It's a golang hessian library used by [Apache/dubbo-go](https://github.com/apache/dubbo-go).
 
+There is a big improvement on performance for v1.5.1, 
+thanks to [micln](https://github.com/micln),[pantianying](https://github.com/pantianying),[zonghaishang](https://github.com/zonghaishang).
+
 ## Feature List
 
 * [All JDK Exceptions](https://github.com/apache/dubbo-go-hessian2/issues/59)
