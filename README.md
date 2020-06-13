@@ -9,7 +9,7 @@
 ---
 
 > **Notice: When decoding, the java version of hessian will default skip and ignore non-exist fields.**
-> **From the version of v1.5.1 , hessian2 will skip non-exist fields too, while that before v1.5.1 will throw errors.**
+> **From the version of v1.5.1 , dubbo-go-hessian2 will skip non-exist fields too, while that before v1.5.1 will return errors.**
 
 It's a golang hessian library used by [Apache/dubbo-go](https://github.com/apache/dubbo-go).
 
