@@ -1,9 +1,9 @@
 # Release Notes
 
-## v1.5.1
+## v1.6.0
 
 ### New Features
-- ignore non-exist fields when decoding. [#190](https://github.com/apache/dubbo-go-hessian2/pull/190)
+- ignore non-exist fields when decoding. [#201](https://github.com/apache/dubbo-go-hessian2/pull/201)
 
 ### Enhancement
 - add cache in reflection to improve performance. [#179](https://github.com/apache/dubbo-go-hessian2/pull/179)
