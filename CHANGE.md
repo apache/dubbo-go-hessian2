@@ -1,5 +1,19 @@
 # Release Notes
 
+## v1.6.0
+
+### New Features
+- ignore non-exist fields when decoding. [#201](https://github.com/apache/dubbo-go-hessian2/pull/201)
+
+### Enhancement
+- add cache in reflection to improve performance. [#179](https://github.com/apache/dubbo-go-hessian2/pull/179)
+- string decode performance improvement. [#188](https://github.com/apache/dubbo-go-hessian2/pull/188)
+
+### Bugfixes
+- fix attachment lost for nil value. [#191](https://github.com/apache/dubbo-go-hessian2/pull/191)
+- fix float32 accuracy issue. [#196](https://github.com/apache/dubbo-go-hessian2/pull/196)
+
+
 ## v1.5.0
 
 ### New Features
