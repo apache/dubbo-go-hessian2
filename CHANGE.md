@@ -13,7 +13,6 @@
 - fix attachment lost for nil value. [#191](https://github.com/apache/dubbo-go-hessian2/pull/191)
 - fix float32 accuracy issue. [#196](https://github.com/apache/dubbo-go-hessian2/pull/196)
 
-
 ## v1.5.0
 
 ### New Features
