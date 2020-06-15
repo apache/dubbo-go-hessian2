@@ -18,9 +18,15 @@
 package hessian
 
 import (
+	"encoding/json"
 	"math"
 	"reflect"
 	"testing"
+	"time"
+)
+
+import (
+	"github.com/stretchr/testify/assert"
 )
 
 type Department struct {
@@ -658,4 +664,107 @@ func TestIssue150_EmbedStructJavaDecode(t *testing.T) {
 	t.Log(string(bytes), err)
 
 	testJavaDecode(t, "customArgTypedFixed_Extends", dog)
+}
+
+type Mix struct {
+	A  int
+	B  string
+	CA time.Time
+	CB int64
+	CC string
+	CD []float64
+	D  map[string]interface{}
+}
+
+func (m Mix) JavaClassName() string {
+	return `test.mix`
+}
+
+func init() {
+	RegisterPOJO(new(Mix))
+}
+
+//
+// BenchmarkJsonEncode-8   	  217354	      4799 ns/op	     832 B/op	      15 allocs/op
+func BenchmarkJsonEncode(b *testing.B) {
+	m := Mix{A: int('a'), B: `hello`}
+	m.CD = []float64{1, 2, 3}
+	m.D = map[string]interface{}{`floats`: m.CD, `A`: m.A, `m`: m}
+
+	for i := 0; i < b.N; i++ {
+		_, err := json.Marshal(&m)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+//
+// BenchmarkEncode-8   	  211452	      5560 ns/op	    1771 B/op	      51 allocs/op
+func BenchmarkEncode(b *testing.B) {
+	m := Mix{A: int('a'), B: `hello`}
+	m.CD = []float64{1, 2, 3}
+	m.D = map[string]interface{}{`floats`: m.CD, `A`: m.A, `m`: m}
+
+	for i := 0; i < b.N; i++ {
+		_, err := encodeTarget(&m)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+//
+// BenchmarkJsonDecode-8   	  123922	      8549 ns/op	    1776 B/op	      51 allocs/op
+func BenchmarkJsonDecode(b *testing.B) {
+	m := Mix{A: int('a'), B: `hello`}
+	m.CD = []float64{1, 2, 3}
+	m.D = map[string]interface{}{`floats`: m.CD, `A`: m.A, `m`: m}
+	bytes, err := json.Marshal(&m)
+	if err != nil {
+		b.Error(err)
+	}
+
+	for i := 0; i < b.N; i++ {
+		m := &Mix{}
+		err := json.Unmarshal(bytes, m)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+//
+// BenchmarkDecode-8   	  104196	     10924 ns/op	    6424 B/op	      98 allocs/op
+func BenchmarkDecode(b *testing.B) {
+	m := Mix{A: int('a'), B: `hello`}
+	m.CD = []float64{1, 2, 3}
+	m.D = map[string]interface{}{`floats`: m.CD, `A`: m.A, `m`: m}
+	bytes, err := encodeTarget(&m)
+	if err != nil {
+		b.Error(err)
+	}
+
+	for i := 0; i < b.N; i++ {
+		d := NewDecoder(bytes)
+		_, err := d.Decode()
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+type Person183 struct {
+	Name string
+}
+
+func (Person183) JavaClassName() string {
+	return `test.Person183`
+}
+
+func TestIssue183_DecodeExcessStructField(t *testing.T) {
+	RegisterPOJO(&Person183{})
+	got, err := decodeJavaResponse(`customReplyPerson183`, ``, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
 }

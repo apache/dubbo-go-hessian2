@@ -112,7 +112,7 @@ func (e *Encoder) Encode(v interface{}) error {
 		}
 
 	case float32:
-		e.buffer = encFloat(e.buffer, float64(val))
+		e.buffer = encFloat32(e.buffer, val)
 
 	case float64:
 		e.buffer = encFloat(e.buffer, val)
