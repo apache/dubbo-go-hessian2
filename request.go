@@ -99,6 +99,8 @@ func getArgType(v interface{}) string {
 		return "java.util.Map"
 
 	//  Serialized tags for complex types
+	case POJOEnum:
+		return v.(POJOEnum).JavaClassName()
 	default:
 		t := reflect.TypeOf(v)
 		if reflect.Ptr == t.Kind() {
