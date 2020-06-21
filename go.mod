@@ -1,5 +1,7 @@
 module github.com/apache/dubbo-go-hessian2
 
+go 1.14
+
 require (
 	github.com/dubbogo/gost v1.9.0
 	github.com/pkg/errors v0.9.1

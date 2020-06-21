@@ -87,7 +87,7 @@ type StackTraceElement struct {
 	DeclaringClass string
 	MethodName     string
 	FileName       string
-	LineNumber     int
+	LineNumber     int32
 }
 
 //JavaClassName  java fully qualified path
