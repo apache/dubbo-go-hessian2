@@ -380,7 +380,6 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 			// skip field
 			d.DecodeValue()
 			continue
-			//return nil, perrors.Errorf("can not find field %s", fieldName)
 		}
 
 		// skip unexported anonymous field
@@ -398,8 +397,8 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 
 		// unpack pointer to enable value setting
 		fldRawValue := UnpackPtrValue(field)
-
 		kind := fldTyp.Kind()
+
 		switch kind {
 		case reflect.String:
 			str, err := d.decString(TAG_READ)
