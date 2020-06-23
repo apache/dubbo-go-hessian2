@@ -97,7 +97,8 @@ func getArgType(v interface{}) string {
 	case map[interface{}]interface{}:
 		// return  "java.util.HashMap"
 		return "java.util.Map"
-
+	case POJOEnum:
+		return v.(POJOEnum).JavaClassName()
 	//  Serialized tags for complex types
 	default:
 		t := reflect.TypeOf(v)
