@@ -28,11 +28,11 @@ func checkAndGetException(cls classInfo) (structInfo, bool) {
 	}
 	// 如果满足异常条件
 	if count == 4 {
-		mutex.Lock()
-		defer mutex.Unlock()
 		if throwable, ok = getStructInfo(cls.javaName); ok {
 			return throwable, true
 		}
+		mutex.Lock()
+		defer mutex.Unlock()
 		RegisterPOJO(newBizException(cls.javaName))
 		if throwable, ok = getStructInfo(cls.javaName); ok {
 			return throwable, true
