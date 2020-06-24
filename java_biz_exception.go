@@ -2,25 +2,28 @@ package hessian
 
 import (
 	"fmt"
-	"github.com/apache/dubbo-go-hessian2/java_exception"
 	"sync"
+)
+
+import (
+	"github.com/apache/dubbo-go-hessian2/java_exception"
 )
 
 var mutex sync.Mutex
 
-func checkAndGetException(cls classInfo) (structInfo, bool){
+func checkAndGetException(cls classInfo) (structInfo, bool) {
 
 	if len(cls.fieldNameList) < 4 {
 		return structInfo{}, false
 	}
 	var (
 		throwable structInfo
-		ok bool
+		ok        bool
 	)
-	var count =0
+	var count = 0
 	for _, item := range cls.fieldNameList {
 		if item == "detailMessage" || item == "suppressedExceptions" || item == "stackTrace" || item == "cause" {
-			count ++
+			count++
 		}
 	}
 	// 如果满足异常条件
@@ -44,7 +47,7 @@ type BizException struct {
 	SuppressedExceptions []java_exception.Throwabler
 	StackTrace           []java_exception.StackTraceElement
 	Cause                java_exception.Throwabler
-	name				 string
+	name                 string
 }
 
 // NewThrowable is the constructor
