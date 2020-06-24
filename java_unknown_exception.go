@@ -58,7 +58,7 @@ func checkAndGetException(cls classInfo) (structInfo, bool) {
 	return throwable, count == 4
 }
 
-type BizException struct {
+type UnknownException struct {
 	SerialVersionUID     int64
 	DetailMessage        string
 	SuppressedExceptions []java_exception.Throwabler
@@ -68,16 +68,16 @@ type BizException struct {
 }
 
 // NewThrowable is the constructor
-func newBizException(name string) *BizException {
-	return &BizException{name: name, StackTrace: []java_exception.StackTraceElement{}}
+func newBizException(name string) *UnknownException {
+	return &UnknownException{name: name, StackTrace: []java_exception.StackTraceElement{}}
 }
 
 // Error output error message
-func (e BizException) Error() string {
+func (e UnknownException) Error() string {
 	return fmt.Sprintf("throw %v : %v", e.name, e.DetailMessage)
 }
 
 //JavaClassName  java fully qualified path
-func (e BizException) JavaClassName() string {
+func (e UnknownException) JavaClassName() string {
 	return e.name
 }
