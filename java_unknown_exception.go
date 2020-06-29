@@ -43,7 +43,7 @@ func checkAndGetException(cls classInfo) (structInfo, bool) {
 			count++
 		}
 	}
-	// 如果满足异常条件
+	// if have these 4 fields, it is throwable struct
 	if count == 4 {
 		if throwable, ok = getStructInfo(cls.javaName); ok {
 			return throwable, true
@@ -80,4 +80,9 @@ func (e UnknownException) Error() string {
 //JavaClassName  java fully qualified path
 func (e UnknownException) JavaClassName() string {
 	return e.name
+}
+
+// equals to getStackTrace in java
+func (e UnknownException) GetStackTrace() []java_exception.StackTraceElement {
+	return e.StackTrace
 }

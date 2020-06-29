@@ -50,7 +50,7 @@ var (
 		"date":             reflect.TypeOf(time.Time{}),
 		"object":           reflect.TypeOf([]Object{}).Elem(),
 		"java.lang.Object": reflect.TypeOf([]Object{}).Elem(),
-		//异常
+		// exception field
 		"java.lang.StackTraceElement": reflect.TypeOf([]*java_exception.StackTraceElement{}).Elem(),
 	}
 )
