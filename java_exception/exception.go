@@ -90,9 +90,9 @@ func (e Exception) GetStackTrace() []StackTraceElement {
 	return e.StackTrace
 }
 
-////////////////////////////
+/////////////////////////////
 // StackTraceElement
-////////////////////////////
+/////////////////////////////
 
 type StackTraceElement struct {
 	DeclaringClass string
