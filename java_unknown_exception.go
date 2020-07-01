@@ -26,7 +26,9 @@ import (
 	"github.com/apache/dubbo-go-hessian2/java_exception"
 )
 
-var mutex sync.Mutex
+var (
+	expRegMutex sync.Mutex
+)
 
 func checkAndGetException(cls classInfo) (structInfo, bool) {
 
@@ -48,8 +50,8 @@ func checkAndGetException(cls classInfo) (structInfo, bool) {
 		if throwable, ok = getStructInfo(cls.javaName); ok {
 			return throwable, true
 		}
-		mutex.Lock()
-		defer mutex.Unlock()
+		expRegMutex.Lock()
+		defer expRegMutex.Unlock()
 		RegisterPOJO(newBizException(cls.javaName))
 		if throwable, ok = getStructInfo(cls.javaName); ok {
 			return throwable, true
