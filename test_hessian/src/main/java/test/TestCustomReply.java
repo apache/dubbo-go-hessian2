@@ -26,6 +26,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 import test.model.DateDemo;
 
 
@@ -422,6 +425,70 @@ public class TestCustomReply {
         output.flush();
     }
 
+    public void customReplyPerson183() throws Exception {
+        Person183 p = new Person183();
+        p.name = "pname";
+        p.age = 13;
+        InnerPerson innerPerson = new InnerPerson();
+        innerPerson.name = "pname2";
+        innerPerson.age = 132;
+        p.innerPerson = innerPerson;
+        output.writeObject(p);
+        output.flush();
+    }
+
+    public void customReplyComplexString() throws Exception {
+        output.writeObject(TestString.getComplexString());
+        output.flush();
+    }
+
+    public void customReplyExtendClass() throws Exception {
+        Dog dog = new Dog();
+        dog.name = "a dog";
+        dog.gender = "male";
+        output.writeObject(dog);
+        output.flush();
+    }
+
+    public void customReplyExtendClassToSingleStruct() throws Exception {
+        Dog dog = new DogAll();
+        dog.name = "a dog";
+        dog.gender = "male";
+        output.writeObject(dog);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_HashSet() throws Exception {
+        Set<Integer> set = new HashSet<>();
+        set.add(0);
+        set.add(1);
+        output.writeObject(set);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_HashSetCustomObject() throws Exception {
+        Set<Object> set = new HashSet<>();
+        set.add(new BigInteger("1234"));
+        set.add(new BigDecimal("123.4"));
+        output.writeObject(set);
+        output.flush();
+    }
+}
+
+interface Leg {
+    public int legConnt = 4;
+}
+
+class Animal {
+    public String name;
+}
+
+class Dog extends Animal implements Serializable, Leg {
+    public String gender;
+}
+
+class DogAll extends Dog {
+    public boolean all = true;
 }
 
 class TypedListTest implements Serializable {
@@ -435,4 +502,15 @@ class TypedListTest implements Serializable {
         this.list1 = new A1[][]{{new A1(), new A1()}, {new A1(), new A1()}};
     }
 
+}
+
+class Person183 implements Serializable {
+    public String name;
+    public Integer age;
+    public InnerPerson innerPerson;
+}
+
+class InnerPerson implements Serializable {
+    public String name;
+    public Integer age;
 }

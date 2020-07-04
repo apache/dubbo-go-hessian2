@@ -29,4 +29,9 @@ public class TestString {
 
         return s + ",max" + maxUnicode;
     }
+
+    public static String getComplexString() {
+        String s = "킐\u0088中国你好!\u0088\u0088\u0088\u0088\u0088\u0088";
+        return s;
+    }
 }

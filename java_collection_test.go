@@ -15,33 +15,44 @@
  * limitations under the License.
  */
 
-package java_exception
+package hessian
 
-// EOFException represents an exception of the same name in java
-type EOFException struct {
-	SerialVersionUID     int64
-	DetailMessage        string
-	StackTrace           []StackTraceElement
-	SuppressedExceptions []Throwabler
-	Cause                Throwabler
+import (
+	"testing"
+)
+
+func init() {
+	SetCollectionSerialize(&JavaHashSet{})
 }
 
-// NewEOFException is the constructor
-func NewEOFException(detailMessage string) *EOFException {
-	return &EOFException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
+type JavaHashSet struct {
+	value []interface{}
 }
 
-// Error output error message
-func (e EOFException) Error() string {
-	return e.DetailMessage
+func (j *JavaHashSet) Get() []interface{} {
+	return j.value
 }
 
-// JavaClassName  java fully qualified path
-func (EOFException) JavaClassName() string {
-	return "java.io.EOFException"
+func (j *JavaHashSet) Set(v []interface{}) {
+	j.value = v
 }
 
-// equals to getStackTrace in java
-func (e EOFException) GetStackTrace() []StackTraceElement {
-	return e.StackTrace
+func (j *JavaHashSet) JavaClassName() string {
+	return "java.util.HashSet"
+}
+
+func TestListJavaCollectionEncode(t *testing.T) {
+	inside := make([]interface{}, 2)
+	inside[0] = int32(0)
+	inside[1] = int32(1)
+	hashSet := JavaHashSet{value: inside}
+	testJavaDecode(t, "customArgTypedFixedList_HashSet", &hashSet)
+}
+
+func TestListJavaCollectionDecode(t *testing.T) {
+	inside := make([]interface{}, 2)
+	inside[0] = int32(0)
+	inside[1] = int32(1)
+	hashSet := JavaHashSet{value: inside}
+	testDecodeFramework(t, "customReplyTypedFixedList_HashSet", &hashSet)
 }

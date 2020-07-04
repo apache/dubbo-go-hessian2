@@ -18,8 +18,11 @@
 package hessian
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+)
+
+import (
+	"github.com/stretchr/testify/assert"
 )
 
 func TestEncInt32Len1B(t *testing.T) {

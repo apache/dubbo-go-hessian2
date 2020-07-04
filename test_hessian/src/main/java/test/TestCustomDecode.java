@@ -23,10 +23,8 @@ import com.caucho.hessian.test.A1;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
 import test.model.DateDemo;
 
 
@@ -187,6 +185,11 @@ public class TestCustomDecode {
         return o.toString().equals("100.256");
     }
 
+    public Object customArgTypedFixed_Extends() throws Exception {
+        Dog o = (Dog) input.readObject();
+        return o.name.equals("a dog") && o.gender.equals("male");
+    }
+
     public Object customArgTypedFixed_DateNull() throws Exception {
         DateDemo o = (DateDemo) input.readObject();
         return o.getDate() == null && o.getDate1() == null;
@@ -195,5 +198,15 @@ public class TestCustomDecode {
     public Object customArgString_emoji() throws Exception {
         String o = (String) input.readObject();
         return TestString.getEmojiTestString().equals(o);
+    }
+
+    public Object customArgComplexString() throws Exception {
+        String o = (String) input.readObject();
+        return TestString.getComplexString().equals(o);
+    }
+
+    public Object customArgTypedFixedList_HashSet() throws Exception {
+        HashSet o = (HashSet) input.readObject();
+        return o.contains(0) && o.contains(1);
     }
 }
