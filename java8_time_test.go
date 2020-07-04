@@ -40,11 +40,4 @@ func doTestJava8Time(t *testing.T, method string, pojo POJO) {
 	javaStr := getJavaReply(method, "")
 	assert.Equal(t, goStr, javaStr)
 
-	//反序列异常
-	//
-	//content := string(e.buffer)
-	//testDecodeFrameworkWithSkip(t, method, func(r interface{}) {
-	//	t.Logf("%#v", r)
-	//	assert.Equal(t, content, r.(error).Error())
-	//})
 }

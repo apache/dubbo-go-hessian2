@@ -6,7 +6,6 @@ import java.time.*;
  * date 2020/7/2 11:07 <br/>
  * description class <br/>
  * add java8 package java.time Object method
- * 添加 java8 java.time 包下的各种序列化对象的获取 方便测试
  *
  * @author danao
  * @version 1.0

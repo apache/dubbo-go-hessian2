@@ -64,7 +64,6 @@ public class Hessian {
             output.flush();
         }else if(args[0].startsWith("java8_")){
             //add java8 java.time Object test
-            //添加java8 包 java.time 下对象的测试
             Method method = TestJava8Time.class.getMethod(args[0]);
             Object obj = new Object();
             Object object =method.invoke(obj);
