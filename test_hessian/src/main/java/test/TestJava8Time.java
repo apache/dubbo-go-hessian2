@@ -7,12 +7,11 @@ import java.time.*;
  * description class <br/>
  * add java8 package java.time Object method
  *
- * @author danao
+ * @author zhangyanmingjiayou@163.com
  * @version 1.0
  * @since 1.0
  */
 public class TestJava8Time {
-
 
     public static Duration java8_Duration() {
         return Duration.ZERO;
@@ -67,12 +66,8 @@ public class TestJava8Time {
         return ZoneId.of("1000");
     }
 
-
     public static ZoneOffset java8_ZoneOffset() {
         return ZoneOffset.of("1000");
     }
 
-    public static void main(String[] args) {
-
-    }
 }
