@@ -24,14 +24,20 @@
 package hessian
 
 import (
-	"github.com/apache/dubbo-go-hessian2/java_exception"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"reflect"
 	"testing"
+)
+
+import (
+	"github.com/stretchr/testify/assert"
+)
+
+import (
+	"github.com/apache/dubbo-go-hessian2/java_exception"
 )
 
 const (
