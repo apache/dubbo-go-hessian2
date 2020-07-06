@@ -45,11 +45,11 @@ func checkAndGetException(cls classInfo) (structInfo, bool) {
 	}
 	// if have these 4 fields, it is throwable struct
 	if count == 4 {
+		mutex.Lock()
+		defer mutex.Unlock()
 		if throwable, ok = getStructInfo(cls.javaName); ok {
 			return throwable, true
 		}
-		mutex.Lock()
-		defer mutex.Unlock()
 		RegisterPOJO(newBizException(cls.javaName))
 		if throwable, ok = getStructInfo(cls.javaName); ok {
 			return throwable, true
