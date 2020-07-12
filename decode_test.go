@@ -24,12 +24,14 @@
 package hessian
 
 import (
-	"github.com/apache/dubbo-go-hessian2/java_exception"
 	"log"
 	"os"
 	"os/exec"
 	"reflect"
 	"testing"
+)
+import (
+	"github.com/apache/dubbo-go-hessian2/java_exception"
 )
 
 const (
