@@ -30,6 +30,9 @@ import (
 	"reflect"
 	"testing"
 )
+import (
+	"github.com/apache/dubbo-go-hessian2/java_exception"
+)
 
 const (
 	hessianJar = "test_hessian/target/test_hessian-1.0.0.jar"
@@ -109,7 +112,15 @@ func testDecodeJavaData(t *testing.T, method, className string, skip bool, expec
 	if ok {
 		r = tmp.value.Interface()
 	}
-	if !reflect.DeepEqual(r, expected) {
+	trow, o1 := r.(java_exception.Throwabler)
+	expe, o2 := expected.(java_exception.Throwabler)
+	if o1 && o2 {
+		log.Println(reflect.TypeOf(trow), reflect.TypeOf(trow).Elem().Name())
+		if trow.Error() == expe.Error() && reflect.TypeOf(trow).Elem().Name() == reflect.TypeOf(expe).Elem().Name() {
+			return
+		}
+		t.Errorf("%s: got %v, wanted %v", method, r, expected)
+	} else if !reflect.DeepEqual(r, expected) {
 		t.Errorf("%s: got %v, wanted %v", method, r, expected)
 	}
 }
@@ -126,4 +137,11 @@ func testDecodeFrameworkFunc(t *testing.T, method string, expected func(interfac
 		r = tmp.value.Interface()
 	}
 	expected(r)
+}
+
+func TestUserDefindeException(t *testing.T) {
+	expect := &UnknownException{
+		DetailMessage: "throw UserDefindException",
+	}
+	testDecodeFramework(t, "throw_UserDefindException", expect)
 }

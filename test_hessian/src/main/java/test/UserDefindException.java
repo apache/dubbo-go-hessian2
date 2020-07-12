@@ -15,33 +15,10 @@
  * limitations under the License.
  */
 
-package java_exception
+package test;
 
-// IOException represents an exception of the same name in java
-type IOException struct {
-	SerialVersionUID     int64
-	DetailMessage        string
-	SuppressedExceptions []Throwabler
-	StackTrace           []StackTraceElement
-	Cause                Throwabler
-}
-
-// NewIOException is the constructor
-func NewIOException(detailMessage string) *IOException {
-	return &IOException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
-}
-
-// Error output error message
-func (e IOException) Error() string {
-	return e.DetailMessage
-}
-
-// JavaClassName  java fully qualified path
-func (IOException) JavaClassName() string {
-	return "java.io.IOException"
-}
-
-// equals to getStackTrace in java
-func (e IOException) GetStackTrace() []StackTraceElement {
-	return e.StackTrace
+public class UserDefindException extends RuntimeException{
+    public UserDefindException(String dd){
+        super(dd);
+    }
 }

@@ -547,6 +547,10 @@ func (d *Decoder) getStructDefByIndex(idx int) (reflect.Type, classInfo, error) 
 	cls = d.classInfoList[idx]
 	s, ok = getStructInfo(cls.javaName)
 	if !ok {
+		// exception
+		if s, ok = checkAndGetException(cls); ok {
+			return s.typ, cls, nil
+		}
 		if !d.isSkip {
 			err = perrors.Errorf("can not find go type name %s in registry", cls.javaName)
 		}

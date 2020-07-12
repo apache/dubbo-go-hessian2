@@ -15,33 +15,31 @@
  * limitations under the License.
  */
 
-package java_exception
+package hessian
 
-// IOException represents an exception of the same name in java
-type IOException struct {
-	SerialVersionUID     int64
-	DetailMessage        string
-	SuppressedExceptions []Throwabler
-	StackTrace           []StackTraceElement
-	Cause                Throwabler
-}
+import (
+	"testing"
+)
+import (
+	"github.com/stretchr/testify/assert"
+)
 
-// NewIOException is the constructor
-func NewIOException(detailMessage string) *IOException {
-	return &IOException{DetailMessage: detailMessage, StackTrace: []StackTraceElement{}}
-}
+func TestCheckAndGetException(t *testing.T) {
+	clazzInfo1 := classInfo{
+		javaName:      "com.test.UserDefinedException",
+		fieldNameList: []string{"detailMessage", "code", "suppressedExceptions", "stackTrace", "cause"},
+	}
+	s, b := checkAndGetException(clazzInfo1)
+	assert.True(t, b)
 
-// Error output error message
-func (e IOException) Error() string {
-	return e.DetailMessage
-}
+	assert.Equal(t, s.javaName, "com.test.UserDefinedException")
+	assert.Equal(t, s.goName, "hessian.UnknownException")
 
-// JavaClassName  java fully qualified path
-func (IOException) JavaClassName() string {
-	return "java.io.IOException"
-}
-
-// equals to getStackTrace in java
-func (e IOException) GetStackTrace() []StackTraceElement {
-	return e.StackTrace
+	clazzInfo2 := classInfo{
+		javaName:      "com.test.UserDefinedException",
+		fieldNameList: []string{"detailMessage", "code", "suppressedExceptions", "cause"},
+	}
+	s, b = checkAndGetException(clazzInfo2)
+	assert.False(t, b)
+	assert.Equal(t, s, structInfo{})
 }
