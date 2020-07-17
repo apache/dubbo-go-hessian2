@@ -15,18 +15,19 @@
  * limitations under the License.
  */
 
-package hessian
+package java8_time
 
-import (
-	"github.com/apache/dubbo-go-hessian2/java8_time"
-)
+type LocalTime struct {
+	Hour   int32 `hessian:"hour"`
+	Minute int32 `hessian:"minute"`
+	Second int32 `hessian:"second"`
+	Nano   int32 `hessian:"nano"`
+}
 
-func init() {
-	RegisterPOJO(&java8_time.Year{Year: 2020})
-	RegisterPOJO(&java8_time.LocalDate{Year: 2020, Month: 6, Day: 6})
-	RegisterPOJO(&java8_time.LocalTime{Hour: 6, Minute: 6, Second: 0, Nano: 0})
-	RegisterPOJO(&java8_time.LocalDateTime{Date: java8_time.LocalDate{Year: 2020, Month: 6, Day: 6}, Time: java8_time.LocalTime{Hour: 6, Minute: 6}})
-	RegisterPOJO(&java8_time.MonthDay{Month: 6, Day: 6})
-	RegisterPOJO(&java8_time.Duration{Second: 0, Nano: 0})
-	RegisterPOJO(&java8_time.Instant{Seconds: 100, Nanos: 0})
+func (LocalTime) JavaClassName() string {
+	return "com.alibaba.com.caucho.hessian.io.java8.LocalTimeHandle"
+}
+
+func (LocalTime) Error() string {
+	return "encode LocalTime error"
 }

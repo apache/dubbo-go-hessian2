@@ -25,5 +25,5 @@ func (Year) JavaClassName() string {
 }
 
 func (Year) Error() string {
-	return "encode year error"
+	return "encode Year error"
 }
