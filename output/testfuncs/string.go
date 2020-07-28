@@ -23,6 +23,6 @@ import (
 
 func HelloWorldString() []byte {
 	e := hessian.NewEncoder()
-	e.Encode("hello world1")
+	e.Encode("hello world")
 	return e.Buffer()
 }
