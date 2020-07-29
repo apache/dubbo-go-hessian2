@@ -23,6 +23,8 @@ import (
 
 func init() {
 	RegisterPOJO(&java8_time.Year{Year: 2020})
+	RegisterPOJO(&java8_time.YearMonth{Month: 2020, Year: 6})
+	RegisterPOJO(&java8_time.Period{Years: 2020, Months: 6, Days: 6})
 	RegisterPOJO(&java8_time.LocalDate{Year: 2020, Month: 6, Day: 6})
 	RegisterPOJO(&java8_time.LocalTime{Hour: 6, Minute: 6, Second: 0, Nano: 0})
 	RegisterPOJO(&java8_time.LocalDateTime{Date: java8_time.LocalDate{Year: 2020, Month: 6, Day: 6}, Time: java8_time.LocalTime{Hour: 6, Minute: 6}})

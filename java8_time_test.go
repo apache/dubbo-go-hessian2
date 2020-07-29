@@ -30,6 +30,8 @@ func TestJava8Time(t *testing.T) {
 	doTestTime(t, "java8_MonthDay", &java8_time.MonthDay{Month: 6, Day: 6})
 	doTestTime(t, "java8_Duration", &java8_time.Duration{Second: 0, Nano: 0})
 	doTestTime(t, "java8_Instant", &java8_time.Instant{Seconds: 100, Nanos: 0})
+	doTestTime(t, "java8_YearMonth", &java8_time.YearMonth{Year: 2020, Month: 6})
+	doTestTime(t, "java8_Period", &java8_time.Period{Years: 2020, Months: 6, Days: 6})
 }
 
 func doTestTime(t *testing.T, method string, expected interface{}) {

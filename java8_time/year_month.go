@@ -16,15 +16,16 @@
  */
 package java8_time
 
-//java8-time java.time.Year
-type Year struct {
-	Year int32 `hessian:"year"`
+//java8-time java.time.YearMonth
+type YearMonth struct {
+	Month int32 `hessian:"month"`
+	Year  int32 `hessian:"year"`
 }
 
-func (Year) JavaClassName() string {
-	return "com.alibaba.com.caucho.hessian.io.java8.YearHandle"
+func (YearMonth) JavaClassName() string {
+	return "com.alibaba.com.caucho.hessian.io.java8.YearMonthHandle"
 }
 
-func (Year) Error() string {
-	return "encode Year error"
+func (YearMonth) Error() string {
+	return "encode YearMonth error"
 }
