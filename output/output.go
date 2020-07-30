@@ -21,7 +21,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
+)
 
+import (
 	"github.com/apache/dubbo-go-hessian2/output/testfuncs"
 )
 
@@ -29,7 +31,7 @@ type outputFunc func() []byte
 
 var (
 	funcName = flag.String("func_name", "", "func name")
-	funcMap  = make(map[string]outputFunc)
+	funcMap  = make(map[string]outputFunc, 8)
 )
 
 // add all output func here
