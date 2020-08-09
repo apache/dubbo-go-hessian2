@@ -26,7 +26,7 @@ import (
 	"github.com/apache/dubbo-go-hessian2/java_exception"
 )
 
-var mutex sync.Mutex
+var exceptionCheckMutex sync.Mutex
 
 func checkAndGetException(cls classInfo) (structInfo, bool) {
 
@@ -45,8 +45,8 @@ func checkAndGetException(cls classInfo) (structInfo, bool) {
 	}
 	// if have these 4 fields, it is throwable struct
 	if count == 4 {
-		mutex.Lock()
-		defer mutex.Unlock()
+		exceptionCheckMutex.Lock()
+		defer exceptionCheckMutex.Unlock()
 		if throwable, ok = getStructInfo(cls.javaName); ok {
 			return throwable, true
 		}
