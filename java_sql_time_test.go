@@ -18,6 +18,7 @@
 package hessian
 
 import (
+	"reflect"
 	"testing"
 	"time"
 )
@@ -32,4 +33,23 @@ func TestJavaSqlTimeEncode(t *testing.T) {
 	time1 := Time{Time: location}
 	t.Log(time1.UnixNano() / 1000000)
 	testJavaDecode(t, "javaSql_encode_time", time1)
+}
+
+func TestJavaSqlTimeDecode(t *testing.T) {
+	Bdate := "1997-01-01 13:15:46"
+	location, _ := time.ParseInLocation("2006-01-02 15:04:05", Bdate, time.Local)
+	time1 := Time{Time: location}
+	//t.Log(time1.UnixNano() / 1000000)
+	//testJavaDecode(t, "javaSql_encode_time", time1)
+	testDecodeFramework(t, "javaSql_decode_time", &time1)
+}
+
+func TestName(t *testing.T) {
+	Bdate := "1997-01-01 13:15:46"
+	location, _ := time.ParseInLocation("2006-01-02 15:04:05", Bdate, time.Local)
+	time1 := Time{Time: location}
+	time2 := Time{Time: location}
+	r := time1
+	expected := time2
+	t.Log(reflect.DeepEqual(r, expected))
 }

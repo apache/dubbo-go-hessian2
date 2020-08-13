@@ -82,7 +82,7 @@ public class Hessian {
                 System.out.print(method.invoke(testJavaSqlTime, o));
             } else {
                 Method method = TestJavaSqlTime.class.getMethod(args[0]);
-                TestJavaSqlTime testJavaSqlTime = new TestJavaSqlTime(System.out);
+                TestJavaSqlTime testJavaSqlTime = new TestJavaSqlTime();
                 Object object = method.invoke(testJavaSqlTime);
 
                 Hessian2Output output = new Hessian2Output(System.out);

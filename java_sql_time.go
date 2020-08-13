@@ -18,6 +18,7 @@
 package hessian
 
 import (
+	"io"
 	"reflect"
 	"time"
 )
@@ -26,8 +27,13 @@ import (
 	perrors "github.com/pkg/errors"
 )
 
+func init() {
+	RegisterPOJO(&Date{})
+	RegisterPOJO(&Time{})
+}
+
 type JavaSqlTime interface {
-	SetTime(time int64)
+	SetTime(time time.Time)
 	ValueOf(time string) (JavaSqlTime, error)
 	JavaClassName() string
 	UnixNano() int64
@@ -45,11 +51,8 @@ func (Date) JavaClassName() string {
 	return "java.sql.Date"
 }
 
-func (Date) Error() string {
-	return "encode java.sql.Date error"
-}
-func (Date) SetTime(time int64) {
-	panic("")
+func (d *Date) SetTime(time time.Time) {
+	d.Time = time
 }
 func (Date) ValueOf(time string) (JavaSqlTime, error) {
 	panic("")
@@ -63,16 +66,12 @@ func (Time) JavaClassName() string {
 	return "java.sql.Time"
 }
 
-func (Time) Error() string {
-	return "encode java.sql.Time error"
-}
-
 func (t Time) time() time.Time {
 	return t.Time
 }
 
-func (Time) SetTime(time int64) {
-	panic("")
+func (t *Time) SetTime(time time.Time) {
+	t.Time = time
 }
 func (Time) ValueOf(time string) (JavaSqlTime, error) {
 	panic("")
@@ -193,5 +192,28 @@ func (JavaSqlTimeSerializer) EncObject(e *Encoder, vv POJO) error {
 
 func (JavaSqlTimeSerializer) DecObject(d *Decoder, typ reflect.Type, cls classInfo) (interface{}, error) {
 
-	return nil, perrors.New("unexpected collection decode call")
+	if typ.Kind() != reflect.Struct {
+		return nil, perrors.Errorf("wrong type expect Struct but get:%s", typ.String())
+	}
+
+	vRef := reflect.New(typ)
+	// add pointer ref so that ref the same object
+	d.appendRefs(vRef.Interface())
+
+	tag, err := d.readByte()
+	if err == io.EOF {
+		return nil, err
+	}
+	date, err := d.decDate(int32(tag))
+	if err != nil {
+		date = date
+	}
+	sqlTime := vRef.Interface()
+
+	result, ok := sqlTime.(JavaSqlTime)
+	result.SetTime(date)
+	if !ok {
+		panic("result type is not sql time, please check the whether the conversion is ok")
+	}
+	return result, nil
 }

@@ -17,32 +17,21 @@
 
 package test;
 
-import com.alibaba.com.caucho.hessian.io.Hessian2Output;
-
 import java.io.IOException;
-import java.io.OutputStream;
 import java.sql.Date;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 
 public class TestJavaSqlTime {
 
-    public void javaSql_decode_date() throws IOException {
+    public Object javaSql_decode_date() throws IOException {
         Date date = Date.valueOf("2020-08-09");
-        output.writeObject(date);
-        output.flush();
+        return date;
     }
 
-    public void javaSql_decode_time() throws IOException {
-        Time time = Time.valueOf("07:35:13");
-        output.writeObject(time);
-        output.flush();
-    }
-
-    private Hessian2Output output;
-
-    public TestJavaSqlTime(OutputStream os) {
-        output = new Hessian2Output(os);
+    public Object javaSql_decode_time() throws IOException {
+        Time time = new Time(852095746000L);
+        return time;
     }
 
 
