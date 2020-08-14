@@ -170,10 +170,3 @@ func (d *Decoder) decBinary(flag int32) ([]byte, error) {
 	}
 	return data, nil
 }
-
-func binaryTag(tag byte) bool {
-	return (tag >= BC_BINARY_DIRECT && tag <= INT_DIRECT_MAX) ||
-		(tag >= BC_BINARY_SHORT && tag <= byte(0x37)) ||
-		tag == BC_BINARY_CHUNK ||
-		tag == BC_BINARY
-}

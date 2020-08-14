@@ -340,7 +340,7 @@ var versionInt = make(map[string]int)
 // isSupportResponseAttachment is for compatibility among some dubbo version
 func isSupportResponseAttachment(ver interface{}) bool {
 	version, ok := ver.(string)
-	if !ok || version == "" {
+	if !ok || len(version) == 0 {
 		return false
 	}
 
@@ -360,7 +360,7 @@ func isSupportResponseAttachment(ver interface{}) bool {
 
 func version2Int(ver interface{}) int {
 	version, ok := ver.(string)
-	if !ok || version == "" {
+	if !ok || len(version) == 0  {
 		return 0
 	}
 	var v = 0

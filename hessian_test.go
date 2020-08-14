@@ -192,14 +192,14 @@ func TestRequest(t *testing.T) {
 }
 
 func TestHessianCodec_ReadAttachments(t *testing.T) {
+	RegisterPOJO(&AttachObject{})
 	body := &Response{
 		RspObj:      &CaseB{A: "A", B: CaseA{A: "a", B: 1, C: Case{A: "c", B: 2}}},
 		Exception:   nil,
-		Attachments: map[string]interface{}{DUBBO_VERSION_KEY: "2.6.4"},
+		Attachments: map[string]interface{}{DUBBO_VERSION_KEY: "2.6.4", "att": AttachObject{Id: 23, Name: "haha"}},
 	}
 	resp, err := doTestHessianEncodeHeader(t, PackageResponse, Response_OK, body)
 	assert.NoError(t, err)
-
 	unRegisterPOJOs(&CaseB{}, &CaseA{})
 	codecR1 := NewHessianCodec(bufio.NewReader(bytes.NewReader(resp)))
 	codecR2 := NewHessianCodec(bufio.NewReader(bytes.NewReader(resp)))
@@ -214,6 +214,17 @@ func TestHessianCodec_ReadAttachments(t *testing.T) {
 	attrs, err := codecR2.ReadAttachments()
 	assert.NoError(t, err)
 	assert.Equal(t, "2.6.4", attrs[DUBBO_VERSION_KEY])
+	assert.Equal(t, AttachObject{Id: 23, Name: "haha"}, *(attrs["att"].(*AttachObject)))
+	assert.NotEqual(t, AttachObject{Id: 24, Name: "nohaha"}, *(attrs["att"].(*AttachObject)))
 
 	t.Log(attrs)
+}
+
+type AttachObject struct {
+	Id   int32
+	Name string `dubbo:name`
+}
+
+func (AttachObject) JavaClassName() string {
+	return "com.test.Test"
 }
