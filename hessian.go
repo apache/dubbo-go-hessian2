@@ -218,7 +218,7 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 }
 
 // ignore body, but only read attachments
-func (h *HessianCodec) ReadAttachments() (map[string]string, error) {
+func (h *HessianCodec) ReadAttachments() (map[string]interface{}, error) {
 	if h.reader.Buffered() < h.bodyLen {
 		return nil, ErrBodyNotEnough
 	}
@@ -237,7 +237,7 @@ func (h *HessianCodec) ReadAttachments() (map[string]string, error) {
 		if err = unpackRequestBody(NewDecoderWithSkip(buf[:]), rspObj); err != nil {
 			return nil, perrors.WithStack(err)
 		}
-		return rspObj[6].(map[string]string), nil
+		return rspObj[6].(map[string]interface{}), nil
 	case PackageResponse:
 		rspObj := &Response{}
 		if err = unpackResponseBody(NewDecoderWithSkip(buf[:]), rspObj); err != nil {

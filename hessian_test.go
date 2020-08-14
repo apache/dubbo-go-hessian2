@@ -195,7 +195,7 @@ func TestHessianCodec_ReadAttachments(t *testing.T) {
 	body := &Response{
 		RspObj:      &CaseB{A: "A", B: CaseA{A: "a", B: 1, C: Case{A: "c", B: 2}}},
 		Exception:   nil,
-		Attachments: map[string]string{DUBBO_VERSION_KEY: "2.6.4"},
+		Attachments: map[string]interface{}{DUBBO_VERSION_KEY: "2.6.4"},
 	}
 	resp, err := doTestHessianEncodeHeader(t, PackageResponse, Response_OK, body)
 	assert.NoError(t, err)

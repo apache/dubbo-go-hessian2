@@ -37,13 +37,13 @@ import (
 type Response struct {
 	RspObj      interface{}
 	Exception   error
-	Attachments map[string]string
+	Attachments map[string]interface{}
 }
 
 // NewResponse create a new Response
-func NewResponse(rspObj interface{}, exception error, attachments map[string]string) *Response {
+func NewResponse(rspObj interface{}, exception error, attachments map[string]interface{}) *Response {
 	if attachments == nil {
-		attachments = make(map[string]string)
+		attachments = make(map[string]interface{})
 	}
 	return &Response{
 		RspObj:      rspObj,
@@ -176,7 +176,7 @@ func unpackResponseBody(decoder *Decoder, resp interface{}) error {
 				return perrors.WithStack(err)
 			}
 			if v, ok := attachments.(map[interface{}]interface{}); ok {
-				atta := ToMapStringString(v)
+				atta := ToMapStringInterface(v)
 				response.Attachments = atta
 			} else {
 				return perrors.Errorf("get wrong attachments: %+v", attachments)
@@ -201,7 +201,7 @@ func unpackResponseBody(decoder *Decoder, resp interface{}) error {
 				return perrors.WithStack(err)
 			}
 			if v, ok := attachments.(map[interface{}]interface{}); ok {
-				response.Attachments = ToMapStringString(v)
+				response.Attachments = ToMapStringInterface(v)
 			} else {
 				return perrors.Errorf("get wrong attachments: %+v", attachments)
 			}
@@ -222,7 +222,7 @@ func unpackResponseBody(decoder *Decoder, resp interface{}) error {
 				return perrors.WithStack(err)
 			}
 			if v, ok := attachments.(map[interface{}]interface{}); ok {
-				atta := ToMapStringString(v)
+				atta := ToMapStringInterface(v)
 				response.Attachments = atta
 			} else {
 				return perrors.Errorf("get wrong attachments: %+v", attachments)
@@ -338,8 +338,9 @@ var versionInt = make(map[string]int)
 
 // https://github.com/apache/dubbo/blob/dubbo-2.7.1/dubbo-common/src/main/java/org/apache/dubbo/common/Version.java#L96
 // isSupportResponseAttachment is for compatibility among some dubbo version
-func isSupportResponseAttachment(version string) bool {
-	if version == "" {
+func isSupportResponseAttachment(ver interface{}) bool {
+	version, ok := ver.(string)
+	if !ok || version == "" {
 		return false
 	}
 
@@ -357,7 +358,11 @@ func isSupportResponseAttachment(version string) bool {
 	return v >= LOWEST_VERSION_FOR_RESPONSE_ATTACHMENT
 }
 
-func version2Int(version string) int {
+func version2Int(ver interface{}) int {
+	version, ok := ver.(string)
+	if !ok || version == "" {
+		return 0
+	}
 	var v = 0
 	varr := strings.Split(version, ".")
 	length := len(varr)
