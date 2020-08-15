@@ -18,7 +18,7 @@
 package hessian
 
 import (
-	"reflect"
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
@@ -27,29 +27,56 @@ func init() {
 	SetJavaSqlTimeSerialize(&Date{})
 	SetJavaSqlTimeSerialize(&Time{})
 }
+
+// test local time between go and java
+// go encode
+// java decode
 func TestJavaSqlTimeEncode(t *testing.T) {
-	Bdate := "1997-01-01 13:15:46"
-	location, _ := time.ParseInLocation("2006-01-02 15:04:05", Bdate, time.Local)
-	time1 := Time{Time: location}
-	t.Log(time1.UnixNano() / 1000000)
-	testJavaDecode(t, "javaSql_encode_time", time1)
+	location, _ := time.ParseInLocation("2006-01-02 15:04:05", "1997-01-01 13:15:46", time.Local)
+	testSqlTime := Time{Time: location}
+	testJavaDecode(t, "javaSql_encode_time", &testSqlTime)
+
+	location, _ = time.ParseInLocation("2006-01-02 15:04:05", "2020-08-09 00:00:00", time.Local)
+	testSqlDate := Time{Time: location}
+	testJavaDecode(t, "javaSql_encode_date", &testSqlDate)
 }
 
+// test local time between go and java
+// java encode
+// go decode
 func TestJavaSqlTimeDecode(t *testing.T) {
-	Bdate := "1997-01-01 13:15:46"
-	location, _ := time.ParseInLocation("2006-01-02 15:04:05", Bdate, time.Local)
-	time1 := Time{Time: location}
-	//t.Log(time1.UnixNano() / 1000000)
-	//testJavaDecode(t, "javaSql_encode_time", time1)
-	testDecodeFramework(t, "javaSql_decode_time", &time1)
+	location, _ := time.ParseInLocation("2006-01-02 15:04:05", "1997-01-01 13:15:46", time.Local)
+	testSqlTime := Time{Time: location}
+	testDecodeFramework(t, "javaSql_decode_time", &testSqlTime)
+
+	location, _ = time.ParseInLocation("2006-01-02 15:04:05", "2020-08-09 00:00:00", time.Local)
+	testDateTime := Date{Time: location}
+	testDecodeFramework(t, "javaSql_decode_date", &testDateTime)
 }
 
-func TestName(t *testing.T) {
-	Bdate := "1997-01-01 13:15:46"
-	location, _ := time.ParseInLocation("2006-01-02 15:04:05", Bdate, time.Local)
-	time1 := Time{Time: location}
-	time2 := Time{Time: location}
-	r := time1
-	expected := time2
-	t.Log(reflect.DeepEqual(r, expected))
+// test local time between go and go
+// go encode
+// go decode
+func TestJavaSqlTimeWithGo(t *testing.T) {
+	location, _ := time.ParseInLocation("2006-01-02 15:04:05", "1997-01-01 13:15:46", time.Local)
+	sqlTime := Time{Time: location}
+	e := NewEncoder()
+	e.Encode(&sqlTime)
+	if len(e.Buffer()) == 0 {
+		t.Fail()
+	}
+	d := NewDecoder(e.Buffer())
+	resultSqlTime, _ := d.Decode()
+	assert.Equal(t, &sqlTime, resultSqlTime)
+
+	location, _ = time.ParseInLocation("2006-01-02 15:04:05", "2020-08-09 00:00:00", time.Local)
+	sqlDate := Date{Time: location}
+	e = NewEncoder()
+	e.Encode(&sqlDate)
+	if len(e.Buffer()) == 0 {
+		t.Fail()
+	}
+	d = NewDecoder(e.Buffer())
+	resultSqlDate, _ := d.Decode()
+	assert.Equal(t, &sqlDate, resultSqlDate)
 }

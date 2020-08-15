@@ -17,33 +17,23 @@
 
 package test;
 
-import java.io.IOException;
 import java.sql.Date;
 import java.sql.Time;
-import java.text.SimpleDateFormat;
 
 public class TestJavaSqlTime {
 
-    public Object javaSql_decode_date() throws IOException {
+    public Object javaSql_decode_date() {
         Date date = Date.valueOf("2020-08-09");
         return date;
     }
 
-    public Object javaSql_decode_time() throws IOException {
+    public Object javaSql_decode_time() {
         Time time = new Time(852095746000L);
         return time;
     }
 
 
     public TestJavaSqlTime() {
-    }
-
-    public static void main(String[] args) {
-        long time = 894621091000L;
-
-        time -= time % 60000L;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        System.out.println(sdf.format(new java.util.Date(time)));
     }
 
     public static Object javaSql_encode_time(Object v) {
