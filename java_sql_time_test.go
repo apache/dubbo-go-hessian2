@@ -32,12 +32,12 @@ func init() {
 // go encode
 // java decode
 func TestJavaSqlTimeEncode(t *testing.T) {
-	location, _ := time.ParseInLocation("2006-01-02 15:04:05", "1997-01-01 13:15:46", time.Local)
-	testSqlTime := Time{Time: location}
+	sqlTime := time.Date(1997, 1, 1, 13, 15, 46, 0, time.UTC)
+	testSqlTime := Time{Time: sqlTime}
 	testJavaDecode(t, "javaSql_encode_time", &testSqlTime)
 
-	location, _ = time.ParseInLocation("2006-01-02 15:04:05", "2020-08-09 00:00:00", time.Local)
-	testSqlDate := Time{Time: location}
+	sqlDate := time.Date(2020, 8, 9, 0, 0, 0, 0, time.UTC)
+	testSqlDate := Date{Time: sqlDate}
 	testJavaDecode(t, "javaSql_encode_date", &testSqlDate)
 }
 
@@ -45,13 +45,28 @@ func TestJavaSqlTimeEncode(t *testing.T) {
 // java encode
 // go decode
 func TestJavaSqlTimeDecode(t *testing.T) {
-	location, _ := time.ParseInLocation("2006-01-02 15:04:05", "1997-01-01 13:15:46", time.Local)
-	testSqlTime := Time{Time: location}
-	testDecodeFramework(t, "javaSql_decode_time", &testSqlTime)
+	sqlTime := time.Date(1997, 1, 1, 13, 15, 46, 0, time.UTC)
+	testSqlTime := Time{Time: sqlTime}
+	testDecodeJavaSqlTime(t, "javaSql_decode_time", &testSqlTime)
 
-	location, _ = time.ParseInLocation("2006-01-02 15:04:05", "2020-08-09 00:00:00", time.Local)
-	testDateTime := Date{Time: location}
-	testDecodeFramework(t, "javaSql_decode_date", &testDateTime)
+	sqlDate := time.Date(2020, 8, 9, 0, 0, 0, 0, time.UTC)
+	testDateTime := Date{Time: sqlDate}
+	testDecodeJavaSqlTime(t, "javaSql_decode_date", &testDateTime)
+}
+
+func testDecodeJavaSqlTime(t *testing.T, method string, expected JavaSqlTime) {
+	r, e := decodeJavaResponse(method, "", false)
+	if e != nil {
+		t.Errorf("%s: decode fail with error %v", method, e)
+		return
+	}
+
+	resultSqlTime, ok := r.(JavaSqlTime)
+
+	if !ok {
+		t.Errorf("got error type:%v", r)
+	}
+	assert.Equal(t, resultSqlTime.time().UnixNano(), expected.time().UnixNano())
 }
 
 // test local time between go and go

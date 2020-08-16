@@ -23,13 +23,11 @@ import java.sql.Time;
 public class TestJavaSqlTime {
 
     public Object javaSql_decode_date() {
-        Date date = Date.valueOf("2020-08-09");
-        return date;
+        return new Date(1596931200000L);
     }
 
     public Object javaSql_decode_time() {
-        Time time = new Time(852095746000L);
-        return time;
+        return new Time(852124546000L);
     }
 
 
@@ -37,12 +35,11 @@ public class TestJavaSqlTime {
     }
 
     public static Object javaSql_encode_time(Object v) {
-        return v.equals(new Time(852095746000L));
+        return v.equals(new Time(852124546000L));
     }
 
     public boolean javaSql_encode_date(Object v) {
-        Date date = Date.valueOf("2020-08-09");
-        return date.equals(v);
+        return v.equals(new Date(1596931200000L));
     }
 
 }
