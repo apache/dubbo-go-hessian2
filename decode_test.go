@@ -76,7 +76,7 @@ func getJavaReply(method, className string) []byte {
 	if className != "" {
 		cmdArgs = append(cmdArgs, className)
 	}
-	cmd := exec.Command("/Library/Java/JavaVirtualMachines/jdk1.8.0_201.jdk/Contents/Home/bin/java", cmdArgs...)
+	cmd := exec.Command("java", cmdArgs...)
 	out, err := cmd.Output()
 	if err != nil {
 		log.Fatal(err)
