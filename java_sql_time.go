@@ -20,112 +20,25 @@ package hessian
 import (
 	"io"
 	"reflect"
-	"time"
 )
 
 import (
 	perrors "github.com/pkg/errors"
 )
 
+import (
+	"github.com/apache/dubbo-go-hessian2/java_sql_time"
+)
+
 func init() {
-	RegisterPOJO(&Date{})
-	RegisterPOJO(&Time{})
-}
-
-type JavaSqlTime interface {
-	// ValueOf parse time string which format likes '2006-01-02 15:04:05'
-	ValueOf(timeStr string) error
-	// setTime for decode time
-	setTime(time time.Time)
-	JavaClassName() string
-	// time used to time
-	time() time.Time
-}
-
-type Date struct {
-	time.Time
-}
-
-func (d *Date) time() time.Time {
-	return d.Time
-}
-
-func (d *Date) setTime(time time.Time) {
-	d.Time = time
-}
-
-func (Date) JavaClassName() string {
-	return "java.sql.Date"
-}
-
-func (d *Date) ValueOf(dateStr string) error {
-	time, err := time.Parse("2006-01-02", dateStr)
-	if err != nil {
-		return err
-	}
-	d.Time = time
-	return nil
-}
-
-// nolint
-func (d *Date) Year() int {
-	return d.Time.Year()
-}
-
-// nolint
-func (d *Date) Month() time.Month {
-	return d.Time.Month()
-}
-
-// nolint
-func (d *Date) Day() int {
-	return d.Time.Day()
-}
-
-type Time struct {
-	time.Time
-}
-
-func (Time) JavaClassName() string {
-	return "java.sql.Time"
-}
-
-func (t Time) time() time.Time {
-	return t.Time
-}
-
-// nolint
-func (t *Time) Hour() int {
-	return t.Time.Hour()
-}
-
-// nolint
-func (t *Time) Minute() int {
-	return t.Time.Minute()
-}
-
-// nolint
-func (t *Time) Second() int {
-	return t.Time.Second()
-}
-
-func (t *Time) setTime(time time.Time) {
-	t.Time = time
-}
-
-func (t *Time) ValueOf(timeStr string) error {
-	time, err := time.Parse("15:04:05", timeStr)
-	if err != nil {
-		return err
-	}
-	t.Time = time
-	return nil
+	RegisterPOJO(&java_sql_time.Date{})
+	RegisterPOJO(&java_sql_time.Time{})
 }
 
 var javaSqlTimeTypeMap = make(map[string]reflect.Type, 16)
 
 // SetJavaSqlTimeSerialize register serializer for java.sql.Time & java.sql.Date
-func SetJavaSqlTimeSerialize(time JavaSqlTime) {
+func SetJavaSqlTimeSerialize(time java_sql_time.JavaSqlTime) {
 	name := time.JavaClassName()
 	var typ = reflect.TypeOf(time)
 	SetSerializer(name, JavaSqlTimeSerializer{})
@@ -158,7 +71,7 @@ func (JavaSqlTimeSerializer) EncObject(e *Encoder, vv POJO) error {
 	if reflect.TypeOf(vv).Kind() != reflect.Ptr {
 		ptrV = PackPtr(ptrV)
 	}
-	v, ok := ptrV.Interface().(JavaSqlTime)
+	v, ok := ptrV.Interface().(java_sql_time.JavaSqlTime)
 	if !ok {
 		return perrors.New("can not be converted into java sql time object")
 	}
@@ -205,7 +118,7 @@ func (JavaSqlTimeSerializer) EncObject(e *Encoder, vv POJO) error {
 		e.buffer = encByte(e.buffer, BC_OBJECT)
 		e.buffer = encInt32(e.buffer, int32(idx))
 	}
-	e.buffer = encDateInMs(e.buffer, v.time())
+	e.buffer = encDateInMs(e.buffer, v.GetTime())
 	return nil
 }
 
@@ -230,8 +143,8 @@ func (JavaSqlTimeSerializer) DecObject(d *Decoder, typ reflect.Type, cls classIn
 	}
 	sqlTime := vRef.Interface()
 
-	result, ok := sqlTime.(JavaSqlTime)
-	result.setTime(date)
+	result, ok := sqlTime.(java_sql_time.JavaSqlTime)
+	result.SetTime(date)
 	if !ok {
 		panic("result type is not sql time, please check the whether the conversion is ok")
 	}
