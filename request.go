@@ -342,12 +342,7 @@ func ToMapStringInterface(origin map[interface{}]interface{}) map[string]interfa
 				dest[kv] = ""
 				continue
 			}
-
-			if vv, ok := v.(string); ok {
-				dest[kv] = vv
-			} else {
-				dest[kv] = v
-			}
+			dest[kv] = v
 		}
 	}
 	return dest
