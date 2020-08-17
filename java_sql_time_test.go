@@ -18,9 +18,12 @@
 package hessian
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+)
+
+import (
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {
@@ -34,7 +37,7 @@ func init() {
 func TestJavaSqlTimeEncode(t *testing.T) {
 	sqlTime := time.Date(1997, 1, 1, 13, 15, 46, 0, time.UTC)
 	testSqlTime := Time{Time: sqlTime}
-	testJavaDecode(t, "javaSql_encode_time", &testSqlTime)
+	testJavaDecode(t, "javaSql_encode_time", testSqlTime)
 
 	sqlDate := time.Date(2020, 8, 9, 0, 0, 0, 0, time.UTC)
 	testSqlDate := Date{Time: sqlDate}
@@ -60,9 +63,7 @@ func testDecodeJavaSqlTime(t *testing.T, method string, expected JavaSqlTime) {
 		t.Errorf("%s: decode fail with error %v", method, e)
 		return
 	}
-
 	resultSqlTime, ok := r.(JavaSqlTime)
-
 	if !ok {
 		t.Errorf("got error type:%v", r)
 	}

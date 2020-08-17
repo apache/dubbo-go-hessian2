@@ -33,9 +33,12 @@ func init() {
 }
 
 type JavaSqlTime interface {
+	// ValueOf parse time string which format likes '2006-01-02 15:04:05'
 	ValueOf(timeStr string) error
+	// setTime for decode time
 	setTime(time time.Time)
 	JavaClassName() string
+	// time used to time
 	time() time.Time
 }
 
@@ -64,14 +67,17 @@ func (d *Date) ValueOf(dateStr string) error {
 	return nil
 }
 
+// nolint
 func (d *Date) Year() int {
 	return d.Time.Year()
 }
 
+// nolint
 func (d *Date) Month() time.Month {
 	return d.Time.Month()
 }
 
+// nolint
 func (d *Date) Day() int {
 	return d.Time.Day()
 }
@@ -88,15 +94,18 @@ func (t Time) time() time.Time {
 	return t.Time
 }
 
-func (t *Time) Hours() int {
+// nolint
+func (t *Time) Hour() int {
 	return t.Time.Hour()
 }
 
-func (t *Time) Minutes() int {
+// nolint
+func (t *Time) Minute() int {
 	return t.Time.Minute()
 }
 
-func (t *Time) Seconds() int {
+// nolint
+func (t *Time) Second() int {
 	return t.Time.Second()
 }
 
@@ -115,39 +124,48 @@ func (t *Time) ValueOf(timeStr string) error {
 
 var javaSqlTimeTypeMap = make(map[string]reflect.Type, 16)
 
+// SetJavaSqlTimeSerialize register serializer for java.sql.Time & java.sql.Date
 func SetJavaSqlTimeSerialize(time JavaSqlTime) {
 	name := time.JavaClassName()
 	var typ = reflect.TypeOf(time)
 	SetSerializer(name, JavaSqlTimeSerializer{})
-	//RegisterPOJO(time)
 	javaSqlTimeTypeMap[name] = typ
 }
 
+// nolint
 func getJavaSqlTimeSerialize(name string) reflect.Type {
 	return javaSqlTimeTypeMap[name]
 }
 
+// JavaSqlTimeSerializer used to encode & decode java.sql.Time & java.sql.Date
 type JavaSqlTimeSerializer struct {
 }
 
+// nolint
 func (JavaSqlTimeSerializer) EncObject(e *Encoder, vv POJO) error {
 
 	var (
-		idx    int
-		idx1   int
-		i      int
-		err    error
-		clsDef classInfo
+		i         int
+		idx       int
+		err       error
+		clsDef    classInfo
+		className string
+		ptrV      reflect.Value
 	)
-	v, ok := vv.(JavaSqlTime)
+
+	// ensure ptrV is pointer to know vv is type JavaSqlTime or not
+	ptrV = reflect.ValueOf(vv)
+	if reflect.TypeOf(vv).Kind() != reflect.Ptr {
+		ptrV = PackPtr(ptrV)
+	}
+	v, ok := ptrV.Interface().(JavaSqlTime)
 	if !ok {
 		return perrors.New("can not be converted into java sql time object")
 	}
-	className := v.JavaClassName()
+	className = v.JavaClassName()
 	if className == "" {
 		return perrors.New("class name empty")
 	}
-
 	tValue := reflect.ValueOf(vv)
 	// check ref
 	if n, ok := e.checkRefMap(tValue); ok {
@@ -163,44 +181,35 @@ func (JavaSqlTimeSerializer) EncObject(e *Encoder, vv POJO) error {
 			break
 		}
 	}
-
 	if idx == -1 {
-		idx1, ok = checkPOJORegistry(typeof(v))
+		idx, ok = checkPOJORegistry(typeof(vv))
 		if !ok {
-			if reflect.TypeOf(v).Implements(javaEnumType) {
-				idx1 = RegisterJavaEnum(v.(POJOEnum))
-			} else {
-				idx1 = RegisterPOJO(v)
-			}
+			idx = RegisterPOJO(v)
 		}
-		_, clsDef, err = getStructDefByIndex(idx1)
+		_, clsDef, err = getStructDefByIndex(idx)
 		if err != nil {
 			return perrors.WithStack(err)
 		}
-
-		i = len(e.classInfoList)
+		idx = len(e.classInfoList)
 		e.classInfoList = append(e.classInfoList, clsDef)
 		e.buffer = append(e.buffer, clsDef.buffer...)
-		e.buffer = e.buffer[0 : len(e.buffer)-1]
 	}
+	e.buffer = e.buffer[0 : len(e.buffer)-1]
+	e.buffer = encInt32(e.buffer, 1)
+	e.buffer = encString(e.buffer, "value")
 
-	if idx == -1 {
-		e.buffer = encInt32(e.buffer, 1)
-		e.buffer = encString(e.buffer, "value")
-
-		// write object instance
-		if byte(i) <= OBJECT_DIRECT_MAX {
-			e.buffer = encByte(e.buffer, byte(i)+BC_OBJECT_DIRECT)
-		} else {
-			e.buffer = encByte(e.buffer, BC_OBJECT)
-			e.buffer = encInt32(e.buffer, int32(idx1))
-		}
-		e.buffer = encDateInMs(e.buffer, v.time())
+	// write object instance
+	if byte(idx) <= OBJECT_DIRECT_MAX {
+		e.buffer = encByte(e.buffer, byte(idx)+BC_OBJECT_DIRECT)
+	} else {
+		e.buffer = encByte(e.buffer, BC_OBJECT)
+		e.buffer = encInt32(e.buffer, int32(idx))
 	}
-
+	e.buffer = encDateInMs(e.buffer, v.time())
 	return nil
 }
 
+// nolint
 func (JavaSqlTimeSerializer) DecObject(d *Decoder, typ reflect.Type, cls classInfo) (interface{}, error) {
 
 	if typ.Kind() != reflect.Struct {
@@ -217,7 +226,7 @@ func (JavaSqlTimeSerializer) DecObject(d *Decoder, typ reflect.Type, cls classIn
 	}
 	date, err := d.decDate(int32(tag))
 	if err != nil {
-		date = date
+		return nil, perrors.WithStack(err)
 	}
 	sqlTime := vRef.Interface()
 
