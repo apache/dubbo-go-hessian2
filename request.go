@@ -151,13 +151,13 @@ func getArgsTypeList(args []interface{}) (string, error) {
 
 type Request struct {
 	Params      interface{}
-	Attachments map[string]string
+	Attachments map[string]interface{}
 }
 
 // NewRequest create a new Request
-func NewRequest(params interface{}, atta map[string]string) *Request {
+func NewRequest(params interface{}, atta map[string]interface{}) *Request {
 	if atta == nil {
-		atta = make(map[string]string)
+		atta = make(map[string]interface{})
 	}
 	return &Request{
 		Params:      params,
@@ -327,25 +327,22 @@ func unpackRequestBody(decoder *Decoder, reqObj interface{}) error {
 	}
 	if v, ok := attachments.(map[interface{}]interface{}); ok {
 		v[DUBBO_VERSION_KEY] = dubboVersion
-		req[6] = ToMapStringString(v)
+		req[6] = ToMapStringInterface(v)
 		return nil
 	}
 
 	return perrors.Errorf("get wrong attachments: %+v", attachments)
 }
 
-func ToMapStringString(origin map[interface{}]interface{}) map[string]string {
-	dest := make(map[string]string)
+func ToMapStringInterface(origin map[interface{}]interface{}) map[string]interface{} {
+	dest := make(map[string]interface{})
 	for k, v := range origin {
 		if kv, ok := k.(string); ok {
 			if v == nil {
 				dest[kv] = ""
 				continue
 			}
-
-			if vv, ok := v.(string); ok {
-				dest[kv] = vv
-			}
+			dest[kv] = v
 		}
 	}
 	return dest
