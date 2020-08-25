@@ -33,21 +33,14 @@ import (
 func init() {
 	RegisterPOJO(&java_sql_time.Date{})
 	RegisterPOJO(&java_sql_time.Time{})
+	SetJavaSqlTimeSerialize(&java_sql_time.Date{})
+	SetJavaSqlTimeSerialize(&java_sql_time.Time{})
 }
-
-var javaSqlTimeTypeMap = make(map[string]reflect.Type, 16)
 
 // SetJavaSqlTimeSerialize register serializer for java.sql.Time & java.sql.Date
 func SetJavaSqlTimeSerialize(time java_sql_time.JavaSqlTime) {
 	name := time.JavaClassName()
-	var typ = reflect.TypeOf(time)
 	SetSerializer(name, JavaSqlTimeSerializer{})
-	javaSqlTimeTypeMap[name] = typ
-}
-
-// nolint
-func getJavaSqlTimeSerialize(name string) reflect.Type {
-	return javaSqlTimeTypeMap[name]
 }
 
 // JavaSqlTimeSerializer used to encode & decode java.sql.Time & java.sql.Date
@@ -144,9 +137,9 @@ func (JavaSqlTimeSerializer) DecObject(d *Decoder, typ reflect.Type, cls classIn
 	sqlTime := vRef.Interface()
 
 	result, ok := sqlTime.(java_sql_time.JavaSqlTime)
-	result.SetTime(date)
 	if !ok {
 		panic("result type is not sql time, please check the whether the conversion is ok")
 	}
+	result.SetTime(date)
 	return result, nil
 }
