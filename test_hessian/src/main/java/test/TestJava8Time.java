@@ -34,7 +34,7 @@ public class TestJava8Time {
     }
 
     public static LocalDateTime java8_LocalDateTime() {
-        return LocalDateTime.of(2020, 6, 6, 6, 6);
+        return LocalDateTime.of(2020, 6, 6, 6, 6, 6, 6);
     }
 
     public static LocalTime java8_LocalTime() {
@@ -71,6 +71,13 @@ public class TestJava8Time {
     }
 
     public static ZoneId java8_ZoneId() {
+        return ZoneId.of("Z");
+    }
+
+    public static ZoneOffset java8_ZoneOffset() {
+        return ZoneOffset.of("Z");
+    }
+
         return ZoneId.of("1000");
     }
 
