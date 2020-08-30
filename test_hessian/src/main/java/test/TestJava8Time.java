@@ -78,9 +78,6 @@ public class TestJava8Time {
         return ZoneOffset.of("Z");
     }
 
-        return ZoneId.of("1000");
-    }
-
     public static ZoneOffset java8_ZoneOffset() {
         return ZoneOffset.of("1000");
     }
