@@ -26,12 +26,16 @@ func TestJava8Time(t *testing.T) {
 	doTestTime(t, "java8_Year", &java8_time.Year{Year: 2020})
 	doTestTime(t, "java8_LocalDate", &java8_time.LocalDate{Year: 2020, Month: 6, Day: 6})
 	doTestTime(t, "java8_LocalTime", &java8_time.LocalTime{Hour: 6, Minute: 6})
-	doTestTime(t, "java8_LocalDateTime", &java8_time.LocalDateTime{Date: java8_time.LocalDate{Year: 2020, Month: 6, Day: 6}, Time: java8_time.LocalTime{Hour: 6, Minute: 6}})
+	doTestTime(t, "java8_LocalDateTime", &java8_time.LocalDateTime{Date: java8_time.LocalDate{Year: 2020, Month: 6, Day: 6}, Time: java8_time.LocalTime{Hour: 6, Minute: 6, Second: 6, Nano: 6}})
 	doTestTime(t, "java8_MonthDay", &java8_time.MonthDay{Month: 6, Day: 6})
 	doTestTime(t, "java8_Duration", &java8_time.Duration{Second: 0, Nano: 0})
 	doTestTime(t, "java8_Instant", &java8_time.Instant{Seconds: 100, Nanos: 0})
 	doTestTime(t, "java8_YearMonth", &java8_time.YearMonth{Year: 2020, Month: 6})
 	doTestTime(t, "java8_Period", &java8_time.Period{Years: 2020, Months: 6, Days: 6})
+	doTestTime(t, "java8_ZoneOffset", &java8_time.ZoneOffSet{Seconds: 0})
+	doTestTime(t, "java8_OffsetDateTime", &java8_time.OffsetDateTime{DateTime: java8_time.LocalDateTime{Date: java8_time.LocalDate{Year: 2020, Month: 6, Day: 6}, Time: java8_time.LocalTime{Hour: 6, Minute: 6, Second: 6, Nano: 6}}, Offset: java8_time.ZoneOffSet{Seconds: -64800}})
+	doTestTime(t, "java8_OffsetTime", &java8_time.OffsetTime{LocalTime: java8_time.LocalTime{Hour: 6, Minute: 6, Second: 6, Nano: 6}, ZoneOffset: java8_time.ZoneOffSet{Seconds: -64800}})
+	doTestTime(t, "java8_ZonedDateTime", &java8_time.ZonedDateTime{DateTime: java8_time.LocalDateTime{Date: java8_time.LocalDate{Year: 2020, Month: 6, Day: 6}, Time: java8_time.LocalTime{Hour: 6, Minute: 6, Second: 6, Nano: 6}}, Offset: java8_time.ZoneOffSet{Seconds: 0}, ZoneId: "Z"})
 }
 
 func doTestTime(t *testing.T, method string, expected interface{}) {
