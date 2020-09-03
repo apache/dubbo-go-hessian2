@@ -27,8 +27,13 @@ func init() {
 	RegisterPOJO(&java8_time.Period{Years: 2020, Months: 6, Days: 6})
 	RegisterPOJO(&java8_time.LocalDate{Year: 2020, Month: 6, Day: 6})
 	RegisterPOJO(&java8_time.LocalTime{Hour: 6, Minute: 6, Second: 0, Nano: 0})
-	RegisterPOJO(&java8_time.LocalDateTime{Date: java8_time.LocalDate{Year: 2020, Month: 6, Day: 6}, Time: java8_time.LocalTime{Hour: 6, Minute: 6}})
+	RegisterPOJO(&java8_time.LocalDateTime{Date: java8_time.LocalDate{Year: 2020, Month: 6, Day: 6}, Time: java8_time.LocalTime{Hour: 6, Minute: 6, Second: 6, Nano: 6}})
 	RegisterPOJO(&java8_time.MonthDay{Month: 6, Day: 6})
 	RegisterPOJO(&java8_time.Duration{Second: 0, Nano: 0})
 	RegisterPOJO(&java8_time.Instant{Seconds: 100, Nanos: 0})
+	RegisterPOJO(&java8_time.ZoneOffSet{Seconds: 0})
+	RegisterPOJO(&java8_time.OffsetDateTime{DateTime: java8_time.LocalDateTime{Date: java8_time.LocalDate{Year: 2020, Month: 6, Day: 6}, Time: java8_time.LocalTime{Hour: 6, Minute: 6, Second: 6, Nano: 6}}, Offset: java8_time.ZoneOffSet{Seconds: -64800}})
+	RegisterPOJO(&java8_time.OffsetTime{LocalTime: java8_time.LocalTime{Hour: 6, Minute: 6, Second: 6, Nano: 6}, ZoneOffset: java8_time.ZoneOffSet{Seconds: -64800}})
+	RegisterPOJO(&java8_time.ZonedDateTime{DateTime: java8_time.LocalDateTime{Date: java8_time.LocalDate{Year: 2020, Month: 6, Day: 6}, Time: java8_time.LocalTime{Hour: 6, Minute: 6, Second: 6, Nano: 6}}, Offset: java8_time.ZoneOffSet{Seconds: 0}, ZoneId: "Z"})
+
 }
