@@ -168,10 +168,7 @@ func TestCopySlice(t *testing.T) {
 }
 
 func TestIsSupportResponseAttachment(t *testing.T) {
-	is := isSupportResponseAttachment("2.X")
-	assert.False(t, is)
-
-	is = isSupportResponseAttachment("2.0.10")
+	is := isSupportResponseAttachment("2.0.10")
 	assert.False(t, is)
 
 	is = isSupportResponseAttachment("2.5.3")

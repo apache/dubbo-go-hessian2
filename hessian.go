@@ -21,9 +21,7 @@ import (
 	"bufio"
 	"encoding/binary"
 	"time"
-)
 
-import (
 	perrors "github.com/pkg/errors"
 )
 
@@ -218,7 +216,7 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 }
 
 // ignore body, but only read attachments
-func (h *HessianCodec) ReadAttachments() (map[string]interface{}, error) {
+func (h *HessianCodec) ReadAttachments() (map[string]string, error) {
 	if h.reader.Buffered() < h.bodyLen {
 		return nil, ErrBodyNotEnough
 	}
@@ -237,7 +235,7 @@ func (h *HessianCodec) ReadAttachments() (map[string]interface{}, error) {
 		if err = unpackRequestBody(NewDecoderWithSkip(buf[:]), rspObj); err != nil {
 			return nil, perrors.WithStack(err)
 		}
-		return rspObj[6].(map[string]interface{}), nil
+		return rspObj[6].(map[string]string), nil
 	case PackageResponse:
 		rspObj := &Response{}
 		if err = unpackResponseBody(NewDecoderWithSkip(buf[:]), rspObj); err != nil {
