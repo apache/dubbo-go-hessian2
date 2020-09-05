@@ -23,3 +23,8 @@ package hessian
 func encNull(b []byte) []byte {
 	return append(b, BC_NULL)
 }
+
+// It is the same as encNull. It is public
+func EncNull(b []byte) []byte {
+	return encNull(b)
+}
