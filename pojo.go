@@ -206,7 +206,7 @@ func RegisterPOJO(o POJO) int {
 	return structInfo.index
 }
 
-// easy for test. It is compatible with previous
+// easy for test.
 func unRegisterPOJOs(os ...POJO) []int {
 	arr := make([]int, len(os))
 	for i := range os {
@@ -216,7 +216,7 @@ func unRegisterPOJOs(os ...POJO) []int {
 	return arr
 }
 
-// UnRegisterPOJOs unregister POJO instances. It is easy for test.
+// UnRegisterPOJOs unregister POJO instances. It is easy for test and it is the same as unRegisterPOJOs.
 func UnRegisterPOJOs(os ...POJO) []int {
 	return unRegisterPOJOs(os...)
 }

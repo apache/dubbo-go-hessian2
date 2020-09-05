@@ -24,7 +24,7 @@ func encNull(b []byte) []byte {
 	return append(b, BC_NULL)
 }
 
-// It is the same as encNull. It is public
+// It is the same as encNull. It is exported.
 func EncNull(b []byte) []byte {
 	return encNull(b)
 }
