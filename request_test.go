@@ -129,7 +129,7 @@ func TestIssue192(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want map[string]interface{}
+		want map[string]string
 	}{
 		{
 			name: "not null",
@@ -140,7 +140,7 @@ func TestIssue192(t *testing.T) {
 					"":  "",
 				},
 			},
-			want: map[string]interface{}{
+			want: map[string]string{
 				"1": "",
 				"2": "3",
 				"":  "",
@@ -149,8 +149,8 @@ func TestIssue192(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := ToMapStringInterface(tt.args.origin); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ToMapStringInterface() = %v, want %v", got, tt.want)
+			if got := ToMapStringString(tt.args.origin); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ToMapStringString() = %v, want %v", got, tt.want)
 			}
 		})
 	}
