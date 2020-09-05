@@ -117,7 +117,7 @@ func (e *Encoder) encObject(v POJO) error {
 	vv = UnpackPtr(vv)
 	// check nil pointer
 	if !vv.IsValid() {
-		e.buffer = encNull(e.buffer)
+		e.buffer = EncNull(e.buffer)
 		return nil
 	}
 

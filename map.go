@@ -113,14 +113,14 @@ func (e *Encoder) encMap(m interface{}) error {
 	value = UnpackPtrValue(value)
 	// check nil map
 	if value.Kind() == reflect.Ptr && !value.Elem().IsValid() {
-		e.buffer = encNull(e.buffer)
+		e.buffer = EncNull(e.buffer)
 		return nil
 	}
 
 	keys = value.MapKeys()
 	if len(keys) == 0 {
 		// fix: set nil for empty map
-		e.buffer = encNull(e.buffer)
+		e.buffer = EncNull(e.buffer)
 		return nil
 	}
 

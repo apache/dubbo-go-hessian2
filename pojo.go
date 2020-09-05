@@ -206,19 +206,14 @@ func RegisterPOJO(o POJO) int {
 	return structInfo.index
 }
 
-// easy for test.
-func unRegisterPOJOs(os ...POJO) []int {
+// UnRegisterPOJOs unregister POJO instances. It is easy for test.
+func UnRegisterPOJOs(os ...POJO) []int {
 	arr := make([]int, len(os))
 	for i := range os {
 		arr[i] = unRegisterPOJO(os[i])
 	}
 
 	return arr
-}
-
-// UnRegisterPOJOs unregister POJO instances. It is easy for test and it is the same as unRegisterPOJOs.
-func UnRegisterPOJOs(os ...POJO) []int {
-	return unRegisterPOJOs(os...)
 }
 
 func unRegisterPOJO(o POJO) int {

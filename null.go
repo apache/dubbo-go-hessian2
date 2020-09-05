@@ -20,11 +20,6 @@ package hessian
 /////////////////////////////////////////
 // Null
 /////////////////////////////////////////
-func encNull(b []byte) []byte {
-	return append(b, BC_NULL)
-}
-
-// It is the same as encNull. It is exported.
 func EncNull(b []byte) []byte {
-	return encNull(b)
+	return append(b, BC_NULL)
 }
