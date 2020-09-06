@@ -24,11 +24,20 @@
 package hessian
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
 	"reflect"
 	"testing"
+)
+
+import (
+	"github.com/stretchr/testify/assert"
+)
+
+import (
+	"github.com/apache/dubbo-go-hessian2/java_exception"
 )
 
 const (
@@ -109,7 +118,15 @@ func testDecodeJavaData(t *testing.T, method, className string, skip bool, expec
 	if ok {
 		r = tmp.value.Interface()
 	}
-	if !reflect.DeepEqual(r, expected) {
+	trow, o1 := r.(java_exception.Throwabler)
+	expe, o2 := expected.(java_exception.Throwabler)
+	if o1 && o2 {
+		log.Println(reflect.TypeOf(trow), reflect.TypeOf(trow).Elem().Name())
+		if trow.Error() == expe.Error() && reflect.TypeOf(trow).Elem().Name() == reflect.TypeOf(expe).Elem().Name() {
+			return
+		}
+		t.Errorf("%s: got %v, wanted %v", method, r, expected)
+	} else if !reflect.DeepEqual(r, expected) {
 		t.Errorf("%s: got %v, wanted %v", method, r, expected)
 	}
 }
@@ -126,4 +143,50 @@ func testDecodeFrameworkFunc(t *testing.T, method string, expected func(interfac
 		r = tmp.value.Interface()
 	}
 	expected(r)
+}
+
+func TestUserDefindeException(t *testing.T) {
+	expect := &UnknownException{
+		DetailMessage: "throw UserDefindException",
+	}
+	testDecodeFramework(t, "throw_UserDefindException", expect)
+}
+
+type Circular214 struct {
+	Num      int
+	Previous *Circular214
+	Next     *Circular214
+	Bytes    []byte
+}
+
+func (Circular214) JavaClassName() string {
+	return "com.company.Circular"
+}
+
+func (c *Circular214) String() string {
+	return fmt.Sprintf("Addr:%p, Num: %d, Previous: %p, Next: %p, Bytes: %s", c, c.Num, c.Previous, c.Next, c.Bytes)
+}
+
+func TestIssue214(t *testing.T) {
+	c := &Circular214{}
+	c.Num = 1234
+	c.Previous = c
+	c.Next = c
+	c.Bytes = []byte(`{"a":"b"}`)
+	e := NewEncoder()
+	err := e.Encode(c)
+	if err != nil {
+		assert.FailNow(t, fmt.Sprintf("%v", err))
+		return
+	}
+
+	bytes := e.Buffer()
+	decoder := NewDecoder(bytes)
+	decode, err := decoder.Decode()
+	if err != nil {
+		assert.FailNow(t, fmt.Sprintf("%v", err))
+		return
+	}
+	t.Log(decode)
+	assert.True(t, reflect.DeepEqual(c, decode))
 }
