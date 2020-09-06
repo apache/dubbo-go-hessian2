@@ -20,9 +20,7 @@ package hessian
 import (
 	"io"
 	"reflect"
-)
 
-import (
 	perrors "github.com/pkg/errors"
 )
 
@@ -268,9 +266,13 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 				if !ok {
 					return nil, perrors.Errorf("the type of map key must be string, but get %v", k)
 				}
-				fieldValue = instValue.FieldByName(fieldName)
-				if fieldValue.IsValid() {
-					fieldValue.Set(EnsureRawValue(v))
+				if instValue.Elem().Kind() == reflect.Map {
+					instValue.Elem().SetMapIndex(reflect.ValueOf(k), EnsureRawValue(v))
+				} else {
+					fieldValue = instValue.FieldByName(fieldName)
+					if fieldValue.IsValid() {
+						fieldValue.Set(EnsureRawValue(v))
+					}
 				}
 			}
 			_, err = d.readByte()
@@ -280,6 +282,9 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 			return inst, nil
 		} else {
 			m = make(map[interface{}]interface{})
+			classIndex := RegisterPOJOMapping(t, m)
+			d.appendClsDef(pojoRegistry.classInfoList[classIndex])
+
 			d.appendRefs(m)
 			for d.peekByte() != BC_END {
 				k, err = d.Decode()

@@ -18,8 +18,12 @@
 package test;
 
 import com.alibaba.com.caucho.hessian.io.Hessian2Output;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.caucho.hessian.test.A0;
 import com.caucho.hessian.test.A1;
+import test.model.DateDemo;
+
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -27,9 +31,8 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-
-import test.model.DateDemo;
 
 
 public class TestCustomReply {
@@ -37,7 +40,7 @@ public class TestCustomReply {
     private Hessian2Output output;
     private HashMap<Class<?>, String> typeMap;
 
-    TestCustomReply(OutputStream os) {
+    public TestCustomReply(OutputStream os) {
         output = new Hessian2Output(os);
 
         typeMap = new HashMap<>();
@@ -355,32 +358,32 @@ public class TestCustomReply {
     }
 
     public void customReplyTypedFixedList_BigInteger() throws Exception {
-        BigInteger[] integers = new BigInteger[] { 
-            new BigInteger("1234"), 
-            new BigInteger("12347890"), 
-            new BigInteger("123478901234"), 
-            new BigInteger("1234789012345678"), 
-            new BigInteger("123478901234567890"), 
-            new BigInteger("1234789012345678901234"), 
-            new BigInteger("12347890123456789012345678"), 
-            new BigInteger("123478901234567890123456781234"), 
-            new BigInteger("1234789012345678901234567812345678"), 
-            new BigInteger("12347890123456789012345678123456781234"), 
-            new BigInteger("-12347890123456789012345678123456781234"), 
-            new BigInteger("0"), 
+        BigInteger[] integers = new BigInteger[]{
+                new BigInteger("1234"),
+                new BigInteger("12347890"),
+                new BigInteger("123478901234"),
+                new BigInteger("1234789012345678"),
+                new BigInteger("123478901234567890"),
+                new BigInteger("1234789012345678901234"),
+                new BigInteger("12347890123456789012345678"),
+                new BigInteger("123478901234567890123456781234"),
+                new BigInteger("1234789012345678901234567812345678"),
+                new BigInteger("12347890123456789012345678123456781234"),
+                new BigInteger("-12347890123456789012345678123456781234"),
+                new BigInteger("0"),
         };
         output.writeObject(integers);
         output.flush();
     }
 
     public void customReplyTypedFixedList_CustomObject() throws Exception {
-        Object[] objects = new Object[] {
-            new BigInteger("1234"),
-            new BigInteger("-12347890"),
-            new BigInteger("0"),
-            new BigDecimal("123.4"),
-            new BigDecimal("-123.45"),
-            new BigDecimal("0"),
+        Object[] objects = new Object[]{
+                new BigInteger("1234"),
+                new BigInteger("-12347890"),
+                new BigInteger("0"),
+                new BigDecimal("123.4"),
+                new BigDecimal("-123.45"),
+                new BigDecimal("0"),
         };
         output.writeObject(objects);
         output.flush();
@@ -471,6 +474,30 @@ public class TestCustomReply {
         set.add(new BigInteger("1234"));
         set.add(new BigDecimal("123.4"));
         output.writeObject(set);
+        output.flush();
+    }
+
+    public void customReplyMap() throws Exception {
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("a", 1);
+        map.put("b", 2);
+        output.writeObject(map);
+        output.flush();
+    }
+
+    public void customReplyMapInMap() throws Exception {
+        Map<String, Object> map1 = new HashMap<String, Object>();
+        map1.put("a", 1);
+        Map<String, Object> map2 = new HashMap<String, Object>();
+        map2.put("b", 2);
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("obj1", map1);
+        map.put("obj2", map2);
+
+        JSONObject json = JSON.parseObject(JSON.toJSONString(map));
+
+        output.writeObject(json);
         output.flush();
     }
 }
