@@ -485,7 +485,7 @@ public class TestCustomReply {
         output.flush();
     }
 
-    public void customReplyMapInMap() throws Exception {
+    public Map<String, Object> mapInMap() throws Exception {
         Map<String, Object> map1 = new HashMap<String, Object>();
         map1.put("a", 1);
         Map<String, Object> map2 = new HashMap<String, Object>();
@@ -494,9 +494,16 @@ public class TestCustomReply {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("obj1", map1);
         map.put("obj2", map2);
+        return map;
+    }
 
-        JSONObject json = JSON.parseObject(JSON.toJSONString(map));
+    public void customReplyMapInMap() throws Exception {
+        output.writeObject(mapInMap());
+        output.flush();
+    }
 
+    public void customReplyMapInMapJsonObject() throws Exception {
+        JSONObject json = JSON.parseObject(JSON.toJSONString(mapInMap()));
         output.writeObject(json);
         output.flush();
     }

@@ -99,8 +99,11 @@ func TestMapEncode(t *testing.T) {
 
 func TestCustomMap(t *testing.T) {
 	testDecodeFramework(t, "customReplyMap", map[interface{}]interface{}{"a": int32(1), "b": int32(2)})
-	testDecodeFramework(t, "customReplyMapInMap", map[interface{}]interface{}{
+
+	mapInMap := map[interface{}]interface{}{
 		"obj1": map[interface{}]interface{}{"a": int32(1)},
 		"obj2": map[interface{}]interface{}{"b": int32(2)},
-	})
+	}
+	testDecodeFramework(t, "customReplyMapInMap", mapInMap)
+	testDecodeFramework(t, "customReplyMapInMapJsonObject", mapInMap)
 }
