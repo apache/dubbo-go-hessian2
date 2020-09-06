@@ -140,7 +140,7 @@ func packResponse(header DubboHeader, ret interface{}) ([]byte, error) {
 	}
 
 	byteArray = encoder.Buffer()
-	byteArray = encNull(byteArray) // if not, "java client" will throw exception  "unexpected end of file"
+	byteArray = EncNull(byteArray) // if not, "java client" will throw exception  "unexpected end of file"
 	pkgLen := len(byteArray)
 	if pkgLen > int(DEFAULT_LEN) { // 8M
 		return nil, perrors.Errorf("Data length %d too large, max payload %d", pkgLen, DEFAULT_LEN)
