@@ -388,6 +388,10 @@ func createInstance(goName string) interface{} {
 		return nil
 	}
 
+	if s.typ.Kind() == reflect.Map {
+		return reflect.MakeMap(s.typ).Interface()
+	}
+
 	return reflect.New(s.typ).Interface()
 }
 

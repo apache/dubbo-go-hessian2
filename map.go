@@ -266,8 +266,8 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 				if !ok {
 					return nil, perrors.Errorf("the type of map key must be string, but get %v", k)
 				}
-				if instValue.Elem().Kind() == reflect.Map {
-					instValue.Elem().SetMapIndex(reflect.ValueOf(k), EnsureRawValue(v))
+				if instValue.Kind() == reflect.Map {
+					instValue.SetMapIndex(reflect.ValueOf(k), EnsureRawValue(v))
 				} else {
 					fieldValue = instValue.FieldByName(fieldName)
 					if fieldValue.IsValid() {
