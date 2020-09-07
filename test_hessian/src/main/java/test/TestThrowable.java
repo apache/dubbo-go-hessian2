@@ -409,4 +409,8 @@ public class TestThrowable {
     return new AnnotationTypeMismatchException(Override.class.getEnclosingMethod(), "AnnotationTypeMismatchException");
   }
 
+  public static Object throw_UserDefindException() {
+      return new UserDefindException("throw UserDefindException");
+  }
+
 }
