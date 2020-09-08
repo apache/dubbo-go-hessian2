@@ -22,7 +22,7 @@ import java.time.*;
 public class TestJava8Time {
 
     public static Duration java8_Duration() {
-        return Duration.ZERO;
+        return Duration.ofSeconds(30, 10);
     }
 
     public static Instant java8_Instant() {
@@ -30,31 +30,31 @@ public class TestJava8Time {
     }
 
     public static LocalDate java8_LocalDate() {
-        return LocalDate.of(2020, 6, 6);
+        return LocalDate.of(2020, 6, 16);
     }
 
     public static LocalDateTime java8_LocalDateTime() {
-        return LocalDateTime.of(2020, 6, 6, 6, 6, 6, 6);
+        return LocalDateTime.of(2020, 6, 16, 6, 5, 4, 3);
     }
 
     public static LocalTime java8_LocalTime() {
-        return LocalTime.of(6, 6);
+        return LocalTime.of(6, 16);
     }
 
     public static MonthDay java8_MonthDay() {
-        return MonthDay.of(6, 6);
+        return MonthDay.of(6, 16);
     }
 
     public static OffsetDateTime java8_OffsetDateTime() {
-        return OffsetDateTime.of(2020, 6, 6, 6, 6, 6, 6, ZoneOffset.MIN);
+        return OffsetDateTime.of(2020, 6, 16, 6, 5, 4, 3, java8_ZoneOffset());
     }
 
     public static OffsetTime java8_OffsetTime() {
-        return OffsetTime.of(6, 6, 6, 6, ZoneOffset.MIN);
+        return OffsetTime.of(6, 5, 4, 3, java8_ZoneOffset());
     }
 
     public static Period java8_Period() {
-        return Period.of(2020, 6, 6);
+        return Period.of(2020, 6, 16);
     }
 
     public static Year java8_Year() {
@@ -75,7 +75,7 @@ public class TestJava8Time {
     }
 
     public static ZoneOffset java8_ZoneOffset() {
-        return ZoneOffset.of("Z");
+        return ZoneOffset.ofHours(2);
     }
 
 }
