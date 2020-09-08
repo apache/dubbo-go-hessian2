@@ -26,7 +26,7 @@ public class TestJava8Time {
     }
 
     public static Instant java8_Instant() {
-        return Instant.ofEpochMilli(100000L);
+        return Instant.ofEpochSecond(100, 10);
     }
 
     public static LocalDate java8_LocalDate() {

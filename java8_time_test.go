@@ -29,7 +29,7 @@ func TestJava8Time(t *testing.T) {
 	doTestTime(t, "java8_LocalDateTime", &java8_time.LocalDateTime{Date: java8_time.LocalDate{Year: 2020, Month: 6, Day: 16}, Time: java8_time.LocalTime{Hour: 6, Minute: 5, Second: 4, Nano: 3}})
 	doTestTime(t, "java8_MonthDay", &java8_time.MonthDay{Month: 6, Day: 16})
 	doTestTime(t, "java8_Duration", &java8_time.Duration{Seconds: 30, Nanos: 10})
-	doTestTime(t, "java8_Instant", &java8_time.Instant{Seconds: 100, Nanos: 0})
+	doTestTime(t, "java8_Instant", &java8_time.Instant{Seconds: 100, Nanos: 10})
 	doTestTime(t, "java8_YearMonth", &java8_time.YearMonth{Year: 2020, Month: 6})
 	doTestTime(t, "java8_Period", &java8_time.Period{Years: 2020, Months: 6, Days: 16})
 	doTestTime(t, "java8_ZoneOffset", &java8_time.ZoneOffSet{Seconds: 7200})
