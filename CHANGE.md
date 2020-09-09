@@ -16,6 +16,7 @@
 - fix eunm encode error in request. [#203](https://github.com/apache/dubbo-go-hessian2/pull/203)
 - fix []byte field decoding issue. [#216](https://github.com/apache/dubbo-go-hessian2/pull/216)
 - fix decoding error for map in map. [#229](https://github.com/apache/dubbo-go-hessian2/pull/229)
+- fix fields name mismatch in Duration class. [#234](https://github.com/apache/dubbo-go-hessian2/pull/234)
 
 ## v1.6.0
 
