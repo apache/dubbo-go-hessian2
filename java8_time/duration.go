@@ -18,8 +18,8 @@
 package java8_time
 
 type Duration struct {
-	Second int64 `hessian:"second"`
-	Nano   int32 `hessian:"nano"`
+	Seconds int64 `hessian:"seconds"`
+	Nanos   int32 `hessian:"nanos"`
 }
 
 func (Duration) JavaClassName() string {
