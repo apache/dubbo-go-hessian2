@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package testfuncs
 
 import (
@@ -21,7 +22,7 @@ import (
 	"github.com/apache/dubbo-go-hessian2/java_exception"
 )
 
-// test java Exception
+// JavaException is test java Exception
 func JavaException() []byte {
 	e := hessian.NewEncoder()
 	exception := java_exception.NewException("java_exception")

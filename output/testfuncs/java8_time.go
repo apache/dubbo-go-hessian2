@@ -22,7 +22,7 @@ import (
 	"github.com/apache/dubbo-go-hessian2/java8_time"
 )
 
-// test java8 java.time.Year
+// Java8TimeYear is test java8 java.time.Year
 func Java8TimeYear() []byte {
 	e := hessian.NewEncoder()
 	year := java8_time.Year{Year: 2020}
@@ -30,7 +30,7 @@ func Java8TimeYear() []byte {
 	return e.Buffer()
 }
 
-// test java8 java.time.LocalDate
+// Java8LocalDate is test java8 java.time.LocalDate
 func Java8LocalDate() []byte {
 	e := hessian.NewEncoder()
 	date := java8_time.LocalDate{Year: 2020, Month: 9, Day: 12}
