@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.os }}-Go${{ matrix.go_version }}-JDK${{ matrix.jdk_version }}
+    name: ${{ matrix.os }} - Go${{ matrix.go_version }} - JDK${{ matrix.jdk_version }}
 
     runs-on: ${{ matrix.os }}
 
@@ -96,10 +96,10 @@ jobs:
           
     - name: DingTalk Message Notify only PR
       uses: zcong1993/actions-ding@v3.0.1
-      # TODO: github.repository == 'apache/dubbo-go-hessian2'
       if: | 
         always() && 
-        github.event_name == 'pull_request'
+        github.event_name == 'pull_request' &&
+        github.repository == 'apache/dubbo-go-hessian2'        
       with:
         dingToken: ${{ env.DING_TOKEN }}
         secret: ${{ env.DING_SIGN }}
