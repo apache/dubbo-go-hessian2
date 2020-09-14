@@ -37,13 +37,10 @@ public class GoJavaExceptionTest {
     public void testException() {
         Exception exception = new Exception("java_exception");
         Object javaException = GoTestUtil.readGoObject("JavaException");
+        // assertEquals don't compare Exception object
         if (javaException instanceof Exception) {
             Assert.assertEquals(exception.getMessage(), ((Exception) javaException).getMessage());
         }
-        // assertEquals don't compare Exception object
-        // Exception exception2 = new Exception("java_exception");
-        // Assert.assertEquals(exception, exception2);
-        // Assert.assertEquals(exception, GoTestUtil.readGoObject("JavaException"));
     }
 
 }
