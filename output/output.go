@@ -37,6 +37,9 @@ var (
 // add all output func here
 func init() {
 	funcMap["HelloWorldString"] = testfuncs.HelloWorldString
+	funcMap["Java8TimeYear"] = testfuncs.Java8TimeYear
+	funcMap["Java8LocalDate"] = testfuncs.Java8LocalDate
+	funcMap["JavaException"] = testfuncs.JavaException
 }
 
 func main() {
