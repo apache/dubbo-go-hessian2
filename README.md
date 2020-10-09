@@ -13,7 +13,7 @@
 
 It's a golang hessian library used by [Apache/dubbo-go](https://github.com/apache/dubbo-go).
 
-There is a big performance improvement, and some bugs fix for v1.6.0, 
+There is a big performance improvement, and some bugs fix for v1.6.0,
 thanks to [micln](https://github.com/micln), [pantianying](https://github.com/pantianying), [zonghaishang](https://github.com/zonghaishang),
  [willson-chen](https://github.com/willson-chen), [champly](https://github.com/champly).
 
@@ -40,10 +40,10 @@ Cross languages message definition should be careful, the following situations s
 
 So we can maintain a cross language type mapping:
 
-| hessian type |  java type  |  golang type | 
-| --- | --- | --- | 
-| **null** | null | nil | 
-| **binary** | byte[] | []byte | 
+| hessian type |  java type  |  golang type |
+| --- | --- | --- |
+| **null** | null | nil |
+| **binary** | byte[] | []byte |
 | **boolean** | boolean | bool |
 | **date** | java.util.Date | time.Time |
 | **double** | double | float64 |
@@ -53,9 +53,12 @@ So we can maintain a cross language type mapping:
 | **list** | java.util.List | slice |
 | **map** | java.util.Map | map |
 | **object** | custom define object | custom define struct|
-| **OTHER COMMON USING TYPE** | | | 
+| **OTHER COMMON USING TYPE** | | |
 | **big decimal** | java.math.BigDecimal | github.com/dubbogo/gost/math/big/Decimal |
 | **big integer** | java.math.BigInteger | github.com/dubbogo/gost/math/big/Integer |
+| **date** | java.sql.Date | github.com/apache/dubbo-go-hessian2/java_sql_time/Date |
+| **date** | java.sql.Time | github.com/apache/dubbo-go-hessian2/java_sql_time/Time |
+| **date** | all java8 sdk time | github.com/apache/dubbo-go-hessian2/java8_time |
 
 ## reference
 
@@ -253,13 +256,13 @@ func (j *JavaHashSet) Set(v []interface{}) {
 	j.value = v
 }
 
-//should be the same as the class name of the Java collection 
+//should be the same as the class name of the Java collection
 func (j *JavaHashSet) JavaClassName() string {
 	return "java.util.HashSet"
 }
 
 func init() {
-        //register your struct so that hessian can recognized it when encoding and decoding 
+        //register your struct so that hessian can recognized it when encoding and decoding
 	SetCollectionSerialize(&JavaHashSet{})
 }
 ```
@@ -272,7 +275,7 @@ func init() {
 
 + **Avoid fields with the same name in multiple parent struct**
 
-The following struct `C` have inherited field `Name`(default from the first parent), 
+The following struct `C` have inherited field `Name`(default from the first parent),
 but it's confused in logic.
 
 ```go
@@ -286,9 +289,9 @@ type C struct {
 
 + **Avoid inheritance for a pointer of struct**
 
-The following definition is valid for golang syntax, 
-but the parent will be nil when create a new Dog, like `dog := Dog{}`, 
-which will not happen in java inheritance, 
+The following definition is valid for golang syntax,
+but the parent will be nil when create a new Dog, like `dog := Dog{}`,
+which will not happen in java inheritance,
 and is also not supported by `go-hessian2`.
 
 ```go
