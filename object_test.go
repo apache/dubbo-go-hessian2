@@ -768,3 +768,46 @@ func TestIssue183_DecodeExcessStructField(t *testing.T) {
 	assert.NoError(t, err)
 	t.Logf("%T %+v", got, got)
 }
+
+type GenericResponse struct {
+	Code int
+	Data interface{}
+}
+
+func (GenericResponse) JavaClassName() string {
+	return `test.generic.Response`
+}
+
+type BusinessData struct {
+	Name  string
+	Count int
+}
+
+func (BusinessData) JavaClassName() string {
+	return `test.generic.BusinessData`
+}
+
+func TestCustomReplyGenericResponseLong(t *testing.T) {
+	res := &GenericResponse{
+		Code: 200,
+		Data: int64(123),
+	}
+	RegisterPOJO(res)
+
+	testDecodeFramework(t, "customReplyGenericResponseLong", res)
+}
+
+func TestCustomReplyGenericResponseBusinessData(t *testing.T) {
+	data := BusinessData{
+		Name:  "apple",
+		Count: 5,
+	}
+	res := &GenericResponse{
+		Code: 201,
+		Data: data,
+	}
+	RegisterPOJO(data)
+	RegisterPOJO(res)
+
+	testDecodeFramework(t, "customReplyGenericResponseBusinessData", res)
+}
