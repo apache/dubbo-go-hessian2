@@ -498,7 +498,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 			if err != nil {
 				return nil, err
 			}
-		case reflect.Struct, reflect.Interface:
+		case reflect.Struct:
 			var (
 				err error
 				s   interface{}
@@ -520,7 +520,15 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 					SetValue(fldRawValue, EnsurePackValue(s))
 				}
 			}
-
+		case reflect.Interface:
+			s, err := d.DecodeValue()
+			if err != nil {
+				return nil, perrors.WithStack(err)
+			}
+			if s != nil {
+				// set value which accepting pointers
+				SetValue(fldRawValue, EnsurePackValue(s))
+			}
 		default:
 			return nil, perrors.Errorf("unknown struct member type: %v %v", kind, typ.Name()+"."+fieldStruct.Name)
 		}
