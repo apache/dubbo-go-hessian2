@@ -79,8 +79,7 @@ func getJavaReply(method, className string) []byte {
 	cmd := exec.Command("java", cmdArgs...)
 	out, err := cmd.Output()
 	if err != nil {
-		log.Println(cmd.Args)
-		log.Fatal(err)
+		log.Fatal(cmd.Args, err)
 	}
 	return out
 }
