@@ -18,6 +18,7 @@
 package hessian
 
 import (
+	"fmt"
 	"io"
 	"reflect"
 	"strings"
@@ -149,6 +150,104 @@ func (e *Encoder) encObject(v POJO) error {
 		e.buffer = append(e.buffer, clsDef.buffer...)
 	}
 
+	// write object instance
+	if byte(idx) <= OBJECT_DIRECT_MAX {
+		e.buffer = encByte(e.buffer, byte(idx)+BC_OBJECT_DIRECT)
+	} else {
+		e.buffer = encByte(e.buffer, BC_OBJECT)
+		e.buffer = encInt32(e.buffer, int32(idx))
+	}
+
+	if reflect.TypeOf(v).Implements(javaEnumType) {
+		e.buffer = encString(e.buffer, v.(POJOEnum).String())
+		return nil
+	}
+
+	structs := []reflect.Value{vv}
+	for len(structs) > 0 {
+		vv := structs[0]
+		vvt := vv.Type()
+		num = vv.NumField()
+		for i = 0; i < num; i++ {
+			tf := vvt.Field(i)
+			// skip unexported anonymous field
+			if tf.PkgPath != "" {
+				continue
+			}
+
+			// skip ignored field
+			if tag, _ := tf.Tag.Lookup(tagIdentifier); tag == `-` {
+				continue
+			}
+
+			field := vv.Field(i)
+			if tf.Anonymous && field.Kind() == reflect.Struct {
+				structs = append(structs, field)
+				continue
+			}
+
+			if err = e.Encode(field.Interface()); err != nil {
+				fieldName := field.Type().String()
+				return perrors.Wrapf(err, "failed to encode field: %s, %+v", fieldName, field.Interface())
+			}
+		}
+
+		structs = structs[1:]
+	}
+
+	return nil
+}
+
+func (e *Encoder) encNotPOJOObject(v interface{}, javaClassName string) error {
+	var (
+		ok     bool
+		i      int
+		idx    int
+		num    int
+		err    error
+		clsDef classInfo
+	)
+	vv := reflect.ValueOf(v)
+	// check ref
+	if n, ok := e.checkRefMap(vv); ok {
+		e.buffer = encRef(e.buffer, n)
+		return nil
+	}
+
+	vv = UnpackPtr(vv)
+	// check nil pointer
+	if !vv.IsValid() {
+		e.buffer = EncNull(e.buffer)
+		return nil
+	}
+
+	// write object definition
+	idx = -1
+	for i = range e.classInfoList {
+		if javaClassName == e.classInfoList[i].javaName {
+			idx = i
+			break
+		}
+	}
+	if idx == -1 {
+		idx, ok = checkPOJORegistry(typeof(v))
+		if !ok {
+			if reflect.TypeOf(v).Implements(javaEnumType) {
+				idx = RegisterJavaEnum(v.(POJOEnum))
+			} else {
+				fmt.Printf("RegisterPOJOMapping javaClassName = %s, val = %+v ", javaClassName, v)
+				idx = RegisterPOJOMapping(javaClassName, v)
+			}
+		}
+		_, clsDef, err = getStructDefByIndex(idx)
+		if err != nil {
+			return perrors.WithStack(err)
+		}
+
+		idx = len(e.classInfoList)
+		e.classInfoList = append(e.classInfoList, clsDef)
+		e.buffer = append(e.buffer, clsDef.buffer...)
+	}
 	// write object instance
 	if byte(idx) <= OBJECT_DIRECT_MAX {
 		e.buffer = encByte(e.buffer, byte(idx)+BC_OBJECT_DIRECT)
