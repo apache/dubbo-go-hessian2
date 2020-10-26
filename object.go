@@ -18,7 +18,6 @@
 package hessian
 
 import (
-	"fmt"
 	"io"
 	"reflect"
 	"strings"
