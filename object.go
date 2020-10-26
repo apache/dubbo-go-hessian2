@@ -235,7 +235,6 @@ func (e *Encoder) encNotPOJOObject(v interface{}, javaClassName string) error {
 			if reflect.TypeOf(v).Implements(javaEnumType) {
 				idx = RegisterJavaEnum(v.(POJOEnum))
 			} else {
-				fmt.Printf("RegisterPOJOMapping javaClassName = %s, val = %+v ", javaClassName, v)
 				idx = RegisterPOJOMapping(javaClassName, v)
 			}
 		}
