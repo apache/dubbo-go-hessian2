@@ -48,7 +48,7 @@ func (Location) JavaClassName() string {
 	return "hessian.demo.Location"
 }
 
-func TestLoopDecode(t *testing.T) {
+func TestLoopEncodeDecode(t *testing.T) {
 	u := &User{
 		Name: "wongoo",
 		Age:  18,
