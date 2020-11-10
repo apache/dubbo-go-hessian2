@@ -79,6 +79,14 @@ func NewCheapDecoderWithSkip(b []byte) *Decoder {
 	return &Decoder{reader: bufio.NewReader(bytes.NewReader(b)), isSkip: true}
 }
 
+// Clean clean the Decoder (room) for a new object decoding.
+// Notice it won't reset reader buffer and will continue to read data from it.
+func (d *Decoder) Clean() {
+	d.typeRefs = &TypeRefs{records: map[string]bool{}}
+	d.refs = nil
+	d.classInfoList = nil
+}
+
 /////////////////////////////////////////
 // utilities
 /////////////////////////////////////////
@@ -86,15 +94,7 @@ func NewCheapDecoderWithSkip(b []byte) *Decoder {
 func (d *Decoder) Reset(b []byte) *Decoder {
 	// reuse reader buf, avoid allocate
 	d.reader.Reset(bytes.NewReader(b))
-	d.typeRefs = &TypeRefs{records: map[string]bool{}}
-
-	if d.refs != nil {
-		d.refs = nil
-	}
-	if d.classInfoList != nil {
-		d.classInfoList = nil
-	}
-
+	d.Clean()
 	return d
 }
 

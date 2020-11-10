@@ -48,6 +48,13 @@ func NewEncoder() *Encoder {
 	}
 }
 
+// Clean clean the Encoder (room) for a new object encoding
+func (e *Encoder) Clean() {
+	e.classInfoList = nil
+	e.buffer = e.buffer[:0]
+	e.refMap = make(map[unsafe.Pointer]_refElem, 7)
+}
+
 // Buffer returns byte buffer
 func (e *Encoder) Buffer() []byte {
 	return e.buffer[:]
