@@ -1,4 +1,4 @@
-module github.com/LaurenceLiZhixin/dubbo-go-hessian2
+module github.com/apache/dubbo-go-hessian2
 
 require (
 	github.com/dubbogo/gost v1.9.0
