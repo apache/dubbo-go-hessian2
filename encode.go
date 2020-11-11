@@ -52,7 +52,7 @@ func NewEncoder() *Encoder {
 func (e *Encoder) Clean() {
 	var buffer = make([]byte, 64)
 	e.classInfoList = nil
-	e.buffer =  buffer[:0]
+	e.buffer = buffer[:0]
 	e.refMap = make(map[unsafe.Pointer]_refElem, 7)
 }
 
