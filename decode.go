@@ -109,9 +109,14 @@ func (d *Decoder) len() int {
 	return d.reader.Buffered()
 }
 
-// read a byte from Decoder, advance the ptr
-func (d *Decoder) readByte() (byte, error) {
+// ReadByte read a byte from Decoder, advance the ptr
+func (d *Decoder) ReadByte() (byte, error) {
 	return d.reader.ReadByte()
+}
+
+// Discard skips the next n bytes
+func (d *Decoder) Discard(n int) (int, error) {
+	return d.reader.Discard(n)
 }
 
 // unread a byte
@@ -198,7 +203,7 @@ func (d *Decoder) DecodeValue() (interface{}, error) {
 		tag byte
 	)
 
-	tag, err = d.readByte()
+	tag, err = d.ReadByte()
 	if err == io.EOF {
 		return nil, err
 	}

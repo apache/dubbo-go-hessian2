@@ -63,63 +63,74 @@ func TestLoopEncodeDecode(t *testing.T) {
 	e := hessian.NewEncoder()
 
 	// -------- encode 1
-	if err := e.Encode(u); err != nil {
-		t.Fatal(err)
-	}
-	bytes = append(bytes, e.Buffer()...)
+	bytes = append(bytes, encodeWithFlagAndLength(e, 'D', u)...)
 
 	// -------- encode 2
-	e.Clean()
-	if err := e.Encode(12345); err != nil {
-		t.Fatal(err)
-	}
-	bytes = append(bytes, e.Buffer()...)
+	bytes = append(bytes, encodeWithFlagAndLength(e, 'S', 12345)...)
 
 	// -------- encode 3
-	e.Clean()
-	if err := e.Encode(loc); err != nil {
-		t.Fatal(err)
-	}
-	bytes = append(bytes, e.Buffer()...)
+	bytes = append(bytes, encodeWithFlagAndLength(e, 'D', loc)...)
 
 	// -------- encode 4
-	e.Clean()
-	if err := e.Encode("hello"); err != nil {
-		t.Fatal(err)
-	}
-	bytes = append(bytes, e.Buffer()...)
+	bytes = append(bytes, encodeWithFlagAndLength(e, 'D', "hello")...)
 
 	// demo a decoder to decode buffer from client
 	d := hessian.NewDecoder(bytes)
 
 	// -------- decode 1
-	res, err := d.Decode()
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.True(t, reflect.DeepEqual(u, res))
+	decodeFlagAndLengthAndData(t, d, u)
 
 	// -------- decode 2
-	d.Clean()
-	res, err = d.Decode()
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, int64(12345), res)
+	decodeFlagAndLengthAndData(t, d, 12345)
 
 	// -------- decode 3
-	d.Clean()
-	res, err = d.Decode()
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.True(t, reflect.DeepEqual(loc, res))
+	decodeFlagAndLengthAndData(t, d, loc)
 
 	// -------- decode 4
+	decodeFlagAndLengthAndData(t, d, "hello")
+}
+
+// encode format: [flag][length][binary data]
+func encodeWithFlagAndLength(e *hessian.Encoder, flag byte, obj interface{}) []byte {
+	var bytes []byte
+	bytes = append(bytes, flag)
+
+	e.Clean()
+	_ = e.Encode(obj)
+	dataBytes := e.Buffer()
+
+	length := len(dataBytes)
+
+	e.Clean()
+	_ = e.Encode(length)
+	lengthBytes := e.Buffer()
+
+	bytes = append(bytes, lengthBytes...)
+	bytes = append(bytes, dataBytes...)
+
+	return bytes
+}
+
+func decodeFlagAndLengthAndData(t *testing.T, d *hessian.Decoder, expect interface{}) {
+	// decode flag
 	d.Clean()
-	res, err = d.Decode()
-	if err != nil {
-		t.Fatal(err)
+	flag, _ := d.ReadByte()
+
+	// decode length
+	d.Clean()
+	lengthObj, _ := d.Decode()
+	length := lengthObj.(int64)
+
+	// skip data when flag='S'
+	if flag == 'S' {
+		_, _ = d.Discard(int(length))
+		return
 	}
-	assert.Equal(t, "hello", res)
+
+	// decode data
+	d.Clean()
+	res, _ := d.Decode()
+
+	// check
+	assert.True(t, reflect.DeepEqual(expect, res))
 }

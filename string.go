@@ -225,7 +225,7 @@ func (d *Decoder) getStringLength(tag byte) (int, error) {
 		return int(tag - 0x00), nil
 
 	case tag >= 0x30 && tag <= 0x33:
-		b, err := d.readByte()
+		b, err := d.ReadByte()
 		if err != nil {
 			return -1, perrors.WithStack(err)
 		}
@@ -234,12 +234,12 @@ func (d *Decoder) getStringLength(tag byte) (int, error) {
 		return length, nil
 
 	case tag == BC_STRING_CHUNK || tag == BC_STRING:
-		b0, err := d.readByte()
+		b0, err := d.ReadByte()
 		if err != nil {
 			return -1, perrors.WithStack(err)
 		}
 
-		b1, err := d.readByte()
+		b1, err := d.ReadByte()
 		if err != nil {
 			return -1, perrors.WithStack(err)
 		}
@@ -262,7 +262,7 @@ func (d *Decoder) decString(flag int32) (string, error) {
 	if flag != TAG_READ {
 		tag = byte(flag)
 	} else {
-		tag, _ = d.readByte()
+		tag, _ = d.ReadByte()
 	}
 
 	switch {
@@ -325,7 +325,7 @@ func (d *Decoder) decString(flag int32) (string, error) {
 					return *(*string)(unsafe.Pointer(&b)), nil
 				}
 
-				b, _ := d.readByte()
+				b, _ := d.ReadByte()
 				switch {
 				case (tag >= BC_STRING_DIRECT && tag <= STRING_DIRECT_MAX) ||
 					(tag >= 0x30 && tag <= 0x33) ||
@@ -484,7 +484,7 @@ func (d *Decoder) decString(flag int32) (string, error) {
 
 				if remain := offset - prev - nread; remain > 0 {
 					if remain == 1 {
-						ch, err := d.readByte()
+						ch, err := d.ReadByte()
 						if err != nil {
 							return s, perrors.WithStack(err)
 						}
@@ -514,7 +514,7 @@ func (d *Decoder) decString(flag int32) (string, error) {
 			}
 
 			// decode byte
-			ch, err := d.readByte()
+			ch, err := d.ReadByte()
 			if err != nil {
 				if err == io.EOF {
 					break
@@ -526,7 +526,7 @@ func (d *Decoder) decString(flag int32) (string, error) {
 				bytesBuf[offset] = ch
 				offset++
 			} else if (ch & 0xe0) == 0xc0 {
-				ch1, err := d.readByte()
+				ch1, err := d.ReadByte()
 				if err != nil {
 					return s, perrors.WithStack(err)
 				}
