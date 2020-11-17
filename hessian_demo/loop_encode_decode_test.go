@@ -23,11 +23,11 @@ import (
 )
 
 import (
-	hessian "github.com/apache/dubbo-go-hessian2"
+	"github.com/stretchr/testify/assert"
 )
 
 import (
-	"github.com/stretchr/testify/assert"
+	hessian "github.com/apache/dubbo-go-hessian2"
 )
 
 type User struct {
