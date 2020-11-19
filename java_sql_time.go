@@ -126,7 +126,7 @@ func (JavaSqlTimeSerializer) DecObject(d *Decoder, typ reflect.Type, cls classIn
 	// add pointer ref so that ref the same object
 	d.appendRefs(vRef.Interface())
 
-	tag, err := d.readByte()
+	tag, err := d.ReadByte()
 	if err == io.EOF {
 		return nil, err
 	}

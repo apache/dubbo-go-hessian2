@@ -159,7 +159,7 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 	)
 
 	//tag, _ = d.readBufByte()
-	tag, err = d.readByte()
+	tag, err = d.ReadByte()
 	// check error
 	if err != nil {
 		return perrors.WithStack(err)
@@ -236,7 +236,7 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 	if flag != TAG_READ {
 		tag = byte(flag)
 	} else {
-		tag, _ = d.readByte()
+		tag, _ = d.ReadByte()
 	}
 
 	switch {
@@ -277,7 +277,7 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 					}
 				}
 			}
-			_, err = d.readByte()
+			_, err = d.ReadByte()
 			if err != nil {
 				return nil, perrors.WithStack(err)
 			}
@@ -299,7 +299,7 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 				}
 				m[k] = v
 			}
-			_, err = d.readByte()
+			_, err = d.ReadByte()
 			if err != nil {
 				return nil, perrors.WithStack(err)
 			}
@@ -320,7 +320,7 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 			}
 			m[k] = v
 		}
-		_, err = d.readByte()
+		_, err = d.ReadByte()
 		if err != nil {
 			return nil, perrors.WithStack(err)
 		}

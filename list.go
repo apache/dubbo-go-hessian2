@@ -269,7 +269,7 @@ func (d *Decoder) decList(flag int32) (interface{}, error) {
 	if flag != TAG_READ {
 		tag = byte(flag)
 	} else {
-		tag, err = d.readByte()
+		tag, err = d.ReadByte()
 		if err != nil {
 			return nil, perrors.WithStack(err)
 		}

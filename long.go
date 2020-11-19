@@ -70,7 +70,7 @@ func (d *Decoder) decInt64(flag int32) (int64, error) {
 	if flag != TAG_READ {
 		tag = byte(flag)
 	} else {
-		tag, _ = d.readByte()
+		tag, _ = d.ReadByte()
 	}
 
 	switch {
@@ -102,7 +102,7 @@ func (d *Decoder) decInt64(flag int32) (int64, error) {
 		return int64(tag-BC_INT_SHORT_ZERO)<<16 + int64(buf[0])<<8 + int64(buf[1]), nil
 
 	case tag == BC_DOUBLE_BYTE:
-		tag, _ = d.readByte()
+		tag, _ = d.ReadByte()
 		return int64(tag), nil
 
 	case tag == BC_DOUBLE_SHORT:

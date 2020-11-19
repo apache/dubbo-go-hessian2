@@ -79,6 +79,14 @@ func NewCheapDecoderWithSkip(b []byte) *Decoder {
 	return &Decoder{reader: bufio.NewReader(bytes.NewReader(b)), isSkip: true}
 }
 
+// Clean clean the Decoder (room) for a new object decoding.
+// Notice it won't reset reader buffer and will continue to read data from it.
+func (d *Decoder) Clean() {
+	d.typeRefs = &TypeRefs{records: map[string]bool{}}
+	d.refs = nil
+	d.classInfoList = nil
+}
+
 /////////////////////////////////////////
 // utilities
 /////////////////////////////////////////
@@ -86,15 +94,7 @@ func NewCheapDecoderWithSkip(b []byte) *Decoder {
 func (d *Decoder) Reset(b []byte) *Decoder {
 	// reuse reader buf, avoid allocate
 	d.reader.Reset(bytes.NewReader(b))
-	d.typeRefs = &TypeRefs{records: map[string]bool{}}
-
-	if d.refs != nil {
-		d.refs = nil
-	}
-	if d.classInfoList != nil {
-		d.classInfoList = nil
-	}
-
+	d.Clean()
 	return d
 }
 
@@ -109,9 +109,14 @@ func (d *Decoder) len() int {
 	return d.reader.Buffered()
 }
 
-// read a byte from Decoder, advance the ptr
-func (d *Decoder) readByte() (byte, error) {
+// ReadByte read a byte from Decoder, advance the ptr
+func (d *Decoder) ReadByte() (byte, error) {
 	return d.reader.ReadByte()
+}
+
+// Discard skips the next n bytes
+func (d *Decoder) Discard(n int) (int, error) {
+	return d.reader.Discard(n)
 }
 
 // unread a byte
@@ -198,7 +203,7 @@ func (d *Decoder) DecodeValue() (interface{}, error) {
 		tag byte
 	)
 
-	tag, err = d.readByte()
+	tag, err = d.ReadByte()
 	if err == io.EOF {
 		return nil, err
 	}
