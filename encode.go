@@ -153,8 +153,9 @@ func (e *Encoder) Encode(v interface{}) error {
 				}
 				return e.encObject(p)
 			}
-			if javaClassName, ok := checkInterface(v); ok {
-				return e.encNotPOJOObject(v, javaClassName)
+			o := reflect.ValueOf(v).Elem().Interface()
+			if _, ok := checkPOJORegistry(reflect.TypeOf(o).String()); ok{
+				return e.encObject(o)
 			}
 			return perrors.Errorf("struct type not Support! %s[%v] is not a instance of POJO!", t.String(), v)
 		case reflect.Slice, reflect.Array:
@@ -180,18 +181,4 @@ func (e *Encoder) Encode(v interface{}) error {
 	}
 
 	return nil
-}
-
-func checkInterface(v interface{}) (string, bool) {
-	typ := reflect.TypeOf(v).Elem()
-	val := reflect.ValueOf(v).Elem()
-	nums := val.NumField()
-	for i := 0; i < nums; i++ {
-		if typ.Field(i).Name == "JavaClassName" {
-			if javaClassName, ok := val.Field(i).Interface().(string); ok {
-				return javaClassName, ok
-			}
-		}
-	}
-	return "", false
 }
