@@ -153,6 +153,7 @@ func (e *Encoder) Encode(v interface{}) error {
 				}
 				return e.encObject(p)
 			}
+
 			o := reflect.ValueOf(v).Elem().Interface()
 			if _, ok := checkPOJORegistry(reflect.TypeOf(o).String()); ok{
 				return e.encObject(o)
