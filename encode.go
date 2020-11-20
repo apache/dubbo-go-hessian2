@@ -154,9 +154,8 @@ func (e *Encoder) Encode(v interface{}) error {
 				return e.encObject(p)
 			}
 
-			o := reflect.ValueOf(v).Elem().Interface()
-			if _, ok := checkPOJORegistry(reflect.TypeOf(o).String()); ok{
-				return e.encObject(o)
+			if _, ok := checkPOJORegistry(vv.Type().String()); ok {
+				return e.encObject(vv.Interface())
 			}
 			return perrors.Errorf("struct type not Support! %s[%v] is not a instance of POJO!", t.String(), v)
 		case reflect.Slice, reflect.Array:

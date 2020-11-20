@@ -135,10 +135,10 @@ func (e *Encoder) encObject(v interface{}) error {
 		if !ok {
 			if reflect.TypeOf(v).Implements(javaEnumType) {
 				idx = RegisterJavaEnum(v.(POJOEnum))
-			} else if isPojo{
+			} else if isPojo {
 				idx = RegisterPOJO(pojo)
-			}else {
-				return perrors.New("Not pojo obj:" + typeof(v)+" didn't registered before!")
+			} else {
+				return perrors.New("Not pojo obj:" + typeof(v) + " didn't registered before!")
 			}
 		}
 		_, clsDef, err = getStructDefByIndex(idx)
