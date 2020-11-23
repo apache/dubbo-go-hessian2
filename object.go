@@ -18,6 +18,7 @@
 package hessian
 
 import (
+	"fmt"
 	"io"
 	"reflect"
 	"strings"
@@ -108,6 +109,17 @@ func (e *Encoder) encObject(v interface{}) error {
 	)
 	pojo, isPojo := v.(POJO)
 	vv := reflect.ValueOf(v)
+
+	// get none pojo JavaClassName
+	var nonePojoJavaName string
+	if !isPojo {
+		s, ok := pojoRegistry.registry[vv.Type().String()]
+		if !ok {
+			return perrors.New("Not pojo obj:" + typeof(v) + " didn't registered before!")
+		}
+		nonePojoJavaName = s.javaName
+	}
+
 	// check ref
 	if n, ok := e.checkRefMap(vv); ok {
 		e.buffer = encRef(e.buffer, n)
@@ -124,7 +136,7 @@ func (e *Encoder) encObject(v interface{}) error {
 	// write object definition
 	idx = -1
 	for i = range e.classInfoList {
-		if isPojo && pojo.JavaClassName() == e.classInfoList[i].javaName {
+		if isPojo && pojo.JavaClassName() == e.classInfoList[i].javaName || !isPojo && nonePojoJavaName == e.classInfoList[i].javaName {
 			idx = i
 			break
 		}
