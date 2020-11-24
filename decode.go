@@ -35,7 +35,7 @@ type Decoder struct {
 	// record type refs, both list and map need it
 	// todo: map
 	typeRefs      *TypeRefs
-	classInfoList []classInfo
+	classInfoList []*classInfo
 	isSkip        bool
 }
 

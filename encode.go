@@ -33,7 +33,7 @@ import (
 
 // Encoder struct
 type Encoder struct {
-	classInfoList []classInfo
+	classInfoList []*classInfo
 	buffer        []byte
 	refMap        map[unsafe.Pointer]_refElem
 }

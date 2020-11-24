@@ -54,7 +54,7 @@ func (JavaSqlTimeSerializer) EncObject(e *Encoder, vv POJO) error {
 		i         int
 		idx       int
 		err       error
-		clsDef    classInfo
+		clsDef    *classInfo
 		className string
 		ptrV      reflect.Value
 	)
@@ -116,7 +116,7 @@ func (JavaSqlTimeSerializer) EncObject(e *Encoder, vv POJO) error {
 }
 
 // nolint
-func (JavaSqlTimeSerializer) DecObject(d *Decoder, typ reflect.Type, cls classInfo) (interface{}, error) {
+func (JavaSqlTimeSerializer) DecObject(d *Decoder, typ reflect.Type, cls *classInfo) (interface{}, error) {
 
 	if typ.Kind() != reflect.Struct {
 		return nil, perrors.Errorf("wrong type expect Struct but get:%s", typ.String())
