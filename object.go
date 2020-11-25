@@ -104,7 +104,7 @@ func (e *Encoder) encObject(v POJO) error {
 		idx    int
 		num    int
 		err    error
-		clsDef classInfo
+		clsDef *classInfo
 	)
 
 	vv := reflect.ValueOf(v)
@@ -292,7 +292,7 @@ func (d *Decoder) decClassDef() (interface{}, error) {
 		fieldList[i] = fieldName
 	}
 
-	return classInfo{javaName: clsName, fieldNameList: fieldList}, nil
+	return &classInfo{javaName: clsName, fieldNameList: fieldList}, nil
 }
 
 type fieldInfo struct {
@@ -362,7 +362,7 @@ func findField(name string, typ reflect.Type) ([]int, *reflect.StructField, erro
 	return []int{}, nil, perrors.Errorf("failed to find field %s", name)
 }
 
-func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, error) {
+func (d *Decoder) decInstance(typ reflect.Type, cls *classInfo) (interface{}, error) {
 	if typ.Kind() != reflect.Struct {
 		return nil, perrors.Errorf("wrong type expect Struct but get:%s", typ.String())
 	}
@@ -537,15 +537,15 @@ func (d *Decoder) decInstance(typ reflect.Type, cls classInfo) (interface{}, err
 	return vRef.Interface(), nil
 }
 
-func (d *Decoder) appendClsDef(cd classInfo) {
+func (d *Decoder) appendClsDef(cd *classInfo) {
 	d.classInfoList = append(d.classInfoList, cd)
 }
 
-func (d *Decoder) getStructDefByIndex(idx int) (reflect.Type, classInfo, error) {
+func (d *Decoder) getStructDefByIndex(idx int) (reflect.Type, *classInfo, error) {
 	var (
 		ok  bool
-		cls classInfo
-		s   structInfo
+		cls *classInfo
+		s   *structInfo
 		err error
 	)
 
@@ -573,7 +573,7 @@ func (d *Decoder) decEnum(javaName string, flag int32) (JavaEnum, error) {
 		err       error
 		enumName  string
 		ok        bool
-		info      structInfo
+		info      *structInfo
 		enumValue JavaEnum
 	)
 	enumName, err = d.decString(TAG_READ) // java enum class member is "name"
@@ -591,7 +591,7 @@ func (d *Decoder) decEnum(javaName string, flag int32) (JavaEnum, error) {
 }
 
 // skip this object
-func (d *Decoder) skip(cls classInfo) error {
+func (d *Decoder) skip(cls *classInfo) error {
 	len := len(cls.fieldNameList)
 	if len < 1 {
 		return nil
@@ -613,7 +613,7 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 		idx int32
 		err error
 		typ reflect.Type
-		cls classInfo
+		cls *classInfo
 	)
 
 	if flag != TAG_READ {
@@ -632,7 +632,7 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 		if err != nil {
 			return nil, perrors.Wrap(err, "decObject->decClassDef byte double")
 		}
-		cls, _ = clsDef.(classInfo)
+		cls, _ = clsDef.(*classInfo)
 		//add to slice
 		d.appendClsDef(cls)
 
