@@ -114,7 +114,7 @@ func (e *Encoder) encObject(v interface{}) error {
 	if !isPojo {
 		s, ok := loadPOJORegistry(vv.Type().String())
 		if !ok {
-			return perrors.Errorf("Not pojo obj: %s didn't registered before!", typeof(v))
+			return perrors.Errorf("non-pojo obj %s has not being registered before!", typeof(v))
 		}
 		nonePojoJavaName = s.javaName
 	}
@@ -149,7 +149,7 @@ func (e *Encoder) encObject(v interface{}) error {
 			} else if isPojo {
 				idx = RegisterPOJO(pojo)
 			} else {
-				return perrors.Errorf("Not pojo obj: %s didn't registered before!", typeof(v))
+				return perrors.Errorf("non-pojo obj %s has not being registered before!", typeof(v))
 			}
 		}
 		_, clsDef, err = getStructDefByIndex(idx)
