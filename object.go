@@ -112,7 +112,7 @@ func (e *Encoder) encObject(v interface{}) error {
 	// get none pojo JavaClassName
 	var nonePojoJavaName string
 	if !isPojo {
-		s, ok := pojoRegistry.registry[vv.Type().String()]
+		s, ok := loadPOJORegistry(vv.Type().String())
 		if !ok {
 			return perrors.Errorf("Not pojo obj: %s didn't registered before!", typeof(v))
 		}
