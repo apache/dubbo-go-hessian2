@@ -88,7 +88,7 @@ func (JavaCollectionSerializer) EncObject(e *Encoder, vv POJO) error {
 	return nil
 }
 
-func (JavaCollectionSerializer) DecObject(d *Decoder, typ reflect.Type, cls classInfo) (interface{}, error) {
+func (JavaCollectionSerializer) DecObject(d *Decoder, typ reflect.Type, cls *classInfo) (interface{}, error) {
 	//for the java impl of hessian encode collections as list, which will not be decoded as object in go impl, this method should not be called
 	return nil, perrors.New("unexpected collection decode call")
 }

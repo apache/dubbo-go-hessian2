@@ -66,7 +66,7 @@ func (d *Decoder) decInt32(flag int32) (int32, error) {
 	if flag != TAG_READ {
 		tag = byte(flag)
 	} else {
-		tag, _ = d.readByte()
+		tag, _ = d.ReadByte()
 	}
 
 	switch {

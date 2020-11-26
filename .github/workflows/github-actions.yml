@@ -5,6 +5,8 @@ on:
     branches: [ master ]
   pull_request:
     branches: "*"
+  pull_request_target:
+    branches: "*"
 
 jobs:
   build:
@@ -14,15 +16,17 @@ jobs:
 
     strategy:
       matrix:
-        os: 
+        os:
           - ubuntu-latest
         go_version:
-          - 1.12
+          - 1.13
         jdk_version:
           - 1.8
     env:
-      DING_TOKEN: 049ae645b5dfb16e3240f81c1757333549ca46b30a5d6b40df562c63c36cf166
-      DING_SIGN: SEC128fb97348610e9d4529bfb59ad7f3fd716b972785a0d04f1cee2c83ec160e59
+      # DING_TOKEN: 049ae645b5dfb16e3240f81c1757333549ca46b30a5d6b40df562c63c36cf166
+      # DING_SIGN: SEC128fb97348610e9d4529bfb59ad7f3fd716b972785a0d04f1cee2c83ec160e59
+      DING_TOKEN: ${{ secrets.DING_TOKEN }}
+      DING_SIGN: ${{ secrets.DING_SIGN }}
 
     steps:
     - uses: actions/checkout@v2
@@ -63,13 +67,15 @@ jobs:
         sh before_validate_license.sh
         chmod u+x /tmp/tools/license/license-header-checker
         /tmp/tools/license/license-header-checker -v -a -r -i vendor  /tmp/tools/license/license.txt . go  && [[ -z `git status -s` ]]
-    
+
     - name: Go Test
-      run: go mod vendor && go test -race -v && go test -bench . -race -coverprofile=coverage.txt
-      
+      run: GO111MODULE=on && go mod vendor && go test -race -v && go test -bench . -race -coverprofile=coverage.txt
+
     - name: Coverage
       run: bash <(curl -s https://codecov.io/bash)
 
+    - name: Hello world
+      run: echo Hello world ${{ secrets.DING_TOKEN }} ${{ secrets.DING_SIGN }}
 
       # Because the contexts of push and PR are different, there are two Notify.
       # Notifications are triggered only in the apache/dubbo-go-hessian2 repository.
@@ -77,7 +83,7 @@ jobs:
       uses: zcong1993/actions-ding@v3.0.1
       # Whether job is successful or not, always () is always true.
       if: |
-        always() && 
+        always() &&
         github.event_name == 'push' &&
         github.repository == 'apache/dubbo-go-hessian2'
       with:
@@ -93,11 +99,11 @@ jobs:
                 "text": "## Github Actions \n - name: CI \n - repository: ${{ github.repository }} \n - trigger: ${{ github.actor }} \n - event: ${{ github.event_name }} \n - ref: ${{ github.ref }} \n - status: [${{ job.status	}}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) \n - environment: ${{ runner.os }} \n > SHA: [${{ github.sha }}](${{ github.event.compare }})"
             }
           }
-          
+
     - name: DingTalk Message Notify only PR
       uses: zcong1993/actions-ding@v3.0.1
-      if: | 
-        always() && 
+      if: |
+        always() &&
         github.event_name == 'pull_request' &&
         github.repository == 'apache/dubbo-go-hessian2'
       with:

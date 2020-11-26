@@ -73,7 +73,7 @@ func (d *Decoder) decDate(flag int32) (time.Time, error) {
 	if flag != TAG_READ {
 		tag = byte(flag)
 	} else {
-		tag, _ = d.readByte()
+		tag, _ = d.ReadByte()
 	}
 
 	switch {

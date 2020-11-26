@@ -33,7 +33,7 @@ import (
 
 // Encoder struct
 type Encoder struct {
-	classInfoList []classInfo
+	classInfoList []*classInfo
 	buffer        []byte
 	refMap        map[unsafe.Pointer]_refElem
 }
@@ -46,6 +46,14 @@ func NewEncoder() *Encoder {
 		buffer: buffer[:0],
 		refMap: make(map[unsafe.Pointer]_refElem, 7),
 	}
+}
+
+// Clean clean the Encoder (room) for a new object encoding.
+func (e *Encoder) Clean() {
+	var buffer = make([]byte, 64)
+	e.classInfoList = nil
+	e.buffer = buffer[:0]
+	e.refMap = make(map[unsafe.Pointer]_refElem, 7)
 }
 
 // Buffer returns byte buffer
