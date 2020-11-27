@@ -97,7 +97,7 @@ func typeof(v interface{}) string {
 //  x04 BLUE                # BLUE value
 //
 //x51 x91                   # object ref #1, i.e. Color.GREEN
-func (e *Encoder) encObject(v POJO) error {
+func (e *Encoder) encObject(v interface{}) error {
 	var (
 		ok     bool
 		i      int
@@ -106,8 +106,19 @@ func (e *Encoder) encObject(v POJO) error {
 		err    error
 		clsDef *classInfo
 	)
-
+	pojo, isPojo := v.(POJO)
 	vv := reflect.ValueOf(v)
+
+	// get none pojo JavaClassName
+	var nonePojoJavaName string
+	if !isPojo {
+		s, ok := loadPOJORegistry(vv.Type().String())
+		if !ok {
+			return perrors.Errorf("non-pojo obj %s has not being registered before!", typeof(v))
+		}
+		nonePojoJavaName = s.javaName
+	}
+
 	// check ref
 	if n, ok := e.checkRefMap(vv); ok {
 		e.buffer = encRef(e.buffer, n)
@@ -124,7 +135,7 @@ func (e *Encoder) encObject(v POJO) error {
 	// write object definition
 	idx = -1
 	for i = range e.classInfoList {
-		if v.JavaClassName() == e.classInfoList[i].javaName {
+		if isPojo && pojo.JavaClassName() == e.classInfoList[i].javaName || !isPojo && nonePojoJavaName == e.classInfoList[i].javaName {
 			idx = i
 			break
 		}
@@ -135,8 +146,10 @@ func (e *Encoder) encObject(v POJO) error {
 		if !ok {
 			if reflect.TypeOf(v).Implements(javaEnumType) {
 				idx = RegisterJavaEnum(v.(POJOEnum))
+			} else if isPojo {
+				idx = RegisterPOJO(pojo)
 			} else {
-				idx = RegisterPOJO(v)
+				return perrors.Errorf("non-pojo obj %s has not being registered before!", typeof(v))
 			}
 		}
 		_, clsDef, err = getStructDefByIndex(idx)
