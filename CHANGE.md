@@ -1,5 +1,17 @@
 # Release Notes
 
+## v1.8.0
+
+### New Features
+- support clean encoder/decoder, discard decode buffer. [#242](https://github.com/apache/dubbo-go-hessian2/pull/242)
+- support encode no pojo object. [#243](https://github.com/apache/dubbo-go-hessian2/pull/243)
+
+### Enhancement
+- change value reference to ptr to improve performance. [#244](https://github.com/apache/dubbo-go-hessian2/pull/244)
+
+### Bugfixes
+- fix issue that cannot decode java generic type. [#239](https://github.com/apache/dubbo-go-hessian2/pull/239)
+
 ## v1.7.0
 
 ### New Features
@@ -13,7 +25,7 @@
 - Export function EncNull. [#225](https://github.com/apache/dubbo-go-hessian2/pull/225)
 
 ### Bugfixes
-- fix eunm encode error in request. [#203](https://github.com/apache/dubbo-go-hessian2/pull/203)
+- fix enum encode error in request. [#203](https://github.com/apache/dubbo-go-hessian2/pull/203)
 - fix []byte field decoding issue. [#216](https://github.com/apache/dubbo-go-hessian2/pull/216)
 - fix decoding error for map in map. [#229](https://github.com/apache/dubbo-go-hessian2/pull/229)
 
