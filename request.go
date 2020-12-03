@@ -107,6 +107,10 @@ func getArgType(v interface{}) string {
 		}
 		switch t.Kind() {
 		case reflect.Struct:
+			v, ok := v.(POJO)
+			if ok {
+				return v.JavaClassName()
+			}
 			return "java.lang.Object"
 		case reflect.Slice, reflect.Array:
 			if t.Elem().Kind() == reflect.Struct {
