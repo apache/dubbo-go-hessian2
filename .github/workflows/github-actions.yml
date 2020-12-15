@@ -61,6 +61,7 @@ jobs:
         mvn clean package -DskipTests=true -f test_hessian/pom.xml
         mvn test -f test_hessian/pom.xml
         mvn clean package -f test_dubbo/pom.xml
+        git reset --hard
 
     - name: Validate License
       run: |
