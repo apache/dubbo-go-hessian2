@@ -81,7 +81,7 @@ func (d *Decoder) decDate(flag int32) (time.Time, error) {
 		return ZeroDate, nil
 	case tag == BC_DATE: //'d': //date
 		s = buf[:8]
-		l, err = d.next(s)
+		l, err = d.nextFull(s)
 		if err != nil {
 			return t, err
 		}
@@ -94,7 +94,7 @@ func (d *Decoder) decDate(flag int32) (time.Time, error) {
 
 	case tag == BC_DATE_MINUTE:
 		s = buf[:4]
-		l, err = d.next(s)
+		l, err = d.nextFull(s)
 		if err != nil {
 			return t, err
 		}
