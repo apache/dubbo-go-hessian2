@@ -303,26 +303,27 @@ func (d *Decoder) readTypedList(tag byte) (interface{}, error) {
 		return nil, perrors.Errorf("error to read list type[%s]: %v", listTyp, err)
 	}
 
-	isVariableArr := tag == BC_LIST_VARIABLE
+	var listLen int
+	listLen = int(-1)
 
-	length := -1
+	isVariableArr := tag == BC_LIST_VARIABLE
 	if listFixedTypedLenTag(tag) {
-		length = int(tag - _listFixedTypedLenTagMin)
+		listLen = int(tag - _listFixedTypedLenTagMin)
 	} else if tag == BC_LIST_FIXED {
 		ii, err := d.decInt32(TAG_READ)
 		if err != nil {
 			return nil, perrors.WithStack(err)
 		}
-		length = int(ii)
+		listLen = int(ii)
 	} else if isVariableArr {
-		length = 0
+		listLen = 0
 	} else {
 		return nil, perrors.Errorf("error typed list tag: 0x%x", tag)
 	}
 	if isCollectionSerialize(listTyp) {
-		return d.decodeCollection(length, listTyp)
+		return d.decodeCollection(listLen, listTyp)
 	}
-	return d.readTypedListValue(length, listTyp, isVariableArr)
+	return d.readTypedListValue(listLen, listTyp, isVariableArr)
 }
 
 func (d *Decoder) readTypedListValue(length int, listTyp string, isVariableArr bool) (interface{}, error) {
