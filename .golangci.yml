@@ -33,11 +33,12 @@ linters-settings:
       - wrapperFunc
 
 linters:
-  enable-all: true
-  disable:
-    - maligned
-    - prealloc
-    - gochecknoglobals
+  disable-all: true
+  enable:
+    - govet
+    - staticcheck
+    - ineffassign
+    - misspell
 
 run:
   skip-dirs:
