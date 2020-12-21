@@ -135,23 +135,23 @@ func RegisterPOJOMapping(javaClassName string, o interface{}) int {
 	}
 
 	var (
-		bHeader    []byte
-		bBody      []byte
-		fieldList  []string
-		structInfo structInfo
-		clsDef     classInfo
+		bHeader   []byte
+		bBody     []byte
+		fieldList []string
+		sttInfo   structInfo
+		clsDef    classInfo
 	)
 
-	structInfo.typ = obtainValueType(o)
+	sttInfo.typ = obtainValueType(o)
 
-	structInfo.goName = structInfo.typ.String()
-	structInfo.javaName = javaClassName
-	structInfo.inst = o
-	pojoRegistry.j2g[structInfo.javaName] = structInfo.goName
-	registerTypeName(structInfo.goName, structInfo.javaName)
+	sttInfo.goName = sttInfo.typ.String()
+	sttInfo.javaName = javaClassName
+	sttInfo.inst = o
+	pojoRegistry.j2g[sttInfo.javaName] = sttInfo.goName
+	registerTypeName(sttInfo.goName, sttInfo.javaName)
 
 	// prepare fields info of objectDef
-	nextStruct := []reflect.Type{structInfo.typ}
+	nextStruct := []reflect.Type{sttInfo.typ}
 	for len(nextStruct) > 0 {
 		current := nextStruct[0]
 		if current.Kind() == reflect.Struct {
@@ -192,23 +192,23 @@ func RegisterPOJOMapping(javaClassName string, o interface{}) int {
 
 	// prepare header of objectDef
 	bHeader = encByte(bHeader, BC_OBJECT_DEF)
-	bHeader = encString(bHeader, structInfo.javaName)
+	bHeader = encString(bHeader, sttInfo.javaName)
 
 	// write fields length into header of objectDef
 	// note: cause fieldList is a dynamic slice, so one must calculate length only after it being prepared already.
 	bHeader = encInt32(bHeader, int32(len(fieldList)))
 
 	// prepare classDef
-	clsDef = classInfo{javaName: structInfo.javaName, fieldNameList: fieldList}
+	clsDef = classInfo{javaName: sttInfo.javaName, fieldNameList: fieldList}
 
 	// merge header and body of objectDef into buffer of classInfo
 	clsDef.buffer = append(bHeader, bBody...)
 
-	structInfo.index = len(pojoRegistry.classInfoList)
+	sttInfo.index = len(pojoRegistry.classInfoList)
 	pojoRegistry.classInfoList = append(pojoRegistry.classInfoList, &clsDef)
-	pojoRegistry.registry[structInfo.goName] = &structInfo
+	pojoRegistry.registry[sttInfo.goName] = &sttInfo
 
-	return structInfo.index
+	return sttInfo.index
 }
 
 // UnRegisterPOJOs unregister POJO instances. It is easy for test.

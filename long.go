@@ -113,8 +113,8 @@ func (d *Decoder) decInt64(flag int32) (int64, error) {
 		return int64(int(buf[0])<<8 + int(buf[1])), nil
 
 	case tag == BC_INT: // 'I'
-		i32, err := d.decInt32(TAG_READ)
-		return int64(i32), err
+		i32, decErr := d.decInt32(TAG_READ)
+		return int64(i32), decErr
 
 	case tag == BC_LONG_INT:
 		var i32 int32

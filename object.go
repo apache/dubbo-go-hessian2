@@ -99,7 +99,6 @@ func typeof(v interface{}) string {
 //x51 x91                   # object ref #1, i.e. Color.GREEN
 func (e *Encoder) encObject(v interface{}) error {
 	var (
-		ok     bool
 		i      int
 		idx    int
 		num    int
@@ -141,6 +140,7 @@ func (e *Encoder) encObject(v interface{}) error {
 		}
 	}
 
+	var ok bool
 	if idx == -1 {
 		idx, ok = checkPOJORegistry(typeof(v))
 		if !ok {
@@ -425,9 +425,9 @@ func (d *Decoder) decInstance(typ reflect.Type, cls *classInfo) (interface{}, er
 				// java enum
 				if fldRawValue.Type().Implements(javaEnumType) {
 					d.unreadByte() // Enum parsing, decInt64 above has read a byte, so you need to return a byte here
-					s, err := d.DecodeValue()
-					if err != nil {
-						return nil, perrors.Wrapf(err, "decInstance->decObject field name:%s", fieldName)
+					s, decErr := d.DecodeValue()
+					if decErr != nil {
+						return nil, perrors.Wrapf(decErr, "decInstance->decObject field name:%s", fieldName)
 					}
 					enumValue, _ := s.(JavaEnum)
 					num = int32(enumValue)
@@ -447,9 +447,9 @@ func (d *Decoder) decInstance(typ reflect.Type, cls *classInfo) (interface{}, er
 			if err != nil {
 				if fldTyp.Implements(javaEnumType) {
 					d.unreadByte() // Enum parsing, decInt64 above has read a byte, so you need to return a byte here
-					s, err := d.Decode()
-					if err != nil {
-						return nil, perrors.Wrapf(err, "decInstance->decObject field name:%s", fieldName)
+					s, decErr := d.Decode()
+					if decErr != nil {
+						return nil, perrors.Wrapf(decErr, "decInstance->decObject field name:%s", fieldName)
 					}
 					enumValue, _ := s.(JavaEnum)
 					num = int64(enumValue)
@@ -516,8 +516,8 @@ func (d *Decoder) decInstance(typ reflect.Type, cls *classInfo) (interface{}, er
 				err error
 				s   interface{}
 			)
-			typ := UnpackPtrType(fldRawValue.Type())
-			if typ.String() == "time.Time" {
+			fldType := UnpackPtrType(fldRawValue.Type())
+			if fldType.String() == "time.Time" {
 				s, err = d.decDate(TAG_READ)
 				if err != nil {
 					return nil, perrors.WithStack(err)
@@ -641,9 +641,9 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 	case tag == BC_REF:
 		return d.decRef(int32(tag))
 	case tag == BC_OBJECT_DEF:
-		clsDef, err := d.decClassDef()
-		if err != nil {
-			return nil, perrors.Wrap(err, "decObject->decClassDef byte double")
+		clsDef, decErr := d.decClassDef()
+		if decErr != nil {
+			return nil, perrors.Wrap(decErr, "decObject->decClassDef byte double")
 		}
 		cls, _ = clsDef.(*classInfo)
 		//add to slice
