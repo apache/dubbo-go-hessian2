@@ -152,19 +152,20 @@ func encString(b []byte, v string) []byte {
 	}
 
 	var (
-		byteLen = 0
-		charLen = 0
+		byteLen int
+		charLen int
 		vBuf    = *bytes.NewBufferString(v)
 
-		byteRead  = 0
-		charCount = 0
-		byteCount = 0
+		byteRead  int
+		charCount int
+		byteCount int
 	)
 
 	bufp := gxbytes.AcquireBytes(CHUNK_SIZE * 3)
 	defer gxbytes.ReleaseBytes(bufp)
 	buf := *bufp
 
+	byteRead = 0
 	for {
 		if vBuf.Len() <= 0 {
 			break
@@ -433,6 +434,9 @@ func (d *Decoder) decString(flag int32) (string, error) {
 								} else {
 									// out of the chunk byte data
 									bytesBuf[i+4], err = d.reader.ReadByte()
+									if err != nil {
+										return s, perrors.WithStack(err)
+									}
 									ch1 = bytesBuf[i+4]
 									nread++
 									len++
@@ -449,6 +453,9 @@ func (d *Decoder) decString(flag int32) (string, error) {
 										return s, perrors.WithStack(err)
 									}
 									ch2, err = d.reader.ReadByte()
+									if err != nil {
+										return s, perrors.WithStack(err)
+									}
 									len += 2
 									nread += 2
 								}

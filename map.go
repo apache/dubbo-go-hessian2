@@ -170,9 +170,9 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 		// null map tag check
 		return nil
 	case BC_REF:
-		refObj, err := d.decRef(int32(tag))
-		if err != nil {
-			return perrors.WithStack(err)
+		refObj, decErr := d.decRef(int32(tag))
+		if decErr != nil {
+			return perrors.WithStack(decErr)
 		}
 		SetValue(value, EnsurePackValue(refObj))
 		return nil
