@@ -196,6 +196,15 @@ func TestStringEmoji(t *testing.T) {
 	testJavaDecode(t, "customArgString_emoji", s0)
 }
 
+func TestStringEmoji2(t *testing.T) {
+	// see: test_hessian/src/main/java/test/TestString.java
+	// see https://github.com/apache/dubbo-go-hessian2/issues/252
+	s0 := "❄️🚫🚫🚫🚫 多次自我介绍、任务、动态和"
+
+	testDecodeFramework(t, "customReplyStringEmoji2", s0)
+	testJavaDecode(t, "customArgString_emoji2", s0)
+}
+
 func TestStringComplex(t *testing.T) {
 	// see: test_hessian/src/main/java/test/TestString.java
 	s0 := "킐\u0088中国你好!\u0088\u0088\u0088\u0088\u0088\u0088"

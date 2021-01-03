@@ -430,6 +430,11 @@ public class TestCustomReply {
         output.flush();
     }
 
+    public void customReplyStringEmoji2() throws Exception {
+        output.writeObject(TestString.getEmojiTestString2());
+        output.flush();
+    }
+
     public void customReplyPerson183() throws Exception {
         Person183 p = new Person183();
         p.name = "pname";

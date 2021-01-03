@@ -200,6 +200,11 @@ public class TestCustomDecode {
         return TestString.getEmojiTestString().equals(o);
     }
 
+    public Object customArgString_emoji2() throws Exception {
+        String o = (String) input.readObject();
+        return TestString.getEmojiTestString2().equals(o);
+    }
+
     public Object customArgComplexString() throws Exception {
         String o = (String) input.readObject();
         return TestString.getComplexString().equals(o);
