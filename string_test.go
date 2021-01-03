@@ -19,6 +19,7 @@ package hessian
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 	"testing"
 )
@@ -211,4 +212,19 @@ func TestStringComplex(t *testing.T) {
 
 	testDecodeFramework(t, "customReplyComplexString", s0)
 	testJavaDecode(t, "customArgComplexString", s0)
+}
+
+func BenchmarkDecodeString(b *testing.B) {
+	s := "❄️🚫🚫🚫🚫 多次自我介绍、任务、动态和"
+	s = strings.Repeat(s, 4096)
+
+	e := NewEncoder()
+	_ = e.Encode(s)
+	buf := e.buffer
+
+	d := NewDecoder(buf)
+	for i := 0; i < b.N; i++ {
+		d.Reset(buf)
+		_, _ = d.Decode()
+	}
 }
