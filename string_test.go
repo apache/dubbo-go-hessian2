@@ -214,8 +214,19 @@ func TestStringComplex(t *testing.T) {
 	testJavaDecode(t, "customArgComplexString", s0)
 }
 
-func BenchmarkDecodeString(b *testing.B) {
-	s := "❄️🚫🚫🚫🚫 多次自我介绍、任务、动态和"
+func BenchmarkDecodeStringAscii(b *testing.B) {
+	runBenchmarkDecodeString(b, "hello world, hello hessian")
+}
+
+func BenchmarkDecodeStringUnicode(b *testing.B) {
+	runBenchmarkDecodeString(b, "你好, 世界, 你好, hessian")
+}
+
+func BenchmarkDecodeStringEmoji(b *testing.B) {
+	runBenchmarkDecodeString(b, "❄️🚫🚫🚫🚫 多次自我介绍、任务、动态和")
+}
+
+func runBenchmarkDecodeString(b *testing.B, s string) {
 	s = strings.Repeat(s, 4096)
 
 	e := NewEncoder()
@@ -225,6 +236,10 @@ func BenchmarkDecodeString(b *testing.B) {
 	d := NewDecoder(buf)
 	for i := 0; i < b.N; i++ {
 		d.Reset(buf)
-		_, _ = d.Decode()
+		_, err := d.Decode()
+		if err != nil {
+			b.Logf("err: %s", err)
+			b.FailNow()
+		}
 	}
 }
