@@ -129,6 +129,11 @@ func (d *Decoder) next(b []byte) (int, error) {
 	return d.reader.Read(b)
 }
 
+// read byte arr, and return the real length of b
+func (d *Decoder) nextFull(b []byte) (int, error) {
+	return io.ReadFull(d.reader, b)
+}
+
 // peek n bytes, will not advance the read ptr
 func (d *Decoder) peek(n int) []byte {
 	b, _ := d.reader.Peek(n)

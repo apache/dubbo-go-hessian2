@@ -40,8 +40,7 @@ func encDateInMs(b []byte, i interface{}) []byte {
 	value := UnpackPtrValue(reflect.ValueOf(i))
 	vi := value.Interface().(time.Time)
 	if vi == ZeroDate {
-		b = append(b, BC_NULL)
-		return nil
+		return append(b, BC_NULL)
 	}
 	b = append(b, BC_DATE)
 	return append(b, PackInt64(vi.UnixNano()/1e6)...)
@@ -81,7 +80,7 @@ func (d *Decoder) decDate(flag int32) (time.Time, error) {
 		return ZeroDate, nil
 	case tag == BC_DATE: //'d': //date
 		s = buf[:8]
-		l, err = d.next(s)
+		l, err = d.nextFull(s)
 		if err != nil {
 			return t, err
 		}
@@ -94,7 +93,7 @@ func (d *Decoder) decDate(flag int32) (time.Time, error) {
 
 	case tag == BC_DATE_MINUTE:
 		s = buf[:4]
-		l, err = d.next(s)
+		l, err = d.nextFull(s)
 		if err != nil {
 			return t, err
 		}

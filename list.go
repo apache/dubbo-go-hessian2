@@ -305,7 +305,7 @@ func (d *Decoder) readTypedList(tag byte) (interface{}, error) {
 
 	isVariableArr := tag == BC_LIST_VARIABLE
 
-	length := -1
+	var length int
 	if listFixedTypedLenTag(tag) {
 		length = int(tag - _listFixedTypedLenTagMin)
 	} else if tag == BC_LIST_FIXED {

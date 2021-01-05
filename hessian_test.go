@@ -79,6 +79,7 @@ func doTestHessianEncodeHeader(t *testing.T, packageType PackageType, responseSt
 
 func doTestResponse(t *testing.T, packageType PackageType, responseStatus byte, body interface{}, decodedResponse *Response, assertFunc func()) {
 	resp, err := doTestHessianEncodeHeader(t, packageType, responseStatus, body)
+	assert.Nil(t, err)
 
 	codecR := NewHessianCodec(bufio.NewReader(bytes.NewReader(resp)))
 
@@ -162,6 +163,7 @@ func TestResponse(t *testing.T) {
 
 func doTestRequest(t *testing.T, packageType PackageType, responseStatus byte, body interface{}) {
 	resp, err := doTestHessianEncodeHeader(t, packageType, responseStatus, body)
+	assert.Nil(t, err)
 
 	codecR := NewHessianCodec(bufio.NewReader(bytes.NewReader(resp)))
 
