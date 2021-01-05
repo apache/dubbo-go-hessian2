@@ -1,5 +1,12 @@
 # Release Notes
 
+## v1.8.1
+
+### Bugfixes
+- fix get wrong javaclassname for POJO struct. [#247](https://github.com/apache/dubbo-go-hessian2/pull/247)
+- fix not enough buf error when decode date. [#249](https://github.com/apache/dubbo-go-hessian2/pull/249)
+- fix emoji decoding error. [#254](https://github.com/apache/dubbo-go-hessian2/pull/254)
+
 ## v1.8.0
 
 ### New Features
