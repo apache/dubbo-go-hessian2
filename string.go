@@ -108,7 +108,8 @@ func encString(b []byte, v string) []byte {
 		byteCount int
 	)
 
-	bufp := gxbytes.AcquireBytes(CHUNK_SIZE * 3)
+	// Acquire (CHUNK_SIZE + 1) * 3 bytes since charCount could reach CHUNK_SIZE + 1.
+	bufp := gxbytes.AcquireBytes((CHUNK_SIZE + 1) * 3)
 	defer gxbytes.ReleaseBytes(bufp)
 	buf := *bufp
 
