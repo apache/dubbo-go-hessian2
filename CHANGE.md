@@ -1,5 +1,10 @@
 # Release Notes
 
+## v1.8.2
+
+### Bugfixes
+- fix insufficient bytes for string encoding buffers. [#255](https://github.com/apache/dubbo-go-hessian2/pull/255)
+
 ## v1.8.1
 
 ### Bugfixes
