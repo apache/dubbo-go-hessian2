@@ -111,6 +111,16 @@ func TestEncRune(t *testing.T) {
 	assertEqual([]byte(res.(string)), []byte(v), t)
 }
 
+func TestEncStringChunk(t *testing.T) {
+	enc := NewEncoder()
+	v := strings.Repeat("我", CHUNK_SIZE-1) + "🤣"
+	assert.Nil(t, enc.Encode(v))
+	dec := NewDecoder(enc.Buffer())
+	s, err := dec.Decode()
+	assert.Nil(t, err)
+	assert.Equal(t, v, s)
+}
+
 func TestString(t *testing.T) {
 	s0 := ""
 	s1 := "0"
