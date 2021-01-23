@@ -96,3 +96,14 @@ func TestMapEncode(t *testing.T) {
 	testJavaDecode(t, "argUntypedMap_1", map[interface{}]interface{}{"a": int32(0)})
 	testJavaDecode(t, "argUntypedMap_2", map[interface{}]interface{}{int32(0): "a", int32(1): "b"})
 }
+
+func TestCustomMap(t *testing.T) {
+	testDecodeFramework(t, "customReplyMap", map[interface{}]interface{}{"a": int32(1), "b": int32(2)})
+
+	mapInMap := map[interface{}]interface{}{
+		"obj1": map[interface{}]interface{}{"a": int32(1)},
+		"obj2": map[interface{}]interface{}{"b": int32(2)},
+	}
+	testDecodeFramework(t, "customReplyMapInMap", mapInMap)
+	testDecodeFramework(t, "customReplyMapInMapJsonObject", mapInMap)
+}

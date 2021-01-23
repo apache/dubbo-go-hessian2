@@ -16,6 +16,7 @@
  */
 package java8_time
 
+//java8-time java.time.Year
 type Year struct {
 	Year int32 `hessian:"year"`
 }
@@ -25,5 +26,5 @@ func (Year) JavaClassName() string {
 }
 
 func (Year) Error() string {
-	return "encode year error"
+	return "encode Year error"
 }

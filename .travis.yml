@@ -13,7 +13,8 @@ os: linux
 dist: xenial
 
 script:
-  - mvn clean package -f test_hessian/pom.xml
+  - mvn clean package -DskipTests=true -f test_hessian/pom.xml
+  - mvn test -f test_hessian/pom.xml
   - mvn clean package -f test_dubbo/pom.xml
   - go fmt && [[ -z `git status -s` ]]
   - sh before_validate_license.sh
