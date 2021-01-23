@@ -564,9 +564,9 @@ func doTestBasePointer(t *testing.T, base *BasePointer, expected *BasePointer) {
 
 func TestSkip(t *testing.T) {
 	// clear pojo
-	pojoRegistry = POJORegistry{
+	pojoRegistry = &POJORegistry{
 		j2g:      make(map[string]string),
-		registry: make(map[string]structInfo),
+		registry: make(map[string]*structInfo),
 	}
 	testDecodeFrameworkWithSkip(t, "replyObject_0", nil)
 	testDecodeFrameworkWithSkip(t, "replyObject_1", nil)
@@ -767,4 +767,47 @@ func TestIssue183_DecodeExcessStructField(t *testing.T) {
 	got, err := decodeJavaResponse(`customReplyPerson183`, ``, false)
 	assert.NoError(t, err)
 	t.Logf("%T %+v", got, got)
+}
+
+type GenericResponse struct {
+	Code int
+	Data interface{}
+}
+
+func (GenericResponse) JavaClassName() string {
+	return `test.generic.Response`
+}
+
+type BusinessData struct {
+	Name  string
+	Count int
+}
+
+func (BusinessData) JavaClassName() string {
+	return `test.generic.BusinessData`
+}
+
+func TestCustomReplyGenericResponseLong(t *testing.T) {
+	res := &GenericResponse{
+		Code: 200,
+		Data: int64(123),
+	}
+	RegisterPOJO(res)
+
+	testDecodeFramework(t, "customReplyGenericResponseLong", res)
+}
+
+func TestCustomReplyGenericResponseBusinessData(t *testing.T) {
+	data := BusinessData{
+		Name:  "apple",
+		Count: 5,
+	}
+	res := &GenericResponse{
+		Code: 201,
+		Data: data,
+	}
+	RegisterPOJO(data)
+	RegisterPOJO(res)
+
+	testDecodeFramework(t, "customReplyGenericResponseBusinessData", res)
 }

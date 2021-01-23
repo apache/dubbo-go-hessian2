@@ -89,15 +89,15 @@ type structInfo struct {
 // POJORegistry pojo registry struct
 type POJORegistry struct {
 	sync.RWMutex
-	classInfoList []classInfo           // {class name, field name list...} list
-	j2g           map[string]string     // java class name --> go struct name
-	registry      map[string]structInfo // go class name --> go struct info
+	classInfoList []*classInfo           // {class name, field name list...} list
+	j2g           map[string]string      // java class name --> go struct name
+	registry      map[string]*structInfo // go class name --> go struct info
 }
 
 var (
-	pojoRegistry = POJORegistry{
+	pojoRegistry = &POJORegistry{
 		j2g:      make(map[string]string),
-		registry: make(map[string]structInfo),
+		registry: make(map[string]*structInfo),
 	}
 	pojoType     = reflect.TypeOf((*POJO)(nil)).Elem()
 	javaEnumType = reflect.TypeOf((*POJOEnum)(nil)).Elem()
@@ -135,23 +135,23 @@ func RegisterPOJOMapping(javaClassName string, o interface{}) int {
 	}
 
 	var (
-		bHeader    []byte
-		bBody      []byte
-		fieldList  []string
-		structInfo structInfo
-		clsDef     classInfo
+		bHeader   []byte
+		bBody     []byte
+		fieldList []string
+		sttInfo   structInfo
+		clsDef    classInfo
 	)
 
-	structInfo.typ = obtainValueType(o)
+	sttInfo.typ = obtainValueType(o)
 
-	structInfo.goName = structInfo.typ.String()
-	structInfo.javaName = javaClassName
-	structInfo.inst = o
-	pojoRegistry.j2g[structInfo.javaName] = structInfo.goName
-	registerTypeName(structInfo.goName, structInfo.javaName)
+	sttInfo.goName = sttInfo.typ.String()
+	sttInfo.javaName = javaClassName
+	sttInfo.inst = o
+	pojoRegistry.j2g[sttInfo.javaName] = sttInfo.goName
+	registerTypeName(sttInfo.goName, sttInfo.javaName)
 
 	// prepare fields info of objectDef
-	nextStruct := []reflect.Type{structInfo.typ}
+	nextStruct := []reflect.Type{sttInfo.typ}
 	for len(nextStruct) > 0 {
 		current := nextStruct[0]
 		if current.Kind() == reflect.Struct {
@@ -192,23 +192,23 @@ func RegisterPOJOMapping(javaClassName string, o interface{}) int {
 
 	// prepare header of objectDef
 	bHeader = encByte(bHeader, BC_OBJECT_DEF)
-	bHeader = encString(bHeader, structInfo.javaName)
+	bHeader = encString(bHeader, sttInfo.javaName)
 
 	// write fields length into header of objectDef
 	// note: cause fieldList is a dynamic slice, so one must calculate length only after it being prepared already.
 	bHeader = encInt32(bHeader, int32(len(fieldList)))
 
 	// prepare classDef
-	clsDef = classInfo{javaName: structInfo.javaName, fieldNameList: fieldList}
+	clsDef = classInfo{javaName: sttInfo.javaName, fieldNameList: fieldList}
 
 	// merge header and body of objectDef into buffer of classInfo
 	clsDef.buffer = append(bHeader, bBody...)
 
-	structInfo.index = len(pojoRegistry.classInfoList)
-	pojoRegistry.classInfoList = append(pojoRegistry.classInfoList, clsDef)
-	pojoRegistry.registry[structInfo.goName] = structInfo
+	sttInfo.index = len(pojoRegistry.classInfoList)
+	pojoRegistry.classInfoList = append(pojoRegistry.classInfoList, &clsDef)
+	pojoRegistry.registry[sttInfo.goName] = &sttInfo
 
-	return structInfo.index
+	return sttInfo.index
 }
 
 // UnRegisterPOJOs unregister POJO instances. It is easy for test.
@@ -307,8 +307,8 @@ func RegisterJavaEnum(o POJOEnum) int {
 		c = classInfo{javaName: t.javaName, fieldNameList: l}
 		c.buffer = append(c.buffer, b[:]...)
 		t.index = len(pojoRegistry.classInfoList)
-		pojoRegistry.classInfoList = append(pojoRegistry.classInfoList, c)
-		pojoRegistry.registry[t.goName] = t
+		pojoRegistry.classInfoList = append(pojoRegistry.classInfoList, &c)
+		pojoRegistry.registry[t.goName] = &t
 		i = t.index
 	} else {
 		i = -1
@@ -319,23 +319,32 @@ func RegisterJavaEnum(o POJOEnum) int {
 
 // check if go struct name @goName has been registered or not.
 func checkPOJORegistry(goName string) (int, bool) {
+	s, ok := loadPOJORegistry(goName)
+	if !ok {
+		return -1, false
+	}
+	return s.index, true
+}
+
+// load struct info if go struct name @goName has been registered or not.
+func loadPOJORegistry(goName string) (*structInfo, bool) {
 	var (
 		ok bool
-		s  structInfo
+		s  *structInfo
 	)
 	pojoRegistry.RLock()
 	s, ok = pojoRegistry.registry[goName]
 	pojoRegistry.RUnlock()
 
-	return s.index, ok
+	return s, ok
 }
 
 // @typeName is class's java name
-func getStructInfo(javaName string) (structInfo, bool) {
+func getStructInfo(javaName string) (*structInfo, bool) {
 	var (
 		ok bool
 		g  string
-		s  structInfo
+		s  *structInfo
 	)
 
 	pojoRegistry.RLock()
@@ -348,12 +357,12 @@ func getStructInfo(javaName string) (structInfo, bool) {
 	return s, ok
 }
 
-func getStructDefByIndex(idx int) (reflect.Type, classInfo, error) {
+func getStructDefByIndex(idx int) (reflect.Type, *classInfo, error) {
 	var (
 		ok      bool
 		clsName string
-		cls     classInfo
-		s       structInfo
+		cls     *classInfo
+		s       *structInfo
 	)
 
 	pojoRegistry.RLock()
@@ -380,7 +389,7 @@ func getStructDefByIndex(idx int) (reflect.Type, classInfo, error) {
 func createInstance(goName string) interface{} {
 	var (
 		ok bool
-		s  structInfo
+		s  *structInfo
 	)
 
 	pojoRegistry.RLock()

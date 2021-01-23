@@ -15,31 +15,25 @@
  * limitations under the License.
  */
 
-package hessian
+package testfuncs
 
 import (
-	"testing"
-)
-import (
-	"github.com/stretchr/testify/assert"
+	hessian "github.com/apache/dubbo-go-hessian2"
+	"github.com/apache/dubbo-go-hessian2/java8_time"
 )
 
-func TestCheckAndGetException(t *testing.T) {
-	clazzInfo1 := &classInfo{
-		javaName:      "com.test.UserDefinedException",
-		fieldNameList: []string{"detailMessage", "code", "suppressedExceptions", "stackTrace", "cause"},
-	}
-	s, b := checkAndGetException(clazzInfo1)
-	assert.True(t, b)
+// Java8TimeYear is test java8 java.time.Year
+func Java8TimeYear() []byte {
+	e := hessian.NewEncoder()
+	year := java8_time.Year{Year: 2020}
+	e.Encode(year)
+	return e.Buffer()
+}
 
-	assert.Equal(t, s.javaName, "com.test.UserDefinedException")
-	assert.Equal(t, s.goName, "hessian.UnknownException")
-
-	clazzInfo2 := &classInfo{
-		javaName:      "com.test.UserDefinedException",
-		fieldNameList: []string{"detailMessage", "code", "suppressedExceptions", "cause"},
-	}
-	s, b = checkAndGetException(clazzInfo2)
-	assert.False(t, b)
-	assert.Nil(t, s)
+// Java8LocalDate is test java8 java.time.LocalDate
+func Java8LocalDate() []byte {
+	e := hessian.NewEncoder()
+	date := java8_time.LocalDate{Year: 2020, Month: 9, Day: 12}
+	e.Encode(date)
+	return e.Buffer()
 }

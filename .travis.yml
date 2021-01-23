@@ -7,7 +7,8 @@ go:
 script:
   - mvn clean package -f test_hessian/pom.xml
   - mvn clean package -f test_dubbo/pom.xml
-  - go fmt && [[ -z `git status -s` ]]
+  - git reset --hard
+  - go fmt && git checkout -- go.mod && [[ -z `git status -s` ]]
   - sh before_validate_license.sh
   - chmod u+x /tmp/tools/license/license-header-checker
   - /tmp/tools/license/license-header-checker -v -a -r -i vendor  /tmp/tools/license/license.txt . go  && [[ -z `git status -s` ]]

@@ -19,6 +19,7 @@ package hessian
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 	"testing"
 )
@@ -110,6 +111,16 @@ func TestEncRune(t *testing.T) {
 	assertEqual([]byte(res.(string)), []byte(v), t)
 }
 
+func TestEncStringChunk(t *testing.T) {
+	enc := NewEncoder()
+	v := strings.Repeat("我", CHUNK_SIZE-1) + "🤣"
+	assert.Nil(t, enc.Encode(v))
+	dec := NewDecoder(enc.Buffer())
+	s, err := dec.Decode()
+	assert.Nil(t, err)
+	assert.Equal(t, v, s)
+}
+
 func TestString(t *testing.T) {
 	s0 := ""
 	s1 := "0"
@@ -196,10 +207,49 @@ func TestStringEmoji(t *testing.T) {
 	testJavaDecode(t, "customArgString_emoji", s0)
 }
 
+func TestStringEmoji2(t *testing.T) {
+	// see: test_hessian/src/main/java/test/TestString.java
+	// see https://github.com/apache/dubbo-go-hessian2/issues/252
+	s0 := "❄️🚫🚫🚫🚫 多次自我介绍、任务、动态和"
+
+	testDecodeFramework(t, "customReplyStringEmoji2", s0)
+	testJavaDecode(t, "customArgString_emoji2", s0)
+}
+
 func TestStringComplex(t *testing.T) {
 	// see: test_hessian/src/main/java/test/TestString.java
 	s0 := "킐\u0088中国你好!\u0088\u0088\u0088\u0088\u0088\u0088"
 
 	testDecodeFramework(t, "customReplyComplexString", s0)
 	testJavaDecode(t, "customArgComplexString", s0)
+}
+
+func BenchmarkDecodeStringAscii(b *testing.B) {
+	runBenchmarkDecodeString(b, "hello world, hello hessian")
+}
+
+func BenchmarkDecodeStringUnicode(b *testing.B) {
+	runBenchmarkDecodeString(b, "你好, 世界, 你好, hessian")
+}
+
+func BenchmarkDecodeStringEmoji(b *testing.B) {
+	runBenchmarkDecodeString(b, "❄️🚫🚫🚫🚫 多次自我介绍、任务、动态和")
+}
+
+func runBenchmarkDecodeString(b *testing.B, s string) {
+	s = strings.Repeat(s, 4096)
+
+	e := NewEncoder()
+	_ = e.Encode(s)
+	buf := e.buffer
+
+	d := NewDecoder(buf)
+	for i := 0; i < b.N; i++ {
+		d.Reset(buf)
+		_, err := d.Decode()
+		if err != nil {
+			b.Logf("err: %s", err)
+			b.FailNow()
+		}
+	}
 }

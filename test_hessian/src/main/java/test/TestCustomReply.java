@@ -22,6 +22,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.caucho.hessian.test.A0;
 import com.caucho.hessian.test.A1;
+import test.generic.BusinessData;
+import test.generic.Response;
 import test.model.DateDemo;
 
 import java.io.OutputStream;
@@ -428,6 +430,11 @@ public class TestCustomReply {
         output.flush();
     }
 
+    public void customReplyStringEmoji2() throws Exception {
+        output.writeObject(TestString.getEmojiTestString2());
+        output.flush();
+    }
+
     public void customReplyPerson183() throws Exception {
         Person183 p = new Person183();
         p.name = "pname";
@@ -505,6 +512,18 @@ public class TestCustomReply {
     public void customReplyMapInMapJsonObject() throws Exception {
         JSONObject json = JSON.parseObject(JSON.toJSONString(mapInMap()));
         output.writeObject(json);
+        output.flush();
+    }
+
+    public void customReplyGenericResponseLong() throws Exception {
+        Response<Long> response = new Response<>(200, 123L);
+        output.writeObject(response);
+        output.flush();
+    }
+
+    public void customReplyGenericResponseBusinessData() throws Exception {
+        Response<BusinessData> response = new Response<>(201, new BusinessData("apple", 5));
+        output.writeObject(response);
         output.flush();
     }
 }

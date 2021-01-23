@@ -28,13 +28,13 @@ import (
 
 var exceptionCheckMutex sync.Mutex
 
-func checkAndGetException(cls classInfo) (structInfo, bool) {
+func checkAndGetException(cls *classInfo) (*structInfo, bool) {
 
 	if len(cls.fieldNameList) < 4 {
-		return structInfo{}, false
+		return nil, false
 	}
 	var (
-		throwable structInfo
+		throwable *structInfo
 		ok        bool
 	)
 	var count = 0

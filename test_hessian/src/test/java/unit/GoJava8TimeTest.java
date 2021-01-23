@@ -14,32 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package unit;
 
-package hessian
+import junit.framework.Assert;
+import org.junit.Test;
 
-import (
-	"testing"
-)
-import (
-	"github.com/stretchr/testify/assert"
-)
+import java.time.LocalDate;
+import java.time.Year;
 
-func TestCheckAndGetException(t *testing.T) {
-	clazzInfo1 := &classInfo{
-		javaName:      "com.test.UserDefinedException",
-		fieldNameList: []string{"detailMessage", "code", "suppressedExceptions", "stackTrace", "cause"},
-	}
-	s, b := checkAndGetException(clazzInfo1)
-	assert.True(t, b)
+/**
+ * date 2020/9/12 11:09 <br/>
+ * description class <br/>
+ * test java8
+ *
+ * @author zhangyanmingjiayou@163.com
+ * @version 1.0
+ * @since 1.0
+ */
+public class GoJava8TimeTest {
 
-	assert.Equal(t, s.javaName, "com.test.UserDefinedException")
-	assert.Equal(t, s.goName, "hessian.UnknownException")
+    /**
+     * test java8 java.time.* object and go java8_time/* struct
+     */
+    @Test
+    public void testJava8Year() {
+        Year year = Year.of(2020);
+        Assert.assertEquals(year
+                , GoTestUtil.readGoObject("Java8TimeYear"));
+        LocalDate localDate = LocalDate.of(2020, 9, 12);
+        Assert.assertEquals(localDate, GoTestUtil.readGoObject("Java8LocalDate"));
+    }
 
-	clazzInfo2 := &classInfo{
-		javaName:      "com.test.UserDefinedException",
-		fieldNameList: []string{"detailMessage", "code", "suppressedExceptions", "cause"},
-	}
-	s, b = checkAndGetException(clazzInfo2)
-	assert.False(t, b)
-	assert.Nil(t, s)
 }

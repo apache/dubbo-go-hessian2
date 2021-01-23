@@ -14,32 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package unit;
 
-package hessian
+import junit.framework.Assert;
+import org.junit.Test;
 
-import (
-	"testing"
-)
-import (
-	"github.com/stretchr/testify/assert"
-)
+/**
+ * date 2020/9/12 11:09 <br/>
+ * description class <br/>
+ * test java8
+ *
+ * @author zhangyanmingjiayou@163.com
+ * @version 1.0
+ * @since 1.0
+ */
+public class GoJavaExceptionTest {
 
-func TestCheckAndGetException(t *testing.T) {
-	clazzInfo1 := &classInfo{
-		javaName:      "com.test.UserDefinedException",
-		fieldNameList: []string{"detailMessage", "code", "suppressedExceptions", "stackTrace", "cause"},
-	}
-	s, b := checkAndGetException(clazzInfo1)
-	assert.True(t, b)
+    /**
+     * test java java.lang.Exception object and go java_exception Exception struct
+     */
+    @Test
+    public void testException() {
+        Exception exception = new Exception("java_exception");
+        Object javaException = GoTestUtil.readGoObject("JavaException");
+        // assertEquals don't compare Exception object
+        if (javaException instanceof Exception) {
+            Assert.assertEquals(exception.getMessage(), ((Exception) javaException).getMessage());
+        }
+    }
 
-	assert.Equal(t, s.javaName, "com.test.UserDefinedException")
-	assert.Equal(t, s.goName, "hessian.UnknownException")
-
-	clazzInfo2 := &classInfo{
-		javaName:      "com.test.UserDefinedException",
-		fieldNameList: []string{"detailMessage", "code", "suppressedExceptions", "cause"},
-	}
-	s, b = checkAndGetException(clazzInfo2)
-	assert.False(t, b)
-	assert.Nil(t, s)
 }

@@ -15,31 +15,17 @@
  * limitations under the License.
  */
 
-package hessian
+package testfuncs
 
 import (
-	"testing"
-)
-import (
-	"github.com/stretchr/testify/assert"
+	hessian "github.com/apache/dubbo-go-hessian2"
+	"github.com/apache/dubbo-go-hessian2/java_exception"
 )
 
-func TestCheckAndGetException(t *testing.T) {
-	clazzInfo1 := &classInfo{
-		javaName:      "com.test.UserDefinedException",
-		fieldNameList: []string{"detailMessage", "code", "suppressedExceptions", "stackTrace", "cause"},
-	}
-	s, b := checkAndGetException(clazzInfo1)
-	assert.True(t, b)
-
-	assert.Equal(t, s.javaName, "com.test.UserDefinedException")
-	assert.Equal(t, s.goName, "hessian.UnknownException")
-
-	clazzInfo2 := &classInfo{
-		javaName:      "com.test.UserDefinedException",
-		fieldNameList: []string{"detailMessage", "code", "suppressedExceptions", "cause"},
-	}
-	s, b = checkAndGetException(clazzInfo2)
-	assert.False(t, b)
-	assert.Nil(t, s)
+// JavaException is test java Exception
+func JavaException() []byte {
+	e := hessian.NewEncoder()
+	exception := java_exception.NewException("java_exception")
+	e.Encode(exception)
+	return e.Buffer()
 }

@@ -15,31 +15,25 @@
  * limitations under the License.
  */
 
-package hessian
+package test.generic;
 
-import (
-	"testing"
-)
-import (
-	"github.com/stretchr/testify/assert"
-)
+import java.io.Serializable;
 
-func TestCheckAndGetException(t *testing.T) {
-	clazzInfo1 := &classInfo{
-		javaName:      "com.test.UserDefinedException",
-		fieldNameList: []string{"detailMessage", "code", "suppressedExceptions", "stackTrace", "cause"},
-	}
-	s, b := checkAndGetException(clazzInfo1)
-	assert.True(t, b)
+public class Response<T> implements Serializable {
 
-	assert.Equal(t, s.javaName, "com.test.UserDefinedException")
-	assert.Equal(t, s.goName, "hessian.UnknownException")
+    private int code;
+    private T data;
 
-	clazzInfo2 := &classInfo{
-		javaName:      "com.test.UserDefinedException",
-		fieldNameList: []string{"detailMessage", "code", "suppressedExceptions", "cause"},
-	}
-	s, b = checkAndGetException(clazzInfo2)
-	assert.False(t, b)
-	assert.Nil(t, s)
+    public int getCode() {
+        return code;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public Response(int code, T data) {
+        this.code = code;
+        this.data = data;
+    }
 }
