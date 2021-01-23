@@ -90,6 +90,14 @@ public class Hessian {
                 output.flush();
             }
 
+        } else if (args[0].startsWith("javautil")) {
+            // add java.util.* Object test
+            Method method = TestJavaUtil.class.getMethod(args[0]);
+            Object obj = new Object();
+            Object object = method.invoke(obj);
+            Hessian2Output output = new Hessian2Output(System.out);
+            output.writeObject(object);
+            output.flush();
         }
     }
 
