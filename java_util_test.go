@@ -18,9 +18,10 @@
 package hessian
 
 import (
+	"github.com/apache/dubbo-go-hessian2/java_util"
 	"testing"
 )
 
 func TestJavaUtil(t *testing.T) {
-	//testDecodeFramework(t, "javautilUUID", &java_util.UUID{LeastSigBits: int64(2020), MostSigBits: int64(8067822391307271002)})
+	testDecodeFramework(t, "javautilUUID", &java_util.UUID{LeastSigBits: int64(-7160773830801198154), MostSigBits: int64(459021424248441700)})
 }

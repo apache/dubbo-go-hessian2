@@ -22,7 +22,7 @@ import java.util.UUID;
 public class TestJavaUtil {
 
     public static UUID javautilUUID() {
-        UUID uuid = UUID.randomUUID();
+        UUID uuid = new UUID(459021424248441700L, -7160773830801198154L);
         return uuid;
     }
 
