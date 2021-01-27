@@ -31,10 +31,6 @@ func (UUID) JavaClassName() string {
 	return "java.util.UUID"
 }
 
-func (UUID) Error() string {
-	return "encode java.util.UUID error"
-}
-
 //ToString
 //Returns a string object representing this UUID.
 //The UUID string representation is as described by this BNF:
@@ -58,10 +54,10 @@ func (UUID) Error() string {
 //A string representation of this UUID
 func (uuid UUID) ToString() string {
 	uuidStr := fmt.Sprintf("%v-%v-%v-%v-%v",
-		digits((uuid.MostSigBits>>32), 8),
-		digits((uuid.MostSigBits>>16), 4),
+		digits(uuid.MostSigBits>>32, 8),
+		digits(uuid.MostSigBits>>16, 4),
 		digits(uuid.MostSigBits, 4),
-		digits((uuid.LeastSigBits>>48), 4),
+		digits(uuid.LeastSigBits>>48, 4),
 		digits(uuid.LeastSigBits, 12),
 	)
 	return uuidStr
