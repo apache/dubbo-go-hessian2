@@ -64,7 +64,7 @@ func (uuid UUID) ToString() string {
 }
 
 // digits Returns arg represented by the specified number of hex digits.
-func digits(arg int64, digits int) string {
+func digits(arg int64, digits uint) string {
 	var hi = int64(1) << (digits * 4)
 	i := hi | (arg & (hi - 1))
 	return fmt.Sprintf("%x", i)[1:]
