@@ -18,15 +18,22 @@
 package hessian
 
 import (
+	"encoding/json"
 	"math"
 	"reflect"
 	"testing"
+	"time"
+)
+
+import (
+	"github.com/stretchr/testify/assert"
 )
 
 type Department struct {
 	Name string
 }
 
+// JavaClassName  java fully qualified path
 func (Department) JavaClassName() string {
 	return "com.bdt.info.Department"
 }
@@ -43,6 +50,7 @@ type WorkerInfo struct {
 	Dpt               Department
 }
 
+// JavaClassName  java fully qualified path
 func (WorkerInfo) JavaClassName() string {
 	return "com.bdt.info.WorkerInfo"
 }
@@ -134,6 +142,7 @@ type UserName struct {
 	LastName  string
 }
 
+// JavaClassName  java fully qualified path
 func (UserName) JavaClassName() string {
 	return "com.bdt.info.UserName"
 }
@@ -144,6 +153,7 @@ type Person struct {
 	Sex bool
 }
 
+// JavaClassName  java fully qualified path
 func (Person) JavaClassName() string {
 	return "com.bdt.info.Person"
 }
@@ -153,6 +163,7 @@ type JOB struct {
 	Company string
 }
 
+// JavaClassName  java fully qualified path
 func (JOB) JavaClassName() string {
 	return "com.bdt.info.JOB"
 }
@@ -163,6 +174,7 @@ type Worker struct {
 	Jobs   []JOB
 }
 
+// JavaClassName  java fully qualified path
 func (Worker) JavaClassName() string {
 	return "com.bdt.info.Worker"
 }
@@ -214,102 +226,119 @@ func TestIssue6(t *testing.T) {
 
 type A0 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A0) JavaClassName() string {
 	return "com.caucho.hessian.test.A0"
 }
 
 type A1 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A1) JavaClassName() string {
 	return "com.caucho.hessian.test.A1"
 }
 
 type A2 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A2) JavaClassName() string {
 	return "com.caucho.hessian.test.A2"
 }
 
 type A3 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A3) JavaClassName() string {
 	return "com.caucho.hessian.test.A3"
 }
 
 type A4 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A4) JavaClassName() string {
 	return "com.caucho.hessian.test.A4"
 }
 
 type A5 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A5) JavaClassName() string {
 	return "com.caucho.hessian.test.A5"
 }
 
 type A6 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A6) JavaClassName() string {
 	return "com.caucho.hessian.test.A6"
 }
 
 type A7 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A7) JavaClassName() string {
 	return "com.caucho.hessian.test.A7"
 }
 
 type A8 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A8) JavaClassName() string {
 	return "com.caucho.hessian.test.A8"
 }
 
 type A9 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A9) JavaClassName() string {
 	return "com.caucho.hessian.test.A9"
 }
 
 type A10 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A10) JavaClassName() string {
 	return "com.caucho.hessian.test.A10"
 }
 
 type A11 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A11) JavaClassName() string {
 	return "com.caucho.hessian.test.A11"
 }
 
 type A12 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A12) JavaClassName() string {
 	return "com.caucho.hessian.test.A12"
 }
 
 type A13 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A13) JavaClassName() string {
 	return "com.caucho.hessian.test.A13"
 }
 
 type A14 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A14) JavaClassName() string {
 	return "com.caucho.hessian.test.A14"
 }
 
 type A15 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A15) JavaClassName() string {
 	return "com.caucho.hessian.test.A15"
 }
 
 type A16 struct{}
 
+// JavaClassName  java fully qualified path
 func (*A16) JavaClassName() string {
 	return "com.caucho.hessian.test.A16"
 }
@@ -318,6 +347,7 @@ type TestObjectStruct struct {
 	Value int32 `hessian:"_value"`
 }
 
+// JavaClassName  java fully qualified path
 func (*TestObjectStruct) JavaClassName() string {
 	return "com.caucho.hessian.test.TestObject"
 }
@@ -327,6 +357,7 @@ type TestConsStruct struct {
 	Rest  *TestConsStruct `hessian:"_rest"`
 }
 
+// JavaClassName  java fully qualified path
 func (*TestConsStruct) JavaClassName() string {
 	return "com.caucho.hessian.test.TestCons"
 }
@@ -400,6 +431,7 @@ type Tuple struct {
 	D       float64
 }
 
+// JavaClassName  java fully qualified path
 func (t Tuple) JavaClassName() string {
 	return "test.tuple.Tuple"
 }
@@ -488,6 +520,7 @@ type BasePointer struct {
 	A *bool
 }
 
+// JavaClassName  java fully qualified path
 func (t BasePointer) JavaClassName() string {
 	return "test.base.Base"
 }
@@ -531,9 +564,9 @@ func doTestBasePointer(t *testing.T, base *BasePointer, expected *BasePointer) {
 
 func TestSkip(t *testing.T) {
 	// clear pojo
-	pojoRegistry = POJORegistry{
+	pojoRegistry = &POJORegistry{
 		j2g:      make(map[string]string),
-		registry: make(map[string]structInfo),
+		registry: make(map[string]*structInfo),
 	}
 	testDecodeFrameworkWithSkip(t, "replyObject_0", nil)
 	testDecodeFrameworkWithSkip(t, "replyObject_1", nil)
@@ -557,4 +590,224 @@ func TestSkip(t *testing.T) {
 	testDecodeFrameworkWithSkip(t, "customReplyTypedFixedList_Test", nil)
 
 	testDecodeFrameworkWithSkip(t, "customReplyTypedFixedList_Object", make([]Object, 1))
+}
+
+type Animal struct {
+	Name string
+}
+
+type animal struct {
+	Name string
+}
+
+func (a Animal) JavaClassName() string {
+	return "test.Animal"
+}
+
+type Dog struct {
+	Animal
+	animal
+	Gender  string
+	DogName string `hessian:"-"`
+}
+
+//JavaClassName  java fully qualified path
+func (dog Dog) JavaClassName() string {
+	return "test.Dog"
+}
+
+type DogAll struct {
+	All    bool
+	Name   string
+	Gender string
+}
+
+//JavaClassName  java fully qualified path
+func (dog *DogAll) JavaClassName() string {
+	return "test.DogAll"
+}
+
+// see https://github.com/apache/dubbo-go-hessian2/issues/149
+func TestIssue149_EmbedStructGoDecode(t *testing.T) {
+	t.Run(`extends to embed`, func(t *testing.T) {
+		RegisterPOJO(&Dog{})
+		got, err := decodeJavaResponse(`customReplyExtendClass`, ``, false)
+		if err != nil {
+			t.Error(err)
+		}
+
+		want := &Dog{Animal{`a dog`}, animal{}, `male`, ``}
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("want %v got %v", want, got)
+		}
+	})
+
+	t.Run(`extends to all fields`, func(t *testing.T) {
+		RegisterPOJO(&DogAll{})
+		got, err := decodeJavaResponse(`customReplyExtendClassToSingleStruct`, ``, false)
+		if err != nil {
+			t.Error(err)
+		}
+
+		want := &DogAll{true, `a dog`, `male`}
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("want %v got %v", want, got)
+		}
+	})
+}
+func TestIssue150_EmbedStructJavaDecode(t *testing.T) {
+	RegisterPOJO(&Dog{})
+	RegisterPOJO(&Animal{})
+
+	dog := &Dog{Animal{`a dog`}, animal{}, `male`, `DogName`}
+	bytes, err := encodeTarget(dog)
+	t.Log(string(bytes), err)
+
+	testJavaDecode(t, "customArgTypedFixed_Extends", dog)
+}
+
+type Mix struct {
+	A  int
+	B  string
+	CA time.Time
+	CB int64
+	CC string
+	CD []float64
+	D  map[string]interface{}
+}
+
+func (m Mix) JavaClassName() string {
+	return `test.mix`
+}
+
+func init() {
+	RegisterPOJO(new(Mix))
+}
+
+//
+// BenchmarkJsonEncode-8   	  217354	      4799 ns/op	     832 B/op	      15 allocs/op
+func BenchmarkJsonEncode(b *testing.B) {
+	m := Mix{A: int('a'), B: `hello`}
+	m.CD = []float64{1, 2, 3}
+	m.D = map[string]interface{}{`floats`: m.CD, `A`: m.A, `m`: m}
+
+	for i := 0; i < b.N; i++ {
+		_, err := json.Marshal(&m)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+//
+// BenchmarkEncode-8   	  211452	      5560 ns/op	    1771 B/op	      51 allocs/op
+func BenchmarkEncode(b *testing.B) {
+	m := Mix{A: int('a'), B: `hello`}
+	m.CD = []float64{1, 2, 3}
+	m.D = map[string]interface{}{`floats`: m.CD, `A`: m.A, `m`: m}
+
+	for i := 0; i < b.N; i++ {
+		_, err := encodeTarget(&m)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+//
+// BenchmarkJsonDecode-8   	  123922	      8549 ns/op	    1776 B/op	      51 allocs/op
+func BenchmarkJsonDecode(b *testing.B) {
+	m := Mix{A: int('a'), B: `hello`}
+	m.CD = []float64{1, 2, 3}
+	m.D = map[string]interface{}{`floats`: m.CD, `A`: m.A, `m`: m}
+	bytes, err := json.Marshal(&m)
+	if err != nil {
+		b.Error(err)
+	}
+
+	for i := 0; i < b.N; i++ {
+		m := &Mix{}
+		err := json.Unmarshal(bytes, m)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+//
+// BenchmarkDecode-8   	  104196	     10924 ns/op	    6424 B/op	      98 allocs/op
+func BenchmarkDecode(b *testing.B) {
+	m := Mix{A: int('a'), B: `hello`}
+	m.CD = []float64{1, 2, 3}
+	m.D = map[string]interface{}{`floats`: m.CD, `A`: m.A, `m`: m}
+	bytes, err := encodeTarget(&m)
+	if err != nil {
+		b.Error(err)
+	}
+
+	for i := 0; i < b.N; i++ {
+		d := NewDecoder(bytes)
+		_, err := d.Decode()
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+type Person183 struct {
+	Name string
+}
+
+func (Person183) JavaClassName() string {
+	return `test.Person183`
+}
+
+func TestIssue183_DecodeExcessStructField(t *testing.T) {
+	RegisterPOJO(&Person183{})
+	got, err := decodeJavaResponse(`customReplyPerson183`, ``, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+}
+
+type GenericResponse struct {
+	Code int
+	Data interface{}
+}
+
+func (GenericResponse) JavaClassName() string {
+	return `test.generic.Response`
+}
+
+type BusinessData struct {
+	Name  string
+	Count int
+}
+
+func (BusinessData) JavaClassName() string {
+	return `test.generic.BusinessData`
+}
+
+func TestCustomReplyGenericResponseLong(t *testing.T) {
+	res := &GenericResponse{
+		Code: 200,
+		Data: int64(123),
+	}
+	RegisterPOJO(res)
+
+	testDecodeFramework(t, "customReplyGenericResponseLong", res)
+}
+
+func TestCustomReplyGenericResponseBusinessData(t *testing.T) {
+	data := BusinessData{
+		Name:  "apple",
+		Count: 5,
+	}
+	res := &GenericResponse{
+		Code: 201,
+		Data: data,
+	}
+	RegisterPOJO(data)
+	RegisterPOJO(res)
+
+	testDecodeFramework(t, "customReplyGenericResponseBusinessData", res)
 }

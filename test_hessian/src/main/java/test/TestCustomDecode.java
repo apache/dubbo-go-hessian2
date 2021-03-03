@@ -20,14 +20,13 @@ package test;
 import com.caucho.hessian.io.Hessian2Input;
 import com.caucho.hessian.test.A0;
 import com.caucho.hessian.test.A1;
-import test.model.DateDemo;
-
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.math.BigInteger;
+import java.util.*;
+
+import test.model.DateDemo;
+
 
 public class TestCustomDecode {
 
@@ -166,12 +165,32 @@ public class TestCustomDecode {
         return Arrays.deepEquals(list, (Object[]) o);
     }
 
-    public Object customArgTypedFixedList_Decimal() throws Exception {
+    public Object customArgTypedFixed_Integer() throws Exception {
+        BigInteger o = (BigInteger) input.readObject();
+        return o.toString().equals("4294967298");
+    }
+
+    public Object customArgTypedFixed_IntegerZero() throws Exception {
+        BigInteger o = (BigInteger) input.readObject();
+        return o.toString().equals("0");
+    }
+
+    public Object customArgTypedFixed_IntegerSigned() throws Exception {
+        BigInteger o = (BigInteger) input.readObject();
+        return o.toString().equals("-4294967298");
+    }
+
+    public Object customArgTypedFixed_Decimal() throws Exception {
         BigDecimal o = (BigDecimal) input.readObject();
         return o.toString().equals("100.256");
     }
 
-    public Object customArgTypedFixedList_DateNull() throws Exception {
+    public Object customArgTypedFixed_Extends() throws Exception {
+        Dog o = (Dog) input.readObject();
+        return o.name.equals("a dog") && o.gender.equals("male");
+    }
+
+    public Object customArgTypedFixed_DateNull() throws Exception {
         DateDemo o = (DateDemo) input.readObject();
         return o.getDate() == null && o.getDate1() == null;
     }
@@ -179,5 +198,20 @@ public class TestCustomDecode {
     public Object customArgString_emoji() throws Exception {
         String o = (String) input.readObject();
         return TestString.getEmojiTestString().equals(o);
+    }
+
+    public Object customArgString_emoji2() throws Exception {
+        String o = (String) input.readObject();
+        return TestString.getEmojiTestString2().equals(o);
+    }
+
+    public Object customArgComplexString() throws Exception {
+        String o = (String) input.readObject();
+        return TestString.getComplexString().equals(o);
+    }
+
+    public Object customArgTypedFixedList_HashSet() throws Exception {
+        HashSet o = (HashSet) input.readObject();
+        return o.contains(0) && o.contains(1);
     }
 }

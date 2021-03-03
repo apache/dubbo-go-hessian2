@@ -34,7 +34,27 @@ type Case struct {
 	B int
 }
 
-func (c *Case) JavaClassName() string {
+type CaseA struct {
+	A string
+	B int
+	C Case
+}
+
+type CaseB struct {
+	A string
+	B CaseA
+}
+
+func (c *CaseB) JavaClassName() string {
+	return "com.test.caseb"
+}
+
+func (c CaseA) JavaClassName() string {
+	return "com.test.casea"
+}
+
+//JavaClassName  java fully qualified path
+func (c Case) JavaClassName() string {
 	return "com.test.case"
 }
 
@@ -59,6 +79,7 @@ func doTestHessianEncodeHeader(t *testing.T, packageType PackageType, responseSt
 
 func doTestResponse(t *testing.T, packageType PackageType, responseStatus byte, body interface{}, decodedResponse *Response, assertFunc func()) {
 	resp, err := doTestHessianEncodeHeader(t, packageType, responseStatus, body)
+	assert.Nil(t, err)
 
 	codecR := NewHessianCodec(bufio.NewReader(bytes.NewReader(resp)))
 
@@ -142,6 +163,7 @@ func TestResponse(t *testing.T) {
 
 func doTestRequest(t *testing.T, packageType PackageType, responseStatus byte, body interface{}) {
 	resp, err := doTestHessianEncodeHeader(t, packageType, responseStatus, body)
+	assert.Nil(t, err)
 
 	codecR := NewHessianCodec(bufio.NewReader(bytes.NewReader(resp)))
 
@@ -169,4 +191,30 @@ func TestRequest(t *testing.T) {
 	doTestRequest(t, PackageRequest, Zero, []interface{}{"a", 3, true, &Case{A: "a", B: 3}})
 	doTestRequest(t, PackageRequest, Zero, []interface{}{"a", 3, true, []*Case{{A: "a", B: 3}}})
 	doTestRequest(t, PackageRequest, Zero, []interface{}{map[string][]*Case{"key": {{A: "a", B: 3}}}})
+}
+
+func TestHessianCodec_ReadAttachments(t *testing.T) {
+	body := &Response{
+		RspObj:      &CaseB{A: "A", B: CaseA{A: "a", B: 1, C: Case{A: "c", B: 2}}},
+		Exception:   nil,
+		Attachments: map[string]string{DUBBO_VERSION_KEY: "2.6.4"},
+	}
+	resp, err := doTestHessianEncodeHeader(t, PackageResponse, Response_OK, body)
+	assert.NoError(t, err)
+	UnRegisterPOJOs(&CaseB{}, &CaseA{})
+	codecR1 := NewHessianCodec(bufio.NewReader(bytes.NewReader(resp)))
+	codecR2 := NewHessianCodec(bufio.NewReader(bytes.NewReader(resp)))
+	h := &DubboHeader{}
+	assert.NoError(t, codecR1.ReadHeader(h))
+	t.Log(h)
+	assert.NoError(t, codecR2.ReadHeader(h))
+	t.Log(h)
+
+	err = codecR1.ReadBody(body)
+	assert.Equal(t, "can not find go type name com.test.caseb in registry", err.Error())
+	attrs, err := codecR2.ReadAttachments()
+	assert.NoError(t, err)
+	assert.Equal(t, "2.6.4", attrs[DUBBO_VERSION_KEY])
+
+	t.Log(attrs)
 }

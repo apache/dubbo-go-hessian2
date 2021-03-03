@@ -62,6 +62,34 @@ public class Hessian {
             Hessian2Output output = new Hessian2Output(System.out);
             output.writeObject(object);
             output.flush();
+        } else if (args[0].startsWith("java8_")) {
+            //add java8 java.time Object test
+            Method method = TestJava8Time.class.getMethod(args[0]);
+            Object obj = new Object();
+            Object object = method.invoke(obj);
+
+            Hessian2Output output = new Hessian2Output(System.out);
+            output.writeObject(object);
+            output.flush();
+        } else if (args[0].startsWith("javaSql_")) {
+            if (args[0].startsWith("javaSql_encode")) {
+
+                Hessian2Input input = new Hessian2Input(System.in);
+                Object o = input.readObject();
+
+                Method method = TestJavaSqlTime.class.getMethod(args[0], Object.class);
+                TestJavaSqlTime testJavaSqlTime = new TestJavaSqlTime();
+                System.out.print(method.invoke(testJavaSqlTime, o));
+            } else {
+                Method method = TestJavaSqlTime.class.getMethod(args[0]);
+                TestJavaSqlTime testJavaSqlTime = new TestJavaSqlTime();
+                Object object = method.invoke(testJavaSqlTime);
+
+                Hessian2Output output = new Hessian2Output(System.out);
+                output.writeObject(object);
+                output.flush();
+            }
+
         }
     }
 

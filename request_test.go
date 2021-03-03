@@ -18,6 +18,8 @@
 package hessian
 
 import (
+	"reflect"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -25,6 +27,45 @@ import (
 import (
 	"github.com/stretchr/testify/assert"
 )
+
+type TestEnumGender JavaEnum
+
+const (
+	MAN JavaEnum = iota
+	WOMAN
+)
+
+var genderName = map[JavaEnum]string{
+	MAN:   "MAN",
+	WOMAN: "WOMAN",
+}
+
+var genderValue = map[string]JavaEnum{
+	"MAN":   MAN,
+	"WOMAN": WOMAN,
+}
+
+func (g TestEnumGender) JavaClassName() string {
+	return "com.ikurento.test.TestEnumGender"
+}
+
+func (g TestEnumGender) String() string {
+	s, ok := genderName[JavaEnum(g)]
+	if ok {
+		return s
+	}
+
+	return strconv.Itoa(int(g))
+}
+
+func (g TestEnumGender) EnumValue(s string) JavaEnum {
+	v, ok := genderValue[s]
+	if ok {
+		return v
+	}
+
+	return InvalidJavaEnum
+}
 
 func TestPackRequest(t *testing.T) {
 	bytes, err := packRequest(Service{
@@ -48,9 +89,9 @@ func TestPackRequest(t *testing.T) {
 
 func TestGetArgsTypeList(t *testing.T) {
 	type Test struct{}
-	str, err := getArgsTypeList([]interface{}{nil, 1, []int{2}, true, []bool{false}, "a", []string{"b"}, Test{}, &Test{}, []Test{}, map[string]Test{}})
+	str, err := getArgsTypeList([]interface{}{nil, 1, []int{2}, true, []bool{false}, "a", []string{"b"}, Test{}, &Test{}, []Test{}, map[string]Test{}, TestEnumGender(MAN)})
 	assert.NoError(t, err)
-	assert.Equal(t, "VJ[JZ[ZLjava/lang/String;[Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;[Ljava/lang/Object;Ljava/util/Map;", str)
+	assert.Equal(t, "VJ[JZ[ZLjava/lang/String;[Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;[Ljava/lang/Object;Ljava/util/Map;Lcom/ikurento/test/TestEnumGender;", str)
 }
 
 func TestDescRegex(t *testing.T) {
@@ -79,4 +120,38 @@ func TestDescRegex(t *testing.T) {
 	assert.Equal(t, 2, len(results))
 	assert.Equal(t, "[Ljava/lang/String;", results[0])
 	assert.Equal(t, "[I", results[1])
+}
+
+func TestIssue192(t *testing.T) {
+	type args struct {
+		origin map[interface{}]interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[string]string
+	}{
+		{
+			name: "not null",
+			args: args{
+				origin: map[interface{}]interface{}{
+					"1": nil,
+					"2": "3",
+					"":  "",
+				},
+			},
+			want: map[string]string{
+				"1": "",
+				"2": "3",
+				"":  "",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ToMapStringString(tt.args.origin); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ToMapStringString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

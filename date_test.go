@@ -40,6 +40,7 @@ type DateDemo struct {
 	Date3   ***time.Time
 }
 
+//JavaClassName  java fully qualified path
 func (DateDemo) JavaClassName() string {
 	return "test.model.DateDemo"
 }
@@ -142,7 +143,7 @@ func TestDateNulJavaDecode(t *testing.T) {
 		Name: "zs",
 		Date: ZeroDate,
 	}
-	testJavaDecode(t, "customArgTypedFixedList_DateNull", date)
+	testJavaDecode(t, "customArgTypedFixed_DateNull", date)
 }
 
 func TestDateNilDecode(t *testing.T) {

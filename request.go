@@ -97,7 +97,8 @@ func getArgType(v interface{}) string {
 	case map[interface{}]interface{}:
 		// return  "java.util.HashMap"
 		return "java.util.Map"
-
+	case POJOEnum:
+		return v.(POJOEnum).JavaClassName()
 	//  Serialized tags for complex types
 	default:
 		t := reflect.TypeOf(v)
@@ -106,6 +107,10 @@ func getArgType(v interface{}) string {
 		}
 		switch t.Kind() {
 		case reflect.Struct:
+			v, ok := v.(POJO)
+			if ok {
+				return v.JavaClassName()
+			}
 			return "java.lang.Object"
 		case reflect.Slice, reflect.Array:
 			if t.Elem().Kind() == reflect.Struct {
@@ -334,9 +339,13 @@ func unpackRequestBody(decoder *Decoder, reqObj interface{}) error {
 }
 
 func ToMapStringString(origin map[interface{}]interface{}) map[string]string {
-	dest := make(map[string]string)
+	dest := make(map[string]string, len(origin))
 	for k, v := range origin {
 		if kv, ok := k.(string); ok {
+			if v == nil {
+				dest[kv] = ""
+				continue
+			}
 			if vv, ok := v.(string); ok {
 				dest[kv] = vv
 			}

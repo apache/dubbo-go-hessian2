@@ -18,23 +18,30 @@
 package test;
 
 import com.alibaba.com.caucho.hessian.io.Hessian2Output;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.caucho.hessian.test.A0;
 import com.caucho.hessian.test.A1;
+import test.generic.BusinessData;
+import test.generic.Response;
 import test.model.DateDemo;
 
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class TestCustomReply {
 
     private Hessian2Output output;
     private HashMap<Class<?>, String> typeMap;
 
-    TestCustomReply(OutputStream os) {
+    public TestCustomReply(OutputStream os) {
         output = new Hessian2Output(os);
 
         typeMap = new HashMap<>();
@@ -345,6 +352,56 @@ public class TestCustomReply {
         output.flush();
     }
 
+    public void customReplyTypedFixedInteger() throws Exception {
+        BigInteger integer = new BigInteger("4294967298");
+        output.writeObject(integer);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_BigInteger() throws Exception {
+        BigInteger[] integers = new BigInteger[]{
+                new BigInteger("1234"),
+                new BigInteger("12347890"),
+                new BigInteger("123478901234"),
+                new BigInteger("1234789012345678"),
+                new BigInteger("123478901234567890"),
+                new BigInteger("1234789012345678901234"),
+                new BigInteger("12347890123456789012345678"),
+                new BigInteger("123478901234567890123456781234"),
+                new BigInteger("1234789012345678901234567812345678"),
+                new BigInteger("12347890123456789012345678123456781234"),
+                new BigInteger("-12347890123456789012345678123456781234"),
+                new BigInteger("0"),
+        };
+        output.writeObject(integers);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_CustomObject() throws Exception {
+        Object[] objects = new Object[]{
+                new BigInteger("1234"),
+                new BigInteger("-12347890"),
+                new BigInteger("0"),
+                new BigDecimal("123.4"),
+                new BigDecimal("-123.45"),
+                new BigDecimal("0"),
+        };
+        output.writeObject(objects);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedIntegerZero() throws Exception {
+        BigInteger integer = new BigInteger("0");
+        output.writeObject(integer);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedIntegerSigned() throws Exception {
+        BigInteger integer = new BigInteger("-4294967298");
+        output.writeObject(integer);
+        output.flush();
+    }
+
     public void customReplyTypedFixedDecimal() throws Exception {
         BigDecimal decimal = new BigDecimal("100.256");
         output.writeObject(decimal);
@@ -355,6 +412,16 @@ public class TestCustomReply {
         HashMap mapDemo = new HashMap<>();
         mapDemo.put("test_BigDecimal",decimal);
         output.writeObject(mapDemo);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_BigDecimal() throws Exception {
+        BigDecimal[] decimals = new BigDecimal[]{
+                new BigDecimal("123.4"),
+                new BigDecimal("123.45"),
+                new BigDecimal("123.456"),
+        };
+        output.writeObject(decimals);
         output.flush();
     }
 
@@ -369,6 +436,118 @@ public class TestCustomReply {
         output.flush();
     }
 
+    public void customReplyStringEmoji2() throws Exception {
+        output.writeObject(TestString.getEmojiTestString2());
+        output.flush();
+    }
+
+    public void customReplyPerson183() throws Exception {
+        Person183 p = new Person183();
+        p.name = "pname";
+        p.age = 13;
+        InnerPerson innerPerson = new InnerPerson();
+        innerPerson.name = "pname2";
+        innerPerson.age = 132;
+        p.innerPerson = innerPerson;
+        output.writeObject(p);
+        output.flush();
+    }
+
+    public void customReplyComplexString() throws Exception {
+        output.writeObject(TestString.getComplexString());
+        output.flush();
+    }
+
+    public void customReplyExtendClass() throws Exception {
+        Dog dog = new Dog();
+        dog.name = "a dog";
+        dog.gender = "male";
+        output.writeObject(dog);
+        output.flush();
+    }
+
+    public void customReplyExtendClassToSingleStruct() throws Exception {
+        Dog dog = new DogAll();
+        dog.name = "a dog";
+        dog.gender = "male";
+        output.writeObject(dog);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_HashSet() throws Exception {
+        Set<Integer> set = new HashSet<>();
+        set.add(0);
+        set.add(1);
+        output.writeObject(set);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedList_HashSetCustomObject() throws Exception {
+        Set<Object> set = new HashSet<>();
+        set.add(new BigInteger("1234"));
+        set.add(new BigDecimal("123.4"));
+        output.writeObject(set);
+        output.flush();
+    }
+
+    public void customReplyMap() throws Exception {
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("a", 1);
+        map.put("b", 2);
+        output.writeObject(map);
+        output.flush();
+    }
+
+    public Map<String, Object> mapInMap() throws Exception {
+        Map<String, Object> map1 = new HashMap<String, Object>();
+        map1.put("a", 1);
+        Map<String, Object> map2 = new HashMap<String, Object>();
+        map2.put("b", 2);
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("obj1", map1);
+        map.put("obj2", map2);
+        return map;
+    }
+
+    public void customReplyMapInMap() throws Exception {
+        output.writeObject(mapInMap());
+        output.flush();
+    }
+
+    public void customReplyMapInMapJsonObject() throws Exception {
+        JSONObject json = JSON.parseObject(JSON.toJSONString(mapInMap()));
+        output.writeObject(json);
+        output.flush();
+    }
+
+    public void customReplyGenericResponseLong() throws Exception {
+        Response<Long> response = new Response<>(200, 123L);
+        output.writeObject(response);
+        output.flush();
+    }
+
+    public void customReplyGenericResponseBusinessData() throws Exception {
+        Response<BusinessData> response = new Response<>(201, new BusinessData("apple", 5));
+        output.writeObject(response);
+        output.flush();
+    }
+}
+
+interface Leg {
+    public int legConnt = 4;
+}
+
+class Animal {
+    public String name;
+}
+
+class Dog extends Animal implements Serializable, Leg {
+    public String gender;
+}
+
+class DogAll extends Dog {
+    public boolean all = true;
 }
 
 class TypedListTest implements Serializable {
@@ -382,4 +561,15 @@ class TypedListTest implements Serializable {
         this.list1 = new A1[][]{{new A1(), new A1()}, {new A1(), new A1()}};
     }
 
+}
+
+class Person183 implements Serializable {
+    public String name;
+    public Integer age;
+    public InnerPerson innerPerson;
+}
+
+class InnerPerson implements Serializable {
+    public String name;
+    public Integer age;
 }

@@ -21,6 +21,10 @@ import (
 	"testing"
 )
 
+import (
+	"github.com/stretchr/testify/assert"
+)
+
 func TestEncInt32Len1B(t *testing.T) {
 	var (
 		v   int32
@@ -39,6 +43,7 @@ func TestEncInt32Len1B(t *testing.T) {
 	}
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
+	assert.Equal(t, v, res)
 	t.Logf("decode(%v) = %v, %v\n", v, res, err)
 }
 
@@ -60,7 +65,32 @@ func TestEncInt32Len2B(t *testing.T) {
 	t.Logf("%#v\n", e.buffer)
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
+	assert.Nil(t, err)
+	assert.Equal(t, v, res)
 	t.Logf("decode(%#x) = %#x, %v\n", v, res, err)
+}
+
+func TestEncInt32ForAlias(t *testing.T) {
+	var (
+		v   JavaEnum
+		err error
+		e   *Encoder
+		d   *Decoder
+		res interface{}
+	)
+
+	v = 0xe6
+	// var v int32 = 0xf016
+	e = NewEncoder()
+	e.Encode(v)
+	if len(e.Buffer()) == 0 {
+		t.Fail()
+	}
+	d = NewDecoder(e.Buffer())
+	res, err = d.Decode()
+	assert.Nil(t, err)
+	assert.Equal(t, int32(v), res)
+	t.Logf("decode(%v) = %v, %v\n", v, res, err)
 }
 
 func TestEncInt32Len4B(t *testing.T) {
@@ -81,6 +111,7 @@ func TestEncInt32Len4B(t *testing.T) {
 
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
+	assert.Nil(t, err)
 	t.Logf("decode(%v) = %v, %v\n", v, res, err)
 }
 
@@ -120,4 +151,39 @@ func TestIntEncode(t *testing.T) {
 	testJavaDecode(t, "argInt_m0x801", int32(-0x801))
 	testJavaDecode(t, "argInt_m16", int32(-16))
 	testJavaDecode(t, "argInt_m17", int32(-17))
+}
+
+func TestReflectIntEncode(t *testing.T) {
+	a1 := int32(0)
+	a2 := int32(0x30)
+	a3 := int32(0x3ffff)
+	a4 := int32(0x40000)
+	a5 := int32(0x7ff)
+	a6 := int32(0x7fffffff)
+	a7 := int32(0x800)
+	a8 := int32(1)
+	a9 := int32(47)
+	a10 := int32(-0x40000)
+	a11 := int32(-0x40001)
+	a12 := int32(-0x800)
+	a13 := int32(-0x80000000)
+	a14 := int32(-0x801)
+	a15 := int32(-16)
+	a16 := int32(-17)
+	testJavaDecode(t, "argInt_0", &a1)
+	testJavaDecode(t, "argInt_0x30", &a2)
+	testJavaDecode(t, "argInt_0x3ffff", &a3)
+	testJavaDecode(t, "argInt_0x40000", &a4)
+	testJavaDecode(t, "argInt_0x7ff", &a5)
+	testJavaDecode(t, "argInt_0x7fffffff", &a6)
+	testJavaDecode(t, "argInt_0x800", &a7)
+	testJavaDecode(t, "argInt_1", &a8)
+	testJavaDecode(t, "argInt_47", &a9)
+	testJavaDecode(t, "argInt_m0x40000", &a10)
+	testJavaDecode(t, "argInt_m0x40001", &a11)
+	testJavaDecode(t, "argInt_m0x800", &a12)
+	testJavaDecode(t, "argInt_m0x80000000", &a13)
+	testJavaDecode(t, "argInt_m0x801", &a14)
+	testJavaDecode(t, "argInt_m16", &a15)
+	testJavaDecode(t, "argInt_m17", &a16)
 }
