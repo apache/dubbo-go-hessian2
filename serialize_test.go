@@ -66,7 +66,7 @@ func TestDecimalJavaDecode(t *testing.T) {
 
 func TestEncodeDecodeInteger(t *testing.T) {
 	var bigInt bigInteger
-	//bigInt := new(bigInteger)
+	// bigInt := new(bigInteger)
 	_ = bigInt.FromString("100256")
 	e := NewEncoder()
 	err := e.Encode(bigInt)

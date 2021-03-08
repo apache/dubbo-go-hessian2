@@ -195,7 +195,6 @@ func TestStringWithPool(t *testing.T) {
 
 		decodePool.Put(d)
 	}
-
 }
 
 func TestStringEmoji(t *testing.T) {

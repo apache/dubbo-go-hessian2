@@ -81,11 +81,11 @@ func TestMap(t *testing.T) {
 	testDecodeFramework(t, "replyTypedMap_0", map[interface{}]interface{}{})
 	testDecodeFramework(t, "replyTypedMap_1", map[interface{}]interface{}{"a": int32(0)})
 	testDecodeFramework(t, "replyTypedMap_2", map[interface{}]interface{}{int32(0): "a", int32(1): "b"})
-	//testDecodeFramework(t, "replyTypedMap_3", []interface{}{})
+	// testDecodeFramework(t, "replyTypedMap_3", []interface{}{})
 	testDecodeFramework(t, "replyUntypedMap_0", map[interface{}]interface{}{})
 	testDecodeFramework(t, "replyUntypedMap_1", map[interface{}]interface{}{"a": int32(0)})
 	testDecodeFramework(t, "replyUntypedMap_2", map[interface{}]interface{}{int32(0): "a", int32(1): "b"})
-	//testDecodeFramework(t, "replyTypedMap_3", []interface{}{})
+	// testDecodeFramework(t, "replyTypedMap_3", []interface{}{})
 }
 
 func TestMapEncode(t *testing.T) {

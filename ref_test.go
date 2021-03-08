@@ -32,7 +32,7 @@ type circular struct {
 	Next     *circular
 }
 
-//JavaClassName  java fully qualified path
+// JavaClassName  java fully qualified path
 func (circular) JavaClassName() string {
 	return "circular"
 }
@@ -76,7 +76,7 @@ type personT struct {
 	Tags      map[string]*personT
 }
 
-//JavaClassName  java fully qualified path
+// JavaClassName  java fully qualified path
 func (personT) JavaClassName() string {
 	return "person"
 }
@@ -181,7 +181,7 @@ func TestComplexLevelRef(t *testing.T) {
 	assert.Equal(t, "p5", d5.Name)
 	assert.Equal(t, "p6", d6.Name)
 
-	//value equal
+	// value equal
 	assert.True(t, reflect.DeepEqual(d3.Relations, d4.Relations))
 
 	if d4.Marks == nil {

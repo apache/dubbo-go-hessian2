@@ -29,7 +29,6 @@ import (
 var exceptionCheckMutex sync.Mutex
 
 func checkAndGetException(cls *classInfo) (*structInfo, bool) {
-
 	if len(cls.fieldNameList) < 4 {
 		return nil, false
 	}
@@ -37,7 +36,7 @@ func checkAndGetException(cls *classInfo) (*structInfo, bool) {
 		throwable *structInfo
 		ok        bool
 	)
-	var count = 0
+	count := 0
 	for _, item := range cls.fieldNameList {
 		if item == "detailMessage" || item == "suppressedExceptions" || item == "stackTrace" || item == "cause" {
 			count++
@@ -77,7 +76,7 @@ func (e UnknownException) Error() string {
 	return fmt.Sprintf("throw %v : %v", e.name, e.DetailMessage)
 }
 
-//JavaClassName  java fully qualified path
+// JavaClassName  java fully qualified path
 func (e UnknownException) JavaClassName() string {
 	return e.name
 }

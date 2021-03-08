@@ -646,7 +646,7 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 			return nil, perrors.Wrap(decErr, "decObject->decClassDef byte double")
 		}
 		cls, _ = clsDef.(*classInfo)
-		//add to slice
+		// add to slice
 		d.appendClsDef(cls)
 
 		return d.DecodeValue()

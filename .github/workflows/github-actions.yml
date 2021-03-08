@@ -69,6 +69,10 @@ jobs:
         chmod u+x /tmp/tools/license/license-header-checker
         /tmp/tools/license/license-header-checker -v -a -r -i vendor  /tmp/tools/license/license.txt . go  && [[ -z `git status -s` ]]
 
+    - name: format
+      run: |
+        gofmt -l -w . && [[ -z `git status -s` ]]
+        
     - name: Install go ci lint
       run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.27.0
 
