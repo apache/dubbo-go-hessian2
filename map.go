@@ -284,9 +284,6 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 			return inst, nil
 		} else {
 			m = make(map[interface{}]interface{})
-			classIndex := RegisterPOJOMapping(t, m)
-			d.appendClsDef(pojoRegistry.classInfoList[classIndex])
-
 			d.appendRefs(m)
 			for d.peekByte() != BC_END {
 				k, err = d.Decode()
