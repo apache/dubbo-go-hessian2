@@ -44,12 +44,10 @@ func SetJavaSqlTimeSerialize(time java_sql_time.JavaSqlTime) {
 }
 
 // JavaSqlTimeSerializer used to encode & decode java.sql.Time & java.sql.Date
-type JavaSqlTimeSerializer struct {
-}
+type JavaSqlTimeSerializer struct{}
 
 // nolint
 func (JavaSqlTimeSerializer) EncObject(e *Encoder, vv POJO) error {
-
 	var (
 		i         int
 		idx       int
@@ -117,7 +115,6 @@ func (JavaSqlTimeSerializer) EncObject(e *Encoder, vv POJO) error {
 
 // nolint
 func (JavaSqlTimeSerializer) DecObject(d *Decoder, typ reflect.Type, cls *classInfo) (interface{}, error) {
-
 	if typ.Kind() != reflect.Struct {
 		return nil, perrors.Errorf("wrong type expect Struct but get:%s", typ.String())
 	}

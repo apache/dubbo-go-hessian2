@@ -158,7 +158,7 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 		entryValue interface{}
 	)
 
-	//tag, _ = d.readBufByte()
+	// tag, _ = d.readBufByte()
 	tag, err = d.ReadByte()
 	// check error
 	if err != nil {
@@ -179,7 +179,7 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 	case BC_MAP:
 		d.decString(TAG_READ) // read map type , ignored
 	case BC_MAP_UNTYPED:
-		//do nothing
+		// do nothing
 	default:
 		return perrors.Errorf("expect map header, but get %x", tag)
 	}
@@ -189,7 +189,7 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 	m = PackPtr(m)
 	d.appendRefs(m)
 
-	//read key and value
+	// read key and value
 	for {
 		entryKey, err = d.DecodeValue()
 		if err != nil {

@@ -22,7 +22,7 @@ import (
 )
 
 func TestEncNull(t *testing.T) {
-	var e = NewEncoder()
+	e := NewEncoder()
 	e.Encode(nil)
 	if e.Buffer() == nil {
 		t.Fail()

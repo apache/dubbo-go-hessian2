@@ -36,7 +36,6 @@ var ZeroDate = time.Time{}
 // ::= x4a b7 b6 b5 b4 b3 b2 b1 b0
 // ::= x4b b3 b2 b1 b0       # minutes since epoch
 func encDateInMs(b []byte, i interface{}) []byte {
-
 	value := UnpackPtrValue(reflect.ValueOf(i))
 	vi := value.Interface().(time.Time)
 	if vi == ZeroDate {

@@ -59,7 +59,6 @@ func javaDecodeValidate(t *testing.T, method string, target interface{}) (string
 	}()
 
 	out, err := cmd.Output()
-
 	if err != nil {
 		t.Logf("get java result error: %v", err)
 		return "", err
