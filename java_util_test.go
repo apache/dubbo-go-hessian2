@@ -18,8 +18,11 @@
 package hessian
 
 import (
-	"github.com/apache/dubbo-go-hessian2/java_util"
 	"testing"
+)
+
+import (
+	"github.com/apache/dubbo-go-hessian2/java_util"
 )
 
 func TestJavaUtil(t *testing.T) {
