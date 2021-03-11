@@ -33,7 +33,6 @@ type Decoder struct {
 	reader *bufio.Reader
 	refs   []interface{}
 	// record type refs, both list and map need it
-	// todo: map
 	typeRefs      *TypeRefs
 	classInfoList []*classInfo
 	isSkip        bool
@@ -162,36 +161,48 @@ func (d *Decoder) nextRune(s []rune) []rune {
 }
 
 // read the type of data, used to decode list or map
-func (d *Decoder) decType() (string, error) {
+func (d *Decoder) decMapType() (reflect.Type, error) {
 	var (
-		err error
-		arr [1]byte
-		buf []byte
-		tag byte
-		idx int32
-		typ reflect.Type
+		err     error
+		arr     [1]byte
+		buf     []byte
+		tag     byte
+		idx     int32
+		typ     reflect.Type
+		typName string
 	)
 
 	buf = arr[:1]
 	if _, err = io.ReadFull(d.reader, buf); err != nil {
-		return "", perrors.WithStack(err)
+		return nil, perrors.WithStack(err)
 	}
 	tag = buf[0]
 	if (tag >= BC_STRING_DIRECT && tag <= STRING_DIRECT_MAX) ||
 		(tag >= 0x30 && tag <= 0x33) || (tag == BC_STRING) || (tag == BC_STRING_CHUNK) {
-		return d.decString(int32(tag))
+		typName, err = d.decString(int32(tag))
+		if err != nil {
+			return nil, perrors.WithStack(err)
+		}
+		info, ok := getStructInfo(typName)
+		if ok {
+			typ = info.typ
+		} else {
+			typ = reflect.TypeOf(map[interface{}]interface{}{})
+		}
+		d.typeRefs.appendTypeRefs(typName, typ)
+		return typ, nil
 	}
 
 	if idx, err = d.decInt32(int32(tag)); err != nil {
-		return "", perrors.WithStack(err)
+		return nil, perrors.WithStack(err)
 	}
 
-	typ, _, err = d.getStructDefByIndex(int(idx))
-	if err == nil {
-		return typ.String(), nil
+	typ = d.typeRefs.Get(int(idx))
+	if typ == nil {
+		return nil, perrors.Errorf("the type ref index %d is out of range", idx)
 	}
 
-	return "", err
+	return typ, err
 }
 
 // Decode parse hessian data, and ensure the reflection value unpacked

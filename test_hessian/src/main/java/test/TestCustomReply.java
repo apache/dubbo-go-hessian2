@@ -419,6 +419,15 @@ public class TestCustomReply {
         output.flush();
     }
 
+    public void customReplyObjectJsonObjectBigDecimal() throws Exception {
+        //TestJsonObject t = new TestJsonObject();
+        JSONObject t = new JSONObject();
+        BigDecimal decimal = new BigDecimal("100");
+        t.put("test_BigDecimal",decimal);
+        output.writeObject(t);
+        output.flush();
+    }
+
     public void customReplyTypedFixedDateNull() throws Exception {
         DateDemo demo = new DateDemo("zhangshan", null, null);
         output.writeObject(demo);
@@ -567,3 +576,4 @@ class InnerPerson implements Serializable {
     public String name;
     public Integer age;
 }
+

@@ -22,9 +22,7 @@ import (
 	"reflect"
 	"strings"
 	"sync"
-)
 
-import (
 	perrors "github.com/pkg/errors"
 )
 
@@ -376,6 +374,10 @@ func findField(name string, typ reflect.Type) ([]int, *reflect.StructField, erro
 }
 
 func (d *Decoder) decInstance(typ reflect.Type, cls *classInfo) (interface{}, error) {
+	//if typ.Kind() == reflect.Map {
+	//	return d.decTypeMap(typ)
+	//}
+
 	if typ.Kind() != reflect.Struct {
 		return nil, perrors.Errorf("wrong type expect Struct but get:%s", typ.String())
 	}
