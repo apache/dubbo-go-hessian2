@@ -18,6 +18,8 @@
 package hessian
 
 import (
+	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -27,4 +29,35 @@ import (
 
 func TestJavaUtil(t *testing.T) {
 	testDecodeFramework(t, "javautilUUID", &java_util.UUID{LeastSigBits: int64(-7160773830801198154), MostSigBits: int64(459021424248441700)})
+}
+
+// TestJavaRandomUUID is test java UUID.toString() equals go UUID.ToString()
+// java test result include uuid encode and uuid.toString
+// use '@@@' split that
+func TestJavaRandomUUID(t *testing.T) {
+	method := "javautilRandomUUID"
+	b := getJavaReply(method, "")
+	split := strings.Split(string(b), "@@@")
+	d := NewDecoder([]byte(split[0]))
+	r, e := d.Decode()
+	if e != nil {
+		t.Errorf(e.Error())
+	}
+	if e != nil {
+		t.Errorf("%s: decode fail with error %v", method, e)
+		return
+	}
+	tmp, ok := r.(*_refHolder)
+	if ok {
+		r = tmp.value.Interface()
+	}
+	uuid, ok := r.(*java_util.UUID)
+	if ok {
+		ok := reflect.DeepEqual(split[1], uuid.ToString())
+		if !ok {
+			t.Error("go ToString() no equal java toString()")
+		}
+	} else {
+		t.Error("decode UUID struct false")
+	}
 }

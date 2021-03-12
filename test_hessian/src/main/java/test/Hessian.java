@@ -92,12 +92,23 @@ public class Hessian {
 
         } else if (args[0].startsWith("javautil")) {
             // add java.util.* Object test
-            Method method = TestJavaUtil.class.getMethod(args[0]);
-            Object obj = new Object();
-            Object object = method.invoke(obj);
-            Hessian2Output output = new Hessian2Output(System.out);
-            output.writeObject(object);
-            output.flush();
+            if (args[0].startsWith("javautilUUID")) {
+                Method method = TestJavaUtil.class.getMethod(args[0]);
+                Object obj = new Object();
+                Object object = method.invoke(obj);
+                Hessian2Output output = new Hessian2Output(System.out);
+                output.writeObject(object);
+                output.flush();
+            }
+            if (args[0].startsWith("javautilRandomUUID")) {
+                Method method = TestJavaUtil.class.getMethod(args[0]);
+                Object obj = new Object();
+                Object object = method.invoke(obj);
+                Hessian2Output output = new Hessian2Output(System.out);
+                output.writeObject(object);
+                output.flush();
+                System.out.print("@@@" + object.toString());
+            }
         }
     }
 

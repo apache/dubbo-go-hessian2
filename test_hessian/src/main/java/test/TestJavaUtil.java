@@ -26,4 +26,9 @@ public class TestJavaUtil {
         return uuid;
     }
 
+    public static UUID javautilRandomUUID() {
+        UUID uuid = UUID.randomUUID();
+        return uuid;
+    }
+
 }
