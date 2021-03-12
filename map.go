@@ -223,7 +223,6 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 		err        error
 		tag        byte
 		ok         bool
-		t          string
 		m          map[interface{}]interface{}
 		k          interface{}
 		v          interface{}
@@ -258,8 +257,8 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 
 		inst = instValue.Interface()
 
-		d.typeRefs.appendTypeRefs(t, typ)
 		d.appendRefs(inst)
+
 		for d.peekByte() != BC_END {
 			k, err = d.Decode()
 			if err != nil {

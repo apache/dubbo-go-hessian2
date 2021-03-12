@@ -420,7 +420,6 @@ public class TestCustomReply {
     }
 
     public void customReplyObjectJsonObjectBigDecimal() throws Exception {
-        //TestJsonObject t = new TestJsonObject();
         JSONObject t = new JSONObject();
         BigDecimal decimal = new BigDecimal("100");
         t.put("test_BigDecimal",decimal);
@@ -497,6 +496,25 @@ public class TestCustomReply {
         Map<String, Object> map = new HashMap<String, Object>(4);
         map.put("a", 1);
         map.put("b", 2);
+        output.writeObject(map);
+        output.flush();
+    }
+
+    public void customReplyMultipleTypeMap() throws Exception {
+        Map<String, Integer> map1 = new HashMap<String, Integer>(4);
+        map1.put("a", 1);
+        map1.put("b", 2);
+        Map<Long, String> map2 = new HashMap<Long, String>(4);
+        map2.put(3L, "c");
+        map2.put(4L, "d");
+        Map<Integer, BigDecimal> map3 = new HashMap<Integer, BigDecimal>(4);
+        map3.put(5,new BigDecimal("55.55"));
+        map3.put(3,new BigDecimal("33.33"));
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("m1", map1);
+        map.put("m2", map2);
+        map.put("m3", map3);
+
         output.writeObject(map);
         output.flush();
     }

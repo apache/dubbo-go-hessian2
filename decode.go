@@ -183,13 +183,17 @@ func (d *Decoder) decMapType() (reflect.Type, error) {
 		if err != nil {
 			return nil, perrors.WithStack(err)
 		}
+
 		info, ok := getStructInfo(typName)
 		if ok {
 			typ = info.typ
 		} else {
 			typ = reflect.TypeOf(map[interface{}]interface{}{})
 		}
+
+		// add to type map
 		d.typeRefs.appendTypeRefs(typName, typ)
+
 		return typ, nil
 	}
 
