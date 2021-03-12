@@ -31,7 +31,7 @@ func TestJavaUtil(t *testing.T) {
 	testDecodeFramework(t, "javautilUUID", &java_util.UUID{LeastSigBits: int64(-7160773830801198154), MostSigBits: int64(459021424248441700)})
 }
 
-// TestJavaRandomUUID is test java UUID.toString() equals go UUID.ToString()
+// TestJavaRandomUUID is test java UUID.toString() equals go UUID.String()
 // java test result include uuid encode and uuid.toString
 // use '@@@' split that
 func TestJavaRandomUUID(t *testing.T) {
@@ -53,9 +53,9 @@ func TestJavaRandomUUID(t *testing.T) {
 	}
 	uuid, ok := r.(*java_util.UUID)
 	if ok {
-		ok := reflect.DeepEqual(split[1], uuid.ToString())
+		ok := reflect.DeepEqual(split[1], uuid.String())
 		if !ok {
-			t.Error("go ToString() no equal java toString()")
+			t.Error("go String() no equal java toString()")
 		}
 	} else {
 		t.Error("decode UUID struct false")
