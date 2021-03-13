@@ -18,9 +18,11 @@
 package hessian
 
 import (
-	"reflect"
-	"strings"
 	"testing"
+)
+
+import (
+	"github.com/stretchr/testify/assert"
 )
 
 import (
@@ -28,36 +30,26 @@ import (
 )
 
 func TestJavaUtil(t *testing.T) {
-	testDecodeFramework(t, "javautilUUID", &java_util.UUID{LeastSigBits: int64(-7160773830801198154), MostSigBits: int64(459021424248441700)})
-}
-
-// TestJavaRandomUUID is test java UUID.toString() equals go UUID.String()
-// java test result include uuid encode and uuid.toString
-// use '@@@' split that
-func TestJavaRandomUUID(t *testing.T) {
-	method := "javautilRandomUUID"
-	b := getJavaReply(method, "")
-	split := strings.Split(string(b), "@@@")
-	d := NewDecoder([]byte(split[0]))
-	r, e := d.Decode()
-	if e != nil {
-		t.Errorf(e.Error())
-	}
-	if e != nil {
-		t.Errorf("%s: decode fail with error %v", method, e)
+	res, err := decodeJavaResponse(`customReplyUUID`, ``, false)
+	if err != nil {
+		t.Error(err)
 		return
 	}
-	tmp, ok := r.(*_refHolder)
-	if ok {
-		r = tmp.value.Interface()
-	}
-	uuid, ok := r.(*java_util.UUID)
-	if ok {
-		ok := reflect.DeepEqual(split[1], uuid.String())
-		if !ok {
-			t.Error("go String() no equal java toString()")
-		}
-	} else {
-		t.Error("decode UUID struct false")
-	}
+	m := res.(map[interface{}]interface{})
+
+	uuid1 := &java_util.UUID{LeastSigBits: int64(-7160773830801198154), MostSigBits: int64(459021424248441700)}
+
+	resUuid1 := m["uuid1"]
+	resUuid1String := m["uuid1_string"]
+	resUuid2 := m["uuid2"]
+	resUuid2String := m["uuid2_string"]
+
+	assert.NotNil(t, resUuid1)
+	assert.NotNil(t, resUuid1String)
+	assert.NotNil(t, resUuid2)
+	assert.NotNil(t, resUuid2String)
+
+	assert.Equal(t, uuid1, resUuid1)
+	assert.Equal(t, uuid1.String(), resUuid1String)
+	assert.Equal(t, (resUuid2.(*java_util.UUID)).String(), resUuid2String)
 }
