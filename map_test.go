@@ -21,6 +21,10 @@ import (
 	"testing"
 )
 
+import (
+	big "github.com/dubbogo/gost/math/big"
+)
+
 func TestEncUntypedMap(t *testing.T) {
 	var (
 		m   map[interface{}]interface{}
@@ -106,4 +110,20 @@ func TestCustomMap(t *testing.T) {
 	}
 	testDecodeFramework(t, "customReplyMapInMap", mapInMap)
 	testDecodeFramework(t, "customReplyMapInMapJsonObject", mapInMap)
+
+	b3 := &big.Decimal{}
+	_ = b3.FromString("33.33")
+	b3.Value = "33.33"
+
+	b5 := &big.Decimal{}
+	_ = b5.FromString("55.55")
+	b5.Value = "55.55"
+
+	multipleTypeMap := map[interface{}]interface{}{
+		"m1": map[interface{}]interface{}{"a": int32(1), "b": int32(2)},
+		"m2": map[interface{}]interface{}{int64(3): "c", int64(4): "d"},
+		"m3": map[interface{}]interface{}{int32(3): b3, int32(5): b5},
+	}
+
+	testDecodeFramework(t, "customReplyMultipleTypeMap", multipleTypeMap)
 }

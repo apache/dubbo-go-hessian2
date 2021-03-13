@@ -110,7 +110,7 @@ func testDecodeFrameworkWithSkip(t *testing.T, method string, expected interface
 func testDecodeJavaData(t *testing.T, method, className string, skip bool, expected interface{}) {
 	r, e := decodeJavaResponse(method, className, skip)
 	if e != nil {
-		t.Errorf("%s: decode fail with error %v", method, e)
+		t.Errorf("%s: decode fail with error: %v", method, e)
 		return
 	}
 
