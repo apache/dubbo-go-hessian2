@@ -104,7 +104,6 @@ func (h *HessianCodec) Write(service Service, header DubboHeader, body interface
 
 // ReadHeader uses hessian codec to read dubbo header
 func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
-
 	var err error
 
 	if h.reader.Size() < HEADER_LENGTH {
@@ -166,12 +165,10 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 	}
 
 	return perrors.WithStack(err)
-
 }
 
 // ReadBody uses hessian codec to read response body
 func (h *HessianCodec) ReadBody(rspObj interface{}) error {
-
 	if h.reader.Buffered() < h.bodyLen {
 		return ErrBodyNotEnough
 	}

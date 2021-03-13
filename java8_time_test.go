@@ -18,8 +18,11 @@
 package hessian
 
 import (
-	"github.com/apache/dubbo-go-hessian2/java8_time"
 	"testing"
+)
+
+import (
+	"github.com/apache/dubbo-go-hessian2/java8_time"
 )
 
 func TestJava8Time(t *testing.T) {

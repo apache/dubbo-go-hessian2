@@ -118,35 +118,35 @@ func PackFloat64(v float64) []byte {
 // UnpackInt16 unpacks int16 from byte array
 //(0,2).unpack('n')
 func UnpackInt16(b []byte) int16 {
-	var arr = b[:2]
+	arr := b[:2]
 	return int16(binary.BigEndian.Uint16(arr))
 }
 
 // UnpackUint16 unpacks int16 from byte array
 //(0,2).unpack('n')
 func UnpackUint16(b []byte) uint16 {
-	var arr = b[:2]
+	arr := b[:2]
 	return binary.BigEndian.Uint16(arr)
 }
 
 // UnpackInt32 unpacks int32 from byte array
 //(0,4).unpack('N')
 func UnpackInt32(b []byte) int32 {
-	var arr = b[:4]
+	arr := b[:4]
 	return int32(binary.BigEndian.Uint32(arr))
 }
 
 // UnpackInt64 unpacks int64 from byte array
-//long (0,8).unpack('q>')
+// long (0,8).unpack('q>')
 func UnpackInt64(b []byte) int64 {
-	var arr = b[:8]
+	arr := b[:8]
 	return int64(binary.BigEndian.Uint64(arr))
 }
 
 // UnpackFloat64 unpacks float64 from byte array
-//Double (0,8).unpack('G)
+// Double (0,8).unpack('G)
 func UnpackFloat64(b []byte) float64 {
-	var arr = b[:8]
+	arr := b[:8]
 	return math.Float64frombits(binary.BigEndian.Uint64(arr))
 }
 
@@ -159,14 +159,14 @@ func UnpackPtr(v reflect.Value) reflect.Value {
 	return v
 }
 
-//PackPtr pack a Ptr value
+// PackPtr pack a Ptr value
 func PackPtr(v reflect.Value) reflect.Value {
 	vv := reflect.New(v.Type())
 	vv.Elem().Set(v)
 	return vv
 }
 
-//UnpackPtrType unpack pointer type to original type
+// UnpackPtrType unpack pointer type to original type
 func UnpackPtrType(typ reflect.Type) reflect.Type {
 	for typ.Kind() == reflect.Ptr {
 		typ = typ.Elem()
@@ -268,7 +268,7 @@ func EnsureInterface(in interface{}, err error) (interface{}, error) {
 	return in, nil
 }
 
-//EnsureRawValue pack the interface with value, and make sure it's not a ref holder
+// EnsureRawValue pack the interface with value, and make sure it's not a ref holder
 func EnsureRawValue(in interface{}) reflect.Value {
 	if v, ok := in.(reflect.Value); ok {
 		if v.IsValid() {
@@ -295,7 +295,7 @@ func SetValue(dest, v reflect.Value) {
 			return
 		}
 	}
-	//temporary process, only handle the same type of situation
+	// temporary process, only handle the same type of situation
 	if v.IsValid() && UnpackPtrType(dest.Type()) == UnpackPtrType(v.Type()) && dest.Kind() == reflect.Ptr && dest.CanSet() {
 		for dest.Type() != v.Type() {
 			v = PackPtr(v)
@@ -381,7 +381,7 @@ func AddrEqual(x, y interface{}) bool {
 	return v1.Pointer() == v2.Pointer()
 }
 
-//SetSlice set value into slice object
+// SetSlice set value into slice object
 func SetSlice(dest reflect.Value, objects interface{}) error {
 	if objects == nil {
 		return nil
@@ -422,7 +422,7 @@ func SetSlice(dest reflect.Value, objects interface{}) error {
 	return nil
 }
 
-//ConvertSliceValueType convert to slice of destination type
+// ConvertSliceValueType convert to slice of destination type
 func ConvertSliceValueType(destTyp reflect.Type, v reflect.Value) (reflect.Value, error) {
 	if destTyp == v.Type() {
 		return v, nil
