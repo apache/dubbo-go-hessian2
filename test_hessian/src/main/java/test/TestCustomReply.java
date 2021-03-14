@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 
 public class TestCustomReply {
@@ -551,6 +552,18 @@ public class TestCustomReply {
     public void customReplyGenericResponseBusinessData() throws Exception {
         Response<BusinessData> response = new Response<>(201, new BusinessData("apple", 5));
         output.writeObject(response);
+        output.flush();
+    }
+
+    public void customReplyUUID() throws Exception {
+        Map<String, Object> map = new HashMap<String, Object>();
+        UUID uuid1 = new UUID(459021424248441700L, -7160773830801198154L);
+        UUID uuid2 = UUID.randomUUID();
+        map.put("uuid1", uuid1);
+        map.put("uuid1_string", uuid1.toString());
+        map.put("uuid2", uuid2);
+        map.put("uuid2_string", uuid2.toString());
+        output.writeObject(map);
         output.flush();
     }
 }
