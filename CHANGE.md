@@ -1,5 +1,13 @@
 # Release Notes
 
+## v1.9.0
+
+### New Features
+- support java UUID object. [#256](https://github.com/apache/dubbo-go-hessian2/pull/256)
+
+### Bugfixes
+- fix map decode error. [#261](https://github.com/apache/dubbo-go-hessian2/pull/261)
+
 ## v1.8.2
 
 ### Bugfixes
