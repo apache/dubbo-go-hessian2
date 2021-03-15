@@ -18,22 +18,12 @@
 package hessian
 
 import (
-	"testing"
+	"github.com/apache/dubbo-go-hessian2/java_util"
 )
 
-func TestEncNull(t *testing.T) {
-	e := NewEncoder()
-	e.Encode(nil)
-	if e.Buffer() == nil {
-		t.Fail()
-	}
-	t.Logf("nil enc result:%s\n", string(e.buffer))
-}
-
-func TestNull(t *testing.T) {
-	testDecodeFramework(t, "replyNull", nil)
-}
-
-func TestNulEncode(t *testing.T) {
-	testJavaDecode(t, "argNull", nil)
+func init() {
+	RegisterPOJO(&java_util.UUID{
+		MostSigBits:  int64(200),
+		LeastSigBits: int64(200),
+	})
 }

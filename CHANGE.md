@@ -1,5 +1,37 @@
 # Release Notes
 
+## v1.9.0
+
+### New Features
+- support java UUID object. [#256](https://github.com/apache/dubbo-go-hessian2/pull/256)
+
+### Bugfixes
+- fix map decode error. [#261](https://github.com/apache/dubbo-go-hessian2/pull/261)
+
+## v1.8.2
+
+### Bugfixes
+- fix insufficient bytes for string encoding buffers. [#255](https://github.com/apache/dubbo-go-hessian2/pull/255)
+
+## v1.8.1
+
+### Bugfixes
+- fix get wrong javaclassname for POJO struct. [#247](https://github.com/apache/dubbo-go-hessian2/pull/247)
+- fix not enough buf error when decode date. [#249](https://github.com/apache/dubbo-go-hessian2/pull/249)
+- fix emoji decoding error. [#254](https://github.com/apache/dubbo-go-hessian2/pull/254)
+
+## v1.8.0
+
+### New Features
+- support clean encoder/decoder, discard decode buffer. [#242](https://github.com/apache/dubbo-go-hessian2/pull/242)
+- support encode no pojo object. [#243](https://github.com/apache/dubbo-go-hessian2/pull/243)
+
+### Enhancement
+- change value reference to ptr to improve performance. [#244](https://github.com/apache/dubbo-go-hessian2/pull/244)
+
+### Bugfixes
+- fix issue that cannot decode java generic type. [#239](https://github.com/apache/dubbo-go-hessian2/pull/239)
+
 ## v1.7.0
 
 ### New Features
@@ -13,7 +45,7 @@
 - Export function EncNull. [#225](https://github.com/apache/dubbo-go-hessian2/pull/225)
 
 ### Bugfixes
-- fix eunm encode error in request. [#203](https://github.com/apache/dubbo-go-hessian2/pull/203)
+- fix enum encode error in request. [#203](https://github.com/apache/dubbo-go-hessian2/pull/203)
 - fix []byte field decoding issue. [#216](https://github.com/apache/dubbo-go-hessian2/pull/216)
 - fix decoding error for map in map. [#229](https://github.com/apache/dubbo-go-hessian2/pull/229)
 

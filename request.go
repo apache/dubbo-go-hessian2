@@ -265,7 +265,6 @@ END:
 
 // hessian decode request body
 func unpackRequestBody(decoder *Decoder, reqObj interface{}) error {
-
 	if decoder == nil {
 		return perrors.Errorf("@decoder is nil")
 	}

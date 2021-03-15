@@ -21,19 +21,35 @@ import (
 	"testing"
 )
 
-func TestEncNull(t *testing.T) {
-	e := NewEncoder()
-	e.Encode(nil)
-	if e.Buffer() == nil {
-		t.Fail()
+import (
+	"github.com/stretchr/testify/assert"
+)
+
+import (
+	"github.com/apache/dubbo-go-hessian2/java_util"
+)
+
+func TestJavaUtil(t *testing.T) {
+	res, err := decodeJavaResponse(`customReplyUUID`, ``, false)
+	if err != nil {
+		t.Error(err)
+		return
 	}
-	t.Logf("nil enc result:%s\n", string(e.buffer))
-}
+	m := res.(map[interface{}]interface{})
 
-func TestNull(t *testing.T) {
-	testDecodeFramework(t, "replyNull", nil)
-}
+	uuid1 := &java_util.UUID{LeastSigBits: int64(-7160773830801198154), MostSigBits: int64(459021424248441700)}
 
-func TestNulEncode(t *testing.T) {
-	testJavaDecode(t, "argNull", nil)
+	resUuid1 := m["uuid1"]
+	resUuid1String := m["uuid1_string"]
+	resUuid2 := m["uuid2"]
+	resUuid2String := m["uuid2_string"]
+
+	assert.NotNil(t, resUuid1)
+	assert.NotNil(t, resUuid1String)
+	assert.NotNil(t, resUuid2)
+	assert.NotNil(t, resUuid2String)
+
+	assert.Equal(t, uuid1, resUuid1)
+	assert.Equal(t, uuid1.String(), resUuid1String)
+	assert.Equal(t, (resUuid2.(*java_util.UUID)).String(), resUuid2String)
 }

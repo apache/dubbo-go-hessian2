@@ -68,7 +68,6 @@ func TestEncList(t *testing.T) {
 	res, err = d.Decode()
 	assert.NoError(t, err)
 	assert.True(t, reflect.DeepEqual(res, list_2))
-
 }
 
 func TestList(t *testing.T) {
@@ -112,14 +111,20 @@ func TestList(t *testing.T) {
 	testDecodeFramework(t, "customReplyTypedFixedList_boolean", []bool{true, false, true})
 	testDecodeFramework(t, "customReplyTypedVariableList_boolean", []bool{true, false, true})
 
-	testDecodeFramework(t, "customReplyTypedFixedList_date", []time.Time{time.Unix(1560864, 0),
-		time.Unix(1560864, 0), time.Unix(1560864, 0)})
-	testDecodeFramework(t, "customReplyTypedVariableList_date", []time.Time{time.Unix(1560864, 0),
-		time.Unix(1560864, 0), time.Unix(1560864, 0)})
+	testDecodeFramework(t, "customReplyTypedFixedList_date", []time.Time{
+		time.Unix(1560864, 0),
+		time.Unix(1560864, 0), time.Unix(1560864, 0),
+	})
+	testDecodeFramework(t, "customReplyTypedVariableList_date", []time.Time{
+		time.Unix(1560864, 0),
+		time.Unix(1560864, 0), time.Unix(1560864, 0),
+	})
 
 	testDecodeFramework(t, "customReplyTypedFixedList_arrays", [][][]int32{{{1, 2, 3}, {4, 5, 6, 7}}, {{8, 9, 10}, {11, 12, 13, 14}}})
-	testDecodeFramework(t, "customReplyTypedFixedList_A0arrays", [][][]*A0{{{new(A0), new(A0), new(A0)}, {new(A0), new(A0), new(A0), nil}},
-		{{new(A0)}, {new(A0)}}})
+	testDecodeFramework(t, "customReplyTypedFixedList_A0arrays", [][][]*A0{
+		{{new(A0), new(A0), new(A0)}, {new(A0), new(A0), new(A0), nil}},
+		{{new(A0)}, {new(A0)}},
+	})
 
 	testDecodeFramework(t, "customReplyTypedFixedList_Test", &TypedListTest{A: &A0{}, List: [][]*A0{{new(A0), new(A0)}, {new(A0), new(A0)}}, List1: [][]*A1{{new(A1), new(A1)}, {new(A1), new(A1)}}})
 
@@ -170,12 +175,16 @@ func TestListEncode(t *testing.T) {
 	testJavaDecode(t, "customArgTypedFixedList_boolean_7", []bool{true, false, true, false, true, false, true})
 
 	testJavaDecode(t, "customArgTypedFixedList_date_0", []time.Time{})
-	testJavaDecode(t, "customArgTypedFixedList_date_3", []time.Time{time.Unix(1560864, 0),
-		time.Unix(1560864, 0), time.Unix(1560864, 0)})
+	testJavaDecode(t, "customArgTypedFixedList_date_3", []time.Time{
+		time.Unix(1560864, 0),
+		time.Unix(1560864, 0), time.Unix(1560864, 0),
+	})
 
 	testJavaDecode(t, "customArgTypedFixedList_arrays", [][][]int32{{{1, 2, 3}, {4, 5, 6, 7}}, {{8, 9, 10}, {11, 12, 13, 14}}})
-	testJavaDecode(t, "customArgTypedFixedList_A0arrays", [][][]*A0{{{new(A0), new(A0), new(A0)}, {new(A0), new(A0), new(A0), nil}},
-		{{new(A0)}, {new(A0)}}})
+	testJavaDecode(t, "customArgTypedFixedList_A0arrays", [][][]*A0{
+		{{new(A0), new(A0), new(A0)}, {new(A0), new(A0), new(A0), nil}},
+		{{new(A0)}, {new(A0)}},
+	})
 
 	testJavaDecode(t, "customArgTypedFixedList_Test", &TypedListTest{A: new(A0), List: [][]*A0{{new(A0), new(A0)}, {new(A0), new(A0)}}, List1: [][]*A1{{new(A1), new(A1)}, {new(A1), new(A1)}}})
 
@@ -188,7 +197,7 @@ type TypedListTest struct {
 	List1 [][]*A1
 }
 
-//JavaClassName  java fully qualified path
+// JavaClassName  java fully qualified path
 func (*TypedListTest) JavaClassName() string {
 	return "test.TypedListTest"
 }

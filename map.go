@@ -158,7 +158,7 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 		entryValue interface{}
 	)
 
-	//tag, _ = d.readBufByte()
+	// tag, _ = d.readBufByte()
 	tag, err = d.ReadByte()
 	// check error
 	if err != nil {
@@ -179,7 +179,7 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 	case BC_MAP:
 		d.decString(TAG_READ) // read map type , ignored
 	case BC_MAP_UNTYPED:
-		//do nothing
+		// do nothing
 	default:
 		return perrors.Errorf("expect map header, but get %x", tag)
 	}
@@ -189,7 +189,7 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 	m = PackPtr(m)
 	d.appendRefs(m)
 
-	//read key and value
+	// read key and value
 	for {
 		entryKey, err = d.DecodeValue()
 		if err != nil {
@@ -217,13 +217,12 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 	return nil
 }
 
-// TODO to decode ref object in map
+// decode map object
 func (d *Decoder) decMap(flag int32) (interface{}, error) {
 	var (
 		err        error
 		tag        byte
 		ok         bool
-		t          string
 		m          map[interface{}]interface{}
 		k          interface{}
 		v          interface{}
@@ -231,6 +230,7 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 		instValue  reflect.Value
 		fieldName  string
 		fieldValue reflect.Value
+		typ        reflect.Type
 	)
 
 	if flag != TAG_READ {
@@ -245,67 +245,48 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 	case tag == BC_REF:
 		return d.decRef(int32(tag))
 	case tag == BC_MAP:
-		if t, err = d.decType(); err != nil {
+		if typ, err = d.decMapType(); err != nil {
 			return nil, err
 		}
 
-		_, ok = checkPOJORegistry(t)
-		if ok {
-			inst = createInstance(t)
-			instValue = reflect.ValueOf(inst)
-			d.appendRefs(inst)
-			for d.peekByte() != BC_END {
-				k, err = d.Decode()
-				if err != nil {
-					return nil, err
-				}
-				v, err = d.Decode()
-				if err != nil {
-					return nil, err
-				}
+		if typ.Kind() == reflect.Map {
+			instValue = reflect.MakeMap(typ)
+		} else {
+			instValue = reflect.New(typ).Elem()
+		}
 
+		inst = instValue.Interface()
+
+		d.appendRefs(inst)
+
+		for d.peekByte() != BC_END {
+			k, err = d.Decode()
+			if err != nil {
+				return nil, err
+			}
+			v, err = d.Decode()
+			if err != nil {
+				return nil, err
+			}
+
+			if typ.Kind() == reflect.Map {
+				instValue.SetMapIndex(reflect.ValueOf(k), EnsureRawValue(v))
+			} else {
 				fieldName, ok = k.(string)
 				if !ok {
 					return nil, perrors.Errorf("the type of map key must be string, but get %v", k)
 				}
-				if instValue.Kind() == reflect.Map {
-					instValue.SetMapIndex(reflect.ValueOf(k), EnsureRawValue(v))
-				} else {
-					fieldValue = instValue.FieldByName(fieldName)
-					if fieldValue.IsValid() {
-						fieldValue.Set(EnsureRawValue(v))
-					}
+				fieldValue = instValue.FieldByName(fieldName)
+				if fieldValue.IsValid() {
+					fieldValue.Set(EnsureRawValue(v))
 				}
 			}
-			_, err = d.ReadByte()
-			if err != nil {
-				return nil, perrors.WithStack(err)
-			}
-			return inst, nil
-		} else {
-			m = make(map[interface{}]interface{})
-			classIndex := RegisterPOJOMapping(t, m)
-			d.appendClsDef(pojoRegistry.classInfoList[classIndex])
-
-			d.appendRefs(m)
-			for d.peekByte() != BC_END {
-				k, err = d.Decode()
-				if err != nil {
-					return nil, err
-				}
-				v, err = d.Decode()
-				if err != nil {
-					return nil, err
-				}
-				m[k] = v
-			}
-			_, err = d.ReadByte()
-			if err != nil {
-				return nil, perrors.WithStack(err)
-			}
-			return m, nil
 		}
-
+		_, err = d.ReadByte()
+		if err != nil {
+			return nil, perrors.WithStack(err)
+		}
+		return inst, nil
 	case tag == BC_MAP_UNTYPED:
 		m = make(map[interface{}]interface{})
 		d.appendRefs(m)

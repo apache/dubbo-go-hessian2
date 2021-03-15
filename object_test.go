@@ -194,8 +194,8 @@ func TestIssue6(t *testing.T) {
 		Person: person,
 		CurJob: JOB{Title: "cto", Company: "facebook"},
 		Jobs: []JOB{
-			JOB{Title: "manager", Company: "google"},
-			JOB{Title: "ceo", Company: "microsoft"},
+			{Title: "manager", Company: "google"},
+			{Title: "ceo", Company: "microsoft"},
 		},
 	}
 
@@ -611,7 +611,7 @@ type Dog struct {
 	DogName string `hessian:"-"`
 }
 
-//JavaClassName  java fully qualified path
+// JavaClassName  java fully qualified path
 func (dog Dog) JavaClassName() string {
 	return "test.Dog"
 }
@@ -622,7 +622,7 @@ type DogAll struct {
 	Gender string
 }
 
-//JavaClassName  java fully qualified path
+// JavaClassName  java fully qualified path
 func (dog *DogAll) JavaClassName() string {
 	return "test.DogAll"
 }
@@ -655,6 +655,7 @@ func TestIssue149_EmbedStructGoDecode(t *testing.T) {
 		}
 	})
 }
+
 func TestIssue150_EmbedStructJavaDecode(t *testing.T) {
 	RegisterPOJO(&Dog{})
 	RegisterPOJO(&Animal{})

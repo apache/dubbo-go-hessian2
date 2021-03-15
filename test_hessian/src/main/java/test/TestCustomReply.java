@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 
 public class TestCustomReply {
@@ -419,6 +420,14 @@ public class TestCustomReply {
         output.flush();
     }
 
+    public void customReplyObjectJsonObjectBigDecimal() throws Exception {
+        JSONObject t = new JSONObject();
+        BigDecimal decimal = new BigDecimal("100");
+        t.put("test_BigDecimal",decimal);
+        output.writeObject(t);
+        output.flush();
+    }
+
     public void customReplyTypedFixedDateNull() throws Exception {
         DateDemo demo = new DateDemo("zhangshan", null, null);
         output.writeObject(demo);
@@ -492,6 +501,25 @@ public class TestCustomReply {
         output.flush();
     }
 
+    public void customReplyMultipleTypeMap() throws Exception {
+        Map<String, Integer> map1 = new HashMap<String, Integer>(4);
+        map1.put("a", 1);
+        map1.put("b", 2);
+        Map<Long, String> map2 = new HashMap<Long, String>(4);
+        map2.put(3L, "c");
+        map2.put(4L, "d");
+        Map<Integer, BigDecimal> map3 = new HashMap<Integer, BigDecimal>(4);
+        map3.put(5,new BigDecimal("55.55"));
+        map3.put(3,new BigDecimal("33.33"));
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("m1", map1);
+        map.put("m2", map2);
+        map.put("m3", map3);
+
+        output.writeObject(map);
+        output.flush();
+    }
+
     public Map<String, Object> mapInMap() throws Exception {
         Map<String, Object> map1 = new HashMap<String, Object>();
         map1.put("a", 1);
@@ -524,6 +552,18 @@ public class TestCustomReply {
     public void customReplyGenericResponseBusinessData() throws Exception {
         Response<BusinessData> response = new Response<>(201, new BusinessData("apple", 5));
         output.writeObject(response);
+        output.flush();
+    }
+
+    public void customReplyUUID() throws Exception {
+        Map<String, Object> map = new HashMap<String, Object>();
+        UUID uuid1 = new UUID(459021424248441700L, -7160773830801198154L);
+        UUID uuid2 = UUID.randomUUID();
+        map.put("uuid1", uuid1);
+        map.put("uuid1_string", uuid1.toString());
+        map.put("uuid2", uuid2);
+        map.put("uuid2_string", uuid2.toString());
+        output.writeObject(map);
         output.flush();
     }
 }
@@ -567,3 +607,4 @@ class InnerPerson implements Serializable {
     public String name;
     public Integer age;
 }
+

@@ -66,7 +66,7 @@ func TestDecimalJavaDecode(t *testing.T) {
 
 func TestEncodeDecodeInteger(t *testing.T) {
 	var bigInt bigInteger
-	//bigInt := new(bigInteger)
+	// bigInt := new(bigInteger)
 	_ = bigInt.FromString("100256")
 	e := NewEncoder()
 	err := e.Encode(bigInt)
@@ -163,6 +163,23 @@ func TestDecimalListGoDecode(t *testing.T) {
 			t.Errorf("java: %s go: %s", gotDecimal.String(), data[i])
 		}
 	}
+}
+
+func TestCustomReplyObjectJsonObjectBigDecimalDecode(t *testing.T) {
+	decimal := &big.Decimal{}
+	_ = decimal.FromString("100")
+
+	out, err := decodeJavaResponse(`customReplyObjectJsonObjectBigDecimal`, ``, false)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	res := out.(map[interface{}]interface{})
+	assert.Equal(t, 1, len(res))
+
+	dec := res["test_BigDecimal"].(*big.Decimal)
+	assert.Equal(t, decimal.String(), dec.String())
 }
 
 func TestObjectListGoDecode(t *testing.T) {

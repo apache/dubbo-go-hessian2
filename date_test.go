@@ -40,7 +40,7 @@ type DateDemo struct {
 	Date3   ***time.Time
 }
 
-//JavaClassName  java fully qualified path
+// JavaClassName  java fully qualified path
 func (DateDemo) JavaClassName() string {
 	return "test.model.DateDemo"
 }
@@ -135,7 +135,6 @@ func TestEncDateNull(t *testing.T) {
 	assert.Equal(t, ZeroDate, *res.(*DateDemo).Date1)
 	assert.Equal(t, tz.Local().String(), (*res.(*DateDemo).Date2).String())
 	assert.Equal(t, tz.Local().String(), (*(*res.(*DateDemo).Date3)).String())
-
 }
 
 func TestDateNulJavaDecode(t *testing.T) {
@@ -147,7 +146,6 @@ func TestDateNulJavaDecode(t *testing.T) {
 }
 
 func TestDateNilDecode(t *testing.T) {
-
 	doTestDateNull(t, "customReplyTypedFixedDateNull")
 }
 
