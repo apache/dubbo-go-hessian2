@@ -101,6 +101,11 @@ func TestMapEncode(t *testing.T) {
 	testJavaDecode(t, "argUntypedMap_2", map[interface{}]interface{}{int32(0): "a", int32(1): "b"})
 }
 
+type customMapObject struct {
+	Int int32
+	S   string
+}
+
 func TestCustomMap(t *testing.T) {
 	testDecodeFramework(t, "customReplyMap", map[interface{}]interface{}{"a": int32(1), "b": int32(2)})
 
@@ -126,4 +131,29 @@ func TestCustomMap(t *testing.T) {
 	}
 
 	testDecodeFramework(t, "customReplyMultipleTypeMap", multipleTypeMap)
+
+	RegisterPOJOMapping("test.model.CustomMap", &customMapObject{})
+
+	listMapListMap := []interface{}{
+
+		map[interface{}]interface{}{
+			"a": int32(1),
+			"b": int32(2),
+			"items": []interface{}{
+				b5,
+				"hello",
+				int32(123),
+				customMapObject{
+					Int: 456,
+					S:   "string",
+				},
+			},
+		},
+		customMapObject{
+			Int: 789,
+			S:   "string2",
+		},
+	}
+
+	testDecodeFramework(t, "customReplyListMapListMap", listMapListMap)
 }

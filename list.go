@@ -332,20 +332,28 @@ func (d *Decoder) readTypedListValue(length int, listTyp string, isVariableArr b
 		aryValue reflect.Value
 		arrType  reflect.Type
 	)
+
 	t, err := strconv.Atoi(listTyp)
 	if err == nil {
+		// find the ref list type
 		arrType = d.typeRefs.Get(t)
+		if arrType == nil {
+			return nil, perrors.Errorf("can't find ref list type at index %d", t)
+		}
+		aryValue = reflect.MakeSlice(arrType, length, length)
 	} else {
+		// try to find the registered list type
 		arrType = getListType(listTyp)
+		if arrType != nil {
+			aryValue = reflect.MakeSlice(arrType, length, length)
+			d.typeRefs.appendTypeRefs(listTyp, arrType)
+		} else {
+			// using default generic list type if not found registered
+			aryValue = reflect.ValueOf(make([]interface{}, length, length))
+			d.typeRefs.appendTypeRefs(listTyp, aryValue.Type())
+		}
 	}
 
-	if arrType != nil {
-		aryValue = reflect.MakeSlice(arrType, length, length)
-		d.typeRefs.appendTypeRefs(arrType.String(), arrType)
-	} else {
-		aryValue = reflect.ValueOf(make([]interface{}, length, length))
-		d.typeRefs.appendTypeRefs(strings.Replace(listTyp, "[", "", -1), aryValue.Type())
-	}
 	holder := d.appendRefs(aryValue)
 	for j := 0; j < length || isVariableArr; j++ {
 		it, err := d.DecodeValue()
