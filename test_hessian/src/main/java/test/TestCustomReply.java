@@ -90,6 +90,13 @@ public class TestCustomReply {
         output.flush();
     }
 
+    public void customReplyTypedFixedListRefSelf() throws Exception {
+        Object[] o = new Object[]{new A0(), new A1(), null};
+        o[2] = o;
+        output.writeObject(o);
+        output.flush();
+    }
+
     public void customReplyTypedVariableListHasNull() throws Exception {
         Object[] o = new Object[]{new A0(), new A1(), null};
         if (output.addRef(o)) {
@@ -500,6 +507,16 @@ public class TestCustomReply {
         Map<String, Object> map = new HashMap<String, Object>(4);
         map.put("a", 1);
         map.put("b", 2);
+        output.writeObject(map);
+        output.flush();
+    }
+
+    public void customReplyMapRefMap() throws Exception {
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("a", 1);
+        map.put("b", 2);
+        map.put("self", map);
+
         output.writeObject(map);
         output.flush();
     }

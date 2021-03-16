@@ -70,6 +70,14 @@ func TestEncList(t *testing.T) {
 	assert.True(t, reflect.DeepEqual(res, list_2))
 }
 
+func TestListRefSelf(t *testing.T) {
+	RegisterPOJOs(new(A0), new(A1))
+
+	a := []Object{new(A0), new(A1), nil}
+	a[2] = a
+	testDecodeFramework(t, "customReplyTypedFixedListRefSelf", a)
+}
+
 func TestList(t *testing.T) {
 	RegisterPOJOs(new(A0), new(A1), new(TypedListTest))
 

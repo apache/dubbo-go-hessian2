@@ -101,6 +101,12 @@ func TestMapEncode(t *testing.T) {
 	testJavaDecode(t, "argUntypedMap_2", map[interface{}]interface{}{int32(0): "a", int32(1): "b"})
 }
 
+func TestCustomMapRefMap(t *testing.T) {
+	m := map[interface{}]interface{}{"a": int32(1), "b": int32(2)}
+	m["self"] = m
+	testDecodeFramework(t, "customReplyMapRefMap", m)
+}
+
 type customMapObject struct {
 	Int int32
 	S   string
