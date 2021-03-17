@@ -1,5 +1,10 @@
 # Release Notes
 
+## v1.9.1
+
+### Bugfixes
+- fix repeatedly adding list type in type map. [#263](https://github.com/apache/dubbo-go-hessian2/pull/263)
+
 ## v1.9.0
 
 ### New Features
