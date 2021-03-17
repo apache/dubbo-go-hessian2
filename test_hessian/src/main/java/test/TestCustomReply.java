@@ -24,15 +24,18 @@ import com.caucho.hessian.test.A0;
 import com.caucho.hessian.test.A1;
 import test.generic.BusinessData;
 import test.generic.Response;
+import test.model.CustomMap;
 import test.model.DateDemo;
 
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -83,6 +86,13 @@ public class TestCustomReply {
 
     public void customReplyTypedFixedListHasNull() throws Exception {
         Object[] o = new Object[]{new A0(), new A1(), null};
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyTypedFixedListRefSelf() throws Exception {
+        Object[] o = new Object[]{new A0(), new A1(), null};
+        o[2] = o;
         output.writeObject(o);
         output.flush();
     }
@@ -501,6 +511,16 @@ public class TestCustomReply {
         output.flush();
     }
 
+    public void customReplyMapRefMap() throws Exception {
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("a", 1);
+        map.put("b", 2);
+        map.put("self", map);
+
+        output.writeObject(map);
+        output.flush();
+    }
+
     public void customReplyMultipleTypeMap() throws Exception {
         Map<String, Integer> map1 = new HashMap<String, Integer>(4);
         map1.put("a", 1);
@@ -517,6 +537,37 @@ public class TestCustomReply {
         map.put("m3", map3);
 
         output.writeObject(map);
+        output.flush();
+    }
+
+    public void customReplyListMapListMap() throws Exception {
+        List<Object> list = new ArrayList<>();
+
+        Map<String, Object> listMap1 = new HashMap<String, Object>(4);
+        listMap1.put("a", 1);
+        listMap1.put("b", 2);
+
+        List<Object> items = new ArrayList<>();
+        items.add(new BigDecimal("55.55"));
+        items.add("hello");
+        items.add(123);
+
+        CustomMap<String, Object> innerMap = new CustomMap<String, Object>();
+        innerMap.put("Int", 456);
+        innerMap.put("S", "string");
+        items.add(innerMap);
+
+        listMap1.put("items",items);
+
+        list.add(listMap1);
+
+        CustomMap<String, Object> listMap2 = new CustomMap<String, Object>();
+        listMap2.put("Int", 789);
+        listMap2.put("S", "string2");
+
+        list.add(listMap2);
+
+        output.writeObject(list);
         output.flush();
     }
 
