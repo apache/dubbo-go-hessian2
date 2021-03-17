@@ -73,9 +73,17 @@ func TestEncList(t *testing.T) {
 func TestListRefSelf(t *testing.T) {
 	RegisterPOJOs(new(A0), new(A1))
 
-	a := []Object{new(A0), new(A1), nil}
-	a[2] = a
-	testDecodeFramework(t, "customReplyTypedFixedListRefSelf", a)
+	r, e := decodeJavaResponse("customReplyTypedFixedListRefSelf", "", true)
+	if e != nil {
+		t.Errorf("%s: decode fail with error: %v", "customReplyTypedFixedListRefSelf", e)
+		return
+	}
+
+	res := r.([]Object)
+	assert.Equal(t, 3, len(res))
+	assert.Equal(t, new(A0), res[0])
+	assert.Equal(t, new(A1), res[1])
+	assert.Equal(t, res, res[2])
 }
 
 func TestList(t *testing.T) {

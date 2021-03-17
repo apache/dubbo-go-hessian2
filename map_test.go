@@ -23,6 +23,7 @@ import (
 
 import (
 	big "github.com/dubbogo/gost/math/big"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestEncUntypedMap(t *testing.T) {
@@ -102,9 +103,15 @@ func TestMapEncode(t *testing.T) {
 }
 
 func TestCustomMapRefMap(t *testing.T) {
-	m := map[interface{}]interface{}{"a": int32(1), "b": int32(2)}
-	m["self"] = m
-	testDecodeFramework(t, "customReplyMapRefMap", m)
+	r, e := decodeJavaResponse("customReplyMapRefMap", "", true)
+	if e != nil {
+		t.Errorf("%s: decode fail with error: %v", "customReplyMapRefMap", e)
+		return
+	}
+	res := r.(map[interface{}]interface{})
+	assert.Equal(t, int32(1), res["a"])
+	assert.Equal(t, int32(2), res["b"])
+	assert.Equal(t, res, res["self"])
 }
 
 type customMapObject struct {
