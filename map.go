@@ -226,7 +226,6 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 		m          map[interface{}]interface{}
 		k          interface{}
 		v          interface{}
-		inst       interface{}
 		instValue  reflect.Value
 		fieldName  string
 		fieldValue reflect.Value
@@ -255,9 +254,7 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 			instValue = reflect.New(typ).Elem()
 		}
 
-		inst = instValue.Interface()
-
-		d.appendRefs(inst)
+		d.appendRefs(instValue)
 
 		for d.peekByte() != BC_END {
 			k, err = d.Decode()
@@ -286,7 +283,7 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 		if err != nil {
 			return nil, perrors.WithStack(err)
 		}
-		return inst, nil
+		return instValue.Interface(), nil
 	case tag == BC_MAP_UNTYPED:
 		m = make(map[interface{}]interface{})
 		d.appendRefs(m)
