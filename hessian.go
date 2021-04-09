@@ -38,7 +38,7 @@ const (
 	PackageType_BitSize       = 0x2f
 )
 
-// PackageType ...
+// PackageType defines dubbo package type.
 type PackageType int
 
 // DubboHeader dubbo header

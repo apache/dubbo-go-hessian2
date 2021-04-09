@@ -23,6 +23,7 @@ import (
 
 import (
 	big "github.com/dubbogo/gost/math/big"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestEncUntypedMap(t *testing.T) {
@@ -101,6 +102,23 @@ func TestMapEncode(t *testing.T) {
 	testJavaDecode(t, "argUntypedMap_2", map[interface{}]interface{}{int32(0): "a", int32(1): "b"})
 }
 
+func TestCustomMapRefMap(t *testing.T) {
+	r, e := decodeJavaResponse("customReplyMapRefMap", "", true)
+	if e != nil {
+		t.Errorf("%s: decode fail with error: %v", "customReplyMapRefMap", e)
+		return
+	}
+	res := r.(map[interface{}]interface{})
+	assert.Equal(t, int32(1), res["a"])
+	assert.Equal(t, int32(2), res["b"])
+	assert.Equal(t, res, res["self"])
+}
+
+type customMapObject struct {
+	Int int32
+	S   string
+}
+
 func TestCustomMap(t *testing.T) {
 	testDecodeFramework(t, "customReplyMap", map[interface{}]interface{}{"a": int32(1), "b": int32(2)})
 
@@ -126,4 +144,29 @@ func TestCustomMap(t *testing.T) {
 	}
 
 	testDecodeFramework(t, "customReplyMultipleTypeMap", multipleTypeMap)
+
+	RegisterPOJOMapping("test.model.CustomMap", &customMapObject{})
+
+	listMapListMap := []interface{}{
+
+		map[interface{}]interface{}{
+			"a": int32(1),
+			"b": int32(2),
+			"items": []interface{}{
+				b5,
+				"hello",
+				int32(123),
+				customMapObject{
+					Int: 456,
+					S:   "string",
+				},
+			},
+		},
+		customMapObject{
+			Int: 789,
+			S:   "string2",
+		},
+	}
+
+	testDecodeFramework(t, "customReplyListMapListMap", listMapListMap)
 }

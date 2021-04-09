@@ -25,6 +25,7 @@ thanks to [micln](https://github.com/micln), [pantianying](https://github.com/pa
 * [Java Date & Time](https://github.com/apache/dubbo-go-hessian2/issues/90)
 * [java8 time.Date](https://github.com/apache/dubbo-go-hessian2/pull/212)
 * [java8 java.sql.Time & java.sql.Date](https://github.com/apache/dubbo-go-hessian2/pull/219)
+* [java UUID](https://github.com/apache/dubbo-go-hessian2/pull/256)
 * [Java Generic Invokation](https://github.com/apache/dubbo-go-hessian2/issues/84)
 * [Java Extends](https://github.com/apache/dubbo-go-hessian2/issues/157)
 * [Dubbo Attachements](https://github.com/apache/dubbo-go-hessian2/issues/49)
