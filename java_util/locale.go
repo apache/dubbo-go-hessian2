@@ -22,10 +22,9 @@ import "fmt"
 // LocaleEnum is Locale enumeration value
 type LocaleEnum int
 
-// Locale object enum
+// Locale struct enum
 const (
-	ROOT LocaleEnum = iota
-	ENGLISH
+	ENGLISH LocaleEnum = iota
 	FRENCH
 	GERMAN
 	ITALIAN
@@ -46,6 +45,7 @@ const (
 	US
 	CANADA
 	CANADA_FRENCH
+	ROOT
 )
 
 // Locale => java.util.Locale
@@ -72,7 +72,8 @@ func (LocaleHandle) JavaClassName() string {
 	return "com.alibaba.com.caucho.hessian.io.LocaleHandle"
 }
 
-var locales []Locale = make([]Locale, 22, 22)
+// Locales is all const Locale struct slice
+var Locales []Locale = make([]Locale, 0, 22)
 
 // init java.util.Locale static object
 func init() {
@@ -196,45 +197,17 @@ func init() {
 		Lang:   "",
 		County: "",
 	}
-	locales = append(locales, ENGLISH, FRENCH, GERMAN, ITALIAN, JAPANESE, KOREAN, CHINESE, SIMPLIFIED_CHINESE, TRADITIONAL_CHINESE, FRANCE,
+	Locales = append(Locales, ENGLISH, FRENCH, GERMAN, ITALIAN, JAPANESE, KOREAN, CHINESE, SIMPLIFIED_CHINESE, TRADITIONAL_CHINESE, FRANCE,
 		GERMANY, ITALY, JAPAN, KOREA, CHINA, PRC, TAIWAN, UK, US, CANADA, CANADA_FRENCH, ROOT)
-}
-
-// GetLocale is use enum value get Locale,
-// default value is ROOT
-func GetLocale(localeEnum LocaleEnum) *Locale {
-	// Useful constant for language.
-	var ROOT = Locale{
-		id:     22,
-		Lang:   "",
-		County: "",
-	}
-	for _, locale := range locales {
-		if localeEnum == CHINA || localeEnum == PRC {
-			return GetLocale(SIMPLIFIED_CHINESE)
-		}
-		if localeEnum == TAIWAN {
-			return GetLocale(TRADITIONAL_CHINESE)
-		}
-		if localeEnum == locale.id {
-			return &locale
-		}
-	}
-	return &ROOT
 }
 
 // GetLocaleFromHandler is use LocaleHandle get Locale
 func GetLocaleFromHandler(localeHandler *LocaleHandle) *Locale {
 	// Useful constant for language.
-	var ROOT = Locale{
-		id:     22,
-		Lang:   "",
-		County: "",
-	}
-	for _, locale := range locales {
+	for _, locale := range Locales {
 		if localeHandler.Value == locale.String() {
 			return &locale
 		}
 	}
-	return &ROOT
+	return &Locales[ROOT]
 }
