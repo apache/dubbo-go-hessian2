@@ -73,132 +73,130 @@ func (LocaleHandle) JavaClassName() string {
 }
 
 // Locales is all const Locale struct slice
-var Locales []Locale = make([]Locale, 0, 22)
+var Locales []Locale = make([]Locale, 22, 22)
 
 // init java.util.Locale static object
 func init() {
 	// Useful constant for language.
-	var ENGLISH = Locale{
+	Locales[ENGLISH] = Locale{
 		id:     ENGLISH,
 		Lang:   "en",
 		County: "",
 	}
 	// Useful constant for language.
-	var FRENCH = Locale{
+	Locales[FRENCH] = Locale{
 		id:     FRENCH,
 		Lang:   "fr",
 		County: "",
 	}
 	// Useful constant for language.
-	var GERMAN = Locale{
+	Locales[GERMAN] = Locale{
 		id:     GERMAN,
 		Lang:   "de",
 		County: "",
 	}
 	// Useful constant for language.
-	var ITALIAN = Locale{
+	Locales[ITALIAN] = Locale{
 		id:     ITALIAN,
 		Lang:   "it",
 		County: "",
 	}
 	// Useful constant for language.
-	var JAPANESE = Locale{
+	Locales[JAPANESE] = Locale{
 		id:     JAPANESE,
 		Lang:   "ja",
 		County: "",
 	}
 	// Useful constant for language.
-	var KOREAN = Locale{
+	Locales[KOREAN] = Locale{
 		id:     KOREAN,
 		Lang:   "ko",
 		County: "",
 	}
 	// Useful constant for language.
-	var CHINESE = Locale{
+	Locales[CHINESE] = Locale{
 		id:     CHINESE,
 		Lang:   "zh",
 		County: "",
 	}
 	// Useful constant for language.
-	var SIMPLIFIED_CHINESE = Locale{
+	Locales[SIMPLIFIED_CHINESE] = Locale{
 		id:     SIMPLIFIED_CHINESE,
 		Lang:   "zh",
 		County: "CN",
 	}
 	// Useful constant for language.
-	var TRADITIONAL_CHINESE = Locale{
+	Locales[TRADITIONAL_CHINESE] = Locale{
 		id:     TRADITIONAL_CHINESE,
 		Lang:   "zh",
 		County: "TW",
 	}
 	// Useful constant for language.
-	var FRANCE = Locale{
+	Locales[FRANCE] = Locale{
 		id:     FRANCE,
 		Lang:   "fr",
 		County: "FR",
 	}
 	// Useful constant for language.
-	var GERMANY = Locale{
+	Locales[GERMANY] = Locale{
 		id:     GERMANY,
 		Lang:   "de",
 		County: "DE",
 	}
 	// Useful constant for language.
-	var ITALY = Locale{
+	Locales[ITALY] = Locale{
 		id:     ITALY,
 		Lang:   "it",
 		County: "it",
 	}
 	// Useful constant for language.
-	var JAPAN = Locale{
+	Locales[JAPAN] = Locale{
 		id:     JAPAN,
 		Lang:   "ja",
 		County: "JP",
 	}
 	// Useful constant for language.
-	var KOREA = Locale{
+	Locales[KOREA] = Locale{
 		id:     KOREA,
 		Lang:   "ko",
 		County: "KR",
 	}
 	// Useful constant for language.
-	var CHINA = SIMPLIFIED_CHINESE
+	Locales[CHINA] = Locales[SIMPLIFIED_CHINESE]
 	// Useful constant for language.
-	var PRC = SIMPLIFIED_CHINESE
+	Locales[PRC] = Locales[SIMPLIFIED_CHINESE]
 	// Useful constant for language.
-	var TAIWAN = TRADITIONAL_CHINESE
+	Locales[TAIWAN] = Locales[TRADITIONAL_CHINESE]
 	// Useful constant for language.
-	var UK = Locale{
+	Locales[UK] = Locale{
 		id:     UK,
 		Lang:   "en",
 		County: "GB",
 	}
 	// Useful constant for language.
-	var US = Locale{
+	Locales[US] = Locale{
 		id:     US,
 		Lang:   "en",
 		County: "US",
 	}
 	// Useful constant for language.
-	var CANADA = Locale{
+	Locales[CANADA] = Locale{
 		id:     CANADA,
 		Lang:   "en",
 		County: "CA",
 	}
 	// Useful constant for language.
-	var CANADA_FRENCH = Locale{
+	Locales[CANADA_FRENCH] = Locale{
 		id:     CANADA_FRENCH,
 		Lang:   "fr",
 		County: "CA",
 	}
 	// Useful constant for language.
-	var ROOT = Locale{
+	Locales[ROOT] = Locale{
 		id:     ROOT,
 		Lang:   "",
 		County: "",
 	}
-	Locales = append(Locales, ENGLISH, FRENCH, GERMAN, ITALIAN, JAPANESE, KOREAN, CHINESE, SIMPLIFIED_CHINESE, TRADITIONAL_CHINESE, FRANCE,
-		GERMANY, ITALY, JAPAN, KOREA, CHINA, PRC, TAIWAN, UK, US, CANADA, CANADA_FRENCH, ROOT)
 }
 
 // GetLocaleFromHandler is use LocaleHandle get Locale
