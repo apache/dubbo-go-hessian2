@@ -73,144 +73,124 @@ func (LocaleHandle) JavaClassName() string {
 }
 
 // locales is all const Locale struct slice
-var locales []Locale = make([]Locale, 22, 22)
+// localeMap is key = locale.String() value = locale struct
+var (
+	locales   []Locale            = make([]Locale, 22, 22)
+	localeMap map[string](Locale) = make(map[string](Locale), 22)
+)
 
 // init java.util.Locale static object
 func init() {
-	// Useful constant for language.
 	locales[ENGLISH] = Locale{
 		id:     ENGLISH,
 		Lang:   "en",
 		County: "",
 	}
-	// Useful constant for language.
 	locales[FRENCH] = Locale{
 		id:     FRENCH,
 		Lang:   "fr",
 		County: "",
 	}
-	// Useful constant for language.
 	locales[GERMAN] = Locale{
 		id:     GERMAN,
 		Lang:   "de",
 		County: "",
 	}
-	// Useful constant for language.
 	locales[ITALIAN] = Locale{
 		id:     ITALIAN,
 		Lang:   "it",
 		County: "",
 	}
-	// Useful constant for language.
 	locales[JAPANESE] = Locale{
 		id:     JAPANESE,
 		Lang:   "ja",
 		County: "",
 	}
-	// Useful constant for language.
 	locales[KOREAN] = Locale{
 		id:     KOREAN,
 		Lang:   "ko",
 		County: "",
 	}
-	// Useful constant for language.
 	locales[CHINESE] = Locale{
 		id:     CHINESE,
 		Lang:   "zh",
 		County: "",
 	}
-	// Useful constant for language.
 	locales[SIMPLIFIED_CHINESE] = Locale{
 		id:     SIMPLIFIED_CHINESE,
 		Lang:   "zh",
 		County: "CN",
 	}
-	// Useful constant for language.
 	locales[TRADITIONAL_CHINESE] = Locale{
 		id:     TRADITIONAL_CHINESE,
 		Lang:   "zh",
 		County: "TW",
 	}
-	// Useful constant for language.
 	locales[FRANCE] = Locale{
 		id:     FRANCE,
 		Lang:   "fr",
 		County: "FR",
 	}
-	// Useful constant for language.
 	locales[GERMANY] = Locale{
 		id:     GERMANY,
 		Lang:   "de",
 		County: "DE",
 	}
-	// Useful constant for language.
 	locales[ITALY] = Locale{
 		id:     ITALY,
 		Lang:   "it",
 		County: "it",
 	}
-	// Useful constant for language.
 	locales[JAPAN] = Locale{
 		id:     JAPAN,
 		Lang:   "ja",
 		County: "JP",
 	}
-	// Useful constant for language.
 	locales[KOREA] = Locale{
 		id:     KOREA,
 		Lang:   "ko",
 		County: "KR",
 	}
-	// Useful constant for language.
 	locales[CHINA] = locales[SIMPLIFIED_CHINESE]
-	// Useful constant for language.
 	locales[PRC] = locales[SIMPLIFIED_CHINESE]
-	// Useful constant for language.
 	locales[TAIWAN] = locales[TRADITIONAL_CHINESE]
-	// Useful constant for language.
 	locales[UK] = Locale{
 		id:     UK,
 		Lang:   "en",
 		County: "GB",
 	}
-	// Useful constant for language.
 	locales[US] = Locale{
 		id:     US,
 		Lang:   "en",
 		County: "US",
 	}
-	// Useful constant for language.
 	locales[CANADA] = Locale{
 		id:     CANADA,
 		Lang:   "en",
 		County: "CA",
 	}
-	// Useful constant for language.
 	locales[CANADA_FRENCH] = Locale{
 		id:     CANADA_FRENCH,
 		Lang:   "fr",
 		County: "CA",
 	}
-	// Useful constant for language.
 	locales[ROOT] = Locale{
 		id:     ROOT,
 		Lang:   "",
 		County: "",
 	}
+	for _, locale := range locales {
+		localeMap[locale.String()] = locale
+	}
 }
 
-// ToLocales is get const locale struct slice
-func ToLocales() []Locale {
-	return locales
+// ToLocale get locale from enum
+func ToLocale(e LocaleEnum) *Locale {
+	return &locales[e]
 }
 
 // GetLocaleFromHandler is use LocaleHandle get Locale
 func GetLocaleFromHandler(localeHandler *LocaleHandle) *Locale {
-	// Useful constant for language.
-	for _, locale := range locales {
-		if localeHandler.Value == locale.String() {
-			return &locale
-		}
-	}
-	return &locales[ROOT]
+	locale := localeMap[localeHandler.Value]
+	return &locale
 }
