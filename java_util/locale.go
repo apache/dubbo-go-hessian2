@@ -17,8 +17,6 @@
 
 package java_util
 
-import "fmt"
-
 // LocaleEnum is Locale enumeration value
 type LocaleEnum int
 
@@ -58,7 +56,7 @@ type Locale struct {
 
 func (locale *Locale) String() string {
 	if len(locale.County) != 0 {
-		return fmt.Sprintf("%s_%s", locale.Lang, locale.County)
+		return locale.Lang + "_" + locale.County
 	}
 	return locale.Lang
 }
