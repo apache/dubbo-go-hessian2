@@ -50,15 +50,23 @@ const (
 type Locale struct {
 	// ID is used to implement enumeration
 	id     LocaleEnum
-	Lang   string
-	County string
+	lang   string
+	county string
+}
+
+func (locale *Locale) County() string {
+	return locale.county
+}
+
+func (locale *Locale) Lang() string {
+	return locale.lang
 }
 
 func (locale *Locale) String() string {
-	if len(locale.County) != 0 {
-		return locale.Lang + "_" + locale.County
+	if len(locale.county) != 0 {
+		return locale.lang + "_" + locale.county
 	}
-	return locale.Lang
+	return locale.lang
 }
 
 // LocaleHandle => com.alibaba.com.caucho.hessian.io.LocaleHandle object
@@ -81,101 +89,101 @@ var (
 func init() {
 	locales[ENGLISH] = Locale{
 		id:     ENGLISH,
-		Lang:   "en",
-		County: "",
+		lang:   "en",
+		county: "",
 	}
 	locales[FRENCH] = Locale{
 		id:     FRENCH,
-		Lang:   "fr",
-		County: "",
+		lang:   "fr",
+		county: "",
 	}
 	locales[GERMAN] = Locale{
 		id:     GERMAN,
-		Lang:   "de",
-		County: "",
+		lang:   "de",
+		county: "",
 	}
 	locales[ITALIAN] = Locale{
 		id:     ITALIAN,
-		Lang:   "it",
-		County: "",
+		lang:   "it",
+		county: "",
 	}
 	locales[JAPANESE] = Locale{
 		id:     JAPANESE,
-		Lang:   "ja",
-		County: "",
+		lang:   "ja",
+		county: "",
 	}
 	locales[KOREAN] = Locale{
 		id:     KOREAN,
-		Lang:   "ko",
-		County: "",
+		lang:   "ko",
+		county: "",
 	}
 	locales[CHINESE] = Locale{
 		id:     CHINESE,
-		Lang:   "zh",
-		County: "",
+		lang:   "zh",
+		county: "",
 	}
 	locales[SIMPLIFIED_CHINESE] = Locale{
 		id:     SIMPLIFIED_CHINESE,
-		Lang:   "zh",
-		County: "CN",
+		lang:   "zh",
+		county: "CN",
 	}
 	locales[TRADITIONAL_CHINESE] = Locale{
 		id:     TRADITIONAL_CHINESE,
-		Lang:   "zh",
-		County: "TW",
+		lang:   "zh",
+		county: "TW",
 	}
 	locales[FRANCE] = Locale{
 		id:     FRANCE,
-		Lang:   "fr",
-		County: "FR",
+		lang:   "fr",
+		county: "FR",
 	}
 	locales[GERMANY] = Locale{
 		id:     GERMANY,
-		Lang:   "de",
-		County: "DE",
+		lang:   "de",
+		county: "DE",
 	}
 	locales[ITALY] = Locale{
 		id:     ITALY,
-		Lang:   "it",
-		County: "it",
+		lang:   "it",
+		county: "it",
 	}
 	locales[JAPAN] = Locale{
 		id:     JAPAN,
-		Lang:   "ja",
-		County: "JP",
+		lang:   "ja",
+		county: "JP",
 	}
 	locales[KOREA] = Locale{
 		id:     KOREA,
-		Lang:   "ko",
-		County: "KR",
+		lang:   "ko",
+		county: "KR",
 	}
 	locales[CHINA] = locales[SIMPLIFIED_CHINESE]
 	locales[PRC] = locales[SIMPLIFIED_CHINESE]
 	locales[TAIWAN] = locales[TRADITIONAL_CHINESE]
 	locales[UK] = Locale{
 		id:     UK,
-		Lang:   "en",
-		County: "GB",
+		lang:   "en",
+		county: "GB",
 	}
 	locales[US] = Locale{
 		id:     US,
-		Lang:   "en",
-		County: "US",
+		lang:   "en",
+		county: "US",
 	}
 	locales[CANADA] = Locale{
 		id:     CANADA,
-		Lang:   "en",
-		County: "CA",
+		lang:   "en",
+		county: "CA",
 	}
 	locales[CANADA_FRENCH] = Locale{
 		id:     CANADA_FRENCH,
-		Lang:   "fr",
-		County: "CA",
+		lang:   "fr",
+		county: "CA",
 	}
 	locales[ROOT] = Locale{
 		id:     ROOT,
-		Lang:   "",
-		County: "",
+		lang:   "",
+		county: "",
 	}
 	for _, locale := range locales {
 		localeMap[locale.String()] = locale
