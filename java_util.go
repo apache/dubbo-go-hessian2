@@ -26,4 +26,7 @@ func init() {
 		MostSigBits:  int64(200),
 		LeastSigBits: int64(200),
 	})
+	RegisterPOJO(&java_util.LocaleHandle{
+		Value: "",
+	})
 }
