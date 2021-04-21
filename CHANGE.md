@@ -1,5 +1,10 @@
 # Release Notes
 
+## v1.9.2
+
+### New Features
+- support java.util.Locale. [#264](https://github.com/apache/dubbo-go-hessian2/pull/264)
+
 ## v1.9.1
 
 ### Bugfixes
