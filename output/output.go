@@ -40,6 +40,8 @@ func init() {
 	funcMap["Java8TimeYear"] = testfuncs.Java8TimeYear
 	funcMap["Java8LocalDate"] = testfuncs.Java8LocalDate
 	funcMap["JavaException"] = testfuncs.JavaException
+	funcMap["UserArray"] = testfuncs.UserArray
+	funcMap["UserList"] = testfuncs.UserList
 }
 
 func main() {
