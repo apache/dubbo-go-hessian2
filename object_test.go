@@ -812,3 +812,38 @@ func TestCustomReplyGenericResponseBusinessData(t *testing.T) {
 
 	testDecodeFramework(t, "customReplyGenericResponseBusinessData", res)
 }
+
+func TestCustomReplyGenericResponseList(t *testing.T) {
+	data := []*BusinessData{
+		{
+			Name:  "apple",
+			Count: 5,
+		},
+		{
+			Name:  "banana",
+			Count: 6,
+		},
+	}
+	res := &GenericResponse{
+		Code: 202,
+		Data: data,
+	}
+	RegisterPOJO(data[0])
+	RegisterPOJO(res)
+
+	testDecodeFrameworkFunc(t, "customReplyGenericResponseList", func(r interface{}) {
+		expect, ok := r.(*GenericResponse)
+		if !ok {
+			t.Errorf("expect *GenericResponse, but get %v", r)
+			return
+		}
+		list, dataOk := expect.Data.([]interface{})
+		if !dataOk {
+			t.Errorf("expect []interface{}, but get %v", expect.Data)
+			return
+		}
+		assert.Equal(t, res.Code, expect.Code)
+		assert.True(t, reflect.DeepEqual(data[0], list[0]))
+		assert.True(t, reflect.DeepEqual(data[1], list[1]))
+	})
+}
