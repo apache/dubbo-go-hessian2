@@ -58,7 +58,7 @@ func (e *Encoder) Clean() {
 // it reuse allocated buffer and reduce memory-allocation.
 func (e *Encoder) ReuseBufferClean() {
 	var buffer []byte
-	if len(e.buffer) <= 128 {
+	if cap(e.buffer) <= 128 {
 		// reuse buffer, avoid allocate
 		buffer = e.buffer[:0]
 	} else {
