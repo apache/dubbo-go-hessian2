@@ -397,14 +397,7 @@ func SetSlice(dest reflect.Value, objects interface{}) error {
 	}
 
 	if ref, ok := objects.(*_refHolder); ok {
-		v, err := ConvertSliceValueType(destTyp, ref.value)
-		if err != nil {
-			return err
-		}
-		SetValue(dest, v)
-		ref.change(v) // change finally
-		ref.notify()  // delay set value to all destinations
-		return nil
+		return unpackRefHolder(dest, destTyp, ref)
 	}
 
 	v := EnsurePackValue(objects)
@@ -422,9 +415,21 @@ func SetSlice(dest reflect.Value, objects interface{}) error {
 	return nil
 }
 
+// unpackRefHolder unpack the ref holder when decoding slice finished.
+func unpackRefHolder(dest reflect.Value, destTyp reflect.Type, ref *_refHolder) error {
+	v, err := ConvertSliceValueType(destTyp, ref.value)
+	if err != nil {
+		return err
+	}
+	SetValue(dest, v)
+	ref.change(v) // change finally
+	ref.notify()  // delay set value to all destinations
+	return nil
+}
+
 // ConvertSliceValueType convert to slice of destination type
 func ConvertSliceValueType(destTyp reflect.Type, v reflect.Value) (reflect.Value, error) {
-	if destTyp == v.Type() {
+	if destTyp == v.Type() || destTyp.Kind() == reflect.Interface {
 		return v, nil
 	}
 

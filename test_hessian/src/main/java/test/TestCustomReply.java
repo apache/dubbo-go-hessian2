@@ -31,7 +31,16 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 
 public class TestCustomReply {
@@ -595,6 +604,15 @@ public class TestCustomReply {
 
     public void customReplyGenericResponseBusinessData() throws Exception {
         Response<BusinessData> response = new Response<>(201, new BusinessData("apple", 5));
+        output.writeObject(response);
+        output.flush();
+    }
+
+    public void customReplyGenericResponseList() throws Exception {
+        List<BusinessData> list = new ArrayList<>();
+        list.add(new BusinessData("apple", 5));
+        list.add(new BusinessData("banana", 6));
+        Response<List<BusinessData>> response = new Response<>(202, list);
         output.writeObject(response);
         output.flush();
     }
