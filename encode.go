@@ -21,9 +21,7 @@ import (
 	"reflect"
 	"time"
 	"unsafe"
-)
 
-import (
 	perrors "github.com/pkg/errors"
 )
 
@@ -51,6 +49,22 @@ func NewEncoder() *Encoder {
 // Clean clean the Encoder (room) for a new object encoding.
 func (e *Encoder) Clean() {
 	buffer := make([]byte, 64)
+	e.classInfoList = nil
+	e.buffer = buffer[:0]
+	e.refMap = make(map[unsafe.Pointer]_refElem, 7)
+}
+
+// ReuseBufferClean reuse the Encoder for a new object encoding.
+// it reuse allocated buffer and reduce memory-allocation.
+func (e *Encoder) ReuseBufferClean() {
+	var buffer []byte
+	if cap(e.buffer) <= 512 {
+		// reuse buffer, avoid allocate
+		buffer = e.buffer[:0]
+	} else {
+		// avoiding memory leak caused by growth of underlying array
+		buffer = make([]byte, 64)
+	}
 	e.classInfoList = nil
 	e.buffer = buffer[:0]
 	e.refMap = make(map[unsafe.Pointer]_refElem, 7)
