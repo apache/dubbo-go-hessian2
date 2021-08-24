@@ -86,6 +86,12 @@ public class TestCustomReply {
         typeMap.put(Date[].class, "[date");
     }
 
+    public void customReplyJsonString() throws Exception {
+        String s = "{\"params\":{\"fromAccid\":\"23495382\",\"msgType\":100,\"msgId\":\"148ef1b2-808d-48f2-b268-7a1018a27bdb\",\"attach\":\"{\\\"accid\\\":\\\"23495382\\\",\\\"classRoomFlag\\\":50685,\\\"msgId\\\":\\\"599645021431398400\\\",\\\"msgType\\\":\\\"100\\\",\\\"nickname\\\":\\\"橙子������\\\"}\",\"roomid\":413256699},\"url\":\"https://api.netease.im/nimserver/chatroom/sendMsg.action\"}";
+        output.writeObject(s);
+        output.flush();
+    }
+
     public void customReplyTypedFixedListHasNull() throws Exception {
         Object[] o = new Object[]{new A0(), new A1(), null};
         output.writeObject(o);
