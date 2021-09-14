@@ -28,11 +28,12 @@ func init() {
 	SetCollectionSerialize(&CharacterArray{})
 }
 
-//BooleanArray Boolean[]
+// BooleanArray Boolean[]
 type BooleanArray struct {
 	Values []bool
 }
 
+// nolint
 func (ba *BooleanArray) Get() []interface{} {
 	res := make([]interface{}, len(ba.Values))
 	for i, v := range ba.Values {
@@ -41,6 +42,7 @@ func (ba *BooleanArray) Get() []interface{} {
 	return res
 }
 
+// nolint
 func (ba *BooleanArray) Set(vs []interface{}) {
 	values := make([]bool, len(vs))
 	for i, v := range vs {
@@ -49,6 +51,7 @@ func (ba *BooleanArray) Set(vs []interface{}) {
 	ba.Values = values
 }
 
+// nolint
 func (*BooleanArray) JavaClassName() string {
 	return "[java.lang.Boolean"
 }
@@ -58,6 +61,7 @@ type IntegerArray struct {
 	Values []int32
 }
 
+// nolint
 func (ia *IntegerArray) Get() []interface{} {
 	res := make([]interface{}, len(ia.Values))
 	for i, v := range ia.Values {
@@ -66,6 +70,7 @@ func (ia *IntegerArray) Get() []interface{} {
 	return res
 }
 
+// nolint
 func (ia *IntegerArray) Set(vs []interface{}) {
 	values := make([]int32, len(vs))
 	for i, v := range vs {
@@ -74,15 +79,17 @@ func (ia *IntegerArray) Set(vs []interface{}) {
 	ia.Values = values
 }
 
+// nolint
 func (*IntegerArray) JavaClassName() string {
 	return "[java.lang.Integer"
 }
 
-//ByteArray Byte[]
+// ByteArray Byte[]
 type ByteArray struct {
 	IntegerArray
 }
 
+// nolint
 func (ba *ByteArray) Get() []interface{} {
 	res := make([]interface{}, len(ba.Values))
 	for i, v := range ba.Values {
@@ -91,6 +98,7 @@ func (ba *ByteArray) Get() []interface{} {
 	return res
 }
 
+// nolint
 func (ba *ByteArray) Set(vs []interface{}) {
 	values := make([]int32, len(vs))
 	for i, v := range vs {
@@ -99,15 +107,17 @@ func (ba *ByteArray) Set(vs []interface{}) {
 	ba.Values = values
 }
 
+// nolint
 func (*ByteArray) JavaClassName() string {
 	return "[java.lang.Byte"
 }
 
-//ShortArray Short[]
+// ShortArray Short[]
 type ShortArray struct {
 	IntegerArray
 }
 
+// nolint
 func (sa *ShortArray) Get() []interface{} {
 	res := make([]interface{}, len(sa.Values))
 	for i, v := range sa.Values {
@@ -116,6 +126,7 @@ func (sa *ShortArray) Get() []interface{} {
 	return res
 }
 
+// nolint
 func (sa *ShortArray) Set(vs []interface{}) {
 	values := make([]int32, len(vs))
 	for i, v := range vs {
@@ -124,15 +135,17 @@ func (sa *ShortArray) Set(vs []interface{}) {
 	sa.Values = values
 }
 
+// nolint
 func (*ShortArray) JavaClassName() string {
 	return "[java.lang.Short"
 }
 
-//LongArray Long[]
+// LongArray Long[]
 type LongArray struct {
 	Values []int64
 }
 
+// nolint
 func (ba *LongArray) Get() []interface{} {
 	res := make([]interface{}, len(ba.Values))
 	for i, v := range ba.Values {
@@ -141,6 +154,7 @@ func (ba *LongArray) Get() []interface{} {
 	return res
 }
 
+// nolint
 func (ba *LongArray) Set(vs []interface{}) {
 	values := make([]int64, len(vs))
 	for i, v := range vs {
@@ -149,15 +163,17 @@ func (ba *LongArray) Set(vs []interface{}) {
 	ba.Values = values
 }
 
+// nolint
 func (*LongArray) JavaClassName() string {
 	return "[java.lang.Long"
 }
 
-//FloatArray Float[]
+// FloatArray Float[]
 type FloatArray struct {
 	Values []float32
 }
 
+// nolint
 func (fa *FloatArray) Get() []interface{} {
 	res := make([]interface{}, len(fa.Values))
 	for i, v := range fa.Values {
@@ -166,6 +182,7 @@ func (fa *FloatArray) Get() []interface{} {
 	return res
 }
 
+// nolint
 func (fa *FloatArray) Set(vs []interface{}) {
 	values := make([]float32, len(vs))
 	for i, v := range vs {
@@ -174,6 +191,7 @@ func (fa *FloatArray) Set(vs []interface{}) {
 	fa.Values = values
 }
 
+// nolint
 func (*FloatArray) JavaClassName() string {
 	return "[java.lang.Float"
 }
@@ -183,6 +201,7 @@ type DoubleArray struct {
 	Values []float64
 }
 
+// nolint
 func (da *DoubleArray) Get() []interface{} {
 	res := make([]interface{}, len(da.Values))
 	for i, v := range da.Values {
@@ -191,6 +210,7 @@ func (da *DoubleArray) Get() []interface{} {
 	return res
 }
 
+// nolint
 func (da *DoubleArray) Set(vs []interface{}) {
 	values := make([]float64, len(vs))
 	for i, v := range vs {
@@ -199,6 +219,7 @@ func (da *DoubleArray) Set(vs []interface{}) {
 	da.Values = values
 }
 
+// nolint
 func (*DoubleArray) JavaClassName() string {
 	return "[java.lang.Double"
 }
@@ -208,15 +229,18 @@ type CharacterArray struct {
 	Values string
 }
 
+// nolint
 func (ca *CharacterArray) Get() []interface{} {
 	res := []interface{}{ca.Values}
 	return res
 }
 
+// nolint
 func (ca *CharacterArray) Set(vs []interface{}) {
 	ca.Values = vs[0].(string)
 }
 
+// nolint
 func (*CharacterArray) JavaClassName() string {
 	return "[java.lang.Character"
 }
