@@ -24,11 +24,10 @@ import (
 
 func TestBooleanArray(t *testing.T) {
 	booleanArray := &BooleanArray{[]bool{true, false}}
-	jcs := JavaCollectionSerializer{}
 	e := &Encoder{}
 	a := assert.New(t)
 
-	err := jcs.EncObject(e, booleanArray)
+	err := e.Encode(booleanArray)
 	a.Nil(err)
 
 	decoder := NewDecoder(e.buffer)
@@ -39,11 +38,10 @@ func TestBooleanArray(t *testing.T) {
 
 func TestIntegerArray(t *testing.T) {
 	ia := &IntegerArray{[]int32{1, 2, 3}}
-	jcs := JavaCollectionSerializer{}
-	e := &Encoder{}
 	a := assert.New(t)
 
-	err := jcs.EncObject(e, ia)
+	e := &Encoder{}
+	err := e.Encode(ia)
 	a.Nil(err)
 
 	decoder := NewDecoder(e.buffer)
@@ -54,7 +52,7 @@ func TestIntegerArray(t *testing.T) {
 	// Integer[] that length > 7
 	bigIa := &IntegerArray{[]int32{1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3}}
 	ne := &Encoder{}
-	err = jcs.EncObject(ne, bigIa)
+	err = ne.Encode(bigIa)
 	a.Nil(err)
 
 	decoder = NewDecoder(e.buffer)
@@ -66,11 +64,10 @@ func TestIntegerArray(t *testing.T) {
 func TestByteArray(t *testing.T) {
 	ba := &ByteArray{}
 	ba.Values = []int32{1, 2, 3}
-	jcs := JavaCollectionSerializer{}
-	e := &Encoder{}
 	a := assert.New(t)
 
-	err := jcs.EncObject(e, ba)
+	e := &Encoder{}
+	err := e.Encode(ba)
 	a.Nil(err)
 
 	decoder := NewDecoder(e.buffer)
@@ -82,11 +79,10 @@ func TestByteArray(t *testing.T) {
 func TestShortArray(t *testing.T) {
 	sa := &ShortArray{}
 	sa.Values = []int32{1, 2, 3}
-	jcs := JavaCollectionSerializer{}
-	e := &Encoder{}
 	a := assert.New(t)
 
-	err := jcs.EncObject(e, sa)
+	e := &Encoder{}
+	err := e.Encode(sa)
 	a.Nil(err)
 
 	decoder := NewDecoder(e.buffer)
@@ -97,11 +93,10 @@ func TestShortArray(t *testing.T) {
 
 func TestLongArray(t *testing.T) {
 	la := &LongArray{[]int64{1, 2, 3, 4}}
-	jcs := JavaCollectionSerializer{}
-	e := &Encoder{}
 	a := assert.New(t)
 
-	err := jcs.EncObject(e, la)
+	e := &Encoder{}
+	err := e.Encode(la)
 	a.Nil(err)
 
 	decoder := NewDecoder(e.buffer)
@@ -112,11 +107,10 @@ func TestLongArray(t *testing.T) {
 
 func TestFloatArray(t *testing.T) {
 	fa := &FloatArray{[]float32{1, 2, 3, 4}}
-	jcs := JavaCollectionSerializer{}
-	e := &Encoder{}
 	a := assert.New(t)
 
-	err := jcs.EncObject(e, fa)
+	e := &Encoder{}
+	err := e.Encode(fa)
 	a.Nil(err)
 
 	decoder := NewDecoder(e.buffer)
@@ -127,11 +121,10 @@ func TestFloatArray(t *testing.T) {
 
 func TestDoubleArray(t *testing.T) {
 	da := &DoubleArray{[]float64{1, 2, 3, 4}}
-	jcs := JavaCollectionSerializer{}
-	e := &Encoder{}
 	a := assert.New(t)
 
-	err := jcs.EncObject(e, da)
+	e := &Encoder{}
+	err := e.Encode(da)
 	a.Nil(err)
 
 	decoder := NewDecoder(e.buffer)
@@ -142,11 +135,10 @@ func TestDoubleArray(t *testing.T) {
 
 func TestCharacterArray(t *testing.T) {
 	ca := &CharacterArray{"hello world"}
-	jcs := JavaCollectionSerializer{}
-	e := &Encoder{}
 	a := assert.New(t)
 
-	err := jcs.EncObject(e, ca)
+	e := &Encoder{}
+	err := e.Encode(ca)
 	a.Nil(err)
 
 	decoder := NewDecoder(e.buffer)

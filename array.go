@@ -17,6 +17,10 @@
 
 package hessian
 
+import (
+	"strings"
+)
+
 func init() {
 	SetCollectionSerialize(&IntegerArray{})
 	SetCollectionSerialize(&ByteArray{})
@@ -231,13 +235,20 @@ type CharacterArray struct {
 
 // nolint
 func (ca *CharacterArray) Get() []interface{} {
-	res := []interface{}{ca.Values}
+	length := len(ca.Values)
+	charArr := strings.Split(ca.Values, "")
+	res := make([]interface{}, length)
+	for i := 0; i < length; i++ {
+		res[i] = charArr[i]
+	}
 	return res
 }
 
 // nolint
 func (ca *CharacterArray) Set(vs []interface{}) {
-	ca.Values = vs[0].(string)
+	for _, v := range vs {
+		ca.Values = ca.Values + v.(string)
+	}
 }
 
 // nolint
