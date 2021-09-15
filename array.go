@@ -90,7 +90,7 @@ func (*IntegerArray) JavaClassName() string {
 
 // ByteArray Byte[]
 type ByteArray struct {
-	IntegerArray
+	Values []uint8
 }
 
 // nolint
@@ -104,9 +104,9 @@ func (ba *ByteArray) Get() []interface{} {
 
 // nolint
 func (ba *ByteArray) Set(vs []interface{}) {
-	values := make([]int32, len(vs))
+	values := make([]uint8, len(vs))
 	for i, v := range vs {
-		values[i] = v.(int32)
+		values[i] = uint8(v.(int32))
 	}
 	ba.Values = values
 }
@@ -118,7 +118,7 @@ func (*ByteArray) JavaClassName() string {
 
 // ShortArray Short[]
 type ShortArray struct {
-	IntegerArray
+	Values []int16
 }
 
 // nolint
@@ -132,9 +132,9 @@ func (sa *ShortArray) Get() []interface{} {
 
 // nolint
 func (sa *ShortArray) Set(vs []interface{}) {
-	values := make([]int32, len(vs))
+	values := make([]int16, len(vs))
 	for i, v := range vs {
-		values[i] = v.(int32)
+		values[i] = int16(v.(int32))
 	}
 	sa.Values = values
 }

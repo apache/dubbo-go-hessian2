@@ -63,7 +63,7 @@ func TestIntegerArray(t *testing.T) {
 
 func TestByteArray(t *testing.T) {
 	ba := &ByteArray{}
-	ba.Values = []int32{1, 2, 3}
+	ba.Values = []uint8{1, 2, 3}
 	a := assert.New(t)
 
 	e := &Encoder{}
@@ -78,7 +78,7 @@ func TestByteArray(t *testing.T) {
 
 func TestShortArray(t *testing.T) {
 	sa := &ShortArray{}
-	sa.Values = []int32{1, 2, 3}
+	sa.Values = []int16{1, 2, 3}
 	a := assert.New(t)
 
 	e := &Encoder{}
