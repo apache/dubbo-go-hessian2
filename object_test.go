@@ -847,3 +847,53 @@ func TestCustomReplyGenericResponseList(t *testing.T) {
 		assert.True(t, reflect.DeepEqual(data[1], list[1]))
 	})
 }
+
+func TestWrapperClassArray(t *testing.T) {
+	got, err := decodeJavaResponse(`byteArray`, `test.TestWrapperClassArray`, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	ba := &ByteArray{Values: []byte{byte(1), byte(100), byte(200)}}
+	assert.True(t, reflect.DeepEqual(got, ba))
+
+	got, err = decodeJavaResponse(`shortArray`, `test.TestWrapperClassArray`, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	sa := &ShortArray{Values: []int16{1, 100, 10000}}
+	assert.True(t, reflect.DeepEqual(got, sa))
+
+	got, err = decodeJavaResponse(`integerArray`, `test.TestWrapperClassArray`, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	ia := &IntegerArray{Values: []int32{1, 100, 10000}}
+	assert.True(t, reflect.DeepEqual(got, ia))
+
+	got, err = decodeJavaResponse(`longArray`, `test.TestWrapperClassArray`, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	la := &LongArray{Values: []int64{1, 100, 10000}}
+	assert.True(t, reflect.DeepEqual(got, la))
+
+	got, err = decodeJavaResponse(`characterArray`, `test.TestWrapperClassArray`, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	ca := &CharacterArray{Values: "hello world"}
+	assert.True(t, reflect.DeepEqual(got, ca))
+
+	got, err = decodeJavaResponse(`booleanArray`, `test.TestWrapperClassArray`, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	bla := &BooleanArray{Values: []bool{true, false, true}}
+	assert.True(t, reflect.DeepEqual(got, bla))
+
+	got, err = decodeJavaResponse(`floatArray`, `test.TestWrapperClassArray`, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	fa := &FloatArray{Values: []float32{1.0, 100.0, 10000.1}}
+	assert.True(t, reflect.DeepEqual(got, fa))
+
+	got, err = decodeJavaResponse(`doubleArray`, `test.TestWrapperClassArray`, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	da := &DoubleArray{Values: []float64{1.0, 100.0, 10000.1}}
+	assert.True(t, reflect.DeepEqual(got, da))
+}
