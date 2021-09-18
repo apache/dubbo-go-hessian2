@@ -126,6 +126,7 @@ func RegisterPOJOMapping(javaClassName string, o interface{}) int {
 	defer pojoRegistry.Unlock()
 
 	if goName, ok := pojoRegistry.j2g[javaClassName]; ok {
+		// TODO print warning message about duplicate registration JavaClass
 		return pojoRegistry.registry[goName].index
 	}
 
@@ -143,8 +144,7 @@ func RegisterPOJOMapping(javaClassName string, o interface{}) int {
 	)
 
 	sttInfo.typ = obtainValueType(o)
-
-	sttInfo.goName = sttInfo.typ.String()
+	sttInfo.goName = getGoName(o)
 	sttInfo.javaName = javaClassName
 	sttInfo.inst = o
 	pojoRegistry.j2g[sttInfo.javaName] = sttInfo.goName
@@ -225,7 +225,7 @@ func unRegisterPOJO(o POJO) int {
 	pojoRegistry.Lock()
 	defer pojoRegistry.Unlock()
 
-	goName := obtainValueType(o).String()
+	goName := getGoName(o)
 
 	if structInfo, ok := pojoRegistry.registry[goName]; ok {
 		delete(pojoRegistry.j2g, structInfo.javaName)
@@ -238,6 +238,11 @@ func unRegisterPOJO(o POJO) int {
 	}
 
 	return -1
+}
+
+func getGoName(o interface{}) string {
+	goType := obtainValueType(o)
+	return goType.PkgPath() + "/" + goType.String()
 }
 
 func obtainValueType(o interface{}) reflect.Type {
