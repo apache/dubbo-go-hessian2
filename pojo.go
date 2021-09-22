@@ -102,6 +102,8 @@ var (
 	}
 	pojoType     = reflect.TypeOf((*POJO)(nil)).Elem()
 	javaEnumType = reflect.TypeOf((*POJOEnum)(nil)).Elem()
+
+	goPkgPathWhiteListRegexp = regexp.MustCompile(`^(github\.com/apache/dubbo-go-hessian2|time)`)
 )
 
 // struct parsing
@@ -243,7 +245,7 @@ func unRegisterPOJO(o POJO) int {
 
 func getGoName(o interface{}) string {
 	goType := reflect.TypeOf(o)
-	if reflect.Ptr == goType.Kind() {
+	for reflect.Ptr == goType.Kind() {
 		goType = goType.Elem()
 	}
 	return combineGoName(goType)
@@ -252,8 +254,7 @@ func getGoName(o interface{}) string {
 func combineGoName(t reflect.Type) string {
 	pkgPath := t.PkgPath()
 	goName := t.String()
-	if pkgPath == "" ||
-		regexp.MustCompile(`^(github\.com/apache/dubbo-go-hessian2|time)`).Match([]byte(pkgPath)) {
+	if pkgPath == "" || goPkgPathWhiteListRegexp.Match([]byte(pkgPath)) {
 		return goName
 	}
 	return pkgPath + "/" + goName
