@@ -20,11 +20,17 @@ package hessian_test
 import (
 	"bufio"
 	"bytes"
-	dup "dup_struct_name"
-	"github.com/apache/dubbo-go-hessian2"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+)
+
+import (
+	dup "dup_struct_name"
+)
+
+import (
+	"github.com/apache/dubbo-go-hessian2"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
