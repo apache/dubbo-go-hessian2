@@ -15,26 +15,24 @@
  * limitations under the License.
  */
 
-package hessian_test
+package hessian
 
 import (
 	"bufio"
 	"bytes"
 	"testing"
-	"time"
 )
 
 import (
-	dup "dup_struct_name"
+	dup "dubbo-go-hessian2-dup-struct-name-test"
 )
 
 import (
-	"github.com/apache/dubbo-go-hessian2"
 	"github.com/stretchr/testify/assert"
 )
 
 const (
-	EXPECTED_ERROR_MSG = "reflect.Set: value of type hessian_test.CaseZ is not assignable to type hessian_test.CaseZ"
+	EXPECTED_ERROR_MSG = "reflect.Set: value of type hessian.CaseZ is not assignable to type hessian.CaseZ"
 )
 
 type CaseZ struct {
@@ -45,41 +43,24 @@ func (CaseZ) JavaClassName() string {
 	return "com.test.caseZ"
 }
 
-func doTestHessianEncodeHeader(t *testing.T, packageType hessian.PackageType, responseStatus byte, body interface{}) ([]byte, error) {
-	hessian.RegisterPOJO(&dup.CaseZ{})
-	hessian.RegisterPOJO(&CaseZ{})
-	codecW := hessian.NewHessianCodec(nil)
-	resp, err := codecW.Write(hessian.Service{
-		Path:      "test",
-		Interface: "ITest",
-		Version:   "v1.0",
-		Method:    "test",
-		Timeout:   time.Second * 10,
-	}, hessian.DubboHeader{
-		SerialID:       2,
-		Type:           packageType,
-		ID:             1,
-		ResponseStatus: responseStatus,
-	}, body)
-	assert.Nil(t, err)
-	return resp, err
-}
-
 func TestDupStructNameRequest(t *testing.T) {
-	packageType := hessian.PackageRequest
-	responseStatus := hessian.Zero
+	RegisterPOJO(&dup.CaseZ{})
+	RegisterPOJO(&CaseZ{})
+
+	packageType := PackageRequest
+	responseStatus := Zero
 	var body interface{}
 	body = []interface{}{"a"}
 	resp, err := doTestHessianEncodeHeader(t, packageType, responseStatus, body)
 	assert.Nil(t, err)
 
-	codecR := hessian.NewHessianCodec(bufio.NewReader(bytes.NewReader(resp)))
+	codecR := NewHessianCodec(bufio.NewReader(bytes.NewReader(resp)))
 
-	h := &hessian.DubboHeader{}
+	h := &DubboHeader{}
 	err = codecR.ReadHeader(h)
 	assert.Nil(t, err)
 	assert.Equal(t, byte(2), h.SerialID)
-	assert.Equal(t, packageType, h.Type&(hessian.PackageRequest|hessian.PackageResponse|hessian.PackageHeartbeat))
+	assert.Equal(t, packageType, h.Type&(PackageRequest|PackageResponse|PackageHeartbeat))
 	assert.Equal(t, int64(1), h.ID)
 	assert.Equal(t, responseStatus, h.ResponseStatus)
 
@@ -103,13 +84,13 @@ func TestDupStructNameResponse(t *testing.T) {
 	body = &CaseZ{Name: "TestDupStructNameResponse"}
 	err, codecR, h := doTestHeader(t, body)
 
-	decodedResponse := &hessian.Response{}
+	decodedResponse := &Response{}
 	decodedResponse.RspObj = &dup.CaseZ{}
 	err = codecR.ReadBody(decodedResponse)
 	assert.NotNil(t, err)
 	assert.Equal(t, EXPECTED_ERROR_MSG, err.Error())
 
-	decodedResponse = &hessian.Response{}
+	decodedResponse = &Response{}
 	decodedResponse.RspObj = &CaseZ{}
 	err = codecR.ReadBody(decodedResponse)
 	assert.Nil(t, err)
@@ -130,13 +111,13 @@ func TestDupStructNameResponse2(t *testing.T) {
 	body = &dup.CaseZ{Name: "TestDupStructNameResponse"}
 	err, codecR, h := doTestHeader(t, body)
 
-	decodedResponse := &hessian.Response{}
+	decodedResponse := &Response{}
 	decodedResponse.RspObj = &CaseZ{}
 	err = codecR.ReadBody(decodedResponse)
 	assert.NotNil(t, err)
 	assert.Equal(t, EXPECTED_ERROR_MSG, err.Error())
 
-	decodedResponse = &hessian.Response{}
+	decodedResponse = &Response{}
 	decodedResponse.RspObj = &dup.CaseZ{}
 	err = codecR.ReadBody(decodedResponse)
 	assert.Nil(t, err)
@@ -144,34 +125,37 @@ func TestDupStructNameResponse2(t *testing.T) {
 	checkResponseBody(t, decodedResponse, h, body)
 }
 
-func doTestHeader(t *testing.T, body interface{}) (error, *hessian.HessianCodec, *hessian.DubboHeader) {
-	packageType := hessian.PackageResponse
-	responseStatus := hessian.Response_OK
+func doTestHeader(t *testing.T, body interface{}) (error, *HessianCodec, *DubboHeader) {
+	RegisterPOJO(&dup.CaseZ{})
+	RegisterPOJO(&CaseZ{})
+
+	packageType := PackageResponse
+	responseStatus := Response_OK
 	resp, err := doTestHessianEncodeHeader(t, packageType, responseStatus, body)
 	assert.Nil(t, err)
 
-	codecR := hessian.NewHessianCodec(bufio.NewReader(bytes.NewReader(resp)))
+	codecR := NewHessianCodec(bufio.NewReader(bytes.NewReader(resp)))
 
-	h := &hessian.DubboHeader{}
+	h := &DubboHeader{}
 	err = codecR.ReadHeader(h)
 	assert.Nil(t, err)
 
 	assert.Equal(t, byte(2), h.SerialID)
-	assert.Equal(t, packageType, h.Type&(hessian.PackageRequest|hessian.PackageResponse|hessian.PackageHeartbeat))
+	assert.Equal(t, packageType, h.Type&(PackageRequest|PackageResponse|PackageHeartbeat))
 	assert.Equal(t, int64(1), h.ID)
 	assert.Equal(t, responseStatus, h.ResponseStatus)
 	return err, codecR, h
 }
 
-func checkResponseBody(t *testing.T, decodedResponse *hessian.Response, h *hessian.DubboHeader, body interface{}) {
+func checkResponseBody(t *testing.T, decodedResponse *Response, h *DubboHeader, body interface{}) {
 	t.Log(decodedResponse)
 
-	if h.ResponseStatus != hessian.Zero && h.ResponseStatus != hessian.Response_OK {
+	if h.ResponseStatus != Zero && h.ResponseStatus != Response_OK {
 		assert.Equal(t, "java exception:"+body.(string), decodedResponse.Exception.Error())
 		return
 	}
 
-	in, _ := hessian.EnsureInterface(hessian.UnpackPtrValue(hessian.EnsurePackValue(body)), nil)
-	out, _ := hessian.EnsureInterface(hessian.UnpackPtrValue(hessian.EnsurePackValue(decodedResponse.RspObj)), nil)
+	in, _ := EnsureInterface(UnpackPtrValue(EnsurePackValue(body)), nil)
+	out, _ := EnsureInterface(UnpackPtrValue(EnsurePackValue(decodedResponse.RspObj)), nil)
 	assert.Equal(t, in, out)
 }
