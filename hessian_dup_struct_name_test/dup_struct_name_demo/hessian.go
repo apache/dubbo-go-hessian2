@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package hessian
+package hessian_test
 
 type CaseZ struct {
 	Name string
