@@ -32,7 +32,7 @@ import (
 )
 
 const (
-	EXPECTED_ERROR_MSG = "reflect.Set: value of type hessian.CaseZ is not assignable to type hessian.CaseZ"
+	ExpectedErrorMsg = "reflect.Set: value of type hessian.CaseZ is not assignable to type hessian.CaseZ"
 )
 
 type CaseZ struct {
@@ -75,7 +75,7 @@ func TestDupStructNameResponse(t *testing.T) {
 	defer func() {
 		if err := recover(); err != nil {
 			if errStr, ok := err.(string); ok {
-				assert.Equal(t, EXPECTED_ERROR_MSG, errStr)
+				assert.Equal(t, ExpectedErrorMsg, errStr)
 			}
 		}
 	}()
@@ -88,7 +88,7 @@ func TestDupStructNameResponse(t *testing.T) {
 	decodedResponse.RspObj = &dup.CaseZ{}
 	err = codecR.ReadBody(decodedResponse)
 	assert.NotNil(t, err)
-	assert.Equal(t, EXPECTED_ERROR_MSG, err.Error())
+	assert.Equal(t, ExpectedErrorMsg, err.Error())
 
 	decodedResponse = &Response{}
 	decodedResponse.RspObj = &CaseZ{}
@@ -102,7 +102,7 @@ func TestDupStructNameResponse2(t *testing.T) {
 	defer func() {
 		if err := recover(); err != nil {
 			if errStr, ok := err.(string); ok {
-				assert.Equal(t, EXPECTED_ERROR_MSG, errStr)
+				assert.Equal(t, ExpectedErrorMsg, errStr)
 			}
 		}
 	}()
@@ -110,12 +110,13 @@ func TestDupStructNameResponse2(t *testing.T) {
 	var body interface{}
 	body = &dup.CaseZ{Name: "TestDupStructNameResponse"}
 	err, codecR, h := doTestHeader(t, body)
+	assert.Nil(t, err)
 
 	decodedResponse := &Response{}
 	decodedResponse.RspObj = &CaseZ{}
 	err = codecR.ReadBody(decodedResponse)
 	assert.NotNil(t, err)
-	assert.Equal(t, EXPECTED_ERROR_MSG, err.Error())
+	assert.Equal(t, ExpectedErrorMsg, err.Error())
 
 	decodedResponse = &Response{}
 	decodedResponse.RspObj = &dup.CaseZ{}
