@@ -83,6 +83,7 @@ func TestDupStructNameResponse(t *testing.T) {
 	var body interface{}
 	body = &CaseZ{Name: "TestDupStructNameResponse"}
 	err, codecR, h := doTestHeader(t, body)
+	assert.Nil(t, err)
 
 	decodedResponse := &Response{}
 	decodedResponse.RspObj = &dup.CaseZ{}
