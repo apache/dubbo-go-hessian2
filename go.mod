@@ -1,7 +1,5 @@
 module github.com/apache/dubbo-go-hessian2
 
-go 1.17
-
 require (
 	dubbo-go-hessian2-dup-struct-name-test v0.0.2
 	github.com/dubbogo/gost v1.9.0
