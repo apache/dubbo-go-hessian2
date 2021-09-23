@@ -85,10 +85,62 @@ func TestDupStructNameRequest(t *testing.T) {
 }
 
 func TestDupStructNameResponse(t *testing.T) {
-	packageType := hessian.PackageResponse
-	responseStatus := hessian.Response_OK
+	defer func() {
+		if err := recover(); err != nil {
+			if errStr, ok := err.(string); ok {
+				assert.Equal(t, EXPECTED_ERROR_MSG, errStr)
+			}
+		}
+	}()
+
 	var body interface{}
 	body = &CaseZ{Name: "TestDupStructNameResponse"}
+	err, codecR, h := doTestHeader(t, body)
+
+	decodedResponse := &hessian.Response{}
+	decodedResponse.RspObj = &dup.CaseZ{}
+	err = codecR.ReadBody(decodedResponse)
+	assert.NotNil(t, err)
+	assert.Equal(t, EXPECTED_ERROR_MSG, err.Error())
+
+	decodedResponse = &hessian.Response{}
+	decodedResponse.RspObj = &CaseZ{}
+	err = codecR.ReadBody(decodedResponse)
+	assert.Nil(t, err)
+
+	checkResponseBody(t, decodedResponse, h, body)
+}
+
+func TestDupStructNameResponse2(t *testing.T) {
+	defer func() {
+		if err := recover(); err != nil {
+			if errStr, ok := err.(string); ok {
+				assert.Equal(t, EXPECTED_ERROR_MSG, errStr)
+			}
+		}
+	}()
+
+	var body interface{}
+	body = &dup.CaseZ{Name: "TestDupStructNameResponse"}
+	err, codecR, h := doTestHeader(t, body)
+
+	decodedResponse := &hessian.Response{}
+	decodedResponse.RspObj = &CaseZ{}
+	err = codecR.ReadBody(decodedResponse)
+	assert.NotNil(t, err)
+	assert.Equal(t, EXPECTED_ERROR_MSG, err.Error())
+
+	decodedResponse = &hessian.Response{}
+	decodedResponse.RspObj = &dup.CaseZ{}
+	err = codecR.ReadBody(decodedResponse)
+	assert.Nil(t, err)
+
+	checkResponseBody(t, decodedResponse, h, body)
+}
+
+func doTestHeader(t *testing.T, body interface{}) (error, *hessian.HessianCodec, *hessian.DubboHeader) {
+	packageType := hessian.PackageResponse
+	responseStatus := hessian.Response_OK
 	resp, err := doTestHessianEncodeHeader(t, packageType, responseStatus, body)
 	assert.Nil(t, err)
 
@@ -102,26 +154,10 @@ func TestDupStructNameResponse(t *testing.T) {
 	assert.Equal(t, packageType, h.Type&(hessian.PackageRequest|hessian.PackageResponse|hessian.PackageHeartbeat))
 	assert.Equal(t, int64(1), h.ID)
 	assert.Equal(t, responseStatus, h.ResponseStatus)
+	return err, codecR, h
+}
 
-	defer func() {
-		if err := recover(); err != nil {
-			if errStr, ok := err.(string); ok {
-				assert.Equal(t, EXPECTED_ERROR_MSG, errStr)
-			}
-		}
-	}()
-
-	decodedResponse := &hessian.Response{}
-	decodedResponse.RspObj = &dup.CaseZ{}
-	err = codecR.ReadBody(decodedResponse)
-	assert.NotNil(t, err)
-	assert.Equal(t, EXPECTED_ERROR_MSG, err.Error())
-
-	decodedResponse = &hessian.Response{}
-	decodedResponse.RspObj = &CaseZ{}
-	err = codecR.ReadBody(decodedResponse)
-	assert.Nil(t, err)
-
+func checkResponseBody(t *testing.T, decodedResponse *hessian.Response, h *hessian.DubboHeader, body interface{}) {
 	t.Log(decodedResponse)
 
 	if h.ResponseStatus != hessian.Zero && h.ResponseStatus != hessian.Response_OK {
