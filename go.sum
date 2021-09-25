@@ -1,5 +1,5 @@
-github.com/ChangedenCZD/dubbo-go-hessian2-dup-struct-name-test v0.0.2 h1:r/eEBK6t2iZ/YDqMKYIbm/BLwjOhF424LWSj1Bs6aSE=
-github.com/ChangedenCZD/dubbo-go-hessian2-dup-struct-name-test v0.0.2/go.mod h1:fHkCJ3VeG0Sl5TpciR5/2xt8jUlrQJaHg5uNcRxxR9M=
+github.com/changedenczd/dubbo-go-hessian2-dup-struct-name-test v0.0.3 h1:31bvQXq/6SUwQlr72MUSloySci2nM6Rdfc2A0cT4eGA=
+github.com/changedenczd/dubbo-go-hessian2-dup-struct-name-test v0.0.3/go.mod h1:hDdmLYpL9E/pGzbUrBl5mWkibKysKDYaKVkC3CcWtcA=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dubbogo/gost v1.9.0 h1:UT+dWwvLyJiDotxJERO75jB3Yxgsdy10KztR5ycxRAk=
