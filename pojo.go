@@ -20,6 +20,7 @@ package hessian
 import (
 	"fmt"
 	"reflect"
+	"regexp"
 	"strings"
 	"sync"
 	"unicode"
@@ -101,6 +102,8 @@ var (
 	}
 	pojoType     = reflect.TypeOf((*POJO)(nil)).Elem()
 	javaEnumType = reflect.TypeOf((*POJOEnum)(nil)).Elem()
+
+	goPkgPathWhiteListRegexp = regexp.MustCompile(`^(github\.com/apache/dubbo-go-hessian2|time)`)
 )
 
 // struct parsing
@@ -126,6 +129,7 @@ func RegisterPOJOMapping(javaClassName string, o interface{}) int {
 	defer pojoRegistry.Unlock()
 
 	if goName, ok := pojoRegistry.j2g[javaClassName]; ok {
+		// TODO print warning message about duplicate registration JavaClass
 		return pojoRegistry.registry[goName].index
 	}
 
@@ -143,8 +147,7 @@ func RegisterPOJOMapping(javaClassName string, o interface{}) int {
 	)
 
 	sttInfo.typ = obtainValueType(o)
-
-	sttInfo.goName = sttInfo.typ.String()
+	sttInfo.goName = getGoName(o)
 	sttInfo.javaName = javaClassName
 	sttInfo.inst = o
 	pojoRegistry.j2g[sttInfo.javaName] = sttInfo.goName
@@ -225,7 +228,7 @@ func unRegisterPOJO(o POJO) int {
 	pojoRegistry.Lock()
 	defer pojoRegistry.Unlock()
 
-	goName := obtainValueType(o).String()
+	goName := getGoName(o)
 
 	if structInfo, ok := pojoRegistry.registry[goName]; ok {
 		delete(pojoRegistry.j2g, structInfo.javaName)
@@ -238,6 +241,23 @@ func unRegisterPOJO(o POJO) int {
 	}
 
 	return -1
+}
+
+func getGoName(o interface{}) string {
+	goType := reflect.TypeOf(o)
+	for reflect.Ptr == goType.Kind() {
+		goType = goType.Elem()
+	}
+	return combineGoName(goType)
+}
+
+func combineGoName(t reflect.Type) string {
+	pkgPath := t.PkgPath()
+	goName := t.String()
+	if pkgPath == "" || goPkgPathWhiteListRegexp.Match([]byte(pkgPath)) {
+		return goName
+	}
+	return pkgPath + "/" + goName
 }
 
 func obtainValueType(o interface{}) reflect.Type {
