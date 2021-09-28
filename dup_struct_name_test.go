@@ -24,7 +24,7 @@ import (
 )
 
 import (
-	dup "github.com/changedenczd/dubbo-go-hessian2-dup-struct-name-test"
+	dup "github.com/apache/dubbo-go-hessian2/hessian_test"
 )
 
 import (
