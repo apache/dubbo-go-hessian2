@@ -21,6 +21,7 @@ import (
 	"bufio"
 	"bytes"
 	"testing"
+	"time"
 )
 
 import (
@@ -42,6 +43,24 @@ type CaseZ struct {
 
 func (CaseZ) JavaClassName() string {
 	return "com.test.caseZ"
+}
+
+func doTestHessianEncodeHeader(t *testing.T, packageType hessian.PackageType, responseStatus byte, body interface{}) ([]byte, error) {
+	codecW := hessian.NewHessianCodec(nil)
+	resp, err := codecW.Write(hessian.Service{
+		Path:      "test",
+		Interface: "ITest",
+		Version:   "v1.0",
+		Method:    "test",
+		Timeout:   time.Second * 10,
+	}, hessian.DubboHeader{
+		SerialID:       2,
+		Type:           packageType,
+		ID:             1,
+		ResponseStatus: responseStatus,
+	}, body)
+	assert.Nil(t, err)
+	return resp, err
 }
 
 func TestDupStructNameRequest(t *testing.T) {
