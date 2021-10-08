@@ -25,7 +25,7 @@ import (
 
 import (
 	"github.com/apache/dubbo-go-hessian2"
-	"github.com/apache/dubbo-go-hessian2/hessian_test/dupclass"
+	dupclass "github.com/apache/dubbo-go-hessian2/hessian_test/dupclass"
 )
 
 import (
@@ -33,7 +33,7 @@ import (
 )
 
 const (
-	ExpectedErrorMsg = "reflect.Set: value of type hessian.CaseZ is not assignable to type hessian.CaseZ"
+	ExpectedErrorMsg = "reflect.Set: value of type hessian_test.CaseZ is not assignable to type hessian_test.CaseZ"
 )
 
 type CaseZ struct {

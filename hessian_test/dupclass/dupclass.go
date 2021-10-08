@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package dupclass
+package hessian_test
 
 type CaseZ struct {
 	Name string
