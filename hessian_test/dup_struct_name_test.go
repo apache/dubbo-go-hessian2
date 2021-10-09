@@ -26,7 +26,7 @@ import (
 
 import (
 	"github.com/apache/dubbo-go-hessian2"
-	dupclass "github.com/apache/dubbo-go-hessian2/hessian_test/dupclass"
+	dupclass "github.com/apache/dubbo-go-hessian2/hessian_test/hessian_test"
 )
 
 import (
