@@ -19,10 +19,17 @@ package hessian
 
 import (
 	"reflect"
+	"regexp"
 	"time"
 	"unsafe"
+)
 
+import (
 	perrors "github.com/pkg/errors"
+)
+
+var (
+	DecodeTypeRegexp = regexp.MustCompile(`(int(8|16|32|64)?|bool|uint(8|16|32|64)?|float(32|64)+|string)`)
 )
 
 // nil bool int8 int32 int64 float32 float64 time.Time
@@ -155,6 +162,11 @@ func (e *Encoder) Encode(v interface{}) error {
 
 	default:
 		t := UnpackPtrType(reflect.TypeOf(v))
+
+		if DecodeTypeRegexp.Match([]byte(t.String())) { // unpack base type
+			return e.Encode(v)
+		}
+
 		switch t.Kind() {
 		case reflect.Struct:
 			vv := reflect.ValueOf(v)
