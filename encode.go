@@ -164,7 +164,10 @@ func (e *Encoder) Encode(v interface{}) error {
 		t := UnpackPtrType(reflect.TypeOf(v))
 
 		if DecodeTypeRegexp.Match([]byte(t.String())) { // unpack base type
-			return e.Encode(reflect.ValueOf(v).Elem().Interface())
+			vVal := reflect.ValueOf(v)
+			if !vVal.IsNil() {
+				return e.Encode(vVal.Elem().Interface())
+			}
 		}
 
 		switch t.Kind() {
