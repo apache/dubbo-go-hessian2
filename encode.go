@@ -29,7 +29,7 @@ import (
 )
 
 var (
-	DecodeTypeRegexp = regexp.MustCompile(`(int(8|16|32|64)?|bool|uint(8|16|32|64)?|float(32|64)+|string)`)
+	DecodeTypeRegexp = regexp.MustCompile(`^(int(8|16|32|64)?|bool|uint(8|16|32|64)?|float(32|64)+|string)`)
 )
 
 // nil bool int8 int32 int64 float32 float64 time.Time
