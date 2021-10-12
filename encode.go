@@ -164,7 +164,7 @@ func (e *Encoder) Encode(v interface{}) error {
 			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
 			reflect.Float32, reflect.Float64: // solve base type
 			vVal := reflect.ValueOf(v)
-			if !vVal.IsNil() {
+			if reflect.Ptr == vVal.Kind() && !vVal.IsNil() {
 				return e.Encode(vVal.Elem().Interface())
 			}
 		case reflect.Struct:
