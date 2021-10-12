@@ -29,7 +29,7 @@ import (
 )
 
 var (
-	DecodeTypeRegexp = regexp.MustCompile(`^(int(8|16|32|64)?|bool|uint(8|16|32|64)?|float(32|64)+|string)`)
+	decodeTypeRegexp = regexp.MustCompile(`^(string|u?int(8|16|32|64)?|bool|float(32|64)+)$`)
 )
 
 // nil bool int8 int32 int64 float32 float64 time.Time
@@ -163,7 +163,7 @@ func (e *Encoder) Encode(v interface{}) error {
 	default:
 		t := UnpackPtrType(reflect.TypeOf(v))
 
-		if DecodeTypeRegexp.Match([]byte(t.String())) { // unpack base type
+		if decodeTypeRegexp.Match([]byte(t.String())) { // unpack base type
 			vVal := reflect.ValueOf(v)
 			if !vVal.IsNil() {
 				return e.Encode(vVal.Elem().Interface())
