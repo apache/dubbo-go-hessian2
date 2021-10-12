@@ -167,6 +167,21 @@ func (e *Encoder) Encode(v interface{}) error {
 			if reflect.Ptr == vVal.Kind() && !vVal.IsNil() {
 				return e.Encode(vVal.Elem().Interface())
 			}
+			switch t.Kind() {
+			case reflect.Bool:
+				vv := v.(*bool)
+				if vv != nil {
+					e.buffer = encBool(e.buffer, *vv)
+				} else {
+					e.buffer = encBool(e.buffer, false)
+				}
+			case reflect.Int32:
+				var err error
+				e.buffer, err = e.encTypeInt32(e.buffer, v)
+				if err != nil {
+					return err
+				}
+			}
 		case reflect.Struct:
 			vv := reflect.ValueOf(v)
 			vv = UnpackPtr(vv)
