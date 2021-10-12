@@ -19,17 +19,12 @@ package hessian
 
 import (
 	"reflect"
-	"regexp"
 	"time"
 	"unsafe"
 )
 
 import (
 	perrors "github.com/pkg/errors"
-)
-
-var (
-	decodeTypeRegexp = regexp.MustCompile(`^(string|u?int(8|16|32|64)?|bool|float(32|64))$`)
 )
 
 // nil bool int8 int32 int64 float32 float64 time.Time
@@ -163,14 +158,15 @@ func (e *Encoder) Encode(v interface{}) error {
 	default:
 		t := UnpackPtrType(reflect.TypeOf(v))
 
-		if decodeTypeRegexp.Match([]byte(t.String())) { // unpack base type
+		switch t.Kind() {
+		case reflect.String, reflect.Bool,
+			reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
+			reflect.Float32, reflect.Float64: // solve base type
 			vVal := reflect.ValueOf(v)
 			if !vVal.IsNil() {
 				return e.Encode(vVal.Elem().Interface())
 			}
-		}
-
-		switch t.Kind() {
 		case reflect.Struct:
 			vv := reflect.ValueOf(v)
 			vv = UnpackPtr(vv)
@@ -195,19 +191,6 @@ func (e *Encoder) Encode(v interface{}) error {
 			return e.encList(v)
 		case reflect.Map: // the type must be map[string]int
 			return e.encMap(v)
-		case reflect.Bool:
-			vv := v.(*bool)
-			if vv != nil {
-				e.buffer = encBool(e.buffer, *vv)
-			} else {
-				e.buffer = encBool(e.buffer, false)
-			}
-		case reflect.Int32:
-			var err error
-			e.buffer, err = e.encTypeInt32(e.buffer, v)
-			if err != nil {
-				return err
-			}
 		default:
 			return perrors.Errorf("type not supported! %s", t.Kind().String())
 		}
