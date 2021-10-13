@@ -175,6 +175,11 @@ func TestStringEncode(t *testing.T) {
 	testJavaDecode(t, "argString_65536", s65560[:65536])
 }
 
+func TestStringPrtEncode(t *testing.T) {
+	str := "dubbo-go-hessian2"
+	testSimpleEncode(t, &str)
+}
+
 var decodePool = &sync.Pool{
 	New: func() interface{} {
 		return NewCheapDecoderWithSkip([]byte{})

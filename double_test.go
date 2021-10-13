@@ -100,3 +100,12 @@ func TestDoubleEncode(t *testing.T) {
 	testJavaDecode(t, "argDouble_m129_0", -129.0)
 	testJavaDecode(t, "argDouble_m32768_0", -32768.0)
 }
+
+func TestDoublePrtEncode(t *testing.T) {
+	var (
+		f0 float32 = 3.14
+		f1 float64 = 1024.1024102410241024
+	)
+	testSimpleEncode(t, &f0)
+	testSimpleEncode(t, &f1)
+}

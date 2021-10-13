@@ -19,6 +19,7 @@ package hessian
 
 import (
 	"bytes"
+	"github.com/stretchr/testify/assert"
 	"os/exec"
 	"testing"
 )
@@ -76,4 +77,10 @@ func testJavaDecode(t *testing.T, method string, target interface{}) {
 	if result != "true" {
 		t.Errorf("%s: encode %v to bytes wrongly, result: %s", method, target, result)
 	}
+}
+
+func testSimpleEncode(t *testing.T, v interface{}) {
+	e := NewEncoder()
+	err := e.Encode(v)
+	assert.Nil(t, err)
 }
