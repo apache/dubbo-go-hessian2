@@ -19,9 +19,12 @@ package hessian
 
 import (
 	"bytes"
-	"github.com/stretchr/testify/assert"
 	"os/exec"
 	"testing"
+)
+
+import (
+	"github.com/stretchr/testify/assert"
 )
 
 var assertEqual = func(want, got []byte, t *testing.T) {
