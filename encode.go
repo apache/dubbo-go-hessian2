@@ -21,7 +21,9 @@ import (
 	"reflect"
 	"time"
 	"unsafe"
+)
 
+import (
 	perrors "github.com/pkg/errors"
 )
 
@@ -192,6 +194,14 @@ func (e *Encoder) Encode(v interface{}) error {
 			e.buffer, err = e.encTypeInt32(e.buffer, v)
 			if err != nil {
 				return err
+			}
+		case reflect.String,
+			reflect.Int, reflect.Int8, reflect.Int16, reflect.Int64,
+			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
+			reflect.Float32, reflect.Float64: // resolve base type
+			vVal := reflect.ValueOf(v)
+			if reflect.Ptr == vVal.Kind() && !vVal.IsNil() {
+				return e.Encode(vVal.Elem().Interface())
 			}
 		default:
 			return perrors.Errorf("type not supported! %s", t.Kind().String())
