@@ -15,17 +15,19 @@
  * limitations under the License.
  */
 
-package hessian
+package testfuncs
 
-import (
-	"github.com/apache/dubbo-go-hessian2/java_util"
-)
+import hessian "github.com/apache/dubbo-go-hessian2"
+
+type User struct {
+	Name string
+}
+
+// JavaClassName  java fully qualified path
+func (*User) JavaClassName() string {
+	return "test.model.User"
+}
 
 func init() {
-	RegisterPOJO(&java_util.UUID{
-		Value: "",
-	})
-	RegisterPOJO(&java_util.LocaleHandle{
-		Value: "",
-	})
+	hessian.RegisterPOJO(&User{})
 }

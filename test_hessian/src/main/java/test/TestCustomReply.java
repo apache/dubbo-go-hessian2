@@ -31,7 +31,16 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 
 public class TestCustomReply {
@@ -75,6 +84,12 @@ public class TestCustomReply {
         typeMap.put(String[].class, "[string");
         typeMap.put(Object[].class, "[object");
         typeMap.put(Date[].class, "[date");
+    }
+
+    public void customReplyJsonString() throws Exception {
+        String s = "{\"params\":{\"fromAccid\":\"23495382\",\"msgType\":100,\"msgId\":\"148ef1b2-808d-48f2-b268-7a1018a27bdb\",\"attach\":\"{\\\"accid\\\":\\\"23495382\\\",\\\"classRoomFlag\\\":50685,\\\"msgId\\\":\\\"599645021431398400\\\",\\\"msgType\\\":\\\"100\\\",\\\"nickname\\\":\\\"橙子������\\\"}\",\"roomid\":413256699},\"url\":\"https://api.netease.im/nimserver/chatroom/sendMsg.action\"}";
+        output.writeObject(s);
+        output.flush();
     }
 
     public void customReplyTypedFixedListHasNull() throws Exception {
@@ -595,6 +610,15 @@ public class TestCustomReply {
 
     public void customReplyGenericResponseBusinessData() throws Exception {
         Response<BusinessData> response = new Response<>(201, new BusinessData("apple", 5));
+        output.writeObject(response);
+        output.flush();
+    }
+
+    public void customReplyGenericResponseList() throws Exception {
+        List<BusinessData> list = new ArrayList<>();
+        list.add(new BusinessData("apple", 5));
+        list.add(new BusinessData("banana", 6));
+        Response<List<BusinessData>> response = new Response<>(202, list);
         output.writeObject(response);
         output.flush();
     }

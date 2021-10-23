@@ -118,27 +118,25 @@ func (e *Encoder) encMap(m interface{}) error {
 	}
 
 	keys = value.MapKeys()
-	if len(keys) == 0 {
-		// fix: set nil for empty map
-		e.buffer = EncNull(e.buffer)
-		return nil
+
+	e.buffer = encByte(e.buffer, BC_MAP_UNTYPED)
+	if len(keys) > 0 {
+		typ = value.Type().Key()
+		for i := 0; i < len(keys); i++ {
+			k, err = getMapKey(keys[i], typ)
+			if err != nil {
+				return perrors.Wrapf(err, "getMapKey(idx:%d, key:%+v)", i, keys[i])
+			}
+			if err = e.Encode(k); err != nil {
+				return perrors.Wrapf(err, "failed to encode map key(idx:%d, key:%+v)", i, keys[i])
+			}
+			entryValueObj := value.MapIndex(keys[i]).Interface()
+			if err = e.Encode(entryValueObj); err != nil {
+				return perrors.Wrapf(err, "failed to encode map value(idx:%d, key:%+v, value:%+v)", i, k, entryValueObj)
+			}
+		}
 	}
 
-	typ = value.Type().Key()
-	e.buffer = encByte(e.buffer, BC_MAP_UNTYPED)
-	for i := 0; i < len(keys); i++ {
-		k, err = getMapKey(keys[i], typ)
-		if err != nil {
-			return perrors.Wrapf(err, "getMapKey(idx:%d, key:%+v)", i, keys[i])
-		}
-		if err = e.Encode(k); err != nil {
-			return perrors.Wrapf(err, "failed to encode map key(idx:%d, key:%+v)", i, keys[i])
-		}
-		entryValueObj := value.MapIndex(keys[i]).Interface()
-		if err = e.Encode(entryValueObj); err != nil {
-			return perrors.Wrapf(err, "failed to encode map value(idx:%d, key:%+v, value:%+v)", i, k, entryValueObj)
-		}
-	}
 	e.buffer = encByte(e.buffer, BC_END)
 
 	return nil

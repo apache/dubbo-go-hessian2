@@ -153,6 +153,33 @@ func TestIntEncode(t *testing.T) {
 	testJavaDecode(t, "argInt_m17", int32(-17))
 }
 
+func TestIntPrtEncode(t *testing.T) {
+	var (
+		i0  int      = 0
+		i1  int8     = 1
+		i2  int16    = 2
+		i3  int32    = 3
+		i4  int64    = 4
+		ui0 uint     = 10
+		ui1 uint8    = 11
+		ui2 uint16   = 12
+		ui3 uint32   = 13
+		ui4 uint64   = 14
+		e0  JavaEnum = 0xe6
+	)
+	testSimpleEncode(t, &i0)
+	testSimpleEncode(t, &i1)
+	testSimpleEncode(t, &i2)
+	testSimpleEncode(t, &i3)
+	testSimpleEncode(t, &i4)
+	testSimpleEncode(t, &ui0)
+	testSimpleEncode(t, &ui1)
+	testSimpleEncode(t, &ui2)
+	testSimpleEncode(t, &ui3)
+	testSimpleEncode(t, &ui4)
+	testSimpleEncode(t, &e0)
+}
+
 func TestReflectIntEncode(t *testing.T) {
 	a1 := int32(0)
 	a2 := int32(0x30)

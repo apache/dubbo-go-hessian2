@@ -17,14 +17,9 @@
 
 package java_util
 
-import (
-	"fmt"
-)
-
 // java.util.UUID
 type UUID struct {
-	MostSigBits  int64 `hessian:"mostSigBits"`
-	LeastSigBits int64 `hessian:"leastSigBits"`
+	Value string `hessian:"value"`
 }
 
 func (UUID) JavaClassName() string {
@@ -32,39 +27,6 @@ func (UUID) JavaClassName() string {
 }
 
 //String returns a string object representing this UUID.
-//The UUID string representation is as described by this BNF:
-//
-// UUID                   = <time_low> "-" <time_mid> "-"
-//                          <time_high_and_version> "-"
-//                          <variant_and_sequence> "-"
-//                          <node>
-// time_low               = 4*<hexOctet>
-// time_mid               = 2*<hexOctet>
-// time_high_and_version  = 2*<hexOctet>
-// variant_and_sequence   = 2*<hexOctet>
-// node                   = 6*<hexOctet>
-// hexOctet               = <hexDigit><hexDigit>
-// hexDigit               =
-//       "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
-//       | "a" | "b" | "c" | "d" | "e" | "f"
-//       | "A" | "B" | "C" | "D" | "E" | "F"
-//
-//Returns:
-//A string representation of this UUID
 func (uuid UUID) String() string {
-	uuidStr := fmt.Sprintf("%v-%v-%v-%v-%v",
-		uuidDigits(uuid.MostSigBits>>32, 8),
-		uuidDigits(uuid.MostSigBits>>16, 4),
-		uuidDigits(uuid.MostSigBits, 4),
-		uuidDigits(uuid.LeastSigBits>>48, 4),
-		uuidDigits(uuid.LeastSigBits, 12),
-	)
-	return uuidStr
-}
-
-// uuidDigits returns arg represented by the specified number of hex digits.
-func uuidDigits(arg int64, digits uint) string {
-	hi := int64(1) << (digits * 4)
-	i := hi | (arg & (hi - 1))
-	return fmt.Sprintf("%x", i)[1:]
+	return uuid.Value
 }

@@ -56,6 +56,22 @@ func (e *Encoder) Clean() {
 	e.refMap = make(map[unsafe.Pointer]_refElem, 7)
 }
 
+// ReuseBufferClean reuse the Encoder for a new object encoding.
+// it reuse allocated buffer and reduce memory-allocation.
+func (e *Encoder) ReuseBufferClean() {
+	var buffer []byte
+	if cap(e.buffer) <= 512 {
+		// reuse buffer, avoid allocate
+		buffer = e.buffer[:0]
+	} else {
+		// avoiding memory leak caused by growth of underlying array
+		buffer = make([]byte, 64)
+	}
+	e.classInfoList = nil
+	e.buffer = buffer[:0]
+	e.refMap = make(map[unsafe.Pointer]_refElem, 7)
+}
+
 // Buffer returns byte buffer
 func (e *Encoder) Buffer() []byte {
 	return e.buffer[:]
@@ -178,6 +194,14 @@ func (e *Encoder) Encode(v interface{}) error {
 			e.buffer, err = e.encTypeInt32(e.buffer, v)
 			if err != nil {
 				return err
+			}
+		case reflect.String,
+			reflect.Int, reflect.Int8, reflect.Int16, reflect.Int64,
+			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
+			reflect.Float32, reflect.Float64: // resolve base type
+			vVal := reflect.ValueOf(v)
+			if reflect.Ptr == vVal.Kind() && !vVal.IsNil() {
+				return e.Encode(vVal.Elem().Interface())
 			}
 		default:
 			return perrors.Errorf("type not supported! %s", t.Kind().String())
