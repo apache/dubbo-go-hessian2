@@ -33,9 +33,11 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -82,6 +84,12 @@ public class TestCustomReply {
         typeMap.put(String[].class, "[string");
         typeMap.put(Object[].class, "[object");
         typeMap.put(Date[].class, "[date");
+    }
+
+    public void customReplyJsonString() throws Exception {
+        String s = "{\"params\":{\"fromAccid\":\"23495382\",\"msgType\":100,\"msgId\":\"148ef1b2-808d-48f2-b268-7a1018a27bdb\",\"attach\":\"{\\\"accid\\\":\\\"23495382\\\",\\\"classRoomFlag\\\":50685,\\\"msgId\\\":\\\"599645021431398400\\\",\\\"msgType\\\":\\\"100\\\",\\\"nickname\\\":\\\"橙子������\\\"}\",\"roomid\":413256699},\"url\":\"https://api.netease.im/nimserver/chatroom/sendMsg.action\"}";
+        output.writeObject(s);
+        output.flush();
     }
 
     public void customReplyTypedFixedListHasNull() throws Exception {
@@ -433,7 +441,7 @@ public class TestCustomReply {
     public void customReplyObjectJsonObjectBigDecimal() throws Exception {
         JSONObject t = new JSONObject();
         BigDecimal decimal = new BigDecimal("100");
-        t.put("test_BigDecimal",decimal);
+        t.put("test_BigDecimal", decimal);
         output.writeObject(t);
         output.flush();
     }
@@ -529,8 +537,8 @@ public class TestCustomReply {
         map2.put(3L, "c");
         map2.put(4L, "d");
         Map<Integer, BigDecimal> map3 = new HashMap<Integer, BigDecimal>(4);
-        map3.put(5,new BigDecimal("55.55"));
-        map3.put(3,new BigDecimal("33.33"));
+        map3.put(5, new BigDecimal("55.55"));
+        map3.put(3, new BigDecimal("33.33"));
         Map<String, Object> map = new HashMap<String, Object>(4);
         map.put("m1", map1);
         map.put("m2", map2);
@@ -557,7 +565,7 @@ public class TestCustomReply {
         innerMap.put("S", "string");
         items.add(innerMap);
 
-        listMap1.put("items",items);
+        listMap1.put("items", items);
 
         list.add(listMap1);
 
@@ -606,6 +614,15 @@ public class TestCustomReply {
         output.flush();
     }
 
+    public void customReplyGenericResponseList() throws Exception {
+        List<BusinessData> list = new ArrayList<>();
+        list.add(new BusinessData("apple", 5));
+        list.add(new BusinessData("banana", 6));
+        Response<List<BusinessData>> response = new Response<>(202, list);
+        output.writeObject(response);
+        output.flush();
+    }
+
     public void customReplyUUID() throws Exception {
         Map<String, Object> map = new HashMap<String, Object>();
         UUID uuid1 = new UUID(459021424248441700L, -7160773830801198154L);
@@ -614,6 +631,45 @@ public class TestCustomReply {
         map.put("uuid1_string", uuid1.toString());
         map.put("uuid2", uuid2);
         map.put("uuid2_string", uuid2.toString());
+        output.writeObject(map);
+        output.flush();
+    }
+
+    public void customReplyLocale() throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        map.put("english", Locale.ENGLISH);
+        map.put("french", Locale.FRENCH);
+        map.put("german", Locale.GERMAN);
+        map.put("italian", Locale.ITALIAN);
+        map.put("japanese", Locale.JAPANESE);
+        map.put("korean", Locale.KOREAN);
+        map.put("chinese", Locale.CHINESE);
+        map.put("simplified_chinese", Locale.SIMPLIFIED_CHINESE);
+        map.put("traditional_chinese", Locale.TRADITIONAL_CHINESE);
+        map.put("france", Locale.FRANCE);
+        map.put("germany", Locale.GERMANY);
+        map.put("japan", Locale.JAPAN);
+        map.put("korea", Locale.KOREA);
+        map.put("china", Locale.CHINA);
+        map.put("prc", Locale.PRC);
+        map.put("taiwan", Locale.TAIWAN);
+        map.put("uk", Locale.UK);
+        map.put("us", Locale.US);
+        map.put("canada", Locale.CANADA);
+        map.put("root", Locale.ROOT);
+        // The two objects below is java hessian bug
+        // map.put("italy", Locale.ITALY);
+        // map.put("canada_french", Locale.CANADA_FRENCH);
+        // LocaleHandle
+        output.writeObject(map);
+        output.flush();
+    }
+
+    public void customReplyEnumSet() throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        EnumSet<Locale.Category> enumSet = EnumSet.allOf(Locale.Category.class);
+        map.put("enumset", enumSet);
+        System.out.println(map);
         output.writeObject(map);
         output.flush();
     }

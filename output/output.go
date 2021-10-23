@@ -40,6 +40,16 @@ func init() {
 	funcMap["Java8TimeYear"] = testfuncs.Java8TimeYear
 	funcMap["Java8LocalDate"] = testfuncs.Java8LocalDate
 	funcMap["JavaException"] = testfuncs.JavaException
+	funcMap["UserArray"] = testfuncs.UserArray
+	funcMap["UserList"] = testfuncs.UserList
+	funcMap["ByteArray"] = testfuncs.ByteArray
+	funcMap["ShortArray"] = testfuncs.ShortArray
+	funcMap["IntegerArray"] = testfuncs.IntegerArray
+	funcMap["LongArray"] = testfuncs.LongArray
+	funcMap["BooleanArray"] = testfuncs.BooleanArray
+	funcMap["CharacterArray"] = testfuncs.CharacterArray
+	funcMap["FloatArray"] = testfuncs.FloatArray
+	funcMap["DoubleArray"] = testfuncs.DoubleArray
 }
 
 func main() {

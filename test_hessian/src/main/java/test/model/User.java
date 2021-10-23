@@ -15,18 +15,32 @@
  * limitations under the License.
  */
 
-package hessian
+package test.model;
 
-import (
-	"github.com/apache/dubbo-go-hessian2/java_util"
-)
+import java.io.Serializable;
 
-func init() {
-	RegisterPOJO(&java_util.UUID{
-		MostSigBits:  int64(200),
-		LeastSigBits: int64(200),
-	})
-	RegisterPOJO(&java_util.LocaleHandle{
-		Value: "",
-	})
+public class User implements Serializable {
+    private String name;
+
+    public User() {
+    }
+
+    public User(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }

@@ -1,5 +1,29 @@
 # Release Notes
 
+## v1.9.4
+
+### New Features
+- support wrapper classes for Java basic types. [#278](https://github.com/apache/dubbo-go-hessian2/pull/278)
+
+### Bugfixes
+- fix registration ignored for struct with same name in diff package. [#279](https://github.com/apache/dubbo-go-hessian2/pull/279)
+- fix cannot encode pointer of raw type. [#283](https://github.com/apache/dubbo-go-hessian2/pull/283)
+
+## v1.9.3
+
+### New Features
+- add new api `Encoder.ReuseBufferClean()`. [#271](https://github.com/apache/dubbo-go-hessian2/pull/271)
+
+### Bugfixes
+- fix not unpack ref holder for list. [#269](https://github.com/apache/dubbo-go-hessian2/pull/269)
+- fix encode null for empty map, add map tag instead. [#275](https://github.com/apache/dubbo-go-hessian2/pull/275)
+- Fix getArgType reflection value logic. [#276](https://github.com/apache/dubbo-go-hessian2/pull/276)
+
+## v1.9.2
+
+### New Features
+- support java.util.Locale. [#264](https://github.com/apache/dubbo-go-hessian2/pull/264)
+
 ## v1.9.1
 
 ### Bugfixes

@@ -15,18 +15,26 @@
  * limitations under the License.
  */
 
-package hessian
+package unit;
 
-import (
-	"github.com/apache/dubbo-go-hessian2/java_util"
-)
 
-func init() {
-	RegisterPOJO(&java_util.UUID{
-		MostSigBits:  int64(200),
-		LeastSigBits: int64(200),
-	})
-	RegisterPOJO(&java_util.LocaleHandle{
-		Value: "",
-	})
+import org.junit.Test;
+import test.model.User;
+
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * @author wongoo
+ */
+public class GoUserListTest {
+
+    @Test
+    public void testUserList() {
+        User[] userArray = (User[]) GoTestUtil.readGoObject("UserArray");
+        System.out.println(Arrays.toString(userArray));
+
+        List<User> userList = (List<User>) GoTestUtil.readGoObject("UserList");
+        System.out.println(userList);
+    }
 }

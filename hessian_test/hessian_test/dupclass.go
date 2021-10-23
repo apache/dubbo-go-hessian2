@@ -15,18 +15,13 @@
  * limitations under the License.
  */
 
-package hessian
+package hessian_test
 
-import (
-	"github.com/apache/dubbo-go-hessian2/java_util"
-)
+type CaseZ struct {
+	Name string
+	Age  int
+}
 
-func init() {
-	RegisterPOJO(&java_util.UUID{
-		MostSigBits:  int64(200),
-		LeastSigBits: int64(200),
-	})
-	RegisterPOJO(&java_util.LocaleHandle{
-		Value: "",
-	})
+func (CaseZ) JavaClassName() string {
+	return "com.test.caseZz"
 }

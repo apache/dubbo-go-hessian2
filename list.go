@@ -160,7 +160,8 @@ func (e *Encoder) writeTypedList(v interface{}) error {
 	}
 
 	value = UnpackPtrValue(value)
-	totype := UnpackPtrType(value.Type().Elem()).String()
+	goType := UnpackPtrType(value.Type().Elem())
+	totype := combineGoName(goType)
 	typeName := getListTypeName(totype)
 	if typeName == "" {
 		return perrors.New("no this type name: " + totype)

@@ -146,6 +146,11 @@ func TestString(t *testing.T) {
 	testDecodeFramework(t, "replyString_null", nil)
 }
 
+func TestDecodeJsonString(t *testing.T) {
+	jsonString := `{"params":{"fromAccid":"23495382","msgType":100,"msgId":"148ef1b2-808d-48f2-b268-7a1018a27bdb","attach":"{\"accid\":\"23495382\",\"classRoomFlag\":50685,\"msgId\":\"599645021431398400\",\"msgType\":\"100\",\"nickname\":\"橙子������\"}","roomid":413256699},"url":"https://api.netease.im/nimserver/chatroom/sendMsg.action"}`
+	testDecodeFramework(t, "customReplyJsonString", jsonString)
+}
+
 func TestStringEncode(t *testing.T) {
 	s0 := ""
 	s1 := "0"
@@ -168,6 +173,11 @@ func TestStringEncode(t *testing.T) {
 	testJavaDecode(t, "argString_31", s32[:31])
 	testJavaDecode(t, "argString_32", s32)
 	testJavaDecode(t, "argString_65536", s65560[:65536])
+}
+
+func TestStringPrtEncode(t *testing.T) {
+	str := "dubbo-go-hessian2"
+	testSimpleEncode(t, &str)
 }
 
 var decodePool = &sync.Pool{

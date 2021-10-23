@@ -15,18 +15,24 @@
  * limitations under the License.
  */
 
-package hessian
+package testfuncs
 
 import (
-	"github.com/apache/dubbo-go-hessian2/java_util"
+	hessian "github.com/apache/dubbo-go-hessian2"
 )
 
-func init() {
-	RegisterPOJO(&java_util.UUID{
-		MostSigBits:  int64(200),
-		LeastSigBits: int64(200),
+func UserArray() []byte {
+	e := hessian.NewEncoder()
+	_ = e.Encode([]*User{
+		{"wongoo"}, {"alex"},
 	})
-	RegisterPOJO(&java_util.LocaleHandle{
-		Value: "",
+	return e.Buffer()
+}
+
+func UserList() []byte {
+	e := hessian.NewEncoder()
+	_ = e.Encode([]interface{}{
+		&User{"wongoo"}, &User{"alex"},
 	})
+	return e.Buffer()
 }

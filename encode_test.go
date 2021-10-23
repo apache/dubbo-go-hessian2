@@ -23,6 +23,10 @@ import (
 	"testing"
 )
 
+import (
+	"github.com/stretchr/testify/assert"
+)
+
 var assertEqual = func(want, got []byte, t *testing.T) {
 	if !bytes.Equal(want, got) {
 		t.Fatalf("want %v , got %v", want, got)
@@ -76,4 +80,10 @@ func testJavaDecode(t *testing.T, method string, target interface{}) {
 	if result != "true" {
 		t.Errorf("%s: encode %v to bytes wrongly, result: %s", method, target, result)
 	}
+}
+
+func testSimpleEncode(t *testing.T, v interface{}) {
+	e := NewEncoder()
+	err := e.Encode(v)
+	assert.Nil(t, err)
 }
