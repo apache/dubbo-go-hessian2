@@ -37,7 +37,7 @@ func TestJavaUtil(t *testing.T) {
 	}
 	m := res.(map[interface{}]interface{})
 
-	uuid1 := &java_util.UUID{LeastSigBits: int64(-7160773830801198154), MostSigBits: int64(459021424248441700)}
+	uuid1 := &java_util.UUID{Value: "065ec58d-a89f-4b64-9c9f-d223ea2e73b6"}
 
 	resUuid1 := m["uuid1"]
 	resUuid1String := m["uuid1_string"]

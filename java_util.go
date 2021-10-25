@@ -23,8 +23,7 @@ import (
 
 func init() {
 	RegisterPOJO(&java_util.UUID{
-		MostSigBits:  int64(200),
-		LeastSigBits: int64(200),
+		Value: "",
 	})
 	RegisterPOJO(&java_util.LocaleHandle{
 		Value: "",
