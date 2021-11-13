@@ -86,7 +86,7 @@ func (JavaSqlTimeSerializer) EncObject(e *Encoder, vv POJO) error {
 		}
 	}
 	if idx == -1 {
-		idx, ok = checkPOJORegistry(typeof(vv))
+		idx, ok = checkPOJORegistry(vv)
 		if !ok {
 			idx = RegisterPOJO(v)
 		}

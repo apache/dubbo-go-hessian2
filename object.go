@@ -106,18 +106,17 @@ func (e *Encoder) encObject(v interface{}) error {
 		clsDef *classInfo
 	)
 	pojo, isPojo := v.(POJO)
-	vv := reflect.ValueOf(v)
-
 	// get none pojo JavaClassName
 	var nonePojoJavaName string
 	if !isPojo {
-		s, ok := loadPOJORegistry(vv.Type().String())
+		s, ok := loadPOJORegistry(v)
 		if !ok {
 			return perrors.Errorf("non-pojo obj %s has not being registered before!", typeof(v))
 		}
 		nonePojoJavaName = s.javaName
 	}
 
+	vv := reflect.ValueOf(v)
 	// check ref
 	if n, ok := e.checkRefMap(vv); ok {
 		e.buffer = encRef(e.buffer, n)
@@ -142,7 +141,7 @@ func (e *Encoder) encObject(v interface{}) error {
 
 	var ok bool
 	if idx == -1 {
-		idx, ok = checkPOJORegistry(typeof(v))
+		idx, ok = checkPOJORegistry(v)
 		if !ok {
 			if reflect.TypeOf(v).Implements(javaEnumType) {
 				idx = RegisterJavaEnum(v.(POJOEnum))
