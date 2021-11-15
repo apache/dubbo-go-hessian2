@@ -160,7 +160,11 @@ func (e *Encoder) Encode(v interface{}) error {
 		switch t.Kind() {
 		case reflect.Struct:
 			vv := reflect.ValueOf(v)
-			vv = UnpackPtr(vv)
+			if vv.Kind() != reflect.Ptr {
+				v = PackPtrInterface(v, vv)
+			} else {
+				vv = UnpackPtr(vv)
+			}
 			if !vv.IsValid() {
 				e.buffer = EncNull(e.buffer)
 				return nil

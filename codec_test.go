@@ -18,7 +18,12 @@
 package hessian
 
 import (
+	"reflect"
 	"testing"
+)
+
+import (
+	"github.com/stretchr/testify/assert"
 )
 
 // go test -v -run TestPackUint16
@@ -56,4 +61,12 @@ func TestPackInt64(t *testing.T) {
 	if r := UnpackInt64(PackInt64(v)); r != v {
 		t.Fatalf("v:0X%d, pack-unpack value:0X%x\n", v, r)
 	}
+}
+
+func TestPackPtrInterface(t *testing.T) {
+	v := "struct"
+	vv := reflect.ValueOf(v)
+	sPointer, ok := PackPtrInterface(v, vv).(*string)
+	assert.True(t, ok)
+	assert.True(t, *sPointer == "struct")
 }

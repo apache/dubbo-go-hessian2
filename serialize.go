@@ -69,7 +69,7 @@ func (IntegerSerializer) DecObject(d *Decoder, typ reflect.Type, cls *classInfo)
 }
 
 func (IntegerSerializer) EncObject(e *Encoder, v POJO) error {
-	bigInt, ok := v.(bigInteger)
+	bigInt, ok := v.(*bigInteger)
 	if !ok {
 		return e.encObject(v)
 	}
@@ -80,7 +80,7 @@ func (IntegerSerializer) EncObject(e *Encoder, v POJO) error {
 type DecimalSerializer struct{}
 
 func (DecimalSerializer) EncObject(e *Encoder, v POJO) error {
-	decimal, ok := v.(big.Decimal)
+	decimal, ok := v.(*big.Decimal)
 	if !ok {
 		return e.encObject(v)
 	}
