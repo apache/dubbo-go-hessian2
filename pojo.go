@@ -312,7 +312,7 @@ func RegisterJavaEnum(o POJOEnum) int {
 		default:
 			t.typ = reflect.TypeOf(o)
 		}
-		t.goName = t.typ.String()
+		t.goName = getGoName(o)
 		t.javaName = o.JavaClassName()
 		t.inst = o
 		pojoRegistry.j2g[t.javaName] = t.goName
@@ -341,8 +341,8 @@ func RegisterJavaEnum(o POJOEnum) int {
 }
 
 // check if go struct name @goName has been registered or not.
-func checkPOJORegistry(goName string) (int, bool) {
-	s, ok := loadPOJORegistry(goName)
+func checkPOJORegistry(v interface{}) (int, bool) {
+	s, ok := loadPOJORegistry(v)
 	if !ok {
 		return -1, false
 	}
@@ -350,11 +350,12 @@ func checkPOJORegistry(goName string) (int, bool) {
 }
 
 // load struct info if go struct name @goName has been registered or not.
-func loadPOJORegistry(goName string) (*structInfo, bool) {
+func loadPOJORegistry(v interface{}) (*structInfo, bool) {
 	var (
 		ok bool
 		s  *structInfo
 	)
+	goName := getGoName(v)
 	pojoRegistry.RLock()
 	s, ok = pojoRegistry.registry[goName]
 	pojoRegistry.RUnlock()
