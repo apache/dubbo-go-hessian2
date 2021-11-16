@@ -499,7 +499,7 @@ func (d *Decoder) decInstance(typ reflect.Type, cls *classInfo) (interface{}, er
 		case reflect.Slice, reflect.Array:
 			m, err := d.decList(TAG_READ)
 			if err != nil {
-				if err == io.EOF {
+				if perrors.Is(err, io.EOF) {
 					break
 				}
 				return nil, perrors.WithStack(err)

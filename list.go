@@ -359,7 +359,7 @@ func (d *Decoder) readTypedListValue(length int, listTyp string, isVariableArr b
 	for j := 0; j < length || isVariableArr; j++ {
 		it, err := d.DecodeValue()
 		if err != nil {
-			if err == io.EOF && isVariableArr {
+			if perrors.Is(err, io.EOF) && isVariableArr {
 				break
 			}
 			return nil, perrors.WithStack(err)
@@ -414,7 +414,7 @@ func (d *Decoder) readUntypedList(tag byte) (interface{}, error) {
 	for j := 0; j < length || isVariableArr; j++ {
 		it, err := d.DecodeValue()
 		if err != nil {
-			if err == io.EOF && isVariableArr {
+			if perrors.Is(err, io.EOF) && isVariableArr {
 				break
 			}
 			return nil, perrors.WithStack(err)

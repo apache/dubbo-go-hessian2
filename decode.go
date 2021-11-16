@@ -49,12 +49,12 @@ func NewDecoder(b []byte) *Decoder {
 	return &Decoder{reader: bufio.NewReader(bytes.NewReader(b)), typeRefs: &TypeRefs{records: map[string]bool{}}}
 }
 
-// NewDecoder generate a decoder instance
+// NewDecoderSize generate a decoder instance.
 func NewDecoderSize(b []byte, size int) *Decoder {
 	return &Decoder{reader: bufio.NewReaderSize(bytes.NewReader(b), size), typeRefs: &TypeRefs{records: map[string]bool{}}}
 }
 
-// NewDecoder generate a decoder instance with skip
+// NewDecoderWithSkip generate a decoder instance with skip.
 func NewDecoderWithSkip(b []byte) *Decoder {
 	return &Decoder{reader: bufio.NewReader(bytes.NewReader(b)), typeRefs: &TypeRefs{records: map[string]bool{}}, isSkip: true}
 }
@@ -224,7 +224,7 @@ func (d *Decoder) DecodeValue() (interface{}, error) {
 	)
 
 	tag, err = d.ReadByte()
-	if err == io.EOF {
+	if perrors.Is(err, io.EOF) {
 		return nil, err
 	}
 

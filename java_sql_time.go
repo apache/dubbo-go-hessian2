@@ -124,7 +124,7 @@ func (JavaSqlTimeSerializer) DecObject(d *Decoder, typ reflect.Type, cls *classI
 	d.appendRefs(vRef.Interface())
 
 	tag, err := d.ReadByte()
-	if err == io.EOF {
+	if perrors.Is(err, io.EOF) {
 		return nil, err
 	}
 	date, err := d.decDate(int32(tag))
