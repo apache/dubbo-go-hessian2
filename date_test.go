@@ -105,6 +105,7 @@ func TestEncDateNull(t *testing.T) {
 		e   *Encoder
 		d   *Decoder
 		res interface{}
+		err error
 	)
 	v = "2014-02-09 06:15:23 +0800 CST"
 	tz, _ = time.Parse("2006-01-02 15:04:05 +0800 CST", v)
@@ -122,12 +123,16 @@ func TestEncDateNull(t *testing.T) {
 		Date3:   d3,
 	}
 	e = NewEncoder()
-	e.Encode(date)
+	err = e.Encode(date)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if len(e.Buffer()) == 0 {
 		t.Fail()
 	}
 	d = NewDecoder(e.Buffer())
-	res, _ = d.Decode()
+	res, err = d.Decode()
+	assert.Nil(t, err)
 	assert.Equal(t, ZeroDate, res.(*DateDemo).Date)
 	assert.Equal(t, 2, len(res.(*DateDemo).Dates))
 	assert.Equal(t, tz.Local().String(), (*res.(*DateDemo).Dates[0]).String())

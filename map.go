@@ -192,7 +192,7 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 		entryKey, err = d.DecodeValue()
 		if err != nil {
 			// EOF means the end flag 'Z' of map is already read
-			if err == io.EOF {
+			if perrors.Is(err, io.EOF) {
 				break
 			} else {
 				return perrors.WithStack(err)
