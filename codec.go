@@ -476,3 +476,10 @@ func ConvertSliceValueType(destTyp reflect.Type, v reflect.Value) (reflect.Value
 
 	return sl, nil
 }
+
+//PackPtrInterface pack struct interface to pointer interface
+func PackPtrInterface(s interface{}, value reflect.Value) interface{} {
+	vv := reflect.New(reflect.TypeOf(s))
+	vv.Elem().Set(value)
+	return vv.Interface()
+}

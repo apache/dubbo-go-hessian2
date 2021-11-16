@@ -87,3 +87,53 @@ func testSimpleEncode(t *testing.T, v interface{}) {
 	err := e.Encode(v)
 	assert.Nil(t, err)
 }
+
+type BenchData struct {
+	name string
+}
+
+func (b *BenchData) JavaClassName() string {
+	return "test.bench.BenchData"
+}
+
+// Benchmark_Struct_Encode  	 2231869	       506.8 ns/op	     560 B/op	       7 allocs/op
+func Benchmark_Struct_Encode(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		NewEncoder().Encode(BenchData{})
+	}
+}
+
+// Benchmark_Pointer_Encode   	 2565778	       476.1 ns/op	     560 B/op	       7 allocs/op
+func Benchmark_Pointer_Encode(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		NewEncoder().Encode(&BenchData{})
+	}
+}
+
+// Benchmark_Struct_Encode_8   	 2307214	       519.4 ns/op	     560 B/op	       7 allocs/op
+func Benchmark_Struct_Encode_8(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+	b.SetParallelism(8)
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			NewEncoder().Encode(BenchData{})
+		}
+	})
+}
+
+// Benchmark_Pointer_Encode_8   	 2460842	       476.7 ns/op	     560 B/op	       7 allocs/op
+func Benchmark_Pointer_Encode_8(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+	b.SetParallelism(8)
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			NewEncoder().Encode(&BenchData{})
+		}
+	})
+}
