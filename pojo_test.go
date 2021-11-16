@@ -22,9 +22,14 @@ import (
 	"container/list"
 	"testing"
 	"time"
+)
 
+import (
 	"github.com/apache/dubbo-go-hessian2/java_exception"
 	"github.com/apache/dubbo-go-hessian2/java_util"
+)
+
+import (
 	"github.com/stretchr/testify/assert"
 )
 
