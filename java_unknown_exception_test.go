@@ -34,7 +34,7 @@ func TestCheckAndGetException(t *testing.T) {
 	assert.True(t, b)
 
 	assert.Equal(t, s.javaName, "com.test.UserDefinedException")
-	assert.Equal(t, s.goName, "hessian.UnknownException")
+	assert.Equal(t, s.goName, "github.com/apache/dubbo-go-hessian2/hessian.UnknownException")
 
 	clazzInfo2 := &classInfo{
 		javaName:      "com.test.UserDefinedException",

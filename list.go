@@ -70,9 +70,9 @@ func init() {
 	listTypeNameMapper.Store("float64", "[double")
 	listTypeNameMapper.Store("bool", "[boolean")
 	listTypeNameMapper.Store("time.Time", "[date")
-	listTypeNameMapper.Store("java_exception.Throwabler", "[java.lang.Throwable")
+	listTypeNameMapper.Store("github.com/apache/dubbo-go-hessian2/java_exception/java_exception.Throwabler", "[java.lang.Throwable")
 
-	listTypeNameMapper.Store("hessian.Object", "[object")
+	listTypeNameMapper.Store("github.com/apache/dubbo-go-hessian2/hessian.Object", "[object")
 }
 
 func registerTypeName(gotype, javatype string) {

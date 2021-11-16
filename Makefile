@@ -23,6 +23,6 @@ format:
 	go fmt
 
 test:
-	go test
+	go test ./... -v
 
 all: format test
