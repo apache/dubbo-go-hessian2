@@ -252,11 +252,11 @@ func combineGoName(t reflect.Type) string {
 
 	if reflect.Slice == t.Kind() {
 		goName := t.String()
-		sliceNamePrefix := strings.LastIndex(goName, "]")
+		sliceArrayPrefixIndex := strings.LastIndex(goName, "]")
 		for reflect.Slice == t.Kind() {
 			t = t.Elem()
 		}
-		return goName[:sliceNamePrefix+1] + combineGoName(t)
+		return goName[:sliceArrayPrefixIndex+1] + combineGoName(t)
 	}
 
 	pkgPath := t.PkgPath()
