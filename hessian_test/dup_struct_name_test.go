@@ -182,7 +182,7 @@ func checkResponseBody(t *testing.T, decodedResponse *hessian.Response, h *hessi
 	assert.Equal(t, in, out)
 }
 
-func TestDuplicatedClassGetGoName(t *testing.T) {
-	assert.Equal(t, "github.com/apache/dubbo-go-hessian2/hessian_test_test/hessian_test.CaseZ", hessian.GetGoName(&CaseZ{}))
-	assert.Equal(t, "github.com/apache/dubbo-go-hessian2/hessian_test/hessian_test/hessian_test.CaseZ", hessian.GetGoName(&dupclass.CaseZ{}))
+func TestDuplicatedClassGetGoType(t *testing.T) {
+	assert.Equal(t, "github.com/apache/dubbo-go-hessian2/hessian_test_test/hessian_test.CaseZ", hessian.GetGoType(&CaseZ{}))
+	assert.Equal(t, "github.com/apache/dubbo-go-hessian2/hessian_test/hessian_test/hessian_test.CaseZ", hessian.GetGoType(&dupclass.CaseZ{}))
 }

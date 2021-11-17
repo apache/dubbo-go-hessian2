@@ -144,7 +144,7 @@ func RegisterPOJOMapping(javaClassName string, o interface{}) int {
 	)
 
 	sttInfo.typ = obtainValueType(o)
-	sttInfo.goName = GetGoName(o)
+	sttInfo.goName = GetGoType(o)
 	sttInfo.javaName = javaClassName
 	sttInfo.inst = o
 	pojoRegistry.j2g[sttInfo.javaName] = sttInfo.goName
@@ -225,7 +225,7 @@ func unRegisterPOJO(o POJO) int {
 	pojoRegistry.Lock()
 	defer pojoRegistry.Unlock()
 
-	goName := GetGoName(o)
+	goName := GetGoType(o)
 
 	if structInfo, ok := pojoRegistry.registry[goName]; ok {
 		delete(pojoRegistry.j2g, structInfo.javaName)
@@ -240,12 +240,12 @@ func unRegisterPOJO(o POJO) int {
 	return -1
 }
 
-// GetGoName get the raw go type name with package.
-func GetGoName(o interface{}) string {
-	return combineGoName(reflect.TypeOf(o))
+// GetGoType get the raw go type name with package.
+func GetGoType(o interface{}) string {
+	return combineGoTypeName(reflect.TypeOf(o))
 }
 
-func combineGoName(t reflect.Type) string {
+func combineGoTypeName(t reflect.Type) string {
 	for reflect.Ptr == t.Kind() {
 		t = t.Elem()
 	}
@@ -256,7 +256,7 @@ func combineGoName(t reflect.Type) string {
 		for reflect.Slice == t.Kind() {
 			t = t.Elem()
 		}
-		return goName[:sliceArrayPrefixIndex+1] + combineGoName(t)
+		return goName[:sliceArrayPrefixIndex+1] + combineGoTypeName(t)
 	}
 
 	pkgPath := t.PkgPath()
@@ -316,7 +316,7 @@ func RegisterJavaEnum(o POJOEnum) int {
 		default:
 			t.typ = reflect.TypeOf(o)
 		}
-		t.goName = GetGoName(o)
+		t.goName = GetGoType(o)
 		t.javaName = o.JavaClassName()
 		t.inst = o
 		pojoRegistry.j2g[t.javaName] = t.goName
@@ -359,7 +359,7 @@ func loadPOJORegistry(v interface{}) (*structInfo, bool) {
 		ok bool
 		s  *structInfo
 	)
-	goName := GetGoName(v)
+	goName := GetGoType(v)
 	pojoRegistry.RLock()
 	s, ok = pojoRegistry.registry[goName]
 	pojoRegistry.RUnlock()

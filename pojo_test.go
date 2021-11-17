@@ -33,14 +33,14 @@ import (
 	"github.com/apache/dubbo-go-hessian2/java_util"
 )
 
-func TestGetGoName(t *testing.T) {
-	assert.Equal(t, "time.Time", GetGoName(time.Now()))
-	assert.Equal(t, "bytes.Buffer", GetGoName(bytes.Buffer{}))
-	assert.Equal(t, "container/list/list.List", GetGoName(list.New()))
-	assert.Equal(t, "github.com/apache/dubbo-go-hessian2/hessian.BusinessData", GetGoName(&BusinessData{}))
-	assert.Equal(t, "github.com/apache/dubbo-go-hessian2/java_util/java_util.UUID", GetGoName(&java_util.UUID{}))
-	assert.Equal(t, "github.com/apache/dubbo-go-hessian2/java_exception/java_exception.ClassNotFoundException", GetGoName(&java_exception.ClassNotFoundException{}))
+func TestGetGoType(t *testing.T) {
+	assert.Equal(t, "time.Time", GetGoType(time.Now()))
+	assert.Equal(t, "bytes.Buffer", GetGoType(bytes.Buffer{}))
+	assert.Equal(t, "container/list/list.List", GetGoType(list.New()))
+	assert.Equal(t, "github.com/apache/dubbo-go-hessian2/hessian.BusinessData", GetGoType(&BusinessData{}))
+	assert.Equal(t, "github.com/apache/dubbo-go-hessian2/java_util/java_util.UUID", GetGoType(&java_util.UUID{}))
+	assert.Equal(t, "github.com/apache/dubbo-go-hessian2/java_exception/java_exception.ClassNotFoundException", GetGoType(&java_exception.ClassNotFoundException{}))
 
-	assert.Equal(t, "[]github.com/apache/dubbo-go-hessian2/hessian.BusinessData", GetGoName([]*BusinessData{}))
-	assert.Equal(t, "[][]github.com/apache/dubbo-go-hessian2/hessian.BusinessData", GetGoName([][]*BusinessData{}))
+	assert.Equal(t, "[]github.com/apache/dubbo-go-hessian2/hessian.BusinessData", GetGoType([]*BusinessData{}))
+	assert.Equal(t, "[][]github.com/apache/dubbo-go-hessian2/hessian.BusinessData", GetGoType([][]*BusinessData{}))
 }
