@@ -20,7 +20,7 @@ lint2:
 	golangci-lint run
 
 format:
-	go fmt
+	gofmt -l -w .
 
 test:
 	go test ./... -v

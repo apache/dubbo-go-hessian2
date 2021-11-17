@@ -25,12 +25,12 @@ import (
 )
 
 import (
-	"github.com/apache/dubbo-go-hessian2/java_exception"
-	"github.com/apache/dubbo-go-hessian2/java_util"
+	"github.com/stretchr/testify/assert"
 )
 
 import (
-	"github.com/stretchr/testify/assert"
+	"github.com/apache/dubbo-go-hessian2/java_exception"
+	"github.com/apache/dubbo-go-hessian2/java_util"
 )
 
 func TestGetGoName(t *testing.T) {
