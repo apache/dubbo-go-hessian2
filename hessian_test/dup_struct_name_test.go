@@ -181,3 +181,8 @@ func checkResponseBody(t *testing.T, decodedResponse *hessian.Response, h *hessi
 	out, _ := hessian.EnsureInterface(hessian.UnpackPtrValue(hessian.EnsurePackValue(decodedResponse.RspObj)), nil)
 	assert.Equal(t, in, out)
 }
+
+func TestDuplicatedClassGetGoType(t *testing.T) {
+	assert.Equal(t, "github.com/apache/dubbo-go-hessian2/hessian_test_test/hessian_test.CaseZ", hessian.GetGoType(&CaseZ{}))
+	assert.Equal(t, "github.com/apache/dubbo-go-hessian2/hessian_test/hessian_test/hessian_test.CaseZ", hessian.GetGoType(&dupclass.CaseZ{}))
+}

@@ -20,7 +20,6 @@ package hessian
 import (
 	"fmt"
 	"reflect"
-	"regexp"
 	"strings"
 	"sync"
 	"unicode"
@@ -102,9 +101,6 @@ var (
 	}
 	pojoType     = reflect.TypeOf((*POJO)(nil)).Elem()
 	javaEnumType = reflect.TypeOf((*POJOEnum)(nil)).Elem()
-
-	goPkgPathWhiteListRegexp = regexp.MustCompile(`^(github\.com/apache/dubbo-go-hessian2|time)`)
-	goPkgPathBlackListRegexp = regexp.MustCompile(`^(github\.com/apache/dubbo-go-hessian2/hessian_test)`)
 )
 
 // struct parsing
@@ -148,7 +144,7 @@ func RegisterPOJOMapping(javaClassName string, o interface{}) int {
 	)
 
 	sttInfo.typ = obtainValueType(o)
-	sttInfo.goName = getGoName(o)
+	sttInfo.goName = GetGoType(o)
 	sttInfo.javaName = javaClassName
 	sttInfo.inst = o
 	pojoRegistry.j2g[sttInfo.javaName] = sttInfo.goName
@@ -229,7 +225,7 @@ func unRegisterPOJO(o POJO) int {
 	pojoRegistry.Lock()
 	defer pojoRegistry.Unlock()
 
-	goName := getGoName(o)
+	goName := GetGoType(o)
 
 	if structInfo, ok := pojoRegistry.registry[goName]; ok {
 		delete(pojoRegistry.j2g, structInfo.javaName)
@@ -244,20 +240,28 @@ func unRegisterPOJO(o POJO) int {
 	return -1
 }
 
-func getGoName(o interface{}) string {
-	goType := reflect.TypeOf(o)
-	for reflect.Ptr == goType.Kind() {
-		goType = goType.Elem()
-	}
-	return combineGoName(goType)
+// GetGoType get the raw go type name with package.
+func GetGoType(o interface{}) string {
+	return combineGoTypeName(reflect.TypeOf(o))
 }
 
-func combineGoName(t reflect.Type) string {
+func combineGoTypeName(t reflect.Type) string {
+	for reflect.Ptr == t.Kind() {
+		t = t.Elem()
+	}
+
+	if reflect.Slice == t.Kind() {
+		goName := t.String()
+		sliceArrayPrefixIndex := strings.LastIndex(goName, "]")
+		for reflect.Slice == t.Kind() {
+			t = t.Elem()
+		}
+		return goName[:sliceArrayPrefixIndex+1] + combineGoTypeName(t)
+	}
+
 	pkgPath := t.PkgPath()
 	goName := t.String()
-	if pkgPath == "" ||
-		(goPkgPathWhiteListRegexp.Match([]byte(pkgPath)) &&
-			!goPkgPathBlackListRegexp.Match([]byte(pkgPath))) {
+	if pkgPath == "" || strings.HasPrefix(goName, pkgPath) {
 		return goName
 	}
 	return pkgPath + "/" + goName
@@ -312,7 +316,7 @@ func RegisterJavaEnum(o POJOEnum) int {
 		default:
 			t.typ = reflect.TypeOf(o)
 		}
-		t.goName = getGoName(o)
+		t.goName = GetGoType(o)
 		t.javaName = o.JavaClassName()
 		t.inst = o
 		pojoRegistry.j2g[t.javaName] = t.goName
@@ -355,7 +359,7 @@ func loadPOJORegistry(v interface{}) (*structInfo, bool) {
 		ok bool
 		s  *structInfo
 	)
-	goName := getGoName(v)
+	goName := GetGoType(v)
 	pojoRegistry.RLock()
 	s, ok = pojoRegistry.registry[goName]
 	pojoRegistry.RUnlock()
