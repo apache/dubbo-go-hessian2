@@ -1,5 +1,16 @@
 # Release Notes
 
+## v1.9.5
+
+### New Features
+- support serialize UUID to string. [#285](https://github.com/apache/dubbo-go-hessian2/pull/285)
+- support encode non-pointer instance for pointer POJO definition. [#289](https://github.com/apache/dubbo-go-hessian2/pull/289)
+
+### Bugfixes
+- fix POJO registration. [#287](https://github.com/apache/dubbo-go-hessian2/pull/287)
+- fix EOF error check. [#288](https://github.com/apache/dubbo-go-hessian2/pull/288)
+- fix go type name for list. [#290](https://github.com/apache/dubbo-go-hessian2/pull/290)
+
 ## v1.9.4
 
 ### New Features
