@@ -195,8 +195,74 @@ type MyUser struct {
 
 ```
 
+#### Encoding param name
 
-##### hessian.SetTagIdentifier
+When a Java method declares an argument as a parent class, it actually hope receives a subclass，
+You can specify the encoding type of the parameter separately.
+
+##### java-server
+
+```java
+public abstract class User {
+}
+
+public class MyUser extends User implements Serializable {
+
+    private String userFullName;
+
+    private String familyPhoneNumber;
+}
+
+public interface UserProvider {
+    String GetUser(User user);
+}
+
+public class UserProviderImpl implements UserProvider {
+    public UserProviderImpl() {
+    }
+    
+    public String GetUser(User user) {
+        MyUser myUser=(MyUser)user;
+        return myUser.getUserFullName();
+    }
+}
+
+```
+
+##### go-client
+
+```go
+type MyUser struct {
+    UserFullName      string   `hessian:"userFullName"`
+    FamilyPhoneNumber string   // default convert to => familyPhoneNumber
+}
+
+func (m *MyUser) JavaClassName() string {
+    return "com.company.MyUser"
+}
+
+func (m *MyUser) JavaParamName() string {
+    return "com.company.User"
+}
+
+type UserProvider struct {
+    GetUser func(ctx context.Context, user *MyUser) (string, error) `dubbo:"GetUser"`
+}
+```
+
+
+
+#### Set method Alias
+
+When the Go client calls the Java server, the first letter of the method is converted to lowercase by default,you can use the dubbo tag to set method alias.
+
+```go
+type UserProvider struct {
+    GetUser func(ctx context.Context) (*User, error) `dubbo:"GetUser"`
+}
+```
+
+#### hessian.SetTagIdentifier
 
 You can use `hessian.SetTagIdentifier` to customize tag-identifier of hessian, which takes effect to both encoder and decoder.
 
@@ -237,6 +303,7 @@ The encoded bytes of the struct `MyUser` is as following:
 ```
 
 #### Using Java collections
+
 By default, the output of Hessian Java impl of a Java collection like java.util.HashSet will be decoded as `[]interface{}` in `go-hessian2`.
 To apply the one-to-one mapping relationship between certain Java collection class and your Go struct, examples are as follows:
 
