@@ -1,5 +1,10 @@
 # Release Notes
 
+## v1.10.0
+
+### New Features
+- support java function param type. [#295](https://github.com/apache/dubbo-go-hessian2/pull/295)
+
 ## v1.9.5
 
 ### New Features
