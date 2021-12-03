@@ -116,6 +116,7 @@ func TestEncInt32Len4B(t *testing.T) {
 }
 
 func TestInt(t *testing.T) {
+	testDecodeFramework(t, "replyNull", nil)
 	testDecodeFramework(t, "replyInt_0", int32(0))
 	testDecodeFramework(t, "replyInt_0x30", int32(0x30))
 	testDecodeFramework(t, "replyInt_0x3ffff", int32(0x3ffff))

@@ -897,3 +897,22 @@ func TestWrapperClassArray(t *testing.T) {
 	da := &DoubleArray{Values: []float64{1.0, 100.0, 10000.1}}
 	assert.True(t, reflect.DeepEqual(got, da))
 }
+
+type User struct {
+	Id   int32
+	List []int32
+}
+
+func (u *User) JavaClassName() string {
+	return "test.model.User"
+}
+
+func TestDecodeIntegerHasNull(t *testing.T) {
+	RegisterPOJO(&User{})
+	testDecodeFramework(t, "customReplyTypedIntegerHasNull", &User{Id: 0})
+}
+
+func TestDecodeSliceIntegerHasNull(t *testing.T) {
+	RegisterPOJO(&User{})
+	testDecodeFramework(t, "customReplyTypedListIntegerHasNull", &User{Id: 0, List: []int32{1, 0}})
+}

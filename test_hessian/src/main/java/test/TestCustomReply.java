@@ -22,10 +22,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.caucho.hessian.test.A0;
 import com.caucho.hessian.test.A1;
+import com.caucho.hessian.test.TestObject;
 import test.generic.BusinessData;
 import test.generic.Response;
 import test.model.CustomMap;
 import test.model.DateDemo;
+import test.model.User;
 
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -89,6 +91,24 @@ public class TestCustomReply {
     public void customReplyJsonString() throws Exception {
         String s = "{\"params\":{\"fromAccid\":\"23495382\",\"msgType\":100,\"msgId\":\"148ef1b2-808d-48f2-b268-7a1018a27bdb\",\"attach\":\"{\\\"accid\\\":\\\"23495382\\\",\\\"classRoomFlag\\\":50685,\\\"msgId\\\":\\\"599645021431398400\\\",\\\"msgType\\\":\\\"100\\\",\\\"nickname\\\":\\\"橙子������\\\"}\",\"roomid\":413256699},\"url\":\"https://api.netease.im/nimserver/chatroom/sendMsg.action\"}";
         output.writeObject(s);
+        output.flush();
+    }
+
+    public void customReplyTypedIntegerHasNull() throws Exception {
+        User user = new User();
+        user.setId(null);
+        output.writeObject(user);
+        output.flush();
+    }
+
+    public void customReplyTypedListIntegerHasNull() throws Exception {
+        User user = new User();
+        user.setId(null);
+        List<Integer> list = new ArrayList<>();
+        list.add(1);
+        list.add(null);
+        user.setList(list);
+        output.writeObject(user);
         output.flush();
     }
 
