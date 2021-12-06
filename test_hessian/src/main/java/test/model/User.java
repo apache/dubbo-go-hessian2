@@ -18,9 +18,14 @@
 package test.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class User implements Serializable {
     private String name;
+
+    private Integer id;
+
+    private List<Integer> list;
 
     public User() {
     }
@@ -37,10 +42,23 @@ public class User implements Serializable {
         this.name = name;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public List<Integer> getList() { return list; }
+
+    public void setList(List<Integer> list) {  this.list = list; }
+
     @Override
     public String toString() {
         return "User{" +
                 "name='" + name + '\'' +
+                "id='" + id + '\'' +
                 '}';
     }
 }

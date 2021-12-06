@@ -455,7 +455,11 @@ func ConvertSliceValueType(destTyp reflect.Type, v reflect.Value) (reflect.Value
 		if cv, ok := item.(reflect.Value); ok {
 			itemValue = cv
 		} else {
-			itemValue = reflect.ValueOf(item)
+			if item == nil {
+				itemValue = reflect.Zero(destTyp.Elem())
+			} else {
+				itemValue = reflect.ValueOf(item)
+			}
 		}
 
 		if !elemPtrType && itemValue.Kind() == reflect.Ptr {
