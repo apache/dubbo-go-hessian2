@@ -196,48 +196,32 @@ func SprintHex(b []byte) (rs string) {
 
 // EnsureFloat64 convert i to float64
 func EnsureFloat64(i interface{}) float64 {
-	if i64, ok := i.(float64); ok {
-		return i64
-	}
-	if i32, ok := i.(float32); ok {
-		return float64(i32)
+	v := reflect.ValueOf(i)
+	k := v.Kind()
+	if k == reflect.Float32 || k == reflect.Float64 {
+		return v.Float()
 	}
 	panic(fmt.Errorf("can't convert to float64: %v, type:%v", i, reflect.TypeOf(i)))
 }
 
 // EnsureInt64 convert i to int64
 func EnsureInt64(i interface{}) int64 {
-	if i64, ok := i.(int64); ok {
-		return i64
-	}
-	if i32, ok := i.(int32); ok {
-		return int64(i32)
-	}
-	if i, ok := i.(int); ok {
-		return int64(i)
-	}
-	if i16, ok := i.(int16); ok {
-		return int64(i16)
-	}
-	if i8, ok := i.(int8); ok {
-		return int64(i8)
+	v := reflect.ValueOf(i)
+	k := v.Kind()
+	if k == reflect.Int || k == reflect.Int8 || k == reflect.Int16 ||
+		k == reflect.Int32 || k == reflect.Int64 {
+		return v.Int()
 	}
 	panic(fmt.Errorf("can't convert to int64: %v, type:%v", i, reflect.TypeOf(i)))
 }
 
 // EnsureUint64 convert i to uint64
 func EnsureUint64(i interface{}) uint64 {
-	if i64, ok := i.(uint64); ok {
-		return i64
-	}
-	if i64, ok := i.(int64); ok {
-		return uint64(i64)
-	}
-	if i32, ok := i.(int32); ok {
-		return uint64(i32)
-	}
-	if i32, ok := i.(uint32); ok {
-		return uint64(i32)
+	v := reflect.ValueOf(i)
+	k := v.Kind()
+	if k == reflect.Uint || k == reflect.Uint8 || k == reflect.Uint16 ||
+		k == reflect.Uint32 || k == reflect.Uint64 {
+		return v.Uint()
 	}
 	panic(fmt.Errorf("can't convert to uint64: %v, type:%v", i, reflect.TypeOf(i)))
 }
