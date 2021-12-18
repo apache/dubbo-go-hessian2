@@ -194,54 +194,6 @@ func SprintHex(b []byte) (rs string) {
 	return
 }
 
-// EnsureFloat64 convert i to float64
-func EnsureFloat64(i interface{}) float64 {
-	if i64, ok := i.(float64); ok {
-		return i64
-	}
-	if i32, ok := i.(float32); ok {
-		return float64(i32)
-	}
-	panic(fmt.Errorf("can't convert to float64: %v, type:%v", i, reflect.TypeOf(i)))
-}
-
-// EnsureInt64 convert i to int64
-func EnsureInt64(i interface{}) int64 {
-	if i64, ok := i.(int64); ok {
-		return i64
-	}
-	if i32, ok := i.(int32); ok {
-		return int64(i32)
-	}
-	if i, ok := i.(int); ok {
-		return int64(i)
-	}
-	if i16, ok := i.(int16); ok {
-		return int64(i16)
-	}
-	if i8, ok := i.(int8); ok {
-		return int64(i8)
-	}
-	panic(fmt.Errorf("can't convert to int64: %v, type:%v", i, reflect.TypeOf(i)))
-}
-
-// EnsureUint64 convert i to uint64
-func EnsureUint64(i interface{}) uint64 {
-	if i64, ok := i.(uint64); ok {
-		return i64
-	}
-	if i64, ok := i.(int64); ok {
-		return uint64(i64)
-	}
-	if i32, ok := i.(int32); ok {
-		return uint64(i32)
-	}
-	if i32, ok := i.(uint32); ok {
-		return uint64(i32)
-	}
-	panic(fmt.Errorf("can't convert to uint64: %v, type:%v", i, reflect.TypeOf(i)))
-}
-
 // EnsurePackValue pack the interface with value
 func EnsurePackValue(in interface{}) reflect.Value {
 	if v, ok := in.(reflect.Value); ok {
@@ -350,13 +302,13 @@ func SetValue(dest, v reflect.Value) {
 	kind := dest.Kind()
 	switch kind {
 	case reflect.Float32, reflect.Float64:
-		dest.SetFloat(EnsureFloat64(v.Interface()))
+		dest.SetFloat(v.Float())
 		return
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		dest.SetInt(EnsureInt64(v.Interface()))
+		dest.SetInt(v.Int())
 		return
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		dest.SetUint(EnsureUint64(v.Interface()))
+		dest.SetUint(v.Uint())
 		return
 	}
 
@@ -468,11 +420,11 @@ func ConvertSliceValueType(destTyp reflect.Type, v reflect.Value) (reflect.Value
 
 		switch {
 		case elemFloatType:
-			sl.Index(i).SetFloat(EnsureFloat64(itemValue.Interface()))
+			sl.Index(i).SetFloat(itemValue.Float())
 		case elemIntType:
-			sl.Index(i).SetInt(EnsureInt64(itemValue.Interface()))
+			sl.Index(i).SetInt(itemValue.Int())
 		case elemUintType:
-			sl.Index(i).SetUint(EnsureUint64(itemValue.Interface()))
+			sl.Index(i).SetUint(itemValue.Uint())
 		default:
 			SetValue(sl.Index(i), itemValue)
 		}
