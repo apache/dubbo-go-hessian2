@@ -1,5 +1,11 @@
 # Release Notes
 
+## v1.10.1
+
+### Bugfixes
+- support java integer null. [#296](https://github.com/apache/dubbo-go-hessian2/pull/296)
+- fix parse basic type bug. [#298](https://github.com/apache/dubbo-go-hessian2/pull/298)
+ 
 ## v1.10.0
 
 ### New Features
