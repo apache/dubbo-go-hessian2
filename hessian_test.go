@@ -106,8 +106,8 @@ func doTestResponse(t *testing.T, packageType PackageType, responseStatus byte, 
 		return
 	}
 
-	in, _ := EnsureInterface(UnpackPtrValue(EnsurePackValue(body)), nil)
-	out, _ := EnsureInterface(UnpackPtrValue(EnsurePackValue(decodedResponse.RspObj)), nil)
+	in := EnsureRawAny(UnpackPtrValue(EnsurePackValue(body)))
+	out := EnsureRawAny(UnpackPtrValue(EnsurePackValue(decodedResponse.RspObj)))
 	assert.Equal(t, in, out)
 }
 

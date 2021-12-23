@@ -207,15 +207,7 @@ func EnsureInterface(in interface{}, err error) (interface{}, error) {
 		return in, err
 	}
 
-	if v, ok := in.(reflect.Value); ok {
-		in = v.Interface()
-	}
-
-	if v, ok := in.(*_refHolder); ok {
-		in = v.value.Interface()
-	}
-
-	return in, nil
+	return EnsureRawAny(in), nil
 }
 
 // EnsureRawValue pack the interface with value, and make sure it's not a ref holder

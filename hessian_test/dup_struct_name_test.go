@@ -177,8 +177,8 @@ func checkResponseBody(t *testing.T, decodedResponse *hessian.Response, h *hessi
 		return
 	}
 
-	in, _ := hessian.EnsureInterface(hessian.UnpackPtrValue(hessian.EnsurePackValue(body)), nil)
-	out, _ := hessian.EnsureInterface(hessian.UnpackPtrValue(hessian.EnsurePackValue(decodedResponse.RspObj)), nil)
+	in := hessian.EnsureRawAny(hessian.UnpackPtrValue(hessian.EnsurePackValue(body)))
+	out := hessian.EnsureRawAny(hessian.UnpackPtrValue(hessian.EnsurePackValue(decodedResponse.RspObj)))
 	assert.Equal(t, in, out)
 }
 
