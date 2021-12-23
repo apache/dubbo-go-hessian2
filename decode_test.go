@@ -30,9 +30,14 @@ import (
 	"os/exec"
 	"reflect"
 	"testing"
+)
 
-	"github.com/apache/dubbo-go-hessian2/java_exception"
+import (
 	"github.com/stretchr/testify/assert"
+)
+
+import (
+	"github.com/apache/dubbo-go-hessian2/java_exception"
 )
 
 const (
