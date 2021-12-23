@@ -24,9 +24,7 @@ import (
 	"math"
 	"reflect"
 	"strings"
-)
 
-import (
 	perrors "github.com/pkg/errors"
 )
 
@@ -234,6 +232,31 @@ func EnsureRawValue(in interface{}) reflect.Value {
 		return v.value
 	}
 	return reflect.ValueOf(in)
+}
+
+// EnsureRawAny unpack if in is a reflect.Value or a ref holder.
+func EnsureRawAny(in interface{}) interface{} {
+	if v, ok := in.(reflect.Value); ok {
+		if !v.IsValid() {
+			return nil
+		}
+
+		in = v.Interface()
+	}
+
+	if v, ok := in.(*_refHolder); ok {
+		in = v.value
+	}
+
+	if v, ok := in.(reflect.Value); ok {
+		if !v.IsValid() {
+			return nil
+		}
+
+		in = v.Interface()
+	}
+
+	return in
 }
 
 // SetValue set the value to dest.

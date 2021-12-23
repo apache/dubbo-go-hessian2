@@ -30,14 +30,9 @@ import (
 	"os/exec"
 	"reflect"
 	"testing"
-)
 
-import (
-	"github.com/stretchr/testify/assert"
-)
-
-import (
 	"github.com/apache/dubbo-go-hessian2/java_exception"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -189,4 +184,52 @@ func TestIssue214(t *testing.T) {
 	}
 	t.Log(decode)
 	assert.True(t, reflect.DeepEqual(c, decode))
+}
+
+type Issue299Args1 struct {
+	Label string
+	Key   string
+}
+
+func (Issue299Args1) JavaClassName() string {
+	return "com.test.Issue299Args1"
+}
+
+type Issue299MockData struct {
+	Args []interface{}
+}
+
+func (Issue299MockData) JavaClassName() string {
+	return "com.test.Issue299MockData"
+}
+
+func TestIssue299HessianDecode(t *testing.T) {
+	RegisterPOJO(new(Issue299Args1))
+	RegisterPOJO(new(Issue299MockData))
+
+	d := &Issue299MockData{
+		Args: []interface{}{
+			[]*Issue299Args1{
+				{Label: "1", Key: "2"},
+			},
+		},
+	}
+
+	encoder := NewEncoder()
+	err := encoder.Encode(d)
+	if err != nil {
+		t.Errorf("encode obj error: %v", err)
+		return
+	}
+	decoder := NewDecoder(encoder.Buffer())
+	doInterface, err := decoder.Decode()
+	if err != nil {
+		t.Errorf("decode obj error: %v", err)
+		return
+	}
+	do := doInterface.(*Issue299MockData)
+	if !reflect.DeepEqual(d, do) {
+		t.Errorf("not equal d: %+v, do: %+v", d, do)
+		return
+	}
 }
