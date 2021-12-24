@@ -1,5 +1,10 @@
 # Release Notes
 
+## v1.10.2
+
+### Bugfixes
+- fix list value not unpacked. [#300](https://github.com/apache/dubbo-go-hessian2/pull/300)
+
 ## v1.10.1
 
 ### Bugfixes
