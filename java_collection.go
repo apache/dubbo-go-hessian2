@@ -104,10 +104,7 @@ func (d *Decoder) decodeCollection(length int, listTyp string) (interface{}, err
 	if err != nil {
 		return nil, err
 	}
-	listInterface, err := EnsureInterface(list, nil)
-	if err != nil {
-		return nil, err
-	}
+	listInterface := EnsureRawAny(list)
 	listV, listOk := listInterface.([]interface{})
 	if !listOk {
 		return nil, perrors.New("collection deserialize err " + listTyp)

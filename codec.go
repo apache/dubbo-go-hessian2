@@ -209,15 +209,7 @@ func EnsureInterface(in interface{}, err error) (interface{}, error) {
 		return in, err
 	}
 
-	if v, ok := in.(reflect.Value); ok {
-		in = v.Interface()
-	}
-
-	if v, ok := in.(*_refHolder); ok {
-		in = v.value.Interface()
-	}
-
-	return in, nil
+	return EnsureRawAny(in), nil
 }
 
 // EnsureRawValue pack the interface with value, and make sure it's not a ref holder
@@ -234,6 +226,31 @@ func EnsureRawValue(in interface{}) reflect.Value {
 		return v.value
 	}
 	return reflect.ValueOf(in)
+}
+
+// EnsureRawAny unpack if in is a reflect.Value or a ref holder.
+func EnsureRawAny(in interface{}) interface{} {
+	if v, ok := in.(reflect.Value); ok {
+		if !v.IsValid() {
+			return nil
+		}
+
+		in = v.Interface()
+	}
+
+	if v, ok := in.(*_refHolder); ok {
+		in = v.value
+	}
+
+	if v, ok := in.(reflect.Value); ok {
+		if !v.IsValid() {
+			return nil
+		}
+
+		in = v.Interface()
+	}
+
+	return in
 }
 
 // SetValue set the value to dest.

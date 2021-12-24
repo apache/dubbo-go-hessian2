@@ -428,7 +428,7 @@ func (d *Decoder) readUntypedList(tag byte) (interface{}, error) {
 			}
 			holder.change(aryValue)
 		} else {
-			ary[j] = it
+			ary[j] = EnsureRawAny(it)
 		}
 	}
 
