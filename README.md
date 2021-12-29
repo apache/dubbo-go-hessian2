@@ -368,14 +368,8 @@ type Dog struct {
 }
 ```
 
-
-
 ## Tools
 
 ###  tools/gen-go-enum
 
 A tool for generate hessian2 java enum define golang code. If u wanna know how to use it, pls enter dir 'tools/gen-go-enum' and read the readme carefully.
-
-
-
-
