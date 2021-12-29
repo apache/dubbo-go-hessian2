@@ -223,7 +223,7 @@ func TestIssue299HessianDecode(t *testing.T) {
 			"interface_slice": []interface{}{
 				"MyName",
 			},
-			"interface_map": map[string]interface{}{
+			"interface_map": map[interface{}]interface{}{
 				"k1": "v1",
 			},
 		},
