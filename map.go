@@ -206,8 +206,8 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 		if err != nil {
 			return perrors.WithStack(err)
 		}
-		// TODO map value may be a ref object
-		m.Elem().SetMapIndex(EnsurePackValue(entryKey), EnsurePackValue(entryValue))
+
+		m.Elem().SetMapIndex(EnsurePackValue(entryKey), EnsureRawValue(entryValue))
 	}
 
 	SetValue(value, m)
