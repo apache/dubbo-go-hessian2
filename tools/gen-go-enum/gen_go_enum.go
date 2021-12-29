@@ -190,14 +190,14 @@ func init() {
 	flag.StringVar(&targetFile, "o", "", "")
 
 	flag.Usage = func() {
-		fmt.Println(usage)
+		fmt.Print(usage)
 	}
 }
 
 func main() {
 	flag.Parse()
 
-	if className == "" || len(enumValues) < 0 {
+	if className == "" || len(enumValues) == 0 {
 		flag.Usage()
 		return
 	}
