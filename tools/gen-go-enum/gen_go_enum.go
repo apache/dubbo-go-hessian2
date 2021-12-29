@@ -100,7 +100,7 @@ Usage: gen-go-enum -c java_classname [-p golang_package_name] [-e golang_enum_na
 Options
   -c	java class name (eg: com.test.enums.TestEnum)
   -p	golang package name, use 'enum' when not specified (eg: TestEnum)
-  -e	golang enum type name, use java class name when not specified (eg: TestEnum)
+  -e	golang enum type name, use java class name when not specified (eg: test_enums)
   -v	java enum values, can specify multiple (eg: -v TEST1 -v TEST2 -v TEST3)
   -o 	golang code file path, stored in the current directory when not specified
 
