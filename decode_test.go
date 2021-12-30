@@ -201,7 +201,8 @@ func (Issue299Args1) JavaClassName() string {
 }
 
 type Issue299MockData struct {
-	Args []interface{}
+	SliceArgs []interface{}
+	MapArgs   map[string]interface{}
 }
 
 func (Issue299MockData) JavaClassName() string {
@@ -213,9 +214,17 @@ func TestIssue299HessianDecode(t *testing.T) {
 	RegisterPOJO(new(Issue299MockData))
 
 	d := &Issue299MockData{
-		Args: []interface{}{
+		SliceArgs: []interface{}{
 			[]*Issue299Args1{
 				{Label: "1", Key: "2"},
+			},
+		},
+		MapArgs: map[string]interface{}{
+			"interface_slice": []interface{}{
+				"MyName",
+			},
+			"interface_map": map[interface{}]interface{}{
+				"k1": "v1",
 			},
 		},
 	}
@@ -234,7 +243,7 @@ func TestIssue299HessianDecode(t *testing.T) {
 	}
 	do := doInterface.(*Issue299MockData)
 	if !reflect.DeepEqual(d, do) {
-		t.Errorf("not equal d: %+v, do: %+v", d, do)
+		t.Errorf("not equal d: %#v, do: %#v", d, do)
 		return
 	}
 }
