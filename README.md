@@ -367,3 +367,9 @@ type Dog struct {
 	*Animal
 }
 ```
+
+## Tools
+
+###  tools/gen-go-enum
+
+A tool for generate hessian2 java enum define golang code. Read more [details](tools/gen-go-enum/README.md).
