@@ -146,6 +146,9 @@ func (d *Decoder) decDouble(flag int32) (interface{}, error) {
 		var f64 float64
 		err = binary.Read(d.reader, binary.BigEndian, &f64)
 		return f64, perrors.WithStack(err)
+
+	case BC_NULL:
+		return float64(0), nil
 	}
 
 	return nil, perrors.Errorf("decDouble parse double wrong tag:%d-%#x", int(tag), tag)
