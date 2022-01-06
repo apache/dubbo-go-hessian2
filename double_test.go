@@ -18,6 +18,7 @@
 package hessian
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -69,7 +70,35 @@ func TestIssue181(t *testing.T) {
 	t.Logf("decode(%v) = %v\n", v, res)
 }
 
+func TestDoubleNull(t *testing.T) {
+	var (
+		v   float32
+		err error
+		d   *Decoder
+		res interface{}
+	)
+
+	// Double type with null value
+	d = NewDecoder([]byte{'C', 'N'})
+	res, err = d.Decode()
+	if err != nil {
+		t.Errorf("get error when decode %v", err)
+		return
+	}
+	f, ok := res.(float64)
+	if !ok {
+		t.Errorf("float64 is expected but %v", reflect.TypeOf(res))
+		return
+	}
+	if float32(f) != 0.0 {
+		t.Errorf("expect float32")
+		return
+	}
+	t.Logf("decode(%v) = %v\n", v, res)
+}
+
 func TestDouble(t *testing.T) {
+	testDecodeFramework(t, "replyNull", nil)
 	testDecodeFramework(t, "replyDouble_0_0", 0.0)
 	testDecodeFramework(t, "replyDouble_0_001", 0.001)
 	testDecodeFramework(t, "replyDouble_1_0", 1.0)
@@ -108,4 +137,18 @@ func TestDoublePrtEncode(t *testing.T) {
 	)
 	testSimpleEncode(t, &f0)
 	testSimpleEncode(t, &f1)
+}
+
+type score struct {
+	Score float64
+	Name  string
+}
+
+func (s score) JavaClassName() string {
+	return "test.Score"
+}
+
+func TestDecodeDoubleHasNull(t *testing.T) {
+	RegisterPOJO(&score{})
+	testDecodeFramework(t, "customReplyTypedDoubleHasNull", &score{Score: 0, Name: "DoubleWithNull"})
 }

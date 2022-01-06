@@ -693,6 +693,35 @@ public class TestCustomReply {
         output.writeObject(map);
         output.flush();
     }
+
+    public void customReplyTypedDoubleHasNull() throws Exception {
+
+        Score s = new Score();
+        s.setScore(null);
+        s.setName("DoubleWithNull");
+        output.writeObject(s);
+        output.flush();
+    }
+}
+
+class Score implements Serializable {
+    private Double score;
+    private String name;
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getName() {
+        return this.name;
+    }
+
+    public void setScore(Double score) {
+        this.score = score;
+    }
+
+    public Double getScore() {
+        return this.score;
+    }
 }
 
 interface Leg {
