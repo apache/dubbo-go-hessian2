@@ -1,5 +1,14 @@
 # Release Notes
 
+## v1.10.3
+
+### New Features
+- add a tool for generate hessian2 java enum define golang code. [#304](https://github.com/apache/dubbo-go-hessian2/pull/304)
+
+### Bugfixes
+- fix decode interface map bug. [#303](https://github.com/apache/dubbo-go-hessian2/pull/303)
+- fix decode bool error. [#302](https://github.com/apache/dubbo-go-hessian2/pull/302)
+
 ## v1.10.2
 
 ### Bugfixes
