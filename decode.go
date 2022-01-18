@@ -64,7 +64,7 @@ func NewDecoder(b []byte) *Decoder {
 	return &Decoder{reader: bufio.NewReader(bytes.NewReader(b)), typeRefs: &TypeRefs{records: map[string]bool{}}}
 }
 
-// NewStrictDecoder generate a strict mode decoder instance.
+// NewStrictDecoder generates a strict mode decoder instance.
 // In strict mode, all target class must be registered.
 func NewStrictDecoder(b []byte) *Decoder {
 	return &Decoder{
