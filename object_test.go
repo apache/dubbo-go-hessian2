@@ -245,9 +245,9 @@ func TestDecClassToMap(t *testing.T) {
 	t.Logf("worker1: %v", worker1)
 
 	e := NewEncoder()
-	err := e.Encode(worker1)
-	if err != nil {
-		t.Fatalf("encode(worker:%#v) = error:%s", worker1, err)
+	encErr := e.Encode(worker1)
+	if encErr != nil {
+		t.Fatalf("encode(worker:%#v) = error:%s", worker1, encErr)
 	}
 	data := e.Buffer()
 	t.Logf("data: %s", data)
@@ -266,6 +266,7 @@ func TestDecClassToMap(t *testing.T) {
 		t.Error("after unregister pojo, decoding should return error for strict mode")
 		t.FailNow()
 	}
+	assert.Nil(t, res)
 
 	// non-strict mode
 	d = NewDecoder(data)
