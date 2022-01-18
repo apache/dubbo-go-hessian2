@@ -321,6 +321,49 @@ func TestDecClassToMap(t *testing.T) {
 	}
 }
 
+func TestEncodeMapToObject(t *testing.T) {
+	name := &UserName{
+		FirstName: "John",
+		LastName:  "Doe",
+	}
+
+	RegisterPOJO(name)
+
+	// note: the first letter of the keys MUST lowercase.
+	m := map[string]interface{}{
+		"firstName": "John",
+		"lastName":  "Doe",
+	}
+
+	e := NewEncoder()
+	encErr := e.EncodeMapAsClass(name.JavaClassName(), m)
+	if encErr != nil {
+		t.Error(encErr)
+		t.FailNow()
+	}
+
+	res := mustDecodeObject(t, e.Buffer())
+	assert.True(t, reflect.DeepEqual(name, res))
+
+	// note: the map contains the class key.
+	m = map[string]interface{}{
+		ClassKey:    name.JavaClassName(),
+		"firstName": "John",
+		"lastName":  "Doe",
+	}
+
+	// try to encode again
+	e = NewEncoder()
+	encErr = e.EncodeMapClass(m)
+	if encErr != nil {
+		t.Error(encErr)
+		t.FailNow()
+	}
+
+	res = mustDecodeObject(t, e.Buffer())
+	assert.True(t, reflect.DeepEqual(name, res))
+}
+
 type A0 struct{}
 
 // JavaClassName  java fully qualified path

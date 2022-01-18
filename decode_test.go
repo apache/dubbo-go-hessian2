@@ -145,6 +145,16 @@ func testDecodeFrameworkFunc(t *testing.T, method string, expected func(interfac
 	expected(r)
 }
 
+func mustDecodeObject(t *testing.T, b []byte) interface{} {
+	d := NewDecoder(b)
+	res, err := d.Decode()
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	return res
+}
+
 func TestUserDefindeException(t *testing.T) {
 	expect := &UnknownException{
 		DetailMessage: "throw UserDefindException",

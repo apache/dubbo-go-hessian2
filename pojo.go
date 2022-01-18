@@ -105,6 +105,19 @@ var (
 	javaEnumType = reflect.TypeOf((*POJOEnum)(nil)).Elem()
 )
 
+// initDefBuffer initial the class definition buffer, which can be used repeatedly.
+func (c *ClassInfo) initDefBuffer() {
+	if len(c.buffer) == 0 {
+		c.buffer = encByte(c.buffer, BC_OBJECT_DEF)
+		c.buffer = encString(c.buffer, c.javaName)
+		c.buffer = encInt32(c.buffer, int32(len(c.fieldNameList)))
+
+		for _, fieldName := range c.fieldNameList {
+			c.buffer = encString(c.buffer, fieldName)
+		}
+	}
+}
+
 // struct parsing
 func showPOJORegistry() {
 	pojoRegistry.Lock()
@@ -435,4 +448,31 @@ func lowerCamelCase(s string) string {
 	runes := []rune(s)
 	runes[0] = unicode.ToLower(runes[0])
 	return string(runes)
+}
+
+// buildMapClassDef build ClassInfo from map keys.
+func buildMapClassDef(javaName string, m map[string]interface{}) (*ClassInfo, error) {
+	if javaName == "" {
+		var ok bool
+		javaName, ok = m[ClassKey].(string)
+		if !ok {
+			return nil, perrors.Errorf("no java name to build class info from map: %v", m)
+		}
+	}
+
+	info := &ClassInfo{javaName: javaName}
+
+	_, existClassKey := m[ClassKey]
+
+	for fieldName := range m {
+		if existClassKey && fieldName == ClassKey {
+			continue
+		}
+
+		info.fieldNameList = append(info.fieldNameList, fieldName)
+	}
+
+	info.initDefBuffer()
+
+	return info, nil
 }

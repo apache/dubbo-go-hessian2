@@ -227,16 +227,24 @@ func (e *Encoder) EncodeMapClass(m map[string]interface{}) error {
 // EncodeMapAsClass encode a map as object of given class name.
 func (e *Encoder) EncodeMapAsClass(className string, m map[string]interface{}) error {
 	idx := e.classIndex(className)
+
 	if idx == -1 {
+		var clsDef *ClassInfo
 		s, ok := getStructInfo(className)
-		if !ok {
-			return perrors.Errorf("no class def found: %s", className)
+		if ok {
+			clsDef = pojoRegistry.classInfoList[s.index]
+		} else {
+			var err error
+			clsDef, err = buildMapClassDef(className, m)
+			if err != nil {
+				return err
+			}
 		}
 		idx = len(e.classInfoList)
-		clsDef := pojoRegistry.classInfoList[s.index]
 		e.classInfoList = append(e.classInfoList, clsDef)
 		e.buffer = append(e.buffer, clsDef.buffer...)
 	}
+
 	return e.encodeMapAsIndexedClass(idx, m)
 }
 
@@ -248,6 +256,9 @@ func (e *Encoder) EncodeMapAsObject(clsDef *ClassInfo, m map[string]interface{})
 	if idx == -1 {
 		idx = len(e.classInfoList)
 		e.classInfoList = append(e.classInfoList, clsDef)
+		if len(clsDef.buffer) == 0 {
+			clsDef.initDefBuffer()
+		}
 		e.buffer = append(e.buffer, clsDef.buffer...)
 	}
 	return e.encodeMapAsIndexedClass(idx, m)
