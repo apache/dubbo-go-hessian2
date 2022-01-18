@@ -28,7 +28,7 @@ import (
 
 var exceptionCheckMutex sync.Mutex
 
-func checkAndGetException(cls *classInfo) (*structInfo, bool) {
+func checkAndGetException(cls *ClassInfo) (*structInfo, bool) {
 	if len(cls.fieldNameList) < 4 {
 		return nil, false
 	}

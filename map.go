@@ -20,9 +20,7 @@ package hessian
 import (
 	"io"
 	"reflect"
-)
 
-import (
 	perrors "github.com/pkg/errors"
 )
 
@@ -108,6 +106,13 @@ func (e *Encoder) encMap(m interface{}) error {
 	if n, ok := e.checkRefMap(value); ok {
 		e.buffer = encRef(e.buffer, n)
 		return nil
+	}
+
+	// check whether it should encode the map as class.
+	if mm, ok := m.(map[string]interface{}); ok {
+		if _, ok = mm[ClassKey]; ok {
+			return e.EncodeMapClass(mm)
+		}
 	}
 
 	value = UnpackPtrValue(value)

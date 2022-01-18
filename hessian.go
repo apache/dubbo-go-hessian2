@@ -74,7 +74,7 @@ func NewHessianCodec(reader *bufio.Reader) *HessianCodec {
 	}
 }
 
-// NewHessianCodec generate a new hessian codec instance
+// NewHessianCodecCustom generate a new hessian codec instance.
 func NewHessianCodecCustom(pkgType PackageType, reader *bufio.Reader, bodyLen int) *HessianCodec {
 	return &HessianCodec{
 		pkgType: pkgType,
@@ -129,15 +129,15 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 		return perrors.Errorf("serialization ID:%v", header.SerialID)
 	}
 
-	flag := buf[2] & FLAG_EVENT
-	if flag != Zero {
+	headerFlag := buf[2] & FLAG_EVENT
+	if headerFlag != Zero {
 		header.Type |= PackageHeartbeat
 	}
-	flag = buf[2] & FLAG_REQUEST
-	if flag != Zero {
+	headerFlag = buf[2] & FLAG_REQUEST
+	if headerFlag != Zero {
 		header.Type |= PackageRequest
-		flag = buf[2] & FLAG_TWOWAY
-		if flag != Zero {
+		headerFlag = buf[2] & FLAG_TWOWAY
+		if headerFlag != Zero {
 			header.Type |= PackageRequest_TwoWay
 		}
 	} else {
@@ -197,7 +197,7 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 	case PackageRequest | PackageHeartbeat, PackageResponse | PackageHeartbeat:
 	case PackageRequest:
 		if rspObj != nil {
-			if err = unpackRequestBody(NewDecoder(buf[:]), rspObj); err != nil {
+			if err = unpackRequestBody(NewStrictDecoder(buf[:]), rspObj); err != nil {
 				return perrors.WithStack(err)
 			}
 		}
@@ -212,7 +212,7 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 	return nil
 }
 
-// ignore body, but only read attachments
+// ReadAttachments ignore body, but only read attachments
 func (h *HessianCodec) ReadAttachments() (map[string]string, error) {
 	if h.reader.Buffered() < h.bodyLen {
 		return nil, ErrBodyNotEnough

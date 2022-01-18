@@ -34,8 +34,23 @@ type Decoder struct {
 	refs   []interface{}
 	// record type refs, both list and map need it
 	typeRefs      *TypeRefs
-	classInfoList []*classInfo
+	classInfoList []*ClassInfo
 	isSkip        bool
+
+	// In strict mode, a class data can be decoded only when the class is registered, otherwise error returned.
+	// In non-strict mode, a class data will be decoded to a map when the class is not registered.
+	// The default is non-strict mode, user can change it as required.
+	Strict bool
+}
+
+// FindClassInfo find ClassInfo for the given name in decoder class info list.
+func (d *Decoder) FindClassInfo(javaName string) *ClassInfo {
+	for _, info := range d.classInfoList {
+		if info.javaName == javaName {
+			return info
+		}
+	}
+	return nil
 }
 
 // Error part
@@ -47,6 +62,16 @@ var (
 // NewDecoder generate a decoder instance
 func NewDecoder(b []byte) *Decoder {
 	return &Decoder{reader: bufio.NewReader(bytes.NewReader(b)), typeRefs: &TypeRefs{records: map[string]bool{}}}
+}
+
+// NewStrictDecoder generate a strict mode decoder instance.
+// In strict mode, all target class must be registered.
+func NewStrictDecoder(b []byte) *Decoder {
+	return &Decoder{
+		reader:   bufio.NewReader(bytes.NewReader(b)),
+		typeRefs: &TypeRefs{records: map[string]bool{}},
+		Strict:   true,
+	}
 }
 
 // NewDecoderSize generate a decoder instance.

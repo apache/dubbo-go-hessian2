@@ -32,6 +32,8 @@ import (
 // invalid consts
 const (
 	InvalidJavaEnum JavaEnum = -1
+
+	ClassKey = "_class"
 )
 
 // struct filed tag of hessian
@@ -72,7 +74,7 @@ type JavaEnumClass struct {
 	name string
 }
 
-type classInfo struct {
+type ClassInfo struct {
 	javaName      string
 	fieldNameList []string
 	buffer        []byte // encoded buffer
@@ -89,7 +91,7 @@ type structInfo struct {
 // POJORegistry pojo registry struct
 type POJORegistry struct {
 	sync.RWMutex
-	classInfoList []*classInfo           // {class name, field name list...} list
+	classInfoList []*ClassInfo           // {class name, field name list...} list
 	j2g           map[string]string      // java class name --> go struct name
 	registry      map[string]*structInfo // go class name --> go struct info
 }
@@ -140,7 +142,7 @@ func RegisterPOJOMapping(javaClassName string, o interface{}) int {
 		bBody     []byte
 		fieldList []string
 		sttInfo   structInfo
-		clsDef    classInfo
+		clsDef    ClassInfo
 	)
 
 	sttInfo.typ = obtainValueType(o)
@@ -199,9 +201,9 @@ func RegisterPOJOMapping(javaClassName string, o interface{}) int {
 	bHeader = encInt32(bHeader, int32(len(fieldList)))
 
 	// prepare classDef
-	clsDef = classInfo{javaName: sttInfo.javaName, fieldNameList: fieldList}
+	clsDef = ClassInfo{javaName: sttInfo.javaName, fieldNameList: fieldList}
 
-	// merge header and body of objectDef into buffer of classInfo
+	// merge header and body of objectDef into buffer of ClassInfo
 	clsDef.buffer = append(bHeader, bBody...)
 
 	sttInfo.index = len(pojoRegistry.classInfoList)
@@ -227,14 +229,14 @@ func unRegisterPOJO(o POJO) int {
 
 	goName := GetGoType(o)
 
-	if structInfo, ok := pojoRegistry.registry[goName]; ok {
-		delete(pojoRegistry.j2g, structInfo.javaName)
-		listTypeNameMapper.Delete(structInfo.goName)
+	if pojoStructInfo, ok := pojoRegistry.registry[goName]; ok {
+		delete(pojoRegistry.j2g, pojoStructInfo.javaName)
+		listTypeNameMapper.Delete(pojoStructInfo.goName)
 		// remove registry cache.
-		delete(pojoRegistry.registry, structInfo.goName)
+		delete(pojoRegistry.registry, pojoStructInfo.goName)
 		// don't remove registry classInfoList,
 		// indexes of registered pojo may be affected.
-		return structInfo.index
+		return pojoStructInfo.index
 	}
 
 	return -1
@@ -300,7 +302,7 @@ func RegisterJavaEnum(o POJOEnum) int {
 		f  string
 		l  []string
 		t  structInfo
-		c  classInfo
+		c  ClassInfo
 		v  reflect.Value
 	)
 
@@ -331,7 +333,7 @@ func RegisterJavaEnum(o POJOEnum) int {
 		l = append(l, f)
 		b = encString(b, f)
 
-		c = classInfo{javaName: t.javaName, fieldNameList: l}
+		c = ClassInfo{javaName: t.javaName, fieldNameList: l}
 		c.buffer = append(c.buffer, b[:]...)
 		t.index = len(pojoRegistry.classInfoList)
 		pojoRegistry.classInfoList = append(pojoRegistry.classInfoList, &c)
@@ -369,27 +371,22 @@ func loadPOJORegistry(v interface{}) (*structInfo, bool) {
 
 // @typeName is class's java name
 func getStructInfo(javaName string) (*structInfo, bool) {
-	var (
-		ok bool
-		g  string
-		s  *structInfo
-	)
-
 	pojoRegistry.RLock()
-	g, ok = pojoRegistry.j2g[javaName]
-	if ok {
-		s, ok = pojoRegistry.registry[g]
-	}
-	pojoRegistry.RUnlock()
+	defer pojoRegistry.RUnlock()
 
-	return s, ok
+	if g, ok := pojoRegistry.j2g[javaName]; ok {
+		s, b := pojoRegistry.registry[g]
+		return s, b
+	}
+
+	return nil, false
 }
 
-func getStructDefByIndex(idx int) (reflect.Type, *classInfo, error) {
+func getStructDefByIndex(idx int) (reflect.Type, *ClassInfo, error) {
 	var (
 		ok      bool
 		clsName string
-		cls     *classInfo
+		cls     *ClassInfo
 		s       *structInfo
 	)
 
