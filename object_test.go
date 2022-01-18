@@ -327,8 +327,6 @@ func TestEncodeMapToObject(t *testing.T) {
 		LastName:  "Doe",
 	}
 
-	RegisterPOJO(name)
-
 	// note: the first letter of the keys MUST lowercase.
 	m := map[string]interface{}{
 		"firstName": "John",
@@ -342,8 +340,13 @@ func TestEncodeMapToObject(t *testing.T) {
 		t.FailNow()
 	}
 
+	// register for decode map to object.
+	RegisterPOJO(name)
 	res := mustDecodeObject(t, e.Buffer())
 	assert.True(t, reflect.DeepEqual(name, res))
+
+	// unregister for encode map again.
+	UnRegisterPOJOs(name)
 
 	// note: the map contains the class key.
 	m = map[string]interface{}{
@@ -360,6 +363,8 @@ func TestEncodeMapToObject(t *testing.T) {
 		t.FailNow()
 	}
 
+	// register for decode map to object.
+	RegisterPOJO(name)
 	res = mustDecodeObject(t, e.Buffer())
 	assert.True(t, reflect.DeepEqual(name, res))
 }
