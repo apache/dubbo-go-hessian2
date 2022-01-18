@@ -368,6 +368,20 @@ type Dog struct {
 }
 ```
 
+## Strict Mode
+
+Default, hessian2 will decode an object to map if it's not being registered.
+If you don't want that, change the decoder to strict mode as following, 
+and it will return error when meeting unregistered object.
+
+```go
+e := hessian.NewDecoder(bytes)
+e.Strict = true // set to strict mode, default is false
+
+// or 
+e := hessian.NewStrictDecoder(bytes)
+```
+
 ## Tools
 
 ###  tools/gen-go-enum

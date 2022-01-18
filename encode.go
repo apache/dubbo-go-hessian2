@@ -33,9 +33,19 @@ import (
 
 // Encoder struct
 type Encoder struct {
-	classInfoList []*classInfo
+	classInfoList []*ClassInfo
 	buffer        []byte
 	refMap        map[unsafe.Pointer]_refElem
+}
+
+// classIndex find the index of the given java name in encoder class info list.
+func (e *Encoder) classIndex(javaName string) int {
+	for i := range e.classInfoList {
+		if javaName == e.classInfoList[i].javaName {
+			return i
+		}
+	}
+	return -1
 }
 
 // NewEncoder generate an encoder instance

@@ -49,10 +49,9 @@ type JavaSqlTimeSerializer struct{}
 // nolint
 func (JavaSqlTimeSerializer) EncObject(e *Encoder, vv POJO) error {
 	var (
-		i         int
 		idx       int
 		err       error
-		clsDef    *classInfo
+		clsDef    *ClassInfo
 		className string
 		ptrV      reflect.Value
 	)
@@ -78,13 +77,8 @@ func (JavaSqlTimeSerializer) EncObject(e *Encoder, vv POJO) error {
 	}
 
 	// write object definition
-	idx = -1
-	for i = range e.classInfoList {
-		if v.JavaClassName() == e.classInfoList[i].javaName {
-			idx = i
-			break
-		}
-	}
+	idx = e.classIndex(v.JavaClassName())
+
 	if idx == -1 {
 		idx, ok = checkPOJORegistry(vv)
 		if !ok {
@@ -114,7 +108,7 @@ func (JavaSqlTimeSerializer) EncObject(e *Encoder, vv POJO) error {
 }
 
 // nolint
-func (JavaSqlTimeSerializer) DecObject(d *Decoder, typ reflect.Type, cls *classInfo) (interface{}, error) {
+func (JavaSqlTimeSerializer) DecObject(d *Decoder, typ reflect.Type, cls *ClassInfo) (interface{}, error) {
 	if typ.Kind() != reflect.Struct {
 		return nil, perrors.Errorf("wrong type expect Struct but get:%s", typ.String())
 	}

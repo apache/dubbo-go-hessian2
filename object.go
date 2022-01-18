@@ -103,7 +103,7 @@ func (e *Encoder) encObject(v interface{}) error {
 		idx    int
 		num    int
 		err    error
-		clsDef *classInfo
+		clsDef *ClassInfo
 	)
 	pojo, isPojo := v.(POJO)
 	// get none pojo JavaClassName
@@ -209,6 +209,82 @@ func (e *Encoder) encObject(v interface{}) error {
 	return nil
 }
 
+// EncodeMapClass encode a map as object, which MUST contains a key _class and its value is the target class name.
+func (e *Encoder) EncodeMapClass(m map[string]interface{}) error {
+	clsName, ok := m[ClassKey]
+	if !ok {
+		return perrors.New("no _class key map")
+	}
+
+	className, ok := clsName.(string)
+	if !ok {
+		return perrors.Errorf("expect string class name, but get %v", reflect.TypeOf(clsName))
+	}
+
+	return e.EncodeMapAsClass(className, m)
+}
+
+// EncodeMapAsClass encode a map as object of given class name.
+func (e *Encoder) EncodeMapAsClass(className string, m map[string]interface{}) error {
+	idx := e.classIndex(className)
+
+	if idx == -1 {
+		var clsDef *ClassInfo
+		s, ok := getStructInfo(className)
+		if ok {
+			clsDef = pojoRegistry.classInfoList[s.index]
+		} else {
+			var err error
+			clsDef, err = buildMapClassDef(className, m)
+			if err != nil {
+				return err
+			}
+		}
+		idx = len(e.classInfoList)
+		e.classInfoList = append(e.classInfoList, clsDef)
+		e.buffer = append(e.buffer, clsDef.buffer...)
+	}
+
+	return e.encodeMapAsIndexedClass(idx, m)
+}
+
+// EncodeMapAsObject encode a map as the given class defined object.
+// Sometimes a class may not being registered in hessian, but it can be decoded from serialized data,
+// and the ClassInfo can be found in Decoder by calling Decoder.FindClassInfo.
+func (e *Encoder) EncodeMapAsObject(clsDef *ClassInfo, m map[string]interface{}) error {
+	idx := e.classIndex(clsDef.javaName)
+	if idx == -1 {
+		idx = len(e.classInfoList)
+		e.classInfoList = append(e.classInfoList, clsDef)
+		if len(clsDef.buffer) == 0 {
+			clsDef.initDefBuffer()
+		}
+		e.buffer = append(e.buffer, clsDef.buffer...)
+	}
+	return e.encodeMapAsIndexedClass(idx, m)
+}
+
+// encodeMapAsIndexedClass encode a map as the defined class at the given index in the encoder class list.
+func (e *Encoder) encodeMapAsIndexedClass(idx int, m map[string]interface{}) error {
+	// write object instance
+	if byte(idx) <= OBJECT_DIRECT_MAX {
+		e.buffer = encByte(e.buffer, byte(idx)+BC_OBJECT_DIRECT)
+	} else {
+		e.buffer = encByte(e.buffer, BC_OBJECT)
+		e.buffer = encInt32(e.buffer, int32(idx))
+	}
+
+	cls := e.classInfoList[idx]
+	var err error
+	for i := 0; i < len(cls.fieldNameList); i++ {
+		fieldName := cls.fieldNameList[i]
+		if err = e.Encode(m[fieldName]); err != nil {
+			return perrors.Wrapf(err, "failed to encode field: %s, %+v", fieldName, m[fieldName])
+		}
+	}
+	return nil
+}
+
 /////////////////////////////////////////
 // Object
 /////////////////////////////////////////
@@ -304,7 +380,7 @@ func (d *Decoder) decClassDef() (interface{}, error) {
 		fieldList[i] = fieldName
 	}
 
-	return &classInfo{javaName: clsName, fieldNameList: fieldList}, nil
+	return &ClassInfo{javaName: clsName, fieldNameList: fieldList}, nil
 }
 
 type fieldInfo struct {
@@ -374,7 +450,7 @@ func findField(name string, typ reflect.Type) ([]int, *reflect.StructField, erro
 	return []int{}, nil, perrors.Errorf("failed to find field %s", name)
 }
 
-func (d *Decoder) decInstance(typ reflect.Type, cls *classInfo) (interface{}, error) {
+func (d *Decoder) decInstance(typ reflect.Type, cls *ClassInfo) (interface{}, error) {
 	if typ.Kind() != reflect.Struct {
 		return nil, perrors.Errorf("wrong type expect Struct but get:%s", typ.String())
 	}
@@ -553,14 +629,14 @@ func (d *Decoder) decInstance(typ reflect.Type, cls *classInfo) (interface{}, er
 	return vRef.Interface(), nil
 }
 
-func (d *Decoder) appendClsDef(cd *classInfo) {
+func (d *Decoder) appendClsDef(cd *ClassInfo) {
 	d.classInfoList = append(d.classInfoList, cd)
 }
 
-func (d *Decoder) getStructDefByIndex(idx int) (reflect.Type, *classInfo, error) {
+func (d *Decoder) getStructDefByIndex(idx int) (reflect.Type, *ClassInfo, error) {
 	var (
 		ok  bool
-		cls *classInfo
+		cls *ClassInfo
 		s   *structInfo
 		err error
 	)
@@ -575,7 +651,7 @@ func (d *Decoder) getStructDefByIndex(idx int) (reflect.Type, *classInfo, error)
 		if s, ok = checkAndGetException(cls); ok {
 			return s.typ, cls, nil
 		}
-		if !d.isSkip {
+		if !d.isSkip && d.Strict {
 			err = perrors.Errorf("can not find go type name %s in registry", cls.javaName)
 		}
 		return nil, cls, err
@@ -607,13 +683,13 @@ func (d *Decoder) decEnum(javaName string, flag int32) (JavaEnum, error) {
 }
 
 // skip this object
-func (d *Decoder) skip(cls *classInfo) error {
-	len := len(cls.fieldNameList)
-	if len < 1 {
+func (d *Decoder) skip(cls *ClassInfo) error {
+	fieldLen := len(cls.fieldNameList)
+	if fieldLen < 1 {
 		return nil
 	}
 
-	for i := 0; i < len; i++ {
+	for i := 0; i < fieldLen; i++ {
 		// skip class fields.
 		if _, err := d.DecodeValue(); err != nil {
 			return err
@@ -629,7 +705,7 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 		idx int32
 		err error
 		typ reflect.Type
-		cls *classInfo
+		cls *ClassInfo
 	)
 
 	if flag != TAG_READ {
@@ -648,7 +724,7 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 		if decErr != nil {
 			return nil, perrors.Wrap(decErr, "decObject->decClassDef byte double")
 		}
-		cls, _ = clsDef.(*classInfo)
+		cls, _ = clsDef.(*ClassInfo)
 		// add to slice
 		d.appendClsDef(cls)
 
@@ -665,7 +741,10 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 			return nil, err
 		}
 		if typ == nil {
-			return nil, d.skip(cls)
+			if d.isSkip {
+				return nil, d.skip(cls)
+			}
+			return d.decClassToMap(cls)
 		}
 		if typ.Implements(javaEnumType) {
 			return d.decEnum(cls.javaName, TAG_READ)
@@ -683,7 +762,10 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 			return nil, err
 		}
 		if typ == nil {
-			return nil, d.skip(cls)
+			if d.isSkip {
+				return nil, d.skip(cls)
+			}
+			return d.decClassToMap(cls)
 		}
 		if typ.Implements(javaEnumType) {
 			return d.decEnum(cls.javaName, TAG_READ)
@@ -698,4 +780,23 @@ func (d *Decoder) decObject(flag int32) (interface{}, error) {
 	default:
 		return nil, perrors.Errorf("decObject illegal object type tag:%+v", tag)
 	}
+}
+
+func (d *Decoder) decClassToMap(cls *ClassInfo) (interface{}, error) {
+	vMap := make(map[string]interface{}, len(cls.fieldNameList))
+	vMap[ClassKey] = cls.javaName
+
+	d.appendRefs(vMap)
+
+	for i := 0; i < len(cls.fieldNameList); i++ {
+		fieldName := cls.fieldNameList[i]
+
+		fieldValue, decErr := d.DecodeValue()
+		if decErr != nil {
+			return nil, perrors.Wrapf(decErr, "decClassToMap -> decode field name:%s", fieldName)
+		}
+		vMap[fieldName] = EnsureRawAny(fieldValue)
+	}
+
+	return vMap, nil
 }

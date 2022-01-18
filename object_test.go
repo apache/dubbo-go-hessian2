@@ -23,9 +23,7 @@ import (
 	"reflect"
 	"testing"
 	"time"
-)
 
-import (
 	"github.com/stretchr/testify/assert"
 )
 
@@ -222,6 +220,153 @@ func TestIssue6(t *testing.T) {
 	if !reflect.DeepEqual(worker, worker2) {
 		t.Fatalf("worker:%#v != worker2:%#v", worker, worker2)
 	}
+}
+
+func TestDecClassToMap(t *testing.T) {
+	name := UserName{
+		FirstName: "John",
+		LastName:  "Doe",
+	}
+	person := Person{
+		UserName: name,
+		Age:      18,
+		Sex:      true,
+	}
+
+	worker1 := &Worker{
+		Person: person,
+		CurJob: JOB{Title: "cto", Company: "facebook"},
+		Jobs: []JOB{
+			{Title: "manager", Company: "google"},
+			{Title: "ceo", Company: "microsoft"},
+		},
+	}
+
+	t.Logf("worker1: %v", worker1)
+
+	e := NewEncoder()
+	encErr := e.Encode(worker1)
+	if encErr != nil {
+		t.Fatalf("encode(worker:%#v) = error:%s", worker1, encErr)
+	}
+	data := e.Buffer()
+	t.Logf("data: %s", data)
+
+	// unRegisterPOJO before decode, so that to decode to map
+	unRegisterPOJO(name)
+	unRegisterPOJO(person)
+	unRegisterPOJO(worker1)
+	unRegisterPOJO(&worker1.Jobs[0])
+
+	// strict mode
+	d := NewDecoder(data)
+	d.Strict = true
+	res, err := d.Decode()
+	if err == nil {
+		t.Error("after unregister pojo, decoding should return error for strict mode")
+		t.FailNow()
+	}
+	assert.Nil(t, res)
+
+	// non-strict mode
+	d = NewDecoder(data)
+	res, err = d.Decode()
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	t.Logf("type of decode object:%v", reflect.TypeOf(res))
+
+	worker2, ok := res.(map[string]interface{})
+	if !ok {
+		t.Fatalf("res:%#v should be a map for non-strict mode", res)
+	}
+
+	t.Logf("worker2: %v", worker2)
+
+	// register pojo again
+	RegisterPOJO(name)
+	RegisterPOJO(person)
+	RegisterPOJO(worker1)
+	RegisterPOJO(&worker1.Jobs[0])
+
+	// encode the map to object again
+	e = NewEncoder()
+	err = e.Encode(worker2)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+
+	data = e.Buffer()
+	t.Logf("data: %s", data)
+
+	// decode the encoded map data to struct
+	d = NewDecoder(data)
+	res, err = d.Decode()
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	t.Logf("type of decode object:%v", reflect.TypeOf(res))
+
+	worker3, ok := res.(*Worker)
+	if !ok {
+		t.Fatalf("res:%#v should be a worker type", res)
+	}
+
+	t.Logf("worker3: %v", worker3)
+	if !reflect.DeepEqual(worker1, worker3) {
+		t.Fatal("worker1 not equal to worker3!")
+	}
+}
+
+func TestEncodeMapToObject(t *testing.T) {
+	name := &UserName{
+		FirstName: "John",
+		LastName:  "Doe",
+	}
+
+	// note: the first letter of the keys MUST lowercase.
+	m := map[string]interface{}{
+		"firstName": "John",
+		"lastName":  "Doe",
+	}
+
+	e := NewEncoder()
+	encErr := e.EncodeMapAsClass(name.JavaClassName(), m)
+	if encErr != nil {
+		t.Error(encErr)
+		t.FailNow()
+	}
+
+	// register for decode map to object.
+	RegisterPOJO(name)
+	res := mustDecodeObject(t, e.Buffer())
+	assert.True(t, reflect.DeepEqual(name, res))
+
+	// unregister for encode map again.
+	UnRegisterPOJOs(name)
+
+	// note: the map contains the class key.
+	m = map[string]interface{}{
+		ClassKey:    name.JavaClassName(),
+		"firstName": "John",
+		"lastName":  "Doe",
+	}
+
+	// try to encode again
+	e = NewEncoder()
+	encErr = e.EncodeMapClass(m)
+	if encErr != nil {
+		t.Error(encErr)
+		t.FailNow()
+	}
+
+	// register for decode map to object.
+	RegisterPOJO(name)
+	res = mustDecodeObject(t, e.Buffer())
+	assert.True(t, reflect.DeepEqual(name, res))
 }
 
 type A0 struct{}

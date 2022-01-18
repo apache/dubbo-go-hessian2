@@ -23,14 +23,9 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-)
 
-import (
-	perrors "github.com/pkg/errors"
-)
-
-import (
 	"github.com/apache/dubbo-go-hessian2/java_exception"
+	perrors "github.com/pkg/errors"
 )
 
 // Response dubbo response
@@ -163,14 +158,14 @@ func unpackResponseBody(decoder *Decoder, resp interface{}) error {
 
 	switch rspType {
 	case RESPONSE_WITH_EXCEPTION, RESPONSE_WITH_EXCEPTION_WITH_ATTACHMENTS:
-		expt, err := decoder.Decode()
-		if err != nil {
-			return perrors.WithStack(err)
+		expt, decErr := decoder.Decode()
+		if decErr != nil {
+			return perrors.WithStack(decErr)
 		}
 		if rspType == RESPONSE_WITH_EXCEPTION_WITH_ATTACHMENTS {
-			attachments, err := decoder.Decode()
-			if err != nil {
-				return perrors.WithStack(err)
+			attachments, attErr := decoder.Decode()
+			if attErr != nil {
+				return perrors.WithStack(attErr)
 			}
 			if v, ok := attachments.(map[interface{}]interface{}); ok {
 				atta := ToMapStringString(v)
@@ -188,14 +183,14 @@ func unpackResponseBody(decoder *Decoder, resp interface{}) error {
 		return nil
 
 	case RESPONSE_VALUE, RESPONSE_VALUE_WITH_ATTACHMENTS:
-		rsp, err := decoder.Decode()
-		if err != nil {
-			return perrors.WithStack(err)
+		rsp, decErr := decoder.Decode()
+		if decErr != nil {
+			return perrors.WithStack(decErr)
 		}
 		if rspType == RESPONSE_VALUE_WITH_ATTACHMENTS {
-			attachments, err := decoder.Decode()
-			if err != nil {
-				return perrors.WithStack(err)
+			attachments, attErr := decoder.Decode()
+			if attErr != nil {
+				return perrors.WithStack(attErr)
 			}
 			if v, ok := attachments.(map[interface{}]interface{}); ok {
 				response.Attachments = ToMapStringString(v)
@@ -204,19 +199,15 @@ func unpackResponseBody(decoder *Decoder, resp interface{}) error {
 			}
 		}
 
-		// If the return value is nil,
-		// we should consider it normal
-		if rsp == nil {
-			return nil
-		}
+		response.RspObj = rsp
 
-		return perrors.WithStack(ReflectResponse(rsp, response.RspObj))
+		return nil
 
 	case RESPONSE_NULL_VALUE, RESPONSE_NULL_VALUE_WITH_ATTACHMENTS:
 		if rspType == RESPONSE_NULL_VALUE_WITH_ATTACHMENTS {
-			attachments, err := decoder.Decode()
-			if err != nil {
-				return perrors.WithStack(err)
+			attachments, decErr := decoder.Decode()
+			if decErr != nil {
+				return perrors.WithStack(decErr)
 			}
 			if v, ok := attachments.(map[interface{}]interface{}); ok {
 				atta := ToMapStringString(v)

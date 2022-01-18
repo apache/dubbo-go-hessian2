@@ -26,7 +26,7 @@ import (
 )
 
 func TestCheckAndGetException(t *testing.T) {
-	clazzInfo1 := &classInfo{
+	clazzInfo1 := &ClassInfo{
 		javaName:      "com.test.UserDefinedException",
 		fieldNameList: []string{"detailMessage", "code", "suppressedExceptions", "stackTrace", "cause"},
 	}
@@ -36,7 +36,7 @@ func TestCheckAndGetException(t *testing.T) {
 	assert.Equal(t, s.javaName, "com.test.UserDefinedException")
 	assert.Equal(t, s.goName, "github.com/apache/dubbo-go-hessian2/hessian.UnknownException")
 
-	clazzInfo2 := &classInfo{
+	clazzInfo2 := &ClassInfo{
 		javaName:      "com.test.UserDefinedException",
 		fieldNameList: []string{"detailMessage", "code", "suppressedExceptions", "cause"},
 	}
