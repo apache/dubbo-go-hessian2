@@ -1,5 +1,10 @@
 # Release Notes
 
+## v1.11.0
+
+### New Features
+- support encode object to map and vice versa. [#309](https://github.com/apache/dubbo-go-hessian2/pull/309)
+
 ## v1.10.3
 
 ### New Features
