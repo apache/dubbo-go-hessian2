@@ -207,6 +207,19 @@ func TestListEncode(t *testing.T) {
 	testJavaDecode(t, "customArgTypedFixedList_Object", []Object{new(A0)})
 }
 
+func TestNilList(t *testing.T) {
+	var List []*A0
+	e := NewEncoder()
+	_ = e.Encode(List)
+
+	d := NewDecoder(e.Buffer())
+	res, err := d.Decode()
+	if err != nil {
+		t.Fail()
+	}
+	assert.Nil(t, res)
+}
+
 type TypedListTest struct {
 	A     *A0
 	List  [][]*A0
