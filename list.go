@@ -152,7 +152,12 @@ func (e *Encoder) writeTypedList(v interface{}) error {
 	var err error
 
 	value := reflect.ValueOf(v)
-
+	// https://github.com/apache/dubbo-go-hessian2/issues/317
+	// if list is null, just return 'N'
+	if value.IsNil() {
+		e.buffer = encByte(e.buffer, BC_NULL) // 'N'
+		return nil
+	}
 	// check ref
 	if n, ok := e.checkRefMap(value); ok {
 		e.buffer = encRef(e.buffer, n)
