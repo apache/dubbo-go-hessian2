@@ -20,11 +20,13 @@ package test;
 import com.caucho.hessian.io.Hessian2Input;
 import com.caucho.hessian.test.A0;
 import com.caucho.hessian.test.A1;
+
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
+import test.model.CustomMap;
 import test.model.DateDemo;
 
 
@@ -214,4 +216,11 @@ public class TestCustomDecode {
         HashSet o = (HashSet) input.readObject();
         return o.contains(0) && o.contains(1);
     }
+
+    public Object customArgTypedFixed_CustomMap() throws Exception {
+        CustomMap o = (CustomMap) input.readObject();
+        String value = (String) o.get("Name");
+        return "Test".equals(value);
+    }
+
 }

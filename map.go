@@ -122,9 +122,16 @@ func (e *Encoder) encMap(m interface{}) error {
 		return nil
 	}
 
+	// if pojo, write class name first
+	if p, ok := m.(POJO); ok {
+		e.buffer = encByte(e.buffer, BC_MAP)
+		e.buffer = encString(e.buffer, p.JavaClassName())
+	} else {
+		e.buffer = encByte(e.buffer, BC_MAP_UNTYPED)
+	}
+
 	keys = value.MapKeys()
 
-	e.buffer = encByte(e.buffer, BC_MAP_UNTYPED)
 	if len(keys) > 0 {
 		typ = value.Type().Key()
 		for i := 0; i < len(keys); i++ {

@@ -170,3 +170,15 @@ func TestCustomMap(t *testing.T) {
 
 	testDecodeFramework(t, "customReplyListMapListMap", listMapListMap)
 }
+
+type CustomMap map[string]interface{}
+
+func (dict *CustomMap) JavaClassName() string {
+	return "test.model.CustomMap"
+}
+
+func TestJavaMap(t *testing.T) {
+	customMap := &CustomMap{"Name": "Test"}
+	RegisterPOJO(customMap)
+	testJavaDecode(t, "customArgTypedFixed_CustomMap", customMap)
+}
