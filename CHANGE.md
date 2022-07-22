@@ -1,5 +1,11 @@
 # Release Notes
 
+## v1.11.1
+
+### Bugfixes
+- fix not writing class name first when encoding pojo map. [#320](https://github.com/apache/dubbo-go-hessian2/pull/320)
+- fix nil slice decoding to empty slice. [#318](https://github.com/apache/dubbo-go-hessian2/pull/318)
+
 ## v1.11.0
 
 ### New Features
