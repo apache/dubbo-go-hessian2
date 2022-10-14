@@ -1,0 +1,13 @@
+[hsf]
+# 自定义结构体配置
+#customStruct = [
+#    {javaClassName = "1",goImportPath = "2", goStructName = "3"}
+#]
+# 关闭使用Internal
+#closeInternal = true
+[gotests]
+#mockSkipPkg = ["fmt","time","errors","log"]
+[mysql]
+#typeConv = [
+#    { "type" = "tinyint", "unsigned" = [true,false], "goType" = "int" }
+#]
