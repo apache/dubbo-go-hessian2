@@ -1,0 +1,64 @@
+package {{.pkgName}}.response.demo;
+
+
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * demo返回值
+ *
+ * @author seven
+ * @date 2020-12-18
+ */
+@Data
+@Accessors(chain = true)
+public class Hello {
+    /**
+     * String 对应go中的string
+     */
+    private String firstName;
+    /**
+     * String 对应go中的string
+     */
+    private String lastName;
+    /**
+     * Integer 对应go中的int32
+     */
+    private Integer tInt;
+    /**
+     * Long 对应go中的int64
+     */
+    private Long tLong;
+    /**
+     * float 对应go中的float32
+     */
+    private float tFloat;
+    /**
+     * double 对应go中的float64
+     */
+    private double tDouble;
+    /**
+     * Boolean 对应go中的bool
+     */
+    private Boolean tBool;
+    /**
+     * Date 对应go中的time.Time
+     */
+    private Date tDate;
+    /**
+     * List 对应go中的[]int
+     */
+    private List<Integer> tList;
+    /**
+     * Map 对应go中的map[int]string
+     */
+    private Map<Integer,String> tMap;
+    /**
+     * Map 对应go中的map[string]interface{}
+     */
+    private Map<String,Object> tMapInterface;
+}

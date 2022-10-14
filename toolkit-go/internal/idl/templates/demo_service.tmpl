@@ -1,0 +1,27 @@
+package {{.pkgName}}.service;
+
+import {{.pkgName}}.request.demo.UserName;
+import {{.pkgName}}.response.demo.Hello;
+import {{.pkgName}}.common.ResultWrapper;
+
+/**
+ * 示例service
+ *
+ * @author seven
+ * @date 2020-12-18
+ */
+public interface DemoService {
+    /**
+     *
+     * @param firstName
+     * @param lastName
+     * @return
+     */
+    ResultWrapper<Hello> hello(String firstName,String lastName);
+    /**
+     * 更新用户信息
+     * @param user 用户信息
+     * @return bool true表示成功
+     */
+    ResultWrapper<Boolean> updateUser(UserName user);
+}

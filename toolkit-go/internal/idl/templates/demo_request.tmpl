@@ -1,0 +1,17 @@
+package {{.pkgName}}.request.demo;
+
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+/**
+ * demo请求参数
+ *
+ * @author seven
+ * @date 2020-12-18
+ */
+@Data
+@Accessors(chain = true)
+public class UserName {
+    private String firstName;
+    private String lastName;
+}
