@@ -78,6 +78,8 @@ func (d *Decoder) appendRefs(v interface{}) *_refHolder {
 		}
 		// pack holder value
 		v = reflect.ValueOf(holder)
+
+		d.refHolders = append(d.refHolders, holder)
 	}
 
 	d.refs = append(d.refs, v)

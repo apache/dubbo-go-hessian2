@@ -30,8 +30,9 @@ import (
 
 // Decoder struct
 type Decoder struct {
-	reader *bufio.Reader
-	refs   []interface{}
+	reader     *bufio.Reader
+	refs       []interface{}
+	refHolders []*_refHolder
 	// record type refs, both list and map need it
 	typeRefs      *TypeRefs
 	classInfoList []*ClassInfo
@@ -236,7 +237,16 @@ func (d *Decoder) decMapType() (reflect.Type, error) {
 
 // Decode parse hessian data, and ensure the reflection value unpacked
 func (d *Decoder) Decode() (interface{}, error) {
-	return EnsureInterface(d.DecodeValue())
+	v, err := d.DecodeValue()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, holder := range d.refHolders {
+		holder.notify()
+	}
+
+	return EnsureRawAny(v), nil
 }
 
 func (d *Decoder) Buffered() int { return d.reader.Buffered() }

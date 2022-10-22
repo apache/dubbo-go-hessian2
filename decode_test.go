@@ -30,6 +30,7 @@ import (
 	"os/exec"
 	"reflect"
 	"testing"
+	"unsafe"
 )
 
 import (
@@ -256,4 +257,57 @@ func TestIssue299HessianDecode(t *testing.T) {
 		t.Errorf("not equal d: %#v, do: %#v", d, do)
 		return
 	}
+}
+
+type Issue323B struct {
+	Num int
+}
+
+func (b *Issue323B) JavaClassName() string {
+	return "B"
+}
+
+type Issue323BB struct {
+	List1 []*Issue323B
+	List2 []*Issue323B
+}
+
+func (bb *Issue323BB) JavaClassName() string {
+	return "BB"
+}
+
+func TestIssue323(t *testing.T) {
+	RegisterPOJO(&Issue323B{})
+	RegisterPOJO(&Issue323BB{})
+	a1 := &Issue323B{
+		Num: 1,
+	}
+	a2 := &Issue323B{
+		Num: 2,
+	}
+	list := []*Issue323B{a1, a2}
+	b := &Issue323BB{
+		List1: list,
+		List2: list,
+	}
+	e := NewEncoder()
+	err := e.Encode(b)
+	assert.Nil(t, err)
+	fmt.Println(b)
+
+	d := NewDecoder(e.Buffer())
+	res, err := d.Decode()
+	assert.Nil(t, err)
+	fmt.Println(res)
+	assert.True(t, reflect.DeepEqual(b, res))
+
+	decodB, ok := res.(*Issue323BB)
+	if !ok {
+		t.Log("res is not Issue323BB")
+		t.FailNow()
+	}
+
+	// list1 and list2 should be reference to the same one.
+	assert.Equal(t, unsafe.Pointer(reflect.ValueOf(decodB.List1).Pointer()),
+		unsafe.Pointer(reflect.ValueOf(decodB.List2).Pointer()))
 }
