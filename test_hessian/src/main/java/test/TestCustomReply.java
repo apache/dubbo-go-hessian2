@@ -22,7 +22,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.caucho.hessian.test.A0;
 import com.caucho.hessian.test.A1;
-import com.caucho.hessian.test.TestObject;
 import test.generic.BusinessData;
 import test.generic.Response;
 import test.model.CustomMap;
@@ -691,6 +690,15 @@ public class TestCustomReply {
         map.put("enumset", enumSet);
         System.out.println(map);
         output.writeObject(map);
+        output.flush();
+    }
+
+    public void customReplyEnumVariableList() throws Exception {
+        List<Locale.Category> enumList = new ArrayList<>();
+        enumList.add(Locale.Category.DISPLAY);
+        enumList.add(null);
+        enumList.add(Locale.Category.FORMAT);
+        output.writeObject(enumList.toArray(new Locale.Category[enumList.size()]));
         output.flush();
     }
 }

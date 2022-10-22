@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"math"
 	"reflect"
+	"strconv"
 	"testing"
 	"time"
 
@@ -1060,4 +1061,59 @@ func TestDecodeIntegerHasNull(t *testing.T) {
 func TestDecodeSliceIntegerHasNull(t *testing.T) {
 	RegisterPOJO(&User{})
 	testDecodeFramework(t, "customReplyTypedListIntegerHasNull", &User{Id: 0, List: []int32{1, 0}})
+}
+
+func TestDecodeCustomReplyEnumVariableList(t *testing.T) {
+	for v := range _LocaleCategoryEnumValues {
+		RegisterJavaEnum(v)
+	}
+
+	got, err := decodeJavaResponse(`customReplyEnumVariableList`, ``, false)
+	assert.NoError(t, err)
+	t.Logf("customReplyEnumVariableList %T %+v", got, got)
+	enumList, ok := got.([]*LocaleCategoryEnum)
+	if !ok {
+		t.Errorf("expect []LocaleCategoryEnum, but get %v", got)
+		return
+	}
+	assert.Equal(t, LocaleCategoryEnumDisplay, *enumList[0])
+	assert.Nil(t, enumList[1])
+	assert.Equal(t, LocaleCategoryEnumFormat, *enumList[2])
+}
+
+const (
+	LocaleCategoryEnumDisplay LocaleCategoryEnum = iota
+	LocaleCategoryEnumFormat
+)
+
+var _LocaleCategoryEnumValues = map[LocaleCategoryEnum]string{
+	LocaleCategoryEnumDisplay: "DISPLAY",
+	LocaleCategoryEnumFormat:  "FORMAT",
+}
+
+var _LocaleCategoryEnumEntities = map[string]LocaleCategoryEnum{
+	"DISPLAY": LocaleCategoryEnumDisplay,
+	"FORMAT":  LocaleCategoryEnumFormat,
+}
+
+type LocaleCategoryEnum JavaEnum
+
+func (e LocaleCategoryEnum) JavaClassName() string {
+	return "java.util.Locale$Category"
+}
+
+func (e LocaleCategoryEnum) String() string {
+	if v, ok := _LocaleCategoryEnumValues[e]; ok {
+		return v
+	}
+
+	return strconv.Itoa(int(e))
+}
+
+func (e LocaleCategoryEnum) EnumValue(s string) JavaEnum {
+	if v, ok := _LocaleCategoryEnumEntities[s]; ok {
+		return JavaEnum(v)
+	}
+
+	return InvalidJavaEnum
 }
