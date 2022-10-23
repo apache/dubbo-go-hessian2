@@ -1071,6 +1071,8 @@ func TestDecodeCustomReplyEnumVariableList(t *testing.T) {
 	got, err := decodeJavaResponse(`customReplyEnumVariableList`, ``, false)
 	assert.NoError(t, err)
 	t.Logf("%T %+v", got, got)
+	el := []interface{}{JavaEnum(0), nil, JavaEnum(1)}
+	assert.True(t, reflect.DeepEqual(got, el))
 }
 
 const (
@@ -1080,12 +1082,12 @@ const (
 
 var _LocaleCategoryEnumValues = map[LocaleCategoryEnum]string{
 	LocaleCategoryEnumDisplay: "DISPLAY",
-	LocaleCategoryEnumFormat: "FORMAT",
+	LocaleCategoryEnumFormat:  "FORMAT",
 }
 
 var _LocaleCategoryEnumEntities = map[string]LocaleCategoryEnum{
 	"DISPLAY": LocaleCategoryEnumDisplay,
-	"FORMAT": LocaleCategoryEnumFormat,
+	"FORMAT":  LocaleCategoryEnumFormat,
 }
 
 type LocaleCategoryEnum JavaEnum
