@@ -1080,15 +1080,17 @@ const (
 	LocaleCategoryEnumFormat
 )
 
-var _LocaleCategoryEnumValues = map[LocaleCategoryEnum]string{
-	LocaleCategoryEnumDisplay: "DISPLAY",
-	LocaleCategoryEnumFormat:  "FORMAT",
-}
+var (
+	_LocaleCategoryEnumValues = map[LocaleCategoryEnum]string{
+	        LocaleCategoryEnumDisplay: "DISPLAY",
+	        LocaleCategoryEnumFormat:  "FORMAT",
+        }
 
-var _LocaleCategoryEnumEntities = map[string]LocaleCategoryEnum{
-	"DISPLAY": LocaleCategoryEnumDisplay,
-	"FORMAT":  LocaleCategoryEnumFormat,
-}
+        _LocaleCategoryEnumEntities = map[string]LocaleCategoryEnum{
+	        "DISPLAY": LocaleCategoryEnumDisplay,
+	        "FORMAT":  LocaleCategoryEnumFormat,
+        }
+)
 
 type LocaleCategoryEnum JavaEnum
 
