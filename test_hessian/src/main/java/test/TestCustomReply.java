@@ -693,6 +693,15 @@ public class TestCustomReply {
         output.writeObject(map);
         output.flush();
     }
+
+    public void customReplyEnumVariableList() throws Exception {
+        List<Locale.Category> enumList = new ArrayList<>();
+        enumList.add(Locale.Category.DISPLAY);
+        enumList.add(null);
+        enumList.add(Locale.Category.FORMAT);
+        output.writeObject(enumList.toArray(new Locale.Category[enumList.size()]));
+        output.flush();
+    }
 }
 
 interface Leg {
