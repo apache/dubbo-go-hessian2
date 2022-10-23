@@ -120,10 +120,6 @@ func getListType(javalistname string) reflect.Type {
 		}
 
 		tp := tpStructInfo.typ
-		// if tp is enum, return nil
-		if tp.Implements(javaEnumType) {
-			return nil
-		}
 		if tp.Kind() != reflect.Ptr {
 			tp = reflect.New(tp).Type()
 		}
