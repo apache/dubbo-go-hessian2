@@ -660,7 +660,7 @@ func (d *Decoder) getStructDefByIndex(idx int) (reflect.Type, *ClassInfo, error)
 	return s.typ, cls, nil
 }
 
-func (d *Decoder) decEnum(javaName string, flag int32) (JavaEnum, error) {
+func (d *Decoder) decEnum(javaName string, flag int32) (interface{}, error) {
 	var (
 		err       error
 		enumName  string
@@ -678,8 +678,9 @@ func (d *Decoder) decEnum(javaName string, flag int32) (JavaEnum, error) {
 	}
 
 	enumValue = info.inst.(POJOEnum).EnumValue(enumName)
-	d.appendRefs(enumValue)
-	return enumValue, nil
+	enumVal := PackPtr(reflect.ValueOf(enumValue).Convert(info.typ)).Interface()
+	d.appendRefs(enumVal)
+	return enumVal, nil
 }
 
 // skip this object
