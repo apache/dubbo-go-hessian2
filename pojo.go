@@ -41,15 +41,13 @@ var tagIdentifier = "hessian"
 
 // SetTagIdentifier for customize struct filed tag of hessian, your can use it like:
 //
-// hessian.SetTagIdentifier("json")
-//
-// type MyUser struct {
-// 	UserFullName      string   `json:"user_full_name"`
-// 	FamilyPhoneNumber string   // default convert to => familyPhoneNumber
-// }
-//
-// var user MyUser
-// hessian.NewEncoder().Encode(user)
+//	hessian.SetTagIdentifier("json")
+//	type MyUser struct {
+//		UserFullName      string   `json:"user_full_name"`
+//		FamilyPhoneNumber string   // default convert to => familyPhoneNumber
+//	}
+//	var user MyUser
+//	hessian.NewEncoder().Encode(user)
 func SetTagIdentifier(s string) { tagIdentifier = s }
 
 // POJO interface

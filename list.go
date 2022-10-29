@@ -243,10 +243,10 @@ func listFixedTypedLenTag(tag byte) bool {
 	return tag >= _listFixedTypedLenTagMin && tag <= _listFixedTypedLenTagMax
 }
 
-// Include 3 formats:
-// list ::= x55 type value* 'Z'   # variable-length list
-//      ::= 'V' type int value*   # fixed-length list
-//      ::= [x70-77] type value*  # fixed-length typed list
+// list include 3 formats:
+// ::= x55 type value* 'Z'   # variable-length list
+// ::= 'V' type int value*   # fixed-length list
+// ::= [x70-77] type value*  # fixed-length typed list
 func typedListTag(tag byte) bool {
 	return tag == BC_LIST_FIXED || tag == BC_LIST_VARIABLE || listFixedTypedLenTag(tag)
 }
@@ -255,10 +255,10 @@ func listFixedUntypedLenTag(tag byte) bool {
 	return tag >= _listFixedUntypedLenTagMin && tag <= _listFixedUntypedLenTagMax
 }
 
-// Include 3 formats:
-//      ::= x57 value* 'Z'        # variable-length untyped list
-//      ::= x58 int value*        # fixed-length untyped list
-//      ::= [x78-7f] value*       # fixed-length untyped list
+// include 3 formats:
+// ::= x57 value* 'Z'        # variable-length untyped list
+// ::= x58 int value*        # fixed-length untyped list
+// ::= [x78-7f] value*       # fixed-length untyped list
 func untypedListTag(tag byte) bool {
 	return tag == BC_LIST_FIXED_UNTYPED || tag == BC_LIST_VARIABLE_UNTYPED || listFixedUntypedLenTag(tag)
 }
@@ -296,10 +296,10 @@ func (d *Decoder) decList(flag int32) (interface{}, error) {
 }
 
 // readTypedList read typed list
-// Include 3 formats:
-// list ::= x55 type value* 'Z'   # variable-length list
-//      ::= 'V' type int value*   # fixed-length list
-//      ::= [x70-77] type value*  # fixed-length typed list
+// list include 3 formats:
+// ::= x55 type value* 'Z'   # variable-length list
+// ::= 'V' type int value*   # fixed-length list
+// ::= [x70-77] type value*  # fixed-length typed list
 func (d *Decoder) readTypedList(tag byte) (interface{}, error) {
 	listTyp, err := d.decString(TAG_READ)
 	if err != nil {
@@ -389,9 +389,9 @@ func (d *Decoder) readTypedListValue(length int, listTyp string, isVariableArr b
 
 // readUntypedList read untyped list
 // Include 3 formats:
-//      ::= x57 value* 'Z'        # variable-length untyped list
-//      ::= x58 int value*        # fixed-length untyped list
-//      ::= [x78-7f] value*       # fixed-length untyped list
+// ::= x57 value* 'Z'        # variable-length untyped list
+// ::= x58 int value*        # fixed-length untyped list
+// ::= [x78-7f] value*       # fixed-length untyped list
 func (d *Decoder) readUntypedList(tag byte) (interface{}, error) {
 	isVariableArr := tag == BC_LIST_VARIABLE_UNTYPED
 
