@@ -20,8 +20,13 @@ package user
 import (
 	"testing"
 	"time"
+)
 
+import (
 	hessian "github.com/apache/dubbo-go-hessian2"
+)
+
+import (
 	"github.com/stretchr/testify/assert"
 )
 
