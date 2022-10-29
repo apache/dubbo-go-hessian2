@@ -499,17 +499,20 @@ func (d *Decoder) decInstance(typ reflect.Type, cls *ClassInfo) (interface{}, er
 			if err != nil {
 				// java enum
 				if fldRawValue.Type().Implements(javaEnumType) {
-					d.unreadByte() // Enum parsing, decInt64 above has read a byte, so you need to return a byte here
-					s, decErr := d.DecodeValue()
+					_ = d.unreadByte() // Enum parsing, decInt64 above has read a byte, so you need to return a byte here
+					enumVal, decErr := d.DecodeValue()
 					if decErr != nil {
 						return nil, perrors.Wrapf(decErr, "decInstance->decObject field name:%s", fieldName)
 					}
-					enumValue, _ := s.(JavaEnum)
-					num = int32(enumValue)
-				} else {
-					return nil, perrors.Wrapf(err, "decInstance->decInt32, field name:%s", fieldName)
+
+					SetValue(fldRawValue, reflect.ValueOf(enumVal))
+
+					continue
 				}
+
+				return nil, perrors.Wrapf(err, "decInstance->decInt32, field name:%s", fieldName)
 			}
+
 			fldRawValue.SetInt(int64(num))
 		case reflect.Uint16, reflect.Uint8:
 			num, err := d.decInt32(TAG_READ)
