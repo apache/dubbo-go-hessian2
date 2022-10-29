@@ -106,13 +106,6 @@ func TestDupStructNameResponse(t *testing.T) {
 	assert.Nil(t, err)
 
 	decodedResponse := &hessian.Response{}
-	decodedResponse.RspObj = &dupclass.CaseZ{}
-	err = codecR.ReadBody(decodedResponse)
-	assert.NotNil(t, err)
-	assert.Equal(t, ExpectedErrorMsg, err.Error())
-
-	decodedResponse = &hessian.Response{}
-	decodedResponse.RspObj = &CaseZ{}
 	err = codecR.ReadBody(decodedResponse)
 	assert.Nil(t, err)
 
@@ -134,13 +127,6 @@ func TestDupStructNameResponse2(t *testing.T) {
 	assert.Nil(t, err)
 
 	decodedResponse := &hessian.Response{}
-	decodedResponse.RspObj = &CaseZ{}
-	err = codecR.ReadBody(decodedResponse)
-	assert.NotNil(t, err)
-	assert.Equal(t, ExpectedErrorMsg, err.Error())
-
-	decodedResponse = &hessian.Response{}
-	decodedResponse.RspObj = &dupclass.CaseZ{}
 	err = codecR.ReadBody(decodedResponse)
 	assert.Nil(t, err)
 
