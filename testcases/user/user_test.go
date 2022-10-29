@@ -25,6 +25,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestEnumConvert(t *testing.T) {
+	var g interface{}
+	g = WOMAN
+
+	// new defined type cant be converted to the original type.
+	failConvertedValue, ok := g.(hessian.JavaEnum)
+	assert.False(t, ok)
+	assert.Equal(t, hessian.JavaEnum(0), failConvertedValue)
+}
+
 func TestUserEncodeDecode(t *testing.T) {
 	ts, _ := time.Parse("2006-01-02 15:04:05", "2019-01-01 12:34:56")
 	u1 := &User{ID: "001", Name: "Lily", Age: 18, Time: ts.Local(), Sex: WOMAN}
