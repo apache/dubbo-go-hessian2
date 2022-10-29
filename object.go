@@ -37,66 +37,74 @@ func typeof(v interface{}) string {
 // map/object
 /////////////////////////////////////////
 
-//class-def  ::= 'C' string int string* //  mandatory type string, the number of fields, and the field names.
-//object     ::= 'O' int value* // class-def id, value list
-//           ::= [x60-x6f] value* // class-def id, value list
+// class-def  ::= 'C' string int string* //  mandatory type string, the number of fields, and the field names.
+// object     ::= 'O' int value* // class-def id, value list
 //
-//Object serialization
+//	::= [x60-x6f] value* // class-def id, value list
 //
-//class Car {
-//  String color;
-//  String model;
-//}
+// # Object serialization
 //
-//out.writeObject(new Car("red", "corvette"));
-//out.writeObject(new Car("green", "civic"));
+//	class Car {
+//	  String color;
+//	  String model;
+//	}
 //
-//---
+// out.writeObject(new Car("red", "corvette"));
+// out.writeObject(new Car("green", "civic"));
 //
-//C                        # object definition (#0)
-//  x0b example.Car        # type is example.Car
-//  x92                    # two fields
-//  x05 color              # color field name
-//  x05 model              # model field name
+// ---
 //
-//O                        # object def (long form)
-//  x90                    # object definition #0
-//  x03 red                # color field value
-//  x08 corvette           # model field value
+// C                        # object definition (#0)
 //
-//x60                      # object def #0 (short form)
-//  x05 green              # color field value
-//  x05 civic              # model field value
+//	x0b example.Car        # type is example.Car
+//	x92                    # two fields
+//	x05 color              # color field name
+//	x05 model              # model field name
 //
-//enum Color {
-//  RED,
-//  GREEN,
-//  BLUE,
-//}
+// O                        # object def (long form)
 //
-//out.writeObject(Color.RED);
-//out.writeObject(Color.GREEN);
-//out.writeObject(Color.BLUE);
-//out.writeObject(Color.GREEN);
+//	x90                    # object definition #0
+//	x03 red                # color field value
+//	x08 corvette           # model field value
 //
-//---
+// x60                      # object def #0 (short form)
 //
-//C                         # class definition #0
-//  x0b example.Color       # type is example.Color
-//  x91                     # one field
-//  x04 name                # enumeration field is "name"
+//	x05 green              # color field value
+//	x05 civic              # model field value
 //
-//x60                       # object #0 (class def #0)
-//  x03 RED                 # RED value
+//	enum Color {
+//	  RED,
+//	  GREEN,
+//	  BLUE,
+//	}
 //
-//x60                       # object #1 (class def #0)
-//  x90                     # object definition ref #0
-//  x05 GREEN               # GREEN value
+// out.writeObject(Color.RED);
+// out.writeObject(Color.GREEN);
+// out.writeObject(Color.BLUE);
+// out.writeObject(Color.GREEN);
 //
-//x60                       # object #2 (class def #0)
-//  x04 BLUE                # BLUE value
+// ---
 //
-//x51 x91                   # object ref #1, i.e. Color.GREEN
+// C                         # class definition #0
+//
+//	x0b example.Color       # type is example.Color
+//	x91                     # one field
+//	x04 name                # enumeration field is "name"
+//
+// x60                       # object #0 (class def #0)
+//
+//	x03 RED                 # RED value
+//
+// x60                       # object #1 (class def #0)
+//
+//	x90                     # object definition ref #0
+//	x05 GREEN               # GREEN value
+//
+// x60                       # object #2 (class def #0)
+//
+//	x04 BLUE                # BLUE value
+//
+// x51 x91                   # object ref #1, i.e. Color.GREEN
 func (e *Encoder) encObject(v interface{}) error {
 	var (
 		i      int
@@ -289,70 +297,70 @@ func (e *Encoder) encodeMapAsIndexedClass(idx int, m map[string]interface{}) err
 // Object
 /////////////////////////////////////////
 
-//class-def  ::= 'C' string int string* //  mandatory type string, the number of fields, and the field names.
-//object     ::= 'O' int value* // class-def id, value list
-//           ::= [x60-x6f] value* // class-def id, value list
+// class-def  ::= 'C' string int string* //  mandatory type string, the number of fields, and the field names.
+// object     ::= 'O' int value* // class-def id, value list
+//            ::= [x60-x6f] value* // class-def id, value list
 //
-//Object serialization
+// Object serialization
 //
-//class Car {
-//  String color;
-//  String model;
-//}
+// class Car {
+//   String color;
+//   String model;
+// }
 //
-//out.writeObject(new Car("red", "corvette"));
-//out.writeObject(new Car("green", "civic"));
+// out.writeObject(new Car("red", "corvette"));
+// out.writeObject(new Car("green", "civic"));
 //
-//---
+// ---
 //
-//C                        # object definition (#0)
-//  x0b example.Car        # type is example.Car
-//  x92                    # two fields
-//  x05 color              # color field name
-//  x05 model              # model field name
+// C                        # object definition (#0)
+//   x0b example.Car        # type is example.Car
+//   x92                    # two fields
+//   x05 color              # color field name
+//   x05 model              # model field name
 //
-//O                        # object def (long form)
-//  x90                    # object definition #0
-//  x03 red                # color field value
-//  x08 corvette           # model field value
+// O                        # object def (long form)
+//   x90                    # object definition #0
+//   x03 red                # color field value
+//   x08 corvette           # model field value
 //
-//x60                      # object def #0 (short form)
-//  x05 green              # color field value
-//  x05 civic              # model field value
-//
-//
+// x60                      # object def #0 (short form)
+//   x05 green              # color field value
+//   x05 civic              # model field value
 //
 //
 //
-//enum Color {
-//  RED,
-//  GREEN,
-//  BLUE,
-//}
 //
-//out.writeObject(Color.RED);
-//out.writeObject(Color.GREEN);
-//out.writeObject(Color.BLUE);
-//out.writeObject(Color.GREEN);
 //
-//---
+// enum Color {
+//   RED,
+//   GREEN,
+//   BLUE,
+// }
 //
-//C                         # class definition #0
-//  x0b example.Color       # type is example.Color
-//  x91                     # one field
-//  x04 name                # enumeration field is "name"
+// out.writeObject(Color.RED);
+// out.writeObject(Color.GREEN);
+// out.writeObject(Color.BLUE);
+// out.writeObject(Color.GREEN);
 //
-//x60                       # object #0 (class def #0)
-//  x03 RED                 # RED value
+// ---
 //
-//x60                       # object #1 (class def #0)
-//  x90                     # object definition ref #0
-//  x05 GREEN               # GREEN value
+// C                         # class definition #0
+//   x0b example.Color       # type is example.Color
+//   x91                     # one field
+//   x04 name                # enumeration field is "name"
 //
-//x60                       # object #2 (class def #0)
-//  x04 BLUE                # BLUE value
+// x60                       # object #0 (class def #0)
+//   x03 RED                 # RED value
 //
-//x51 x91                   # object ref #1, i.e. Color.GREEN
+// x60                       # object #1 (class def #0)
+//   x90                     # object definition ref #0
+//   x05 GREEN               # GREEN value
+//
+// x60                       # object #2 (class def #0)
+//   x04 BLUE                # BLUE value
+//
+// x51 x91                   # object ref #1, i.e. Color.GREEN
 
 func (d *Decoder) decClassDef() (interface{}, error) {
 	var (
@@ -416,9 +424,10 @@ func findFieldWithCache(name string, typ reflect.Type) ([]int, *reflect.StructFi
 // findField find structField in rType
 //
 // return
-// 	indexes []int
-// 	field reflect.StructField
-// 	err error
+//
+//	indexes []int
+//	field reflect.StructField
+//	err error
 func findField(name string, typ reflect.Type) ([]int, *reflect.StructField, error) {
 	for i := 0; i < typ.NumField(); i++ {
 		// matching tag first, then lowerCamelCase, SameCase, lowerCase

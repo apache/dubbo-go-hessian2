@@ -60,7 +60,7 @@ func (*BooleanArray) JavaClassName() string {
 	return "[java.lang.Boolean"
 }
 
-//IntegerArray Integer[]
+// IntegerArray Integer[]
 type IntegerArray struct {
 	Values []int32
 }

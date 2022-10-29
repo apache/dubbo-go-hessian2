@@ -89,17 +89,17 @@ func NewDecoderWithSkip(b []byte) *Decoder {
 // only for cache pool, before decode Reset should be called.
 // For example, with pooling use, will effectively improve performance
 //
-//	var hessianPool = &sync.Pool{
-//		New: func() interface{} {
-//			return hessian.NewCheapDecoderWithSkip([]byte{})
-//		},
-//	}
+//		var hessianPool = &sync.Pool{
+//			New: func() interface{} {
+//				return hessian.NewCheapDecoderWithSkip([]byte{})
+//			},
+//		}
 //
-//	decoder := hessianPool.Get().(*hessian.Decoder)
-//	fill decode data
-//	decoder.Reset(data[:])
-//  decode anything ...
-//	hessianPool.Put(decoder)
+//		decoder := hessianPool.Get().(*hessian.Decoder)
+//		fill decode data
+//		decoder.Reset(data[:])
+//	 decode anything ...
+//		hessianPool.Put(decoder)
 func NewCheapDecoderWithSkip(b []byte) *Decoder {
 	return &Decoder{reader: bufio.NewReader(bytes.NewReader(b)), isSkip: true}
 }
@@ -324,9 +324,9 @@ func (d *Decoder) DecodeValue() (interface{}, error) {
 	}
 }
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // typeRefs
-/////////////////////////////////////////
+// ///////////////////////////////////////
 type TypeRefs struct {
 	typeRefs []reflect.Type
 	records  map[string]bool // record if existing for type

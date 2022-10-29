@@ -17,9 +17,9 @@
 
 package java_exception
 
-////////////////////////////
+// //////////////////////////
 // InterruptedIOException
-////////////////////////////
+// //////////////////////////
 // InterruptedIOException represents an exception of the same name in java
 type InterruptedIOException struct {
 	SerialVersionUID     int64
