@@ -80,7 +80,7 @@ jobs:
       run: golangci-lint run --timeout=10m -v
 
     - name: Go Test
-      run: GO111MODULE=on && go mod vendor && go test -race -v && go test -bench . -race -coverprofile=coverage.txt
+      run: GO111MODULE=on && go mod vendor && go test ./... -race -v && go test -bench . -race -coverprofile=coverage.txt
 
     - name: Coverage
       run: bash <(curl -s https://codecov.io/bash)
