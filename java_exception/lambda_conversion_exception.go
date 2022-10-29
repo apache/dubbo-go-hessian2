@@ -17,9 +17,9 @@
 
 package java_exception
 
-////////////////////////////
+// //////////////////////////
 // LambdaConversionException
-////////////////////////////
+// //////////////////////////
 // LambdaConversionException represents an exception of the same name in java
 type LambdaConversionException struct {
 	SerialVersionUID     int64

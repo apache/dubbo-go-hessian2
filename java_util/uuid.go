@@ -26,7 +26,7 @@ func (UUID) JavaClassName() string {
 	return "java.util.UUID"
 }
 
-//String returns a string object representing this UUID.
+// String returns a string object representing this UUID.
 func (uuid UUID) String() string {
 	return uuid.Value
 }

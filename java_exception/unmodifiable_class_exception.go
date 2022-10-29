@@ -17,9 +17,9 @@
 
 package java_exception
 
-////////////////////////////
+// //////////////////////////
 // UnmodifiableClassException
-////////////////////////////
+// //////////////////////////
 // UnmodifiableClassException represents an exception of the same name in java
 type UnmodifiableClassException struct {
 	SerialVersionUID     int64

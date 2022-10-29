@@ -28,9 +28,9 @@ type Throwabler interface {
 	GetStackTrace() []StackTraceElement
 }
 
-////////////////////////////
+// //////////////////////////
 // Throwable
-////////////////////////////
+// //////////////////////////
 // Throwable represents an exception of the same name in java
 type Throwable struct {
 	SerialVersionUID     int64

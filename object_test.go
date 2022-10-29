@@ -831,7 +831,6 @@ func init() {
 	RegisterPOJO(new(Mix))
 }
 
-//
 // BenchmarkJsonEncode-8   	  217354	      4799 ns/op	     832 B/op	      15 allocs/op
 func BenchmarkJsonEncode(b *testing.B) {
 	m := Mix{A: int('a'), B: `hello`}
@@ -846,7 +845,6 @@ func BenchmarkJsonEncode(b *testing.B) {
 	}
 }
 
-//
 // BenchmarkEncode-8   	  211452	      5560 ns/op	    1771 B/op	      51 allocs/op
 func BenchmarkEncode(b *testing.B) {
 	m := Mix{A: int('a'), B: `hello`}
@@ -861,7 +859,6 @@ func BenchmarkEncode(b *testing.B) {
 	}
 }
 
-//
 // BenchmarkJsonDecode-8   	  123922	      8549 ns/op	    1776 B/op	      51 allocs/op
 func BenchmarkJsonDecode(b *testing.B) {
 	m := Mix{A: int('a'), B: `hello`}
@@ -881,7 +878,6 @@ func BenchmarkJsonDecode(b *testing.B) {
 	}
 }
 
-//
 // BenchmarkDecode-8   	  104196	     10924 ns/op	    6424 B/op	      98 allocs/op
 func BenchmarkDecode(b *testing.B) {
 	m := Mix{A: int('a'), B: `hello`}
