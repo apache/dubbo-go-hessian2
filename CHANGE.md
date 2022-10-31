@@ -1,11 +1,15 @@
 # Release Notes
 
+## v1.11.3
+
+### Bugfixes
+- fix java enum decoding incorrectly. [#332](https://github.com/apache/dubbo-go-hessian2/pull/332)
+
 ## v1.11.2
 
 ### Bugfixes
 - fix java enum variable list decoding error. [#330](https://github.com/apache/dubbo-go-hessian2/pull/330)
 - fix ref list is nil when decoding. [#324](https://github.com/apache/dubbo-go-hessian2/pull/324)
-
 
 ## v1.11.1
 
