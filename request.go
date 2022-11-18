@@ -23,10 +23,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	perrors "github.com/pkg/errors"
 )
 
+import (
+	perrors "github.com/pkg/errors"
+)
 /////////////////////////////////////////
 // dubbo
 /////////////////////////////////////////
