@@ -23,15 +23,17 @@ import (
 	"strconv"
 	"strings"
 	"time"
-)
 
-import (
 	perrors "github.com/pkg/errors"
 )
 
 /////////////////////////////////////////
 // dubbo
 /////////////////////////////////////////
+
+func GetArgType(v interface{}) string {
+	return getArgType(v)
+}
 
 func getArgType(v interface{}) string {
 	if v == nil {
