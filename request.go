@@ -34,10 +34,6 @@ import (
 /////////////////////////////////////////
 
 func GetArgType(v interface{}) string {
-	return getArgType(v)
-}
-
-func getArgType(v interface{}) string {
 	if v == nil {
 		return "V"
 	}
@@ -140,7 +136,7 @@ func getArgsTypeList(args []interface{}) (string, error) {
 	)
 
 	for i := range args {
-		typ = getArgType(args[i])
+		typ = GetArgType(args[i])
 		if typ == "" {
 			return types, perrors.Errorf("cat not get arg %#v type", args[i])
 		}
