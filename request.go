@@ -15,6 +15,10 @@
  * limitations under the License.
  */
 
+// This file contains the implementation of
+// [dubbo2 rpc protocol](https://dubbo.apache.org/zh/docs/concepts/rpc-protocol/#dubbo2), which is deprecated.
+// Use the [implementation](https://github.com/apache/dubbo-go/tree/master/protocol/dubbo/hessian2) in dubbo-go project instead.
+
 package hessian
 
 import (
