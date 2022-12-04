@@ -27,7 +27,7 @@ import (
 )
 
 // Empty slice is not nil, but the addresses of all empty slice are the same.
-var  _emptySliceAddr = unsafe.Pointer(reflect.ValueOf([]interface{}{}).Pointer())
+var _emptySliceAddr = unsafe.Pointer(reflect.ValueOf([]interface{}{}).Pointer())
 
 // used to ref object,list,map
 type _refElem struct {
