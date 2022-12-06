@@ -1,5 +1,15 @@
 # Release Notes
 
+## v1.11.5
+
+### Bugfixes
+- fix empty slice encode/decode error. [#341](https://github.com/apache/dubbo-go-hessian2/pull/341)
+
+## v1.11.4
+
+### Bugfixes
+- fix bytes.AcquireBytes memory leak by [dubbogo/gost](https://github.com/dubbogo/gost/pull/108)
+
 ## v1.11.3
 
 ### Bugfixes
