@@ -40,7 +40,8 @@ func ShortArray() []byte {
 // nolint
 func IntegerArray() []byte {
 	e := hessian.NewEncoder()
-	ia := &hessian.IntegerArray{Values: []int32{1, 100, 10000}}
+	var a, b, c int32 = 1, 100, 10000
+	ia := []*int32{&a, &b, &c}
 	e.Encode(ia)
 	return e.Buffer()
 }
@@ -48,7 +49,8 @@ func IntegerArray() []byte {
 // nolint
 func LongArray() []byte {
 	e := hessian.NewEncoder()
-	la := &hessian.LongArray{Values: []int64{1, 100, 10000}}
+	var a, b, c int64 = 1, 100, 10000
+	la := []*int64{&a, &b, &c}
 	e.Encode(la)
 	return e.Buffer()
 }

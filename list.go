@@ -75,22 +75,30 @@ func init() {
 	listTypeNameMapper.Store("github.com/apache/dubbo-go-hessian2/hessian.Object", "[object")
 }
 
-func registerTypeName(gotype, javatype string) {
+func registerListNameMapping(gotype, javatype string) {
 	listTypeNameMapper.Store(gotype, "["+javatype)
 }
 
 func getListTypeName(gotype string) string {
 	buf := strings.Builder{}
 	count := strings.Count(gotype, "[]")
-	for i := 0; i < count; i++ {
-		buf.WriteString("[")
+	if count > 0 {
+		for i := 1; i < count; i++ {
+			buf.WriteString("[")
+		}
+		gotype = strings.Replace(gotype, "[]", "", -1)
 	}
-	gotype = strings.Replace(gotype, "[]", "", -1)
-	v, ok := listTypeNameMapper.Load(strings.TrimPrefix(gotype, "*"))
+
+	v, ok := listTypeNameMapper.Load(gotype)
+	if !ok {
+		v, ok = listTypeNameMapper.Load(strings.TrimPrefix(gotype, "*"))
+	}
+
 	if ok {
 		buf.WriteString(v.(string))
 		return buf.String()
 	}
+
 	return ""
 }
 
@@ -164,12 +172,17 @@ func (e *Encoder) writeTypedList(v interface{}) error {
 		return nil
 	}
 
-	value = UnpackPtrValue(value)
-	goType := UnpackPtrType(value.Type().Elem())
-	totype := combineGoTypeName(goType)
-	typeName := getListTypeName(totype)
+	// try to get list type name of the value type first, for hessian support pointer type.
+	// if not found, try to get list type name of the unpacked type.
+	typeName := getListTypeName(value.Type().String())
 	if typeName == "" {
-		return perrors.New("no this type name: " + totype)
+		value = UnpackPtrValue(value)
+		goType := UnpackPtrType(value.Type().Elem())
+		toType := combineGoTypeName(goType)
+		typeName = getListTypeName(toType)
+		if typeName == "" {
+			return perrors.New("no this type name: " + toType)
+		}
 	}
 
 	e.buffer = encByte(e.buffer, BC_LIST_FIXED) // 'V'
@@ -379,7 +392,8 @@ func (d *Decoder) readTypedListValue(length int, listTyp string, isVariableArr b
 			holder.change(aryValue)
 		} else {
 			if it != nil {
-				aryValue.Index(j).Set(EnsureRawValue(it))
+				//aryValue.Index(j).Set(EnsureRawValue(it))
+				SetValue(aryValue.Index(j), EnsureRawValue(it))
 			}
 		}
 	}

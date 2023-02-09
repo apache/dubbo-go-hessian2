@@ -22,7 +22,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.caucho.hessian.test.A0;
 import com.caucho.hessian.test.A1;
-import com.caucho.hessian.test.TestObject;
 import test.generic.BusinessData;
 import test.generic.Response;
 import test.model.CustomMap;
@@ -383,6 +382,30 @@ public class TestCustomReply {
     public void customReplyTypedFixedList_Test() throws Exception {
         TypedListTest o = new TypedListTest();
         output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplySingleInteger() throws Exception {
+        Integer o = new Integer(123);
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyIntegerArray() throws Exception {
+        Integer[] arr = new Integer[]{new Integer(123), null, new Integer(-456)};
+        output.writeObject(arr);
+        output.flush();
+    }
+
+    public void customReplySingleLong() throws Exception {
+        Long o = new Long(12345);
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyLongArray() throws Exception {
+        Long[] arr = new Long[]{new Long(12345), null, new Long(-67890)};
+        output.writeObject(arr);
         output.flush();
     }
 

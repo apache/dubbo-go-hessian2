@@ -148,6 +148,13 @@ func RegisterPOJOMapping(javaClassName string, o interface{}) int {
 		return -1
 	}
 
+	return registerPOJOTypeMapping(javaClassName, GetGoType(o), obtainValueType(o), o)
+}
+
+// registerPOJOTypeMapping Register a POJO instance for given type.
+// It's used internally to register special types directly.
+func registerPOJOTypeMapping(javaClassName string, goName string, typ reflect.Type, o interface{}) int {
+
 	var (
 		bHeader   []byte
 		bBody     []byte
@@ -156,12 +163,12 @@ func RegisterPOJOMapping(javaClassName string, o interface{}) int {
 		clsDef    ClassInfo
 	)
 
-	sttInfo.typ = obtainValueType(o)
-	sttInfo.goName = GetGoType(o)
+	sttInfo.typ = typ
+	sttInfo.goName = goName
 	sttInfo.javaName = javaClassName
 	sttInfo.inst = o
 	pojoRegistry.j2g[sttInfo.javaName] = sttInfo.goName
-	registerTypeName(sttInfo.goName, sttInfo.javaName)
+	registerListNameMapping(sttInfo.goName, sttInfo.javaName)
 
 	// prepare fields info of objectDef
 	nextStruct := []reflect.Type{sttInfo.typ}
