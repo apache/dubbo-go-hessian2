@@ -22,11 +22,6 @@ import (
 )
 
 func init() {
-	SetCollectionSerialize(&IntegerArray{})
-	SetCollectionSerialize(&ByteArray{})
-	SetCollectionSerialize(&ShortArray{})
-	SetCollectionSerialize(&BooleanArray{})
-	SetCollectionSerialize(&LongArray{})
 	SetCollectionSerialize(&FloatArray{})
 	SetCollectionSerialize(&DoubleArray{})
 	SetCollectionSerialize(&CharacterArray{})

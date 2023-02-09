@@ -18,12 +18,47 @@
 package hessian
 
 import (
+	"fmt"
+	"reflect"
 	"testing"
-)
 
-import (
 	"github.com/stretchr/testify/assert"
 )
+
+func TestDecodePointerSliceSet(t *testing.T) {
+	a:=[]*int16{nil}
+	v:=reflect.ValueOf(a)
+	var b int16 = 1
+
+	typ:=reflect.TypeOf(b)
+
+	fmt.Printf("%v %v", v.Index(0).Type(), v.Index(0).Kind())
+	switch v.Index(0).Type() {
+	case typ:
+
+	}
+	v.Index(0).Set(reflect.ValueOf(&b))
+
+}
+func TestDecodeJavaSingleShort(t *testing.T) {
+	var i int32 = 123
+	got, err := decodeJavaResponse(`customReplySingleShort`, ``, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	assert.Equal(t, i, got)
+}
+
+func TestDecodeJavaShortArray(t *testing.T) {
+	var a int16 = 123
+	var b int16 = -456
+
+	arr := []*int16{&a, nil, &b}
+	got, err := decodeJavaResponse(`customReplyJavaShortArray`, ``, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	assert.Equal(t, arr, got)
+}
+
 
 func TestDecodeJavaSingleInteger(t *testing.T) {
 	var i int32 = 123
@@ -38,7 +73,7 @@ func TestDecodeJavaIntegerArray(t *testing.T) {
 	var b int32 = -456
 
 	arr := []*int32{&a, nil, &b}
-	got, err := decodeJavaResponse(`customReplyIntegerArray`, ``, false)
+	got, err := decodeJavaResponse(`customReplyJavaIntegerArray`, ``, false)
 	assert.NoError(t, err)
 	t.Logf("%T %+v", got, got)
 	assert.Equal(t, arr, got)
@@ -57,7 +92,45 @@ func TestDecodeJavaLongArray(t *testing.T) {
 	var b int64 = -67890
 
 	arr := []*int64{&a, nil, &b}
-	got, err := decodeJavaResponse(`customReplyLongArray`, ``, false)
+	got, err := decodeJavaResponse(`customReplyJavaLongArray`, ``, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	assert.Equal(t, arr, got)
+}
+
+func TestDecodeJavaSingleBoolean(t *testing.T) {
+	var b = true
+	got, err := decodeJavaResponse(`customReplySingleBoolean`, ``, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	assert.Equal(t, b, got)
+}
+
+func TestDecodeJavaBooleanArray(t *testing.T) {
+	var a = true
+	var b = false
+
+	arr := []*bool{&a, nil, &b}
+	got, err := decodeJavaResponse(`customReplyJavaBooleanArray`, ``, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	assert.Equal(t, arr, got)
+}
+
+func TestDecodeJavaSingleByte(t *testing.T) {
+	var b int32 = 'A'
+	got, err := decodeJavaResponse(`customReplySingleByte`, ``, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	assert.Equal(t, b, got)
+}
+
+func TestDecodeJavaByteArray(t *testing.T) {
+	var a byte = 'A'
+	var b byte = 'C'
+
+	arr := []*byte{&a, nil, &b}
+	got, err := decodeJavaResponse(`customReplyJavaByteArray`, ``, false)
 	assert.NoError(t, err)
 	t.Logf("%T %+v", got, got)
 	assert.Equal(t, arr, got)

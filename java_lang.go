@@ -25,4 +25,14 @@ func init() {
 
 	var b int64 = 1
 	registerPOJOTypeMapping("java.lang.Long", "*int64", reflect.TypeOf(&b), &b)
+
+	var c = true
+	registerPOJOTypeMapping("java.lang.Boolean", "*bool", reflect.TypeOf(&c), &c)
+
+	var d int16 = 1
+	registerPOJOTypeMapping("java.lang.Short", "*int16", reflect.TypeOf(&d), &d)
+
+	var e byte = 'a'
+	registerPOJOTypeMapping("java.lang.Byte", "*uint8", reflect.TypeOf(&e), &e)
+
 }

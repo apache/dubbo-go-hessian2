@@ -24,7 +24,8 @@ import (
 // nolint
 func ByteArray() []byte {
 	e := hessian.NewEncoder()
-	ba := &hessian.ByteArray{Values: []byte{byte(1), byte(100), byte(200)}}
+	var a, b, c byte = 1, 100, 200
+	ba := []*byte{&a, &b, &c}
 	e.Encode(ba)
 	return e.Buffer()
 }
@@ -32,7 +33,8 @@ func ByteArray() []byte {
 // nolint
 func ShortArray() []byte {
 	e := hessian.NewEncoder()
-	sa := &hessian.ShortArray{Values: []int16{1, 100, 10000}}
+	var a, b, c int16 = 1, 100, 10000
+	sa := []*int16{&a, &b, &c}
 	e.Encode(sa)
 	return e.Buffer()
 }
@@ -58,7 +60,8 @@ func LongArray() []byte {
 // nolint
 func BooleanArray() []byte {
 	e := hessian.NewEncoder()
-	ba := &hessian.BooleanArray{Values: []bool{true, false, true}}
+	var a, b, c = true, false, true
+	ba := []*bool{&a, &b, &c}
 	e.Encode(ba)
 	return e.Buffer()
 }

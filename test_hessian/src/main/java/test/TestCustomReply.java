@@ -385,13 +385,25 @@ public class TestCustomReply {
         output.flush();
     }
 
+    public void customReplySingleShort() throws Exception {
+        Short o = Short.valueOf((short) 123);
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyJavaShortArray() throws Exception {
+        Short[] arr = new Short[]{Short.valueOf((short) 123), null, Short.valueOf((short) -456)};
+        output.writeObject(arr);
+        output.flush();
+    }
+
     public void customReplySingleInteger() throws Exception {
         Integer o = new Integer(123);
         output.writeObject(o);
         output.flush();
     }
 
-    public void customReplyIntegerArray() throws Exception {
+    public void customReplyJavaIntegerArray() throws Exception {
         Integer[] arr = new Integer[]{new Integer(123), null, new Integer(-456)};
         output.writeObject(arr);
         output.flush();
@@ -403,8 +415,32 @@ public class TestCustomReply {
         output.flush();
     }
 
-    public void customReplyLongArray() throws Exception {
+    public void customReplyJavaLongArray() throws Exception {
         Long[] arr = new Long[]{new Long(12345), null, new Long(-67890)};
+        output.writeObject(arr);
+        output.flush();
+    }
+
+    public void customReplySingleBoolean() throws Exception {
+        Boolean o = new Boolean(true);
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyJavaBooleanArray() throws Exception {
+        Boolean[] arr = new Boolean[]{new Boolean(true), null, new Boolean(false)};
+        output.writeObject(arr);
+        output.flush();
+    }
+
+    public void customReplySingleByte() throws Exception {
+        Byte o = Byte.valueOf((byte) 'A');
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyJavaByteArray() throws Exception {
+        Byte[] arr = new Byte[]{Byte.valueOf((byte) 'A'), null, Byte.valueOf((byte) 'C')};
         output.writeObject(arr);
         output.flush();
     }
