@@ -33,6 +33,7 @@ func init() {
 }
 
 // BooleanArray Boolean[]
+// Deprecated: it will be replaced by a slice type instead in next major version.
 type BooleanArray struct {
 	Values []bool
 }
@@ -60,7 +61,8 @@ func (*BooleanArray) JavaClassName() string {
 	return "[java.lang.Boolean"
 }
 
-// IntegerArray Integer[]
+// IntegerArray Integer[].
+// Deprecated: it will be replaced by a slice type instead in next major version.
 type IntegerArray struct {
 	Values []int32
 }
@@ -89,6 +91,7 @@ func (*IntegerArray) JavaClassName() string {
 }
 
 // ByteArray Byte[]
+// Deprecated: it will be replaced by a slice type instead in next major version.
 type ByteArray struct {
 	Values []uint8
 }
@@ -117,6 +120,7 @@ func (*ByteArray) JavaClassName() string {
 }
 
 // ShortArray Short[]
+// Deprecated: it will be replaced by a slice type instead in next major version.
 type ShortArray struct {
 	Values []int16
 }
@@ -145,6 +149,7 @@ func (*ShortArray) JavaClassName() string {
 }
 
 // LongArray Long[]
+// Deprecated: it will be replaced by a slice type instead in next major version.
 type LongArray struct {
 	Values []int64
 }
@@ -173,6 +178,7 @@ func (*LongArray) JavaClassName() string {
 }
 
 // FloatArray Float[]
+// Deprecated: it will be replaced by a slice type instead in next major version.
 type FloatArray struct {
 	Values []float32
 }
@@ -201,6 +207,7 @@ func (*FloatArray) JavaClassName() string {
 }
 
 // DoubleArray Double[]
+// Deprecated: it will be replaced by a slice type instead in next major version.
 type DoubleArray struct {
 	Values []float64
 }
@@ -229,6 +236,7 @@ func (*DoubleArray) JavaClassName() string {
 }
 
 // CharacterArray Character[]
+// Deprecated: it will be replaced by a slice type instead in next major version.
 type CharacterArray struct {
 	Values string
 }
