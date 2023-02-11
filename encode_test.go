@@ -19,6 +19,7 @@ package hessian
 
 import (
 	"bytes"
+	"fmt"
 	"os/exec"
 	"testing"
 )
@@ -58,7 +59,10 @@ func javaDecodeValidate(t *testing.T, method string, target interface{}) (string
 	}
 
 	go func() {
-		_, _ = stdin.Write(b)
+		_, werr := stdin.Write(b)
+		if werr != nil {
+			panic(fmt.Errorf("write to stdin error: %v", werr))
+		}
 		_ = stdin.Close()
 	}()
 

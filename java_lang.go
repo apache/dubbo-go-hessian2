@@ -35,4 +35,20 @@ func init() {
 	var e byte = 'a'
 	registerPOJOTypeMapping("java.lang.Byte", "*uint8", reflect.TypeOf(&e), &e)
 
+	var f float32 = 1.0
+	registerPOJOTypeMapping("java.lang.Float", "*float32", reflect.TypeOf(&f), &f)
+
+	var g = 1.0
+	registerPOJOTypeMapping("java.lang.Double", "*float64", reflect.TypeOf(&g), &g)
+
+	var h = 'a'
+	registerPOJOTypeMapping("java.lang.Character", "*hessian.Rune", reflect.TypeOf(&h), &h)
 }
+
+// Rune is an alias for rune, so that to get the correct runtime type of rune.
+// The runtime type of rune is int32, which is not expected.
+type Rune rune
+
+var (
+	_typeOfRune = reflect.TypeOf(Rune(0))
+)

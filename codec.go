@@ -333,6 +333,21 @@ func SetValue(dest, v reflect.Value) {
 	dest.Set(v)
 }
 
+// setRawValueToDest set the raw value to dest.
+func setRawValueToDest(dest reflect.Value, v reflect.Value) {
+	if dest.Type() == v.Type() {
+		dest.Set(v)
+		return
+	}
+
+	if dest.Type().Kind() == reflect.Ptr {
+		setRawValueToPointer(dest, v)
+		return
+	}
+
+	dest.Set(v)
+}
+
 // setRawValueToPointer set the raw value to dest.
 func setRawValueToPointer(dest reflect.Value, v reflect.Value) {
 	pv := PackPtr(v)
@@ -355,6 +370,11 @@ func setRawValueToPointer(dest reflect.Value, v reflect.Value) {
 		dest.Set(reflect.ValueOf(&vv))
 		return
 	case _typeOfInt32Ptr:
+		if v.Kind() == reflect.String {
+			vv := rune(v.String()[0])
+			dest.Set(reflect.ValueOf(&vv))
+			return
+		}
 		vv := int32(v.Int())
 		dest.Set(reflect.ValueOf(&vv))
 		return

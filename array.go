@@ -21,12 +21,6 @@ import (
 	"strings"
 )
 
-func init() {
-	SetCollectionSerialize(&FloatArray{})
-	SetCollectionSerialize(&DoubleArray{})
-	SetCollectionSerialize(&CharacterArray{})
-}
-
 // BooleanArray Boolean[]
 // Deprecated: it will not be supported in next major version, being replaced by a slice type instead.
 type BooleanArray struct {

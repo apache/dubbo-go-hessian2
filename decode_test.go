@@ -61,6 +61,7 @@ func genHessianJar() {
 		return
 	}
 
+	log.Println("generate hessian jar")
 	cmd := exec.Command("mvn", "clean", "package")
 	cmd.Dir = "./test_hessian"
 	out, err := cmd.Output()
@@ -156,11 +157,11 @@ func mustDecodeObject(t *testing.T, b []byte) interface{} {
 	return res
 }
 
-func TestUserDefindeException(t *testing.T) {
+func TestUserDefinedException(t *testing.T) {
 	expect := &UnknownException{
-		DetailMessage: "throw UserDefindException",
+		DetailMessage: "throw UserDefinedException",
 	}
-	testDecodeFramework(t, "throw_UserDefindException", expect)
+	testDecodeFramework(t, "throw_UserDefinedException", expect)
 }
 
 type Circular214 struct {

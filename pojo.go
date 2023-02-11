@@ -154,7 +154,6 @@ func RegisterPOJOMapping(javaClassName string, o interface{}) int {
 // registerPOJOTypeMapping Register a POJO instance for given type.
 // It's used internally to register special types directly.
 func registerPOJOTypeMapping(javaClassName string, goName string, typ reflect.Type, o interface{}) int {
-
 	var (
 		bHeader   []byte
 		bBody     []byte

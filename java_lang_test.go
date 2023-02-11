@@ -26,11 +26,11 @@ import (
 )
 
 func TestDecodePointerSliceSet(t *testing.T) {
-	a:=[]*int16{nil}
-	v:=reflect.ValueOf(a)
+	a := []*int16{nil}
+	v := reflect.ValueOf(a)
 	var b int16 = 1
 
-	typ:=reflect.TypeOf(b)
+	typ := reflect.TypeOf(b)
 
 	fmt.Printf("%v %v", v.Index(0).Type(), v.Index(0).Kind())
 	switch v.Index(0).Type() {
@@ -58,7 +58,6 @@ func TestDecodeJavaShortArray(t *testing.T) {
 	t.Logf("%T %+v", got, got)
 	assert.Equal(t, arr, got)
 }
-
 
 func TestDecodeJavaSingleInteger(t *testing.T) {
 	var i int32 = 123
@@ -131,6 +130,64 @@ func TestDecodeJavaByteArray(t *testing.T) {
 
 	arr := []*byte{&a, nil, &b}
 	got, err := decodeJavaResponse(`customReplyJavaByteArray`, ``, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	assert.Equal(t, arr, got)
+}
+
+func TestDecodeJavaSingleFloat(t *testing.T) {
+	var b = 1.23
+	got, err := decodeJavaResponse(`customReplySingleFloat`, ``, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	assert.Equal(t, b, got)
+}
+
+func TestDecodeJavaFloatArray(t *testing.T) {
+	var a float32 = 1.23
+	var b float32 = 4.56
+
+	arr := []*float32{&a, nil, &b}
+	got, err := decodeJavaResponse(`customReplyJavaFloatArray`, ``, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	assert.Equal(t, arr, got)
+}
+
+func TestDecodeJavaSingleDouble(t *testing.T) {
+	var b = 1.23
+	got, err := decodeJavaResponse(`customReplySingleDouble`, ``, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	assert.Equal(t, b, got)
+}
+
+func TestDecodeJavaDoubleArray(t *testing.T) {
+	var a = 1.23
+	var b = 4.56
+
+	arr := []*float64{&a, nil, &b}
+	got, err := decodeJavaResponse(`customReplyJavaDoubleArray`, ``, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	assert.Equal(t, arr, got)
+}
+
+
+func TestDecodeJavaSingleCharacter(t *testing.T) {
+	var b = "A"
+	got, err := decodeJavaResponse(`customReplySingleCharacter`, ``, false)
+	assert.NoError(t, err)
+	t.Logf("%T %+v", got, got)
+	assert.Equal(t, b, got)
+}
+
+func TestDecodeJavaCharacterArray(t *testing.T) {
+	var a = 'A'
+	var b = 'C'
+
+	arr := []*rune{&a, nil, &b}
+	got, err := decodeJavaResponse(`customReplyJavaCharacterArray`, ``, false)
 	assert.NoError(t, err)
 	t.Logf("%T %+v", got, got)
 	assert.Equal(t, arr, got)

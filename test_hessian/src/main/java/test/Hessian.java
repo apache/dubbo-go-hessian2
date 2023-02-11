@@ -20,12 +20,15 @@ package test;
 import com.alibaba.com.caucho.hessian.io.Hessian2Input;
 import com.alibaba.com.caucho.hessian.io.Hessian2Output;
 import com.caucho.hessian.test.TestHessian2Servlet;
+import test.util.JavaHessianUtil;
 
 import java.lang.reflect.Method;
 
 
 public class Hessian {
     public static void main(String[] args) throws Exception {
+        JavaHessianUtil.removeTestClassLimitFromAllowList();
+
         if (args.length > 1) {
             testCustomClassMethod(args[0], args[1]);
             return;

@@ -204,6 +204,11 @@ func (e *Encoder) Encode(v interface{}) error {
 				e.buffer = encBool(e.buffer, false)
 			}
 		case reflect.Int32:
+			if t == _typeOfRune {
+				e.buffer = encString(e.buffer, string(*v.(*Rune)))
+				return nil
+			}
+
 			var err error
 			e.buffer, err = e.encTypeInt32(e.buffer, v)
 			if err != nil {

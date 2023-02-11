@@ -445,6 +445,42 @@ public class TestCustomReply {
         output.flush();
     }
 
+    public void customReplySingleFloat() throws Exception {
+        Float o = Float.valueOf((float) 1.23);
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyJavaFloatArray() throws Exception {
+        Float[] arr = new Float[]{Float.valueOf((float) 1.23), null, Float.valueOf((float) 4.56)};
+        output.writeObject(arr);
+        output.flush();
+    }
+
+    public void customReplySingleDouble() throws Exception {
+        Double o = Double.valueOf(1.23);
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyJavaDoubleArray() throws Exception {
+        Double[] arr = new Double[]{Double.valueOf(1.23), null, Double.valueOf(4.56)};
+        output.writeObject(arr);
+        output.flush();
+    }
+
+    public void customReplySingleCharacter() throws Exception {
+        Character o = new Character('A');
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyJavaCharacterArray() throws Exception {
+        Character[] arr = new Character[]{new Character('A'), null, new Character('C')};
+        output.writeObject(arr);
+        output.flush();
+    }
+
     public void customReplyTypedFixedList_Object() throws Exception {
         Object[] o = new Object[]{new A0()};
         output.writeObject(o);

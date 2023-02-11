@@ -83,7 +83,7 @@ func getListTypeName(gotype string) string {
 	buf := strings.Builder{}
 	count := strings.Count(gotype, "[]")
 	if count > 0 {
-		for i := 1; i < count; i++ {
+		for i := 0; i < count; i++ {
 			buf.WriteString("[")
 		}
 		gotype = strings.Replace(gotype, "[]", "", -1)
@@ -102,13 +102,13 @@ func getListTypeName(gotype string) string {
 	return ""
 }
 
-func getListType(javalistname string) reflect.Type {
-	javaname := javalistname
-	if strings.Index(javaname, "[") == 0 {
-		javaname = javaname[1:]
+func getListType(javaListName string) reflect.Type {
+	javaName := javaListName
+	if strings.Index(javaName, "[") == 0 {
+		javaName = javaName[1:]
 	}
-	if strings.Index(javaname, "[") == 0 {
-		lt := getListType(javaname)
+	if strings.Index(javaName, "[") == 0 {
+		lt := getListType(javaName)
 		if lt == nil {
 			return nil
 		}
@@ -116,13 +116,13 @@ func getListType(javalistname string) reflect.Type {
 	}
 
 	var sliceTy reflect.Type
-	ltm := listTypeMapper[javaname]
+	ltm := listTypeMapper[javaName]
 	if ltm != nil {
 		sliceTy = reflect.SliceOf(ltm)
 	}
 
 	if sliceTy == nil {
-		tpStructInfo, _ := getStructInfo(javaname)
+		tpStructInfo, _ := getStructInfo(javaName)
 		if tpStructInfo == nil || tpStructInfo.typ == nil {
 			return nil
 		}
@@ -393,8 +393,7 @@ func (d *Decoder) readTypedListValue(length int, listTyp string, isVariableArr b
 		} else {
 			if it != nil {
 				//aryValue.Index(j).Set(EnsureRawValue(it))
-				//SetValue(aryValue.Index(j), EnsureRawValue(it))
-				setRawValueToPointer(aryValue.Index(j), EnsureRawValue(it))
+				setRawValueToDest(aryValue.Index(j), EnsureRawValue(it))
 			}
 		}
 	}
