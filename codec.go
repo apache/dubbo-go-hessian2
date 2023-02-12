@@ -24,9 +24,7 @@ import (
 	"math"
 	"reflect"
 	"strings"
-)
 
-import (
 	perrors "github.com/pkg/errors"
 )
 
@@ -327,7 +325,7 @@ func SetValue(dest, v reflect.Value) {
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		dest.SetUint(v.Uint())
 		return
-	case reflect.Pointer:
+	case reflect.Ptr:
 		setRawValueToPointer(dest, v)
 		return
 	}
