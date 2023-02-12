@@ -26,5 +26,5 @@ func (i Integer) JavaClassName() string {
 	return "java.lang.Integer"
 }
 
-var IntegerType =reflect.TypeOf(Integer(0))
+var IntegerType = reflect.TypeOf(Integer(0))
 var IntegerKind = IntegerType.Kind()

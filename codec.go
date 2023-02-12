@@ -24,7 +24,9 @@ import (
 	"math"
 	"reflect"
 	"strings"
+)
 
+import (
 	perrors "github.com/pkg/errors"
 )
 

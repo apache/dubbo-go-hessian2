@@ -75,23 +75,23 @@ func init() {
 	listTypeNameMapper.Store("github.com/apache/dubbo-go-hessian2/hessian.Object", "[object")
 }
 
-func registerListNameMapping(gotype, javatype string) {
-	listTypeNameMapper.Store(gotype, "["+javatype)
+func registerListNameMapping(gotype, javaType string) {
+	listTypeNameMapper.Store(gotype, "["+javaType)
 }
 
-func getListTypeName(gotype string) string {
+func getListTypeName(goType string) string {
 	buf := strings.Builder{}
-	count := strings.Count(gotype, "[]")
+	count := strings.Count(goType, "[]")
 	if count > 0 {
-		for i := 0; i < count; i++ {
+		for i := 1; i < count; i++ {
 			buf.WriteString("[")
 		}
-		gotype = strings.Replace(gotype, "[]", "", -1)
+		goType = strings.Replace(goType, "[]", "", -1)
 	}
 
-	v, ok := listTypeNameMapper.Load(gotype)
+	v, ok := listTypeNameMapper.Load(goType)
 	if !ok {
-		v, ok = listTypeNameMapper.Load(strings.TrimPrefix(gotype, "*"))
+		v, ok = listTypeNameMapper.Load(strings.TrimPrefix(goType, "*"))
 	}
 
 	if ok {
@@ -177,7 +177,7 @@ func (e *Encoder) writeTypedList(v interface{}) error {
 	typeName := getListTypeName(value.Type().String())
 	if typeName == "" {
 		value = UnpackPtrValue(value)
-		goType := UnpackPtrType(value.Type().Elem())
+		goType := UnpackPtrType(value.Type())
 		toType := combineGoTypeName(goType)
 		typeName = getListTypeName(toType)
 		if typeName == "" {

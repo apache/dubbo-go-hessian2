@@ -1002,7 +1002,7 @@ func TestWrapperClassArray(t *testing.T) {
 	got, err := decodeJavaResponse(`byteArray`, `test.TestWrapperClassArray`, false)
 	assert.NoError(t, err)
 	t.Logf("%T %+v", got, got)
-	var b1, b2, b3 byte = 'A','B','C'
+	var b1, b2, b3 byte = 'A', 'B', 'C'
 	ba := []*byte{&b1, &b2, &b3}
 	assert.True(t, reflect.DeepEqual(got, ba))
 

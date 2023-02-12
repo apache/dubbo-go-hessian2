@@ -21,7 +21,9 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+)
 
+import (
 	"github.com/stretchr/testify/assert"
 )
 
@@ -172,7 +174,6 @@ func TestDecodeJavaDoubleArray(t *testing.T) {
 	t.Logf("%T %+v", got, got)
 	assert.Equal(t, arr, got)
 }
-
 
 func TestDecodeJavaSingleCharacter(t *testing.T) {
 	var b = "A"
