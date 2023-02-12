@@ -18,8 +18,6 @@
 package hessian
 
 import (
-	"fmt"
-	"reflect"
 	"testing"
 )
 
@@ -27,21 +25,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDecodePointerSliceSet(t *testing.T) {
-	a := []*int16{nil}
-	v := reflect.ValueOf(a)
-	var b int16 = 1
-
-	typ := reflect.TypeOf(b)
-
-	fmt.Printf("%v %v", v.Index(0).Type(), v.Index(0).Kind())
-	switch v.Index(0).Type() {
-	case typ:
-
-	}
-	v.Index(0).Set(reflect.ValueOf(&b))
-
-}
 func TestDecodeJavaSingleShort(t *testing.T) {
 	var i int32 = 123
 	got, err := decodeJavaResponse(`customReplySingleShort`, ``, false)
