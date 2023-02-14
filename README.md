@@ -1,4 +1,4 @@
-# gohessian
+# dubbo-go-hessian2
 
 [![Build Status](https://travis-ci.org/apache/dubbo-go-hessian2.png?branch=master)](https://travis-ci.org/apache/dubbo-go-hessian2)
 [![codecov](https://codecov.io/gh/apache/dubbo-go-hessian2/branch/master/graph/badge.svg)](https://codecov.io/gh/apache/dubbo-go-hessian2)
