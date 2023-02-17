@@ -21,6 +21,7 @@ thanks to [micln](https://github.com/micln), [pantianying](https://github.com/pa
 
 * [All JDK Exceptions](https://github.com/apache/dubbo-go-hessian2/issues/59)
 * [Field Alias By Alias](https://github.com/apache/dubbo-go-hessian2/issues/19)
+* [Java wrapper type](https://github.com/apache/dubbo-go-hessian2/issues/349)
 * [Java Bigdecimal](https://github.com/apache/dubbo-go-hessian2/issues/89)
 * [Java Date & Time](https://github.com/apache/dubbo-go-hessian2/issues/90)
 * [java8 time.Date](https://github.com/apache/dubbo-go-hessian2/pull/212)
@@ -41,25 +42,34 @@ Cross languages message definition should be careful, the following situations s
 
 So we can maintain a cross language type mapping:
 
-| hessian type |  java type  |  golang type |
-| --- | --- | --- |
-| **null** | null | nil |
-| **binary** | byte[] | []byte |
-| **boolean** | boolean | bool |
-| **date** | java.util.Date | time.Time |
-| **double** | double | float64 |
-| **int** | int | int32 |
-| **long** | long | int64 |
-| **string** | java.lang.String | string |
-| **list** | java.util.List | slice |
-| **map** | java.util.Map | map |
-| **object** | custom define object | custom define struct|
-| **OTHER COMMON USING TYPE** | | |
-| **big decimal** | java.math.BigDecimal | github.com/dubbogo/gost/math/big/Decimal |
-| **big integer** | java.math.BigInteger | github.com/dubbogo/gost/math/big/Integer |
-| **date** | java.sql.Date | github.com/apache/dubbo-go-hessian2/java_sql_time/Date |
-| **date** | java.sql.Time | github.com/apache/dubbo-go-hessian2/java_sql_time/Time |
-| **date** | all java8 sdk time | github.com/apache/dubbo-go-hessian2/java8_time |
+| hessian type                | java type            | golang type                                            |
+|-----------------------------|----------------------|--------------------------------------------------------|
+| **null**                    | null                 | nil                                                    |
+| **binary**                  | byte[]               | []byte                                                 |
+| **boolean**                 | boolean              | bool                                                   |
+| **date**                    | java.util.Date       | time.Time                                              |
+| **double**                  | double               | float64                                                |
+| **int**                     | int                  | int32                                                  |
+| **long**                    | long                 | int64                                                  |
+| **string**                  | java.lang.String     | string                                                 |
+| **list**                    | java.util.List       | slice                                                  |
+| **map**                     | java.util.Map        | map                                                    |
+| **object**                  | custom define object | custom define struct                                   |
+| **big decimal**             | java.math.BigDecimal | github.com/dubbogo/gost/math/big/Decimal               |
+| **big integer**             | java.math.BigInteger | github.com/dubbogo/gost/math/big/Integer               |
+| **date**                    | java.sql.Date        | github.com/apache/dubbo-go-hessian2/java_sql_time/Date |
+| **date**                    | java.sql.Time        | github.com/apache/dubbo-go-hessian2/java_sql_time/Time |
+| **date**                    | all java8 sdk time   | github.com/apache/dubbo-go-hessian2/java8_time         |
+| **Integer**                 | java.lang.Integer    | *int32                                                 |
+| **Byte**                    | java.lang.Byte       | *byte                                                  |
+| **Short**                   | java.lang.Short      | *int16                                                 |
+| **Boolean**                 | java.lang.Boolean    | *bool                                                  |
+| **Long**                    | java.lang.Long       | *int64                                                 |
+| **Float**                   | java.lang.Float      | *float32                                               |
+| **Double**                  | java.lang.Double     | *float64                                               |
+| **Character**               | java.lang.Character  | *hessian.Rune                                          |
+| **OTHER COMMON USING TYPE** |                      |                                                        |
+
 
 ## reference
 
