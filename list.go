@@ -75,32 +75,40 @@ func init() {
 	listTypeNameMapper.Store("github.com/apache/dubbo-go-hessian2/hessian.Object", "[object")
 }
 
-func registerTypeName(gotype, javatype string) {
-	listTypeNameMapper.Store(gotype, "["+javatype)
+func registerListNameMapping(gotype, javaType string) {
+	listTypeNameMapper.Store(gotype, "["+javaType)
 }
 
-func getListTypeName(gotype string) string {
+func getListTypeName(goType string) string {
 	buf := strings.Builder{}
-	count := strings.Count(gotype, "[]")
-	for i := 0; i < count; i++ {
-		buf.WriteString("[")
+	count := strings.Count(goType, "[]")
+	if count > 0 {
+		for i := 1; i < count; i++ {
+			buf.WriteString("[")
+		}
+		goType = strings.Replace(goType, "[]", "", -1)
 	}
-	gotype = strings.Replace(gotype, "[]", "", -1)
-	v, ok := listTypeNameMapper.Load(strings.TrimPrefix(gotype, "*"))
+
+	v, ok := listTypeNameMapper.Load(goType)
+	if !ok {
+		v, ok = listTypeNameMapper.Load(strings.TrimPrefix(goType, "*"))
+	}
+
 	if ok {
 		buf.WriteString(v.(string))
 		return buf.String()
 	}
+
 	return ""
 }
 
-func getListType(javalistname string) reflect.Type {
-	javaname := javalistname
-	if strings.Index(javaname, "[") == 0 {
-		javaname = javaname[1:]
+func getListType(javaListName string) reflect.Type {
+	javaName := javaListName
+	if strings.Index(javaName, "[") == 0 {
+		javaName = javaName[1:]
 	}
-	if strings.Index(javaname, "[") == 0 {
-		lt := getListType(javaname)
+	if strings.Index(javaName, "[") == 0 {
+		lt := getListType(javaName)
 		if lt == nil {
 			return nil
 		}
@@ -108,13 +116,13 @@ func getListType(javalistname string) reflect.Type {
 	}
 
 	var sliceTy reflect.Type
-	ltm := listTypeMapper[javaname]
+	ltm := listTypeMapper[javaName]
 	if ltm != nil {
 		sliceTy = reflect.SliceOf(ltm)
 	}
 
 	if sliceTy == nil {
-		tpStructInfo, _ := getStructInfo(javaname)
+		tpStructInfo, _ := getStructInfo(javaName)
 		if tpStructInfo == nil || tpStructInfo.typ == nil {
 			return nil
 		}
@@ -164,12 +172,17 @@ func (e *Encoder) writeTypedList(v interface{}) error {
 		return nil
 	}
 
-	value = UnpackPtrValue(value)
-	goType := UnpackPtrType(value.Type().Elem())
-	totype := combineGoTypeName(goType)
-	typeName := getListTypeName(totype)
+	// try to get list type name of the value type first, for hessian support pointer type.
+	// if not found, try to get list type name of the unpacked type.
+	typeName := getListTypeName(value.Type().String())
 	if typeName == "" {
-		return perrors.New("no this type name: " + totype)
+		value = UnpackPtrValue(value)
+		goType := UnpackPtrType(value.Type())
+		toType := combineGoTypeName(goType)
+		typeName = getListTypeName(toType)
+		if typeName == "" {
+			return perrors.New("no this type name: " + toType)
+		}
 	}
 
 	e.buffer = encByte(e.buffer, BC_LIST_FIXED) // 'V'
@@ -379,7 +392,8 @@ func (d *Decoder) readTypedListValue(length int, listTyp string, isVariableArr b
 			holder.change(aryValue)
 		} else {
 			if it != nil {
-				aryValue.Index(j).Set(EnsureRawValue(it))
+				//aryValue.Index(j).Set(EnsureRawValue(it))
+				setRawValueToDest(aryValue.Index(j), EnsureRawValue(it))
 			}
 		}
 	}

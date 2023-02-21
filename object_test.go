@@ -709,6 +709,12 @@ func doTestBasePointer(t *testing.T, base *BasePointer, expected *BasePointer) {
 }
 
 func TestSkip(t *testing.T) {
+	tempRegistry := pojoRegistry
+	// recover the pojoRegistry after test, avoid influence other test cases.
+	defer func() {
+		pojoRegistry = tempRegistry
+	}()
+
 	// clear pojo
 	pojoRegistry = &POJORegistry{
 		j2g:      make(map[string]string),
@@ -991,52 +997,62 @@ func TestCustomReplyGenericResponseList(t *testing.T) {
 }
 
 func TestWrapperClassArray(t *testing.T) {
+	t.Log(getListType("java.lang.Byte"))
+	t.Log(getListType("java.lang.Integer"))
 	got, err := decodeJavaResponse(`byteArray`, `test.TestWrapperClassArray`, false)
 	assert.NoError(t, err)
 	t.Logf("%T %+v", got, got)
-	ba := &ByteArray{Values: []byte{byte(1), byte(100), byte(200)}}
+	var b1, b2, b3 byte = 'A', 'B', 'C'
+	ba := []*byte{&b1, &b2, &b3}
 	assert.True(t, reflect.DeepEqual(got, ba))
 
 	got, err = decodeJavaResponse(`shortArray`, `test.TestWrapperClassArray`, false)
 	assert.NoError(t, err)
 	t.Logf("%T %+v", got, got)
-	sa := &ShortArray{Values: []int16{1, 100, 10000}}
+	var s1, s2, s3 int16 = 1, 100, 10000
+	sa := []*int16{&s1, &s2, &s3}
 	assert.True(t, reflect.DeepEqual(got, sa))
 
 	got, err = decodeJavaResponse(`integerArray`, `test.TestWrapperClassArray`, false)
 	assert.NoError(t, err)
 	t.Logf("%T %+v", got, got)
-	ia := &IntegerArray{Values: []int32{1, 100, 10000}}
+	var i1, i2, i3 int32 = 1, 100, 10000
+	ia := []*int32{&i1, &i2, &i3}
 	assert.True(t, reflect.DeepEqual(got, ia))
 
 	got, err = decodeJavaResponse(`longArray`, `test.TestWrapperClassArray`, false)
 	assert.NoError(t, err)
 	t.Logf("%T %+v", got, got)
-	la := &LongArray{Values: []int64{1, 100, 10000}}
+	var l1, l2, l3 int64 = 1, 100, 10000
+	la := []*int64{&l1, &l2, &l3}
 	assert.True(t, reflect.DeepEqual(got, la))
 
 	got, err = decodeJavaResponse(`characterArray`, `test.TestWrapperClassArray`, false)
 	assert.NoError(t, err)
 	t.Logf("%T %+v", got, got)
-	ca := &CharacterArray{Values: "hello world"}
+	var r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11 Rune = 'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd'
+	ca := []*int32{(*int32)(&r1), (*int32)(&r2), (*int32)(&r3), (*int32)(&r4), (*int32)(&r5), (*int32)(&r6), (*int32)(&r7), (*int32)(&r8), (*int32)(&r9), (*int32)(&r10), (*int32)(&r11)}
 	assert.True(t, reflect.DeepEqual(got, ca))
 
 	got, err = decodeJavaResponse(`booleanArray`, `test.TestWrapperClassArray`, false)
 	assert.NoError(t, err)
 	t.Logf("%T %+v", got, got)
-	bla := &BooleanArray{Values: []bool{true, false, true}}
+	var bl1, bl2, bl3 bool = true, false, true
+	bla := []*bool{&bl1, &bl2, &bl3}
 	assert.True(t, reflect.DeepEqual(got, bla))
 
 	got, err = decodeJavaResponse(`floatArray`, `test.TestWrapperClassArray`, false)
 	assert.NoError(t, err)
 	t.Logf("%T %+v", got, got)
-	fa := &FloatArray{Values: []float32{1.0, 100.0, 10000.1}}
+	var f1, f2, f3 float32 = 1.0, 100.0, 10000.1
+	fa := []*float32{&f1, &f2, &f3}
 	assert.True(t, reflect.DeepEqual(got, fa))
 
 	got, err = decodeJavaResponse(`doubleArray`, `test.TestWrapperClassArray`, false)
 	assert.NoError(t, err)
 	t.Logf("%T %+v", got, got)
-	da := &DoubleArray{Values: []float64{1.0, 100.0, 10000.1}}
+	var fl1, fl2, fl3 float64 = 1.0, 100.0, 10000.1
+	da := []*float64{&fl1, &fl2, &fl3}
 	assert.True(t, reflect.DeepEqual(got, da))
 }
 

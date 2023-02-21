@@ -22,7 +22,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.caucho.hessian.test.A0;
 import com.caucho.hessian.test.A1;
-import com.caucho.hessian.test.TestObject;
 import test.generic.BusinessData;
 import test.generic.Response;
 import test.model.CustomMap;
@@ -383,6 +382,102 @@ public class TestCustomReply {
     public void customReplyTypedFixedList_Test() throws Exception {
         TypedListTest o = new TypedListTest();
         output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplySingleShort() throws Exception {
+        Short o = Short.valueOf((short) 123);
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyJavaShortArray() throws Exception {
+        Short[] arr = new Short[]{Short.valueOf((short) 123), null, Short.valueOf((short) -456)};
+        output.writeObject(arr);
+        output.flush();
+    }
+
+    public void customReplySingleInteger() throws Exception {
+        Integer o = new Integer(123);
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyJavaIntegerArray() throws Exception {
+        Integer[] arr = new Integer[]{new Integer(123), null, new Integer(-456)};
+        output.writeObject(arr);
+        output.flush();
+    }
+
+    public void customReplySingleLong() throws Exception {
+        Long o = new Long(12345);
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyJavaLongArray() throws Exception {
+        Long[] arr = new Long[]{new Long(12345), null, new Long(-67890)};
+        output.writeObject(arr);
+        output.flush();
+    }
+
+    public void customReplySingleBoolean() throws Exception {
+        Boolean o = new Boolean(true);
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyJavaBooleanArray() throws Exception {
+        Boolean[] arr = new Boolean[]{new Boolean(true), null, new Boolean(false)};
+        output.writeObject(arr);
+        output.flush();
+    }
+
+    public void customReplySingleByte() throws Exception {
+        Byte o = Byte.valueOf((byte) 'A');
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyJavaByteArray() throws Exception {
+        Byte[] arr = new Byte[]{Byte.valueOf((byte) 'A'), null, Byte.valueOf((byte) 'C')};
+        output.writeObject(arr);
+        output.flush();
+    }
+
+    public void customReplySingleFloat() throws Exception {
+        Float o = Float.valueOf((float) 1.23);
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyJavaFloatArray() throws Exception {
+        Float[] arr = new Float[]{Float.valueOf((float) 1.23), null, Float.valueOf((float) 4.56)};
+        output.writeObject(arr);
+        output.flush();
+    }
+
+    public void customReplySingleDouble() throws Exception {
+        Double o = Double.valueOf(1.23);
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyJavaDoubleArray() throws Exception {
+        Double[] arr = new Double[]{Double.valueOf(1.23), null, Double.valueOf(4.56)};
+        output.writeObject(arr);
+        output.flush();
+    }
+
+    public void customReplySingleCharacter() throws Exception {
+        Character o = new Character('A');
+        output.writeObject(o);
+        output.flush();
+    }
+
+    public void customReplyJavaCharacterArray() throws Exception {
+        Character[] arr = new Character[]{new Character('A'), null, new Character('C')};
+        output.writeObject(arr);
         output.flush();
     }
 

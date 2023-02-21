@@ -17,13 +17,19 @@
 
 package unit;
 
+import com.caucho.hessian.test.A0;
 import org.junit.Assert;
 import org.junit.Test;
+import test.util.JavaHessianUtil;
 
 public class GoWrapperClassArrayTest {
 
+    public GoWrapperClassArrayTest(){
+        JavaHessianUtil.removeTestClassLimitFromAllowList();
+    }
+
     @Test
-    public void test() {
+    public void testArrays() {
         Assert.assertArrayEquals(new Byte[]{1, 100, -56}
                 , (Byte[])GoTestUtil.readGoObject("ByteArray"));
         Assert.assertArrayEquals(new Short[]{1, 100, 10000}
@@ -40,5 +46,12 @@ public class GoWrapperClassArrayTest {
                 , (Double[])GoTestUtil.readGoObject("DoubleArray"));
         Assert.assertArrayEquals(new Character[]{'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd'}
                 , (Character[])GoTestUtil.readGoObject("CharacterArray"));
+    }
+
+    @Test
+    public void testMultipleLevelArrays() {
+        A0[][][] multipleLevelA0Array = new A0[][][]{{{new A0(), new A0(), new A0()}, {new A0(), new A0(), new A0(), null}}, {{new A0()}, {new A0()}}};
+
+        Assert.assertArrayEquals(multipleLevelA0Array, (Object[]) GoTestUtil.readGoObject("MultipleLevelA0Array"));
     }
 }

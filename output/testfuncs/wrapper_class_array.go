@@ -24,7 +24,8 @@ import (
 // nolint
 func ByteArray() []byte {
 	e := hessian.NewEncoder()
-	ba := &hessian.ByteArray{Values: []byte{byte(1), byte(100), byte(200)}}
+	var a, b, c byte = 1, 100, 200
+	ba := []*byte{&a, &b, &c}
 	e.Encode(ba)
 	return e.Buffer()
 }
@@ -32,7 +33,8 @@ func ByteArray() []byte {
 // nolint
 func ShortArray() []byte {
 	e := hessian.NewEncoder()
-	sa := &hessian.ShortArray{Values: []int16{1, 100, 10000}}
+	var a, b, c int16 = 1, 100, 10000
+	sa := []*int16{&a, &b, &c}
 	e.Encode(sa)
 	return e.Buffer()
 }
@@ -40,7 +42,8 @@ func ShortArray() []byte {
 // nolint
 func IntegerArray() []byte {
 	e := hessian.NewEncoder()
-	ia := &hessian.IntegerArray{Values: []int32{1, 100, 10000}}
+	var a, b, c int32 = 1, 100, 10000
+	ia := []*int32{&a, &b, &c}
 	e.Encode(ia)
 	return e.Buffer()
 }
@@ -48,7 +51,8 @@ func IntegerArray() []byte {
 // nolint
 func LongArray() []byte {
 	e := hessian.NewEncoder()
-	la := &hessian.LongArray{Values: []int64{1, 100, 10000}}
+	var a, b, c int64 = 1, 100, 10000
+	la := []*int64{&a, &b, &c}
 	e.Encode(la)
 	return e.Buffer()
 }
@@ -56,7 +60,8 @@ func LongArray() []byte {
 // nolint
 func BooleanArray() []byte {
 	e := hessian.NewEncoder()
-	ba := &hessian.BooleanArray{Values: []bool{true, false, true}}
+	var a, b, c = true, false, true
+	ba := []*bool{&a, &b, &c}
 	e.Encode(ba)
 	return e.Buffer()
 }
@@ -64,7 +69,8 @@ func BooleanArray() []byte {
 // nolint
 func CharacterArray() []byte {
 	e := hessian.NewEncoder()
-	ca := &hessian.CharacterArray{Values: "hello world"}
+	var r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11 hessian.Rune = 'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd'
+	ca := []*hessian.Rune{&r1, &r2, &r3, &r4, &r5, &r6, &r7, &r8, &r9, &r10, &r11}
 	e.Encode(ca)
 	return e.Buffer()
 }
@@ -72,7 +78,8 @@ func CharacterArray() []byte {
 // nolint
 func FloatArray() []byte {
 	e := hessian.NewEncoder()
-	fa := &hessian.FloatArray{Values: []float32{1.0, 100.0, 10000.1}}
+	var a, b, c float32 = 1.0, 100.0, 10000.1
+	fa := []*float32{&a, &b, &c}
 	e.Encode(fa)
 	return e.Buffer()
 }
@@ -80,7 +87,21 @@ func FloatArray() []byte {
 // nolint
 func DoubleArray() []byte {
 	e := hessian.NewEncoder()
-	da := &hessian.DoubleArray{Values: []float64{1.0, 100.0, 10000.1}}
+	var a, b, c = 1.0, 100.0, 10000.1
+	da := []*float64{&a, &b, &c}
+	e.Encode(da)
+	return e.Buffer()
+}
+
+// nolint
+func MultipleLevelA0Array() []byte {
+	hessian.RegisterPOJO(&A0{})
+
+	e := hessian.NewEncoder()
+	da := [][][]*A0{
+		{{new(A0), new(A0), new(A0)}, {new(A0), new(A0), new(A0), nil}},
+		{{new(A0)}, {new(A0)}},
+	}
 	e.Encode(da)
 	return e.Buffer()
 }

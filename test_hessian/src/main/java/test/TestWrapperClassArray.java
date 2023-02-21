@@ -20,7 +20,7 @@ package test;
 public class TestWrapperClassArray {
 
     public static Byte[] byteArray() {
-        return new Byte[]{1, 100, -56};
+        return new Byte[]{'A', 'B', 'C'};
     }
 
     public static Short[] shortArray() {

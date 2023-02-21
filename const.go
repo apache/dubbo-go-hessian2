@@ -239,3 +239,50 @@ var (
 var DescRegex, _ = regexp.Compile(DESC_REGEX)
 
 var NilValue = reflect.Zero(reflect.TypeOf((*interface{})(nil)).Elem())
+
+var (
+	// reflect.PointerTo is supported only from go1.20.
+	// So we use a dummy variable to get the pointer type.
+	_varInt     = 0
+	_varInt8    = int8(0)
+	_varInt16   = int16(0)
+	_varInt32   = int32(0)
+	_varInt64   = int64(0)
+	_varUint    = uint(0)
+	_varUint8   = uint8(0)
+	_varUint16  = uint16(0)
+	_varUint32  = uint32(0)
+	_varUint64  = uint64(0)
+	_varFloat32 = float32(0)
+	_varFloat64 = float64(0)
+)
+
+var (
+	_typeOfInt     = reflect.TypeOf(_varInt)
+	_typeOfInt8    = reflect.TypeOf(_varInt8)
+	_typeOfInt16   = reflect.TypeOf(_varInt16)
+	_typeOfInt32   = reflect.TypeOf(_varInt32)
+	_typeOfInt64   = reflect.TypeOf(_varInt64)
+	_typeOfUint    = reflect.TypeOf(_varUint)
+	_typeOfUint8   = reflect.TypeOf(_varUint8)
+	_typeOfUint16  = reflect.TypeOf(_varUint16)
+	_typeOfUint32  = reflect.TypeOf(_varUint32)
+	_typeOfUint64  = reflect.TypeOf(_varUint64)
+	_typeOfFloat32 = reflect.TypeOf(_varFloat32)
+	_typeOfFloat64 = reflect.TypeOf(_varFloat64)
+)
+
+var (
+	_typeOfIntPtr     = reflect.TypeOf(&_varInt)
+	_typeOfInt8Ptr    = reflect.TypeOf(&_varInt8)
+	_typeOfInt16Ptr   = reflect.TypeOf(&_varInt16)
+	_typeOfInt32Ptr   = reflect.TypeOf(&_varInt32)
+	_typeOfInt64Ptr   = reflect.TypeOf(&_varInt64)
+	_typeOfUintPtr    = reflect.TypeOf(&_varUint)
+	_typeOfUint8Ptr   = reflect.TypeOf(&_varUint8)
+	_typeOfUint16Ptr  = reflect.TypeOf(&_varUint16)
+	_typeOfUint32Ptr  = reflect.TypeOf(&_varUint32)
+	_typeOfUint64Ptr  = reflect.TypeOf(&_varUint64)
+	_typeOfFloat32Ptr = reflect.TypeOf(&_varFloat32)
+	_typeOfFloat64Ptr = reflect.TypeOf(&_varFloat64)
+)

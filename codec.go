@@ -24,9 +24,7 @@ import (
 	"math"
 	"reflect"
 	"strings"
-)
 
-import (
 	perrors "github.com/pkg/errors"
 )
 
@@ -327,9 +325,94 @@ func SetValue(dest, v reflect.Value) {
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		dest.SetUint(v.Uint())
 		return
+	case reflect.Ptr:
+		setRawValueToPointer(dest, v)
+		return
 	}
 
 	dest.Set(v)
+}
+
+// setRawValueToDest set the raw value to dest.
+func setRawValueToDest(dest reflect.Value, v reflect.Value) {
+	if dest.Type() == v.Type() {
+		dest.Set(v)
+		return
+	}
+
+	if dest.Type().Kind() == reflect.Ptr {
+		setRawValueToPointer(dest, v)
+		return
+	}
+
+	dest.Set(v)
+}
+
+// setRawValueToPointer set the raw value to dest.
+func setRawValueToPointer(dest reflect.Value, v reflect.Value) {
+	pv := PackPtr(v)
+	if dest.Type() == pv.Type() {
+		dest.Set(pv)
+		return
+	}
+
+	switch dest.Type() {
+	case _typeOfIntPtr:
+		vv := v.Int()
+		dest.Set(reflect.ValueOf(&vv))
+		return
+	case _typeOfInt8Ptr:
+		vv := int8(v.Int())
+		dest.Set(reflect.ValueOf(&vv))
+		return
+	case _typeOfInt16Ptr:
+		vv := int16(v.Int())
+		dest.Set(reflect.ValueOf(&vv))
+		return
+	case _typeOfInt32Ptr:
+		if v.Kind() == reflect.String {
+			vv := rune(v.String()[0])
+			dest.Set(reflect.ValueOf(&vv))
+			return
+		}
+		vv := int32(v.Int())
+		dest.Set(reflect.ValueOf(&vv))
+		return
+	case _typeOfInt64Ptr:
+		vv := v.Int()
+		dest.Set(reflect.ValueOf(&vv))
+		return
+	case _typeOfUintPtr:
+		vv := uint(v.Uint())
+		dest.Set(reflect.ValueOf(&vv))
+		return
+	case _typeOfUint8Ptr:
+		// v is a int32 here.
+		vv := uint8(v.Int())
+		dest.Set(reflect.ValueOf(&vv))
+		return
+	case _typeOfUint16Ptr:
+		vv := uint16(v.Uint())
+		dest.Set(reflect.ValueOf(&vv))
+		return
+	case _typeOfUint32Ptr:
+		vv := uint32(v.Uint())
+		dest.Set(reflect.ValueOf(&vv))
+		return
+	case _typeOfUint64Ptr:
+		vv := v.Uint()
+		dest.Set(reflect.ValueOf(&vv))
+		return
+	case _typeOfFloat32Ptr:
+		vv := float32(v.Float())
+		dest.Set(reflect.ValueOf(&vv))
+	case _typeOfFloat64Ptr:
+		vv := v.Float()
+		dest.Set(reflect.ValueOf(&vv))
+		return
+	default:
+		dest.Set(pv)
+	}
 }
 
 // AddrEqual compares addrs

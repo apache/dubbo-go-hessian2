@@ -50,6 +50,9 @@ func init() {
 	funcMap["CharacterArray"] = testfuncs.CharacterArray
 	funcMap["FloatArray"] = testfuncs.FloatArray
 	funcMap["DoubleArray"] = testfuncs.DoubleArray
+	funcMap["MultipleLevelA0Array"] = testfuncs.MultipleLevelA0Array
+
+	funcMap["ObjectA0"] = testfuncs.ObjectA0
 }
 
 func main() {
