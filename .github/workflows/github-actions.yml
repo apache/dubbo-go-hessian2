@@ -19,7 +19,7 @@ jobs:
         os:
           - ubuntu-latest
         go_version:
-          - 1.13
+          - 1.17
         jdk_version:
           - 1.8
     env:
