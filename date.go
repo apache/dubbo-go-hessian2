@@ -42,12 +42,12 @@ func encDateInMs(b []byte, i interface{}) []byte {
 		return append(b, BC_NULL)
 	}
 	b = append(b, BC_DATE)
-	return append(b, PackInt64(vi.UnixNano()/1e6)...)
+	return append(b, PackInt64(vi.UnixMilli())...)
 }
 
-func encDateInMimute(b []byte, v time.Time) []byte {
+func encDateInMinute(b []byte, v time.Time) []byte {
 	b = append(b, BC_DATE_MINUTE)
-	return append(b, PackInt32(int32(v.UnixNano()/60e9))...)
+	return append(b, PackInt32(int32(v.Unix()/60))...)
 }
 
 /////////////////////////////////////////

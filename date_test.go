@@ -66,6 +66,22 @@ func TestEncDate(t *testing.T) {
 	d = NewDecoder(e.Buffer())
 	res, err = d.Decode()
 	t.Logf("decode(%s, %s) = %v, %v\n", v, tz.Local(), res, err)
+	assert.Equal(t, tz.Local(), res)
+}
+
+func TestEncDateIssue348(t *testing.T) {
+	e := NewEncoder()
+	v := "2914-02-09 06:15:23"
+	tz, _ := time.Parse("2006-01-02 15:04:05", v)
+	e.Encode(tz)
+	if len(e.Buffer()) == 0 {
+		t.Fail()
+	}
+
+	d := NewDecoder(e.Buffer())
+	res, err := d.Decode()
+	t.Logf("decode(%s, %s) = %v, %v\n", v, tz.Local(), res, err)
+	assert.Equal(t, tz.Local(), res)
 }
 
 func testDateFramework(t *testing.T, method string, expected time.Time) {
