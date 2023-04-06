@@ -30,7 +30,7 @@ import (
 var _emptySliceAddr = unsafe.Pointer(reflect.ValueOf([]interface{}{}).Pointer())
 
 // The addresses of all nil map are the same.
-var _emptyMapAddr = unsafe.Pointer(reflect.ValueOf(map[interface{}]interface{}(nil)).Pointer())
+var _nilMapAddr = unsafe.Pointer(reflect.ValueOf(map[interface{}]interface{}(nil)).Pointer())
 
 // used to ref object,list,map
 type _refElem struct {
@@ -130,7 +130,7 @@ func (e *Encoder) checkRefMap(v reflect.Value) (int, bool) {
 		}
 	}
 
-	if addr == _emptySliceAddr || addr == _emptyMapAddr {
+	if addr == _emptySliceAddr || addr == _nilMapAddr {
 		return 0, false
 	}
 
