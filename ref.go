@@ -29,7 +29,7 @@ import (
 // Empty slice is not nil, but the addresses of all empty slice are the same.
 var _emptySliceAddr = unsafe.Pointer(reflect.ValueOf([]interface{}{}).Pointer())
 
-// Empty map is not nil, but the addresses of all empty map are the same.
+// The addresses of all nil map are the same.
 var _emptyMapAddr = unsafe.Pointer(reflect.ValueOf(map[interface{}]interface{}(nil)).Pointer())
 
 // used to ref object,list,map
