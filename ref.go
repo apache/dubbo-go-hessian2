@@ -29,6 +29,9 @@ import (
 // Empty slice is not nil, but the addresses of all empty slice are the same.
 var _emptySliceAddr = unsafe.Pointer(reflect.ValueOf([]interface{}{}).Pointer())
 
+// The addresses of all nil map are the same.
+var _nilMapAddr = unsafe.Pointer(reflect.ValueOf(map[interface{}]interface{}(nil)).Pointer())
+
 // used to ref object,list,map
 type _refElem struct {
 	// record the kind of target, objects are the same only if the address and kind are the same
@@ -127,20 +130,22 @@ func (e *Encoder) checkRefMap(v reflect.Value) (int, bool) {
 		}
 	}
 
-	if addr != _emptySliceAddr {
-		if elem, ok := e.refMap[addr]; ok {
-			if elem.kind == kind {
-				// If kind is not struct, just return the index. Otherwise,
-				// check whether the types are same, because the different
-				// empty struct may share the same address and kind.
-				if elem.kind != reflect.Struct {
-					return elem.index, ok
-				} else if elem.tp == tp {
-					return elem.index, ok
-				}
+	if addr == _emptySliceAddr || addr == _nilMapAddr {
+		return 0, false
+	}
+
+	if elem, ok := e.refMap[addr]; ok {
+		if elem.kind == kind {
+			// If kind is not struct, just return the index. Otherwise,
+			// check whether the types are same, because the different
+			// empty struct may share the same address and kind.
+			if elem.kind != reflect.Struct {
+				return elem.index, ok
+			} else if elem.tp == tp {
+				return elem.index, ok
 			}
-			return 0, false
 		}
+		return 0, false
 	}
 
 	n := len(e.refMap)
