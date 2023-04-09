@@ -117,7 +117,7 @@ func (e *Encoder) encMap(m interface{}) error {
 
 	value = UnpackPtrValue(value)
 	// check nil map
-	if value.Kind() == reflect.Ptr && !value.Elem().IsValid() {
+	if value.IsNil() || (value.Kind() == reflect.Ptr && !value.Elem().IsValid()) {
 		e.buffer = EncNull(e.buffer)
 		return nil
 	}

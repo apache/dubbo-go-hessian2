@@ -1,5 +1,15 @@
 # Release Notes
 
+## v1.12.1
+
+### Bugfixes
+- fix ref to wrong type of map for nil value. [#357](https://github.com/apache/dubbo-go-hessian2/pull/357)
+
+## v1.12.0
+
+### New Features
+- support java wrapper types. [#350](https://github.com/apache/dubbo-go-hessian2/pull/350)
+
 ## v1.11.5
 
 ### Bugfixes
