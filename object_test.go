@@ -1057,7 +1057,7 @@ func TestWrapperClassArray(t *testing.T) {
 }
 
 type User struct {
-	Id   int32
+	Id   *int32
 	List []int32
 }
 
@@ -1067,12 +1067,14 @@ func (u *User) JavaClassName() string {
 
 func TestDecodeIntegerHasNull(t *testing.T) {
 	RegisterPOJO(&User{})
-	testDecodeFramework(t, "customReplyTypedIntegerHasNull", &User{Id: 0})
+	id := int32(1)
+	testDecodeFramework(t, "customReplyTypedIntegerHasNull", &User{Id: &id})
 }
 
 func TestDecodeSliceIntegerHasNull(t *testing.T) {
 	RegisterPOJO(&User{})
-	testDecodeFramework(t, "customReplyTypedListIntegerHasNull", &User{Id: 0, List: []int32{1, 0}})
+	id := int32(1)
+	testDecodeFramework(t, "customReplyTypedListIntegerHasNull", &User{Id: &id, List: []int32{1, 0}})
 }
 
 func TestDecodeCustomReplyEnumVariableList(t *testing.T) {
