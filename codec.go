@@ -172,10 +172,28 @@ func UnpackPtrType(typ reflect.Type) reflect.Type {
 	return typ
 }
 
+// UnpackType unpack pointer type to original type and return the pointer depth.
+func UnpackType(typ reflect.Type) (reflect.Type, int) {
+	depth := 0
+	for typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+		depth++
+	}
+	return typ, depth
+}
+
 // UnpackPtrValue unpack pointer value to original value
 // return the pointer if its elem is zero value, because lots of operations on zero value is invalid
 func UnpackPtrValue(v reflect.Value) reflect.Value {
 	for v.Kind() == reflect.Ptr && v.Elem().IsValid() {
+		v = v.Elem()
+	}
+	return v
+}
+
+// UnpackToRootAddressableValue unpack pointer value to the root addressable value.
+func UnpackToRootAddressableValue(v reflect.Value) reflect.Value {
+	for v.Kind() == reflect.Ptr && v.Elem().CanAddr() {
 		v = v.Elem()
 	}
 	return v
@@ -253,69 +271,56 @@ func EnsureRawAny(in interface{}) interface{} {
 
 // SetValue set the value to dest.
 // It will auto check the Ptr pack level and unpack/pack to the right level.
-// It make sure success to set value
+// It makes sure success to set value
 func SetValue(dest, v reflect.Value) {
-	// check whether the v is a ref holder
-	if v.IsValid() {
-		if h, ok := v.Interface().(*_refHolder); ok {
-			h.add(dest)
-			return
-		}
-	}
-	// temporary process, only handle the same type of situation
-	if v.IsValid() && UnpackPtrType(dest.Type()) == UnpackPtrType(v.Type()) && dest.Kind() == reflect.Ptr && dest.CanSet() {
-		for dest.Type() != v.Type() {
-			v = PackPtr(v)
-		}
-		dest.Set(v)
-		return
-	}
-
-	// if the kind of dest is Ptr, the original value will be zero value
-	// set value on zero value is not allowed
-	// unpack to one-level pointer
-	for dest.Kind() == reflect.Ptr && dest.Elem().Kind() == reflect.Ptr {
-		dest = dest.Elem()
-	}
-
-	// if the kind of dest is Ptr, change the v to a Ptr value too.
-	if dest.Kind() == reflect.Ptr {
-
-		// unpack to one-level pointer
-		for v.IsValid() && v.Kind() == reflect.Ptr && v.Elem().Kind() == reflect.Ptr {
-			v = v.Elem()
-		}
-		// zero value not need to set
-		if !v.IsValid() {
-			return
-		}
-
-		if v.Kind() != reflect.Ptr {
-			// change the v to a Ptr value
-			v = PackPtr(v)
-		}
-	} else {
-		v = UnpackPtrValue(v)
-	}
 	// zero value not need to set
 	if !v.IsValid() {
 		return
 	}
 
-	// set value as required type
-	if dest.Type() == v.Type() && dest.CanSet() {
+	vType := v.Type()
+	destType := dest.Type()
+
+	// for most cases, the types are the same and can set the value directly.
+	if destType == vType {
 		dest.Set(v)
 		return
 	}
 
-	// unpack ptr so that to special check for float,int,uint kind
-	if dest.Kind() == reflect.Ptr {
-		dest = UnpackPtrValue(dest)
-		v = UnpackPtrValue(v)
+	// check whether the v is a ref holder
+	if vType == _refHolderType {
+		h := v.Interface().(*_refHolder)
+		h.add(dest)
+		return
 	}
 
-	kind := dest.Kind()
-	switch kind {
+	vRawType, vPtrDepth := UnpackType(vType)
+
+	// unpack to the root addressable value, so that to set the value.
+	dest = UnpackToRootAddressableValue(dest)
+	destType = dest.Type()
+	destRawType, destPtrDepth := UnpackType(destType)
+
+	// it can set the value directly if the raw types are of the same type.
+	if destRawType == vRawType {
+		if destPtrDepth > vPtrDepth {
+			// pack to the same level of dest
+			for i := 0; i < destPtrDepth-vPtrDepth; i++ {
+				v = PackPtr(v)
+			}
+		} else if destPtrDepth < vPtrDepth {
+			// unpack to the same level of dest
+			for i := 0; i < vPtrDepth-destPtrDepth; i++ {
+				v = v.Elem()
+			}
+		}
+
+		dest.Set(v)
+
+		return
+	}
+
+	switch destType.Kind() {
 	case reflect.Float32, reflect.Float64:
 		dest.SetFloat(v.Float())
 		return
@@ -323,39 +328,22 @@ func SetValue(dest, v reflect.Value) {
 		dest.SetInt(v.Int())
 		return
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		dest.SetUint(v.Uint())
+		// hessian only support 64-bit signed long integer.
+		dest.SetUint(uint64(v.Int()))
 		return
 	case reflect.Ptr:
-		setRawValueToPointer(dest, v)
+		SetValueToPtrDest(dest, v)
 		return
-	}
-
-	dest.Set(v)
-}
-
-// setRawValueToDest set the raw value to dest.
-func setRawValueToDest(dest reflect.Value, v reflect.Value) {
-	if dest.Type() == v.Type() {
+	default:
+		// It's ok when the dest is an interface{}, while the v is a pointer.
 		dest.Set(v)
-		return
 	}
-
-	if dest.Type().Kind() == reflect.Ptr {
-		setRawValueToPointer(dest, v)
-		return
-	}
-
-	dest.Set(v)
 }
 
-// setRawValueToPointer set the raw value to dest.
-func setRawValueToPointer(dest reflect.Value, v reflect.Value) {
-	pv := PackPtr(v)
-	if dest.Type() == pv.Type() {
-		dest.Set(pv)
-		return
-	}
-
+// SetValueToPtrDest set the raw value to a pointer dest.
+func SetValueToPtrDest(dest reflect.Value, v reflect.Value) {
+	// for number, the type of value may be different with the dest,
+	// must convert it to the correct type of value then set.
 	switch dest.Type() {
 	case _typeOfIntPtr:
 		vv := v.Int()
@@ -411,7 +399,7 @@ func setRawValueToPointer(dest reflect.Value, v reflect.Value) {
 		dest.Set(reflect.ValueOf(&vv))
 		return
 	default:
-		dest.Set(pv)
+		dest.Set(v)
 	}
 }
 

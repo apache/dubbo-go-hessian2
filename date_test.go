@@ -152,8 +152,8 @@ func TestEncDateNull(t *testing.T) {
 	assert.Equal(t, ZeroDate, res.(*DateDemo).Date)
 	assert.Equal(t, 2, len(res.(*DateDemo).Dates))
 	assert.Equal(t, tz.Local().String(), (*res.(*DateDemo).Dates[0]).String())
-	assert.Equal(t, &ZeroDate, res.(*DateDemo).NilDate)
-	assert.Equal(t, ZeroDate, *res.(*DateDemo).Date1)
+	assert.Nil(t, res.(*DateDemo).NilDate)
+	assert.Nil(t, res.(*DateDemo).Date1)
 	assert.Equal(t, tz.Local().String(), (*res.(*DateDemo).Date2).String())
 	assert.Equal(t, tz.Local().String(), (*(*res.(*DateDemo).Date3)).String())
 }
@@ -174,6 +174,6 @@ func doTestDateNull(t *testing.T, method string) {
 	testDecodeFrameworkFunc(t, method, func(r interface{}) {
 		t.Logf("%#v", r)
 		assert.Equal(t, ZeroDate, r.(*DateDemo).Date)
-		assert.Equal(t, &ZeroDate, r.(*DateDemo).Date1)
+		assert.Nil(t, r.(*DateDemo).Date1)
 	})
 }
