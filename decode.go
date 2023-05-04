@@ -325,6 +325,11 @@ func (d *Decoder) DecodeValue() (interface{}, error) {
 }
 
 // decToDest decode data to dest value.
+// Before and includes the version v1.12.1, it checks all possible types of the destination,
+// and then decode the data according to the type.
+// But there are too many cases, and it's impossible to handle all of them.
+// After v1.12.1, it decodes the data first, and then set the value to the destination.
+// If the destination is map, slice, array, it decodes separately.
 func (d *Decoder) decToDest(dest reflect.Value) error {
 	destType := dest.Type()
 	destRawType := UnpackPtrType(destType)
