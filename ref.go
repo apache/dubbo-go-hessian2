@@ -32,8 +32,8 @@ var _emptySliceAddr = unsafe.Pointer(reflect.ValueOf([]interface{}{}).Pointer())
 // The addresses of all nil map are the same.
 var _nilMapAddr = unsafe.Pointer(reflect.ValueOf(map[interface{}]interface{}(nil)).Pointer())
 
-// the ref holder type.
-var _refHolderType = reflect.TypeOf(&_refHolder{})
+// the ref holder pointer type.
+var _refHolderPtrType = reflect.TypeOf(&_refHolder{})
 
 // used to ref object,list,map
 type _refElem struct {

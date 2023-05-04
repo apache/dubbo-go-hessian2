@@ -288,7 +288,7 @@ func SetValue(dest, v reflect.Value) {
 	}
 
 	// check whether the v is a ref holder
-	if vType == _refHolderType {
+	if vType == _refHolderPtrType {
 		h := v.Interface().(*_refHolder)
 		h.add(dest)
 		return
