@@ -50,5 +50,7 @@ func init() {
 type Rune rune
 
 var (
-	_typeOfRune = reflect.TypeOf(Rune(0))
+	_varRune       = Rune(0)
+	_typeOfRune    = reflect.TypeOf(_varRune)
+	_typeOfRunePtr = reflect.TypeOf(&_varRune)
 )

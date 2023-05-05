@@ -398,6 +398,16 @@ func SetValueToPtrDest(dest reflect.Value, v reflect.Value) {
 		vv := v.Float()
 		dest.Set(reflect.ValueOf(&vv))
 		return
+	case _typeOfRunePtr:
+		if v.Kind() == reflect.String {
+			vv := Rune(v.String()[0])
+			dest.Set(reflect.ValueOf(&vv))
+			return
+		}
+
+		vv := Rune(v.Int())
+		dest.Set(reflect.ValueOf(&vv))
+		return
 	default:
 		dest.Set(v)
 	}

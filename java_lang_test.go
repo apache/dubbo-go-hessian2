@@ -176,3 +176,52 @@ func TestDecodeJavaCharacterArray(t *testing.T) {
 	t.Logf("%T %+v", got, got)
 	assert.Equal(t, arr, got)
 }
+
+type JavaLangObjectHolder struct {
+	FieldInteger   *int32   `json:"fieldInteger"`
+	FieldLong      *int64   `json:"fieldLong"`
+	FieldBoolean   *bool    `json:"fieldBoolean"`
+	FieldShort     *int16   `json:"fieldShort"`
+	FieldByte      *int8    `json:"fieldByte"`
+	FieldFloat     *float32 `json:"fieldFloat"`
+	FieldDouble    *float64 `json:"fieldDouble"`
+	FieldCharacter *Rune    `json:"fieldCharacter"`
+}
+
+func (h JavaLangObjectHolder) JavaClassName() string {
+	return "test.model.JavaLangObjectHolder"
+}
+
+func TestDecodeJavaLangObjectHolder(t *testing.T) {
+	var a int32 = 123
+	var b int64 = 456
+	var c = true
+	var d int16 = 789
+	var e int8 = 12
+	var f float32 = 3.45
+	var g = 6.78
+	var h Rune = 'A'
+
+	obj := &JavaLangObjectHolder{
+		FieldInteger:   &a,
+		FieldLong:      &b,
+		FieldBoolean:   &c,
+		FieldShort:     &d,
+		FieldByte:      &e,
+		FieldFloat:     &f,
+		FieldDouble:    &g,
+		FieldCharacter: &h,
+	}
+
+	RegisterPOJO(obj)
+
+	got, err := decodeJavaResponse(`customReplyJavaLangObjectHolder`, ``, false)
+	assert.NoError(t, err)
+	t.Logf("customReplyJavaLangObjectHolder: %T %+v", got, got)
+	assert.Equal(t, obj, got)
+
+	got, err = decodeJavaResponse(`customReplyJavaLangObjectHolderForNull`, ``, false)
+	assert.NoError(t, err)
+	t.Logf("customReplyJavaLangObjectHolderForNull: %T %+v", got, got)
+	assert.Equal(t, &JavaLangObjectHolder{}, got)
+}
