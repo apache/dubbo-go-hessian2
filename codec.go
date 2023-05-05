@@ -282,7 +282,7 @@ func SetValue(dest, v reflect.Value) {
 	destType := dest.Type()
 
 	// for most cases, the types are the same and can set the value directly.
-	if destType == vType {
+	if dest.CanSet() && destType == vType {
 		dest.Set(v)
 		return
 	}
