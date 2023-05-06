@@ -393,7 +393,7 @@ func (d *Decoder) readTypedListValue(length int, listTyp string, isVariableArr b
 		} else {
 			if it != nil {
 				//aryValue.Index(j).Set(EnsureRawValue(it))
-				setRawValueToDest(aryValue.Index(j), EnsureRawValue(it))
+				SetValue(aryValue.Index(j), EnsureRawValue(it))
 			}
 		}
 	}

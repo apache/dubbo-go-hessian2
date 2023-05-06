@@ -53,5 +53,6 @@ func TestUserEncodeDecode(t *testing.T) {
 	decoder := hessian.NewDecoder(buf)
 	dec, err := decoder.Decode()
 	assert.Nil(t, err)
+
 	assert.Equal(t, u1, dec)
 }

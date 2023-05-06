@@ -18,7 +18,6 @@
 package hessian
 
 import (
-	"io"
 	"reflect"
 	"strings"
 	"sync"
@@ -484,158 +483,11 @@ func (d *Decoder) decInstance(typ reflect.Type, cls *ClassInfo) (interface{}, er
 		}
 
 		field := vv.FieldByIndex(index)
-		if !field.CanSet() {
-			return nil, perrors.Errorf("decInstance CanSet false for field %s", fieldName)
+
+		if err = d.decToDest(field); err != nil {
+			return nil, perrors.Wrapf(err, "decInstance->DecodeValue: %s", fieldName)
 		}
 
-		// get field type from type object, not do that from value
-		fldTyp := UnpackPtrType(field.Type())
-
-		// unpack pointer to enable value setting
-		fldRawValue := UnpackPtrValue(field)
-		kind := fldTyp.Kind()
-
-		switch kind {
-		case reflect.String:
-			str, err := d.decString(TAG_READ)
-			if err != nil {
-				return nil, perrors.Wrapf(err, "decInstance->ReadString: %s", fieldName)
-			}
-			fldRawValue.SetString(str)
-
-		case reflect.Int32, reflect.Int16, reflect.Int8:
-			num, err := d.decInt32(TAG_READ)
-			if err != nil {
-				// java enum
-				if fldRawValue.Type().Implements(javaEnumType) {
-					_ = d.unreadByte() // Enum parsing, decInt64 above has read a byte, so you need to return a byte here
-					enumVal, decErr := d.DecodeValue()
-					if decErr != nil {
-						return nil, perrors.Wrapf(decErr, "decInstance->decObject field name:%s", fieldName)
-					}
-
-					SetValue(fldRawValue, reflect.ValueOf(enumVal))
-
-					continue
-				}
-
-				return nil, perrors.Wrapf(err, "decInstance->decInt32, field name:%s", fieldName)
-			}
-
-			fldRawValue.SetInt(int64(num))
-		case reflect.Uint16, reflect.Uint8:
-			num, err := d.decInt32(TAG_READ)
-			if err != nil {
-				return nil, perrors.Wrapf(err, "decInstance->decInt32, field name:%s", fieldName)
-			}
-			fldRawValue.SetUint(uint64(num))
-		case reflect.Uint, reflect.Int, reflect.Int64:
-			num, err := d.decInt64(TAG_READ)
-			if err != nil {
-				if fldTyp.Implements(javaEnumType) {
-					d.unreadByte() // Enum parsing, decInt64 above has read a byte, so you need to return a byte here
-					s, decErr := d.Decode()
-					if decErr != nil {
-						return nil, perrors.Wrapf(decErr, "decInstance->decObject field name:%s", fieldName)
-					}
-					enumValue, _ := s.(JavaEnum)
-					num = int64(enumValue)
-				} else {
-					return nil, perrors.Wrapf(err, "decInstance->decInt64 field name:%s", fieldName)
-				}
-			}
-
-			fldRawValue.SetInt(num)
-		case reflect.Uint32, reflect.Uint64:
-			num, err := d.decInt64(TAG_READ)
-			if err != nil {
-				return nil, perrors.Wrapf(err, "decInstance->decInt64, field name:%s", fieldName)
-			}
-			fldRawValue.SetUint(uint64(num))
-		case reflect.Bool:
-			b, err := d.Decode()
-			if err != nil {
-				return nil, perrors.Wrapf(err, "decInstance->Decode field name:%s", fieldName)
-			}
-			v, ok := b.(bool)
-			if !ok {
-				return nil, perrors.Errorf("value convert to bool failed, field name:%s", fieldName)
-			}
-
-			if fldRawValue.Kind() == reflect.Ptr && fldRawValue.CanSet() {
-				if b != nil {
-					field.Set(reflect.ValueOf(&v))
-				}
-			} else if fldRawValue.Kind() != reflect.Ptr {
-				fldRawValue.SetBool(v)
-			}
-
-		case reflect.Float32, reflect.Float64:
-			num, err := d.decDouble(TAG_READ)
-			if err != nil {
-				return nil, perrors.Wrapf(err, "decInstance->decDouble field name:%s", fieldName)
-			}
-			fldRawValue.SetFloat(num.(float64))
-
-		case reflect.Map:
-			// decode map should use the original field value for correct value setting
-			err := d.decMapByValue(field)
-			if err != nil {
-				return nil, perrors.Wrapf(err, "decInstance->decMapByValue field name: %s", fieldName)
-			}
-
-		case reflect.Slice, reflect.Array:
-			m, err := d.decList(TAG_READ)
-			if err != nil {
-				if perrors.Is(err, io.EOF) {
-					break
-				}
-				return nil, perrors.WithStack(err)
-			}
-
-			// set slice separately
-			err = SetSlice(fldRawValue, m)
-			if err != nil {
-				return nil, err
-			}
-		case reflect.Struct:
-			var (
-				err error
-				s   interface{}
-			)
-			fldType := UnpackPtrType(fldRawValue.Type())
-			if fldType.String() == "time.Time" {
-				s, err = d.decDate(TAG_READ)
-				if err != nil {
-					return nil, perrors.WithStack(err)
-				}
-				SetValue(fldRawValue, EnsurePackValue(s))
-			} else {
-				s, err = d.decObject(TAG_READ)
-				if err != nil {
-					return nil, perrors.WithStack(err)
-				}
-				if s != nil {
-					// set value which accepting pointers
-					SetValue(fldRawValue, EnsurePackValue(s))
-				}
-			}
-		case reflect.Interface:
-			s, err := d.DecodeValue()
-			if err != nil {
-				return nil, perrors.WithStack(err)
-			}
-			if s != nil {
-				if ref, ok := s.(*_refHolder); ok {
-					_ = unpackRefHolder(fldRawValue, fldTyp, ref)
-				} else {
-					// set value which accepting pointers
-					SetValue(fldRawValue, EnsurePackValue(s))
-				}
-			}
-		default:
-			return nil, perrors.Errorf("unknown struct member type: %v %v", kind, typ.Name()+"."+fieldStruct.Name)
-		}
 	} // end for
 
 	return vRef.Interface(), nil

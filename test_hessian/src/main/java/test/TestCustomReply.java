@@ -26,6 +26,7 @@ import test.generic.BusinessData;
 import test.generic.Response;
 import test.model.CustomMap;
 import test.model.DateDemo;
+import test.model.JavaLangObjectHolder;
 import test.model.User;
 
 import java.io.OutputStream;
@@ -795,6 +796,29 @@ public class TestCustomReply {
         enumList.add(null);
         enumList.add(Locale.Category.FORMAT);
         output.writeObject(enumList.toArray(new Locale.Category[enumList.size()]));
+        output.flush();
+    }
+
+    public void customReplyJavaLangObjectHolder() throws Exception {
+        JavaLangObjectHolder holder = new JavaLangObjectHolder();
+
+        holder.setFieldInteger(123);
+        holder.setFieldLong(456L);
+        holder.setFieldBoolean(true);
+        holder.setFieldShort((short) 789);
+        holder.setFieldByte((byte) 12);
+        holder.setFieldFloat(3.45f);
+        holder.setFieldDouble(6.78);
+        holder.setFieldCharacter('A');
+
+        output.writeObject(holder);
+        output.flush();
+    }
+
+    public void customReplyJavaLangObjectHolderForNull() throws Exception {
+        // all fields are default null.
+        JavaLangObjectHolder holder = new JavaLangObjectHolder();
+        output.writeObject(holder);
         output.flush();
     }
 }

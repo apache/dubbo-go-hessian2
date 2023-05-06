@@ -324,6 +324,53 @@ func (d *Decoder) DecodeValue() (interface{}, error) {
 	}
 }
 
+// decToDest decode data to dest value.
+// Before and includes the version v1.12.1, it checks all possible types of the destination,
+// and then decode the data according to the type.
+// But there are too many cases, and it's impossible to handle all of them.
+// After v1.12.1, it decodes the data first, and then set the value to the destination.
+// If the destination is map, slice, array, it decodes separately.
+func (d *Decoder) decToDest(dest reflect.Value) error {
+	destType := dest.Type()
+	destRawType := UnpackPtrType(destType)
+
+	// decode for special type, include map, slice, array.
+	switch destRawType.Kind() {
+	case reflect.Map:
+		return d.decMapByValue(dest)
+	case reflect.Slice, reflect.Array:
+		m, err := d.decList(TAG_READ)
+		if err != nil {
+			if perrors.Is(err, io.EOF) {
+				return nil
+			}
+			return perrors.WithStack(err)
+		}
+
+		return SetSlice(UnpackPtrValue(dest), m)
+	}
+
+	dec, err := d.DecodeValue()
+	if err != nil {
+		return perrors.Wrapf(err, "decToDest: %s", dest.Type().Name())
+	}
+
+	// if dec is nil, then return directly.
+	if dec == nil {
+		return nil
+	}
+
+	if ref, ok := dec.(*_refHolder); ok {
+		return unpackRefHolder(UnpackPtrValue(dest), destRawType, ref)
+	}
+
+	decValue := EnsurePackValue(dec)
+
+	SetValue(dest, decValue)
+
+	return nil
+}
+
 // ///////////////////////////////////////
 // typeRefs
 // ///////////////////////////////////////
