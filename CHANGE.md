@@ -1,5 +1,10 @@
 # Release Notes
 
+## v1.12.2
+
+### Bugfixes
+- fix pointer value set. [#361](https://github.com/apache/dubbo-go-hessian2/pull/361)
+
 ## v1.12.1
 
 ### Bugfixes
