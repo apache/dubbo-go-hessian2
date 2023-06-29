@@ -297,6 +297,9 @@ func (d *Decoder) decMap(flag int32) (interface{}, error) {
 	case tag == BC_MAP_UNTYPED:
 		m = make(map[interface{}]interface{})
 		d.appendRefs(m)
+		if d.len() == 0 {
+			return nil, perrors.Errorf("the buffer is empty")
+		}
 		for d.peekByte() != BC_END {
 			k, err = d.Decode()
 			if err != nil {
