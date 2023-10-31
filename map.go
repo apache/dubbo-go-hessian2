@@ -219,7 +219,16 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 			return perrors.WithStack(err)
 		}
 
-		m.Elem().SetMapIndex(EnsurePackValue(entryKey), EnsureRawValue(entryValue))
+		// add a layer of conversion to make the map compatible with more types during decoding
+		key := EnsurePackValue(entryKey)
+		if mKey := m.Elem().Type().Key(); key.Type().ConvertibleTo(mKey) {
+			key = key.Convert(mKey)
+		}
+		val := EnsureRawValue(entryValue)
+		if mVal := m.Elem().Type().Elem(); val.Type().ConvertibleTo(mVal) {
+			val = val.Convert(mVal)
+		}
+		m.Elem().SetMapIndex(key, val)
 	}
 
 	SetValue(value, m)
