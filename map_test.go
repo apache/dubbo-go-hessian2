@@ -18,6 +18,7 @@
 package hessian
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -181,4 +182,47 @@ func TestJavaMap(t *testing.T) {
 	customMap := &CustomMap{"Name": "Test"}
 	RegisterPOJO(customMap)
 	testJavaDecode(t, "customArgTypedFixed_CustomMap", customMap)
+}
+
+type Obj struct {
+	Map8  map[int8]int8
+	Map16 map[int16]int16
+	Map32 map[int32]int32
+}
+
+func (Obj) JavaClassName() string {
+	return ""
+}
+
+func TestMapInObject(t *testing.T) {
+	var (
+		req *Obj
+		e   *Encoder
+		d   *Decoder
+		err error
+		res interface{}
+	)
+
+	req = &Obj{
+		Map8:  map[int8]int8{1: 2, 3: 4},
+		Map16: map[int16]int16{1: 2, 3: 4},
+		Map32: map[int32]int32{1: 2, 3: 4},
+	}
+
+	e = NewEncoder()
+	e.Encode(req)
+	if len(e.Buffer()) == 0 {
+		t.Fail()
+	}
+
+	d = NewDecoder(e.Buffer())
+	res, err = d.Decode()
+	if err != nil {
+		t.Errorf("Decode() = %+v", err)
+	}
+	t.Logf("decode(%v) = %v, %v\n", req, res, err)
+
+	if !reflect.DeepEqual(req, res) {
+		t.Fatalf("req: %#v != res: %#v", req, res)
+	}
 }
