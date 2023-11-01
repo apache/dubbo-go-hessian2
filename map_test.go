@@ -18,6 +18,7 @@
 package hessian
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -195,21 +196,21 @@ func (Obj) JavaClassName() string {
 
 func TestMapInObject(t *testing.T) {
 	var (
-		obj Obj
+		req *Obj
 		e   *Encoder
 		d   *Decoder
 		err error
 		res interface{}
 	)
 
-	obj = Obj{
+	req = &Obj{
 		Map8:  map[int8]int8{1: 2, 3: 4},
 		Map16: map[int16]int16{1: 2, 3: 4},
 		Map32: map[int32]int32{1: 2, 3: 4},
 	}
 
 	e = NewEncoder()
-	e.Encode(obj)
+	e.Encode(req)
 	if len(e.Buffer()) == 0 {
 		t.Fail()
 	}
@@ -219,5 +220,9 @@ func TestMapInObject(t *testing.T) {
 	if err != nil {
 		t.Errorf("Decode() = %+v", err)
 	}
-	t.Logf("decode(%v) = %v, %v\n", obj, res, err)
+	t.Logf("decode(%v) = %v, %v\n", req, res, err)
+
+	if !reflect.DeepEqual(req, res) {
+		t.Fatalf("req: %#v != res: %#v", req, res)
+	}
 }
