@@ -1,5 +1,10 @@
 # Release Notes
 
+## v1.12.3
+
+### Bugfixes
+- fix Decoder failed to decode int8/int16 type values of map field in struct. [#366](https://github.com/apache/dubbo-go-hessian2/pull/366)
+
 ## v1.12.2
 
 ### Bugfixes
