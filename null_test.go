@@ -34,6 +34,18 @@ func TestNull(t *testing.T) {
 	testDecodeFramework(t, "replyNull", nil)
 }
 
-func TestNulEncode(t *testing.T) {
+func TestNullEncode(t *testing.T) {
 	testJavaDecode(t, "argNull", nil)
+}
+
+func TestNullCompatibleEncode(t *testing.T) {
+	e := NewEncoder(
+		WithJavaNullCompatible(),
+	)
+	var null *int = nil
+	e.Encode(null)
+	if e.Buffer() == nil {
+		t.Fail()
+	}
+	assertEqual([]byte("N"), e.buffer, t)
 }
