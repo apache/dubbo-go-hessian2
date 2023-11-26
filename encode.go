@@ -36,7 +36,6 @@ type Encoder struct {
 	classInfoList []*ClassInfo
 	buffer        []byte
 	refMap        map[unsafe.Pointer]_refElem
-	config        *EncoderConfig
 }
 
 // classIndex find the index of the given java name in encoder class info list.
@@ -50,32 +49,12 @@ func (e *Encoder) classIndex(javaName string) int {
 }
 
 // NewEncoder generate an encoder instance
-func NewEncoder(opts ...EncoderOption) *Encoder {
+func NewEncoder() *Encoder {
 	buffer := make([]byte, 64)
-	config := &EncoderConfig{}
-	for _, opt := range opts {
-		opt(config)
-	}
 
 	return &Encoder{
 		buffer: buffer[:0],
 		refMap: make(map[unsafe.Pointer]_refElem, 7),
-		config: config,
-	}
-}
-
-// EncoderConfig config for encoder
-type EncoderConfig struct {
-	JavaNullCompatible bool
-}
-
-// EncoderOption inject configuration into encoder
-type EncoderOption func(*EncoderConfig)
-
-// WithJavaNullCompatible configuring java null compatible for encoder
-func WithJavaNullCompatible() EncoderOption {
-	return func(config *EncoderConfig) {
-		config.JavaNullCompatible = true
 	}
 }
 
@@ -115,13 +94,7 @@ func (e *Encoder) Append(buf []byte) {
 
 // Encode If @v can not be encoded, the return value is nil. At present only struct may can not be encoded.
 func (e *Encoder) Encode(v interface{}) error {
-	if e.config.JavaNullCompatible {
-		vv := reflect.ValueOf(v)
-		if vv.Kind() == reflect.Ptr && vv.IsNil() {
-			e.buffer = EncNull(e.buffer)
-			return nil
-		}
-	} else if v == nil {
+	if v == nil {
 		e.buffer = EncNull(e.buffer)
 		return nil
 	}
@@ -228,7 +201,7 @@ func (e *Encoder) Encode(v interface{}) error {
 			if vv != nil {
 				e.buffer = encBool(e.buffer, *vv)
 			} else {
-				e.buffer = encBool(e.buffer, false)
+				e.buffer = EncNull(e.buffer)
 			}
 		case reflect.Int32:
 			if t == _typeOfRune {
@@ -246,7 +219,12 @@ func (e *Encoder) Encode(v interface{}) error {
 			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
 			reflect.Float32, reflect.Float64: // resolve base type
 			vVal := reflect.ValueOf(v)
-			if reflect.Ptr == vVal.Kind() && !vVal.IsNil() {
+			if reflect.Ptr == vVal.Kind() {
+				if vVal.IsNil() {
+					e.buffer = EncNull(e.buffer)
+					return nil
+				}
+
 				return e.Encode(vVal.Elem().Interface())
 			}
 		default:

@@ -681,11 +681,7 @@ func TestBasePointer(t *testing.T) {
 	base = BasePointer{
 		A: nil,
 	}
-	expectedF := false
-	expectedBase := BasePointer{
-		A: &expectedF,
-	}
-	doTestBasePointer(t, &base, &expectedBase)
+	doTestBasePointer(t, &base, &base)
 }
 
 func doTestBasePointer(t *testing.T, base *BasePointer, expected *BasePointer) {
