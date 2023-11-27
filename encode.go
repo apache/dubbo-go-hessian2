@@ -201,7 +201,7 @@ func (e *Encoder) Encode(v interface{}) error {
 			if vv != nil {
 				e.buffer = encBool(e.buffer, *vv)
 			} else {
-				e.buffer = encBool(e.buffer, false)
+				e.buffer = EncNull(e.buffer)
 			}
 		case reflect.Int32:
 			if t == _typeOfRune {
@@ -219,7 +219,12 @@ func (e *Encoder) Encode(v interface{}) error {
 			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
 			reflect.Float32, reflect.Float64: // resolve base type
 			vVal := reflect.ValueOf(v)
-			if reflect.Ptr == vVal.Kind() && !vVal.IsNil() {
+			if reflect.Ptr == vVal.Kind() {
+				if vVal.IsNil() {
+					e.buffer = EncNull(e.buffer)
+					return nil
+				}
+
 				return e.Encode(vVal.Elem().Interface())
 			}
 		default:
