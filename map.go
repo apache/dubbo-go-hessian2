@@ -96,10 +96,10 @@ func getMapKey(key reflect.Value, t reflect.Type) (interface{}, error) {
 // - `value` is the reflect value of the map
 func (e *Encoder) encMap(m interface{}, value reflect.Value) error {
 	var (
-		err   error
-		k     interface{}
-		typ   reflect.Type
-		keys  []reflect.Value
+		err  error
+		k    interface{}
+		typ  reflect.Type
+		keys []reflect.Value
 	)
 
 	// check ref
