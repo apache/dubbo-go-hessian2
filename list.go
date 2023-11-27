@@ -144,8 +144,9 @@ type Object interface{}
 /////////////////////////////////////////
 
 // encList write list
-func (e *Encoder) encList(v interface{}) error {
-	if !strings.Contains(reflect.TypeOf(v).String(), "interface {}") {
+// The `v` should not be nil, should check nil in advance.
+func (e *Encoder) encList(v reflect.Value) error {
+	if !strings.Contains(v.Type().String(), "interface {}") {
 		return e.writeTypedList(v)
 	}
 	return e.writeUntypedList(v)
@@ -156,10 +157,9 @@ func (e *Encoder) encList(v interface{}) error {
 // ::= x55 type value* 'Z'   # variable-length list
 // ::= 'V' type int value*   # fixed-length list
 // ::= [x70-77] type value*  # fixed-length typed list
-func (e *Encoder) writeTypedList(v interface{}) error {
+func (e *Encoder) writeTypedList(value reflect.Value) error {
 	var err error
 
-	value := reflect.ValueOf(v)
 	// https://github.com/apache/dubbo-go-hessian2/issues/317
 	// if list is null, just return 'N'
 	if value.IsNil() {
@@ -202,10 +202,8 @@ func (e *Encoder) writeTypedList(v interface{}) error {
 // ::= x57 value* 'Z'        # variable-length untyped list
 // ::= x58 int value*        # fixed-length untyped list
 // ::= [x78-7f] value*       # fixed-length untyped list
-func (e *Encoder) writeUntypedList(v interface{}) error {
+func (e *Encoder) writeUntypedList(value reflect.Value) error {
 	var err error
-
-	value := reflect.ValueOf(v)
 
 	// check ref
 	if n, ok := e.checkRefMap(value); ok {

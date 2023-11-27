@@ -91,16 +91,16 @@ func getMapKey(key reflect.Value, t reflect.Type) (interface{}, error) {
 	return nil, perrors.Errorf("unsupported map key kind %s", t.Kind().String())
 }
 
-func (e *Encoder) encMap(m interface{}) error {
+// encMap encode map object.
+// - `m` is the map
+// - `value` is the reflect value of the map
+func (e *Encoder) encMap(m interface{}, value reflect.Value) error {
 	var (
 		err   error
 		k     interface{}
 		typ   reflect.Type
-		value reflect.Value
 		keys  []reflect.Value
 	)
-
-	value = reflect.ValueOf(m)
 
 	// check ref
 	if n, ok := e.checkRefMap(value); ok {
@@ -116,7 +116,7 @@ func (e *Encoder) encMap(m interface{}) error {
 	}
 
 	value = UnpackPtrValue(value)
-	// check nil map
+	// check nil map.
 	if value.IsNil() || (value.Kind() == reflect.Ptr && !value.Elem().IsValid()) {
 		e.buffer = EncNull(e.buffer)
 		return nil

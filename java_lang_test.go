@@ -213,7 +213,7 @@ func TestDecodeJavaLangObjectHolder(t *testing.T) {
 		FieldCharacter: &h,
 	}
 
-	RegisterPOJO(obj)
+	doJavaLangObjectHolderTest(t, obj)
 
 	got, err := decodeJavaResponse(`customReplyJavaLangObjectHolder`, ``, false)
 	assert.NoError(t, err)
@@ -224,4 +224,38 @@ func TestDecodeJavaLangObjectHolder(t *testing.T) {
 	assert.NoError(t, err)
 	t.Logf("customReplyJavaLangObjectHolderForNull: %T %+v", got, got)
 	assert.Equal(t, &JavaLangObjectHolder{}, got)
+}
+
+func TestNilJavaLangObject(t *testing.T) {
+	obj := &JavaLangObjectHolder{
+		FieldInteger:   nil,
+		FieldLong:      nil,
+		FieldBoolean:   nil,
+		FieldShort:     nil,
+		FieldByte:      nil,
+		FieldFloat:     nil,
+		FieldDouble:    nil,
+		FieldCharacter: nil,
+	}
+
+	doJavaLangObjectHolderTest(t, obj)
+}
+
+func doJavaLangObjectHolderTest(t *testing.T, holder *JavaLangObjectHolder) {
+	RegisterPOJO(holder)
+
+	e := NewEncoder()
+	err := e.Encode(holder)
+	if err != nil {
+		t.Errorf("encode error: %v", err)
+		t.FailNow()
+	}
+	buf := e.Buffer()
+	decoder := NewDecoder(buf)
+	des, derr := decoder.Decode()
+	if derr != nil {
+		t.Errorf("dencode error: %v", derr)
+		t.FailNow()
+	}
+	assert.Equal(t, des, holder)
 }

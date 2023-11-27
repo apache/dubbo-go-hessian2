@@ -166,19 +166,22 @@ func (e *Encoder) Encode(v interface{}) error {
 		}
 
 	default:
-		t := UnpackPtrType(reflect.TypeOf(v))
+		vv := reflect.ValueOf(v)
+
+		if vv.Kind() == reflect.Ptr && (vv.IsNil() || !vv.IsValid()) {
+			e.buffer = EncNull(e.buffer)
+			return nil
+		}
+
+		t := UnpackPtrType(vv.Type())
 		switch t.Kind() {
 		case reflect.Struct:
-			vv := reflect.ValueOf(v)
 			if vv.Kind() != reflect.Ptr {
 				v = PackPtrInterface(v, vv)
 			} else {
 				vv = UnpackPtr(vv)
 			}
-			if !vv.IsValid() {
-				e.buffer = EncNull(e.buffer)
-				return nil
-			}
+
 			if vv.Type().String() == "time.Time" {
 				e.buffer = encDateInMs(e.buffer, v)
 				return nil
@@ -193,16 +196,13 @@ func (e *Encoder) Encode(v interface{}) error {
 			}
 			return e.encObject(vv.Interface())
 		case reflect.Slice, reflect.Array:
-			return e.encList(v)
+			return e.encList(vv)
 		case reflect.Map: // the type must be map[string]int
-			return e.encMap(v)
+			return e.encMap(v, vv)
 		case reflect.Bool:
-			vv := v.(*bool)
-			if vv != nil {
-				e.buffer = encBool(e.buffer, *vv)
-			} else {
-				e.buffer = encBool(e.buffer, false)
-			}
+			vv = UnpackPtr(vv)
+			e.buffer = encBool(e.buffer, vv.Interface().(bool))
+			return nil
 		case reflect.Int32:
 			if t == _typeOfRune {
 				e.buffer = encString(e.buffer, string(*v.(*Rune)))
@@ -218,9 +218,8 @@ func (e *Encoder) Encode(v interface{}) error {
 			reflect.Int, reflect.Int8, reflect.Int16, reflect.Int64,
 			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
 			reflect.Float32, reflect.Float64: // resolve base type
-			vVal := reflect.ValueOf(v)
-			if reflect.Ptr == vVal.Kind() && !vVal.IsNil() {
-				return e.Encode(vVal.Elem().Interface())
+			if reflect.Ptr == vv.Kind() {
+				return e.Encode(vv.Elem().Interface())
 			}
 		default:
 			return perrors.Errorf("type not supported! %s", t.Kind().String())
