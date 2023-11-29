@@ -1,5 +1,10 @@
 # Release Notes
 
+## v1.12.4
+
+### Bugfixes
+- fix null encoding for nil pointer. [#368](https://github.com/apache/dubbo-go-hessian2/pull/368)
+
 ## v1.12.3
 
 ### Bugfixes
