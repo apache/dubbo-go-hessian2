@@ -1,5 +1,10 @@
 # Release Notes
 
+## v1.12.5
+
+### Bugfixes
+- fix memory leak issue. [#374](https://github.com/apache/dubbo-go-hessian2/pull/374)
+
 ## v1.12.4
 
 ### Bugfixes
