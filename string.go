@@ -332,7 +332,7 @@ func (d *Decoder) readStringChunkData(tag byte) ([]byte, error) {
 		charCount += charRead
 	}
 
-	return data[:end], nil
+	return append([]byte(nil), data[:end]...), nil
 }
 
 // decode2utf8 decode hessian2 buffer to utf8 buffer
