@@ -410,7 +410,7 @@ public class TestThrowable {
   }
 
   public static Object throw_UserDefinedException() {
-      return new UserDefindException("throw UserDefinedException");
+      return new UserDefinedException("throw UserDefinedException");
   }
 
 }
