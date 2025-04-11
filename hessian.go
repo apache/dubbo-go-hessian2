@@ -66,9 +66,10 @@ type Service struct {
 
 // HessianCodec defines hessian codec
 type HessianCodec struct {
-	pkgType PackageType
-	reader  *bufio.Reader
-	bodyLen int
+	pkgType  PackageType
+	reader   *bufio.Reader
+	bodyLen  int
+	isStream bool
 }
 
 // NewHessianCodec generate a new hessian codec instance
@@ -110,16 +111,34 @@ func (h *HessianCodec) Write(service Service, header DubboHeader, body interface
 func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 	var err error
 
-	if h.reader.Size() < HEADER_LENGTH {
-		return ErrHeaderNotEnough
-	}
-	buf, err := h.reader.Peek(HEADER_LENGTH)
-	if err != nil { // this is impossible
-		return perrors.WithStack(err)
-	}
-	_, err = h.reader.Discard(HEADER_LENGTH)
-	if err != nil { // this is impossible
-		return perrors.WithStack(err)
+	var buf []byte
+
+	if !h.isStream {
+		if h.reader.Size() < HEADER_LENGTH {
+			return ErrHeaderNotEnough
+		}
+		buf, err = h.reader.Peek(HEADER_LENGTH)
+		if err != nil { // this is impossible
+			return perrors.WithStack(err)
+		}
+		_, err = h.reader.Discard(HEADER_LENGTH)
+		if err != nil { // this is impossible
+			return perrors.WithStack(err)
+		}
+	} else {
+		buf = make([]byte, HEADER_LENGTH)
+		n, _ := h.reader.Read(buf)
+		if n < HEADER_LENGTH {
+			// just try once
+			_, err := h.reader.Peek(HEADER_LENGTH - n)
+			if err != nil {
+				return perrors.WithStack(err)
+			}
+			_, err = h.reader.Read(buf[n:])
+			if err != nil { // this is impossible
+				return perrors.WithStack(err)
+			}
+		}
 	}
 
 	//// read header
@@ -164,7 +183,7 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 	h.pkgType = header.Type
 	h.bodyLen = header.BodyLen
 
-	if h.reader.Buffered() < h.bodyLen {
+	if h.reader.Buffered() < h.bodyLen && !h.isStream {
 		return ErrBodyNotEnough
 	}
 
@@ -173,16 +192,30 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 
 // ReadBody uses hessian codec to read response body
 func (h *HessianCodec) ReadBody(rspObj interface{}) error {
-	if h.reader.Buffered() < h.bodyLen {
-		return ErrBodyNotEnough
-	}
-	buf, err := h.reader.Peek(h.bodyLen)
-	if err != nil {
-		return perrors.WithStack(err)
-	}
-	_, err = h.reader.Discard(h.bodyLen)
-	if err != nil { // this is impossible
-		return perrors.WithStack(err)
+	var err error
+	var buf []byte
+	if !h.isStream {
+		if h.reader.Buffered() < h.bodyLen {
+			return ErrBodyNotEnough
+		}
+		buf, err = h.reader.Peek(h.bodyLen)
+		if err != nil {
+			return perrors.WithStack(err)
+		}
+		_, err = h.reader.Discard(h.bodyLen)
+		if err != nil { // this is impossible
+			return perrors.WithStack(err)
+		}
+	} else {
+		buf = make([]byte, h.bodyLen)
+		readLen := 0
+		for readLen < h.bodyLen {
+			n, err := h.reader.Read(buf[readLen:])
+			if err != nil {
+				return perrors.WithStack(err)
+			}
+			readLen += n
+		}
 	}
 
 	switch h.pkgType & PackageType_BitSize {
@@ -218,16 +251,30 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 
 // ReadAttachments ignore body, but only read attachments
 func (h *HessianCodec) ReadAttachments() (map[string]string, error) {
-	if h.reader.Buffered() < h.bodyLen {
-		return nil, ErrBodyNotEnough
-	}
-	buf, err := h.reader.Peek(h.bodyLen)
-	if err != nil {
-		return nil, perrors.WithStack(err)
-	}
-	_, err = h.reader.Discard(h.bodyLen)
-	if err != nil { // this is impossible
-		return nil, perrors.WithStack(err)
+	var err error
+	var buf []byte
+	if !h.isStream {
+		if h.reader.Buffered() < h.bodyLen {
+			return nil, ErrBodyNotEnough
+		}
+		buf, err = h.reader.Peek(h.bodyLen)
+		if err != nil {
+			return nil, perrors.WithStack(err)
+		}
+		_, err = h.reader.Discard(h.bodyLen)
+		if err != nil { // this is impossible
+			return nil, perrors.WithStack(err)
+		}
+	} else {
+		buf = make([]byte, h.bodyLen)
+		readLen := 0
+		for readLen < h.bodyLen {
+			n, err := h.reader.Read(buf[readLen:])
+			if err != nil {
+				return nil, perrors.WithStack(err)
+			}
+			readLen += n
+		}
 	}
 
 	switch h.pkgType & PackageType_BitSize {
