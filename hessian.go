@@ -130,7 +130,7 @@ func (h *HessianCodec) ReadHeader(header *DubboHeader) error {
 		n, _ := h.reader.Read(buf)
 		if n < HEADER_LENGTH {
 			// just try once
-			_, err := h.reader.Peek(HEADER_LENGTH - n)
+			_, err = h.reader.Peek(HEADER_LENGTH - n)
 			if err != nil {
 				return perrors.WithStack(err)
 			}
@@ -208,9 +208,9 @@ func (h *HessianCodec) ReadBody(rspObj interface{}) error {
 		}
 	} else {
 		buf = make([]byte, h.bodyLen)
-		readLen := 0
+		readLen, n := 0, 0
 		for readLen < h.bodyLen {
-			n, err := h.reader.Read(buf[readLen:])
+			n, err = h.reader.Read(buf[readLen:])
 			if err != nil {
 				return perrors.WithStack(err)
 			}
@@ -267,9 +267,9 @@ func (h *HessianCodec) ReadAttachments() (map[string]string, error) {
 		}
 	} else {
 		buf = make([]byte, h.bodyLen)
-		readLen := 0
+		readLen, n := 0, 0
 		for readLen < h.bodyLen {
-			n, err := h.reader.Read(buf[readLen:])
+			n, err = h.reader.Read(buf[readLen:])
 			if err != nil {
 				return nil, perrors.WithStack(err)
 			}
