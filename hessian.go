@@ -80,11 +80,12 @@ func NewHessianCodec(reader *bufio.Reader) *HessianCodec {
 }
 
 // NewHessianCodecCustom generate a new hessian codec instance.
-func NewHessianCodecCustom(pkgType PackageType, reader *bufio.Reader, bodyLen int) *HessianCodec {
+func NewHessianCodecCustom(pkgType PackageType, reader *bufio.Reader, bodyLen int, isStream bool) *HessianCodec {
 	return &HessianCodec{
-		pkgType: pkgType,
-		reader:  reader,
-		bodyLen: bodyLen,
+		pkgType:  pkgType,
+		reader:   reader,
+		bodyLen:  bodyLen,
+		isStream: isStream,
 	}
 }
 
