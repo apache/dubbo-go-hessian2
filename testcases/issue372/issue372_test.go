@@ -3,10 +3,16 @@ package issue372
 import (
 	"bufio"
 	"bytes"
-	hessian "github.com/apache/dubbo-go-hessian2"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+)
+
+import (
+	hessian "github.com/apache/dubbo-go-hessian2"
+)
+
+import (
+	"github.com/stretchr/testify/assert"
 )
 
 type MediaStream struct {
