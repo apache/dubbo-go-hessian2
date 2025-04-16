@@ -92,6 +92,36 @@ func testSimpleEncode(t *testing.T, v interface{}) {
 	assert.Nil(t, err)
 }
 
+func TestEncodeTypedNilPointer(t *testing.T) {
+	encoder := NewEncoder()
+	var val *int32 = nil
+	err := encoder.Encode(val)
+	assert.Nil(t, err)
+
+	expected := []byte{'N'}
+	assertEqual(expected, encoder.Buffer(), t)
+}
+
+func TestEncodeUntypedNil(t *testing.T) {
+	encoder := NewEncoder()
+	err := encoder.Encode(nil)
+	assert.Nil(t, err)
+
+	expected := []byte{'N'}
+	assertEqual(expected, encoder.Buffer(), t)
+}
+
+func TestEncodeNonNilPointer(t *testing.T) {
+	encoder := NewEncoder()
+	val := int32(42)
+	ptr := &val
+	err := encoder.Encode(ptr)
+	assert.Nil(t, err)
+
+	expected := []byte{0xba}
+	assertEqual(expected, encoder.Buffer(), t)
+}
+
 type BenchData struct {
 	name string
 }

@@ -99,6 +99,12 @@ func (e *Encoder) Encode(v interface{}) error {
 		return nil
 	}
 
+	vVal := reflect.ValueOf(v)
+	if vVal.Kind() == reflect.Ptr && vVal.IsNil() {
+		e.buffer = EncNull(e.buffer)
+		return nil
+	}
+
 	switch val := v.(type) {
 	case nil:
 		e.buffer = EncNull(e.buffer)

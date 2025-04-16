@@ -81,6 +81,10 @@ func getJavaReply(method, className string) []byte {
 	cmd := exec.Command("java", cmdArgs...)
 	out, err := cmd.Output()
 	if err != nil {
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			log.Printf("Java command exited with status %d: %s", exitErr.ExitCode(), string(out))
+			return out
+		}
 		log.Fatal(cmd.Args, err)
 	}
 	return out
