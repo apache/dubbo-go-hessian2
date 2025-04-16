@@ -18,40 +18,48 @@
 package hessian
 
 import (
-	"encoding/json"
 	"fmt"
 	"math/rand"
 	"testing"
 	"time"
 )
 
-func TestDecodeBenchmark(t *testing.T) {
-	largeData := generateLargeMap(3, 5) // about 10MB
-
-	now := time.Now()
-	largeDataJson, err := json.Marshal(largeData)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("json serialize %s %dKB\n", time.Since(now), len(largeDataJson)/1024)
-	now = time.Now()
-
-	var data map[string]interface{}
-	err = json.Unmarshal(largeDataJson, &data)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("json deserialize %s\n", time.Since(now))
-	now = time.Now()
+func TestMultipleLevelRecursiveDep(t *testing.T) {
+	// 测试 encode 和 decode 后的对象和源对象结构是一致的，值是相等的
+	data := generateLargeMap(2, 10) // about 1M
 
 	encoder := NewEncoder()
-	err = encoder.Encode(data)
+	err := encoder.Encode(data)
+	if err != nil {
+		panic(err)
+	}
+	bytes := encoder.Buffer()
+
+	decoder := NewDecoder(bytes)
+	obj, err := decoder.Decode()
+	if err != nil {
+		panic(err)
+	}
+
+	s1 := fmt.Sprintf("%v", obj)
+	s2 := fmt.Sprintf("%v", data)
+	if s1 != s2 {
+		t.Error("deserialize mismatched")
+	}
+}
+
+func TestMultipleLevelRecursiveDep2(t *testing.T) {
+	data := generateLargeMap(3, 5) // about 10MB
+
+	now := time.Now()
+	
+	encoder := NewEncoder()
+	err := encoder.Encode(data)
 	if err != nil {
 		panic(err)
 	}
 	bytes := encoder.Buffer()
 	fmt.Printf("hessian2 serialize %s %dKB\n", time.Since(now), len(bytes)/1024)
-	now = time.Now()
 
 	now = time.Now()
 	decoder := NewDecoder(bytes)
@@ -65,8 +73,30 @@ func TestDecodeBenchmark(t *testing.T) {
 	if rt > 1*time.Second {
 		t.Error("deserialize too slow")
 	}
-	if fmt.Sprintf("%v", obj) != fmt.Sprintf("%v", data) {
+	s1 := fmt.Sprintf("%v", obj)
+	s2 := fmt.Sprintf("%v", data)
+	if s1 != s2 {
 		t.Error("deserialize mismatched")
+	}
+}
+func BenchmarkMultipleLevelRecursiveDep(b *testing.B) {
+	// 构造一个多层循环依赖的对象, 无需大对象， 压测情况大批量请求可以看出是否有性能改进
+	data := generateLargeMap(2, 5) // about 300KB
+
+	b.ResetTimer()
+	for range b.N {
+		encoder := NewEncoder()
+		err := encoder.Encode(data)
+		if err != nil {
+			panic(err)
+		}
+		bytes := encoder.Buffer()
+
+		decoder := NewDecoder(bytes)
+		_, err = decoder.Decode()
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
