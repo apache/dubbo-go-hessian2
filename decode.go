@@ -42,6 +42,9 @@ type Decoder struct {
 	// In non-strict mode, a class data will be decoded to a map when the class is not registered.
 	// The default is non-strict mode, user can change it as required.
 	Strict bool
+
+	// count Decode() recursive depth
+	decodeRecursiveDepth int
 }
 
 // FindClassInfo find ClassInfo for the given name in decoder class info list.
@@ -237,13 +240,21 @@ func (d *Decoder) decMapType() (reflect.Type, error) {
 
 // Decode parse hessian data, and ensure the reflection value unpacked
 func (d *Decoder) Decode() (interface{}, error) {
+	d.decodeRecursiveDepth++
+	defer func() { d.decodeRecursiveDepth-- }()
+
 	v, err := d.DecodeValue()
 	if err != nil {
 		return nil, err
 	}
 
-	for _, holder := range d.refHolders {
-		holder.notify()
+	// Decode() will be invoked recursively.
+	// d.refHolders.notify() should run only at the outermost level
+	// to prevent performance issue
+	if d.decodeRecursiveDepth == 1 {
+		for _, holder := range d.refHolders {
+			holder.notify()
+		}
 	}
 
 	return EnsureRawAny(v), nil
