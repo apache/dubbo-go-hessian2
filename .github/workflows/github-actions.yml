@@ -42,14 +42,23 @@ jobs:
       with:
         go-version: ${{ matrix.go_version }}
         check-latest: true
+        cache: false
       id: go
+
+    - name: Verify Go version
+      run: |
+        go version
+        echo "Go root: $(go env GOROOT)"
+        echo "Go version: $(go version)"
 
     - name: Cache Go Dependence
       uses: actions/cache@v4
       with:
         path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: ${{ runner.os }}-go-
+        key: ${{ runner.os }}-go${{ matrix.go_version }}-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go${{ matrix.go_version }}-
+          ${{ runner.os }}-go-
 
     - name: Cache local Maven repository
       uses: actions/cache@v4
