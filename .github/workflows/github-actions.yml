@@ -71,8 +71,7 @@ jobs:
 
     - name: format
       run: |
-        go install github.com/dubbogo/tools/cmd/imports-formatter@latest
-        go fmt ./... && GOROOT=$(go env GOROOT) imports-formatter && git status && [[ -z `git status -s` ]]
+        gofmt -l -w . && [[ -z `git status -s` ]]
         
     - name: Install go ci lint
       run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.27.0

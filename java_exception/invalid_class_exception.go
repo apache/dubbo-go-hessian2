@@ -21,6 +21,8 @@ import (
 	"fmt"
 )
 
+// No third-party imports
+// No internal imports
 // InvalidClassException represents an exception of the same name in java
 type InvalidClassException struct {
 	SerialVersionUID     int64

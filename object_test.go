@@ -30,6 +30,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// No internal imports
 type Department struct {
 	Name string
 }

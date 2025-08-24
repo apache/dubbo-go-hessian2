@@ -28,6 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// No internal imports
 func TestEncUntypedMap(t *testing.T) {
 	var (
 		m   map[interface{}]interface{}

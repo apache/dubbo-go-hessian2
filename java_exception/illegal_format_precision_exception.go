@@ -21,6 +21,8 @@ import (
 	"strconv"
 )
 
+// No third-party imports
+// No internal imports
 // IllegalFormatPrecisionException represents an exception of the same name in java
 type IllegalFormatPrecisionException struct {
 	SerialVersionUID     int64

@@ -21,6 +21,8 @@ import (
 	"fmt"
 )
 
+// No third-party imports
+// No internal imports
 // UnknownFormatConversionException represents an exception of the same name in java
 type UnknownFormatConversionException struct {
 	SerialVersionUID     int64

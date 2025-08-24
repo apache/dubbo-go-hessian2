@@ -21,6 +21,8 @@ import (
 	"fmt"
 )
 
+// No third-party imports
+// No internal imports
 // IllegalFormatFlagsException represents an exception of the same name in java
 type IllegalFormatFlagsException struct {
 	SerialVersionUID     int64

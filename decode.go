@@ -29,6 +29,8 @@ import (
 )
 
 // Decoder struct
+// Note: Decoder instances are not goroutine-safe. If you need to use a Decoder
+// concurrently across multiple goroutines, you must add external synchronization.
 type Decoder struct {
 	reader     *bufio.Reader
 	refs       []interface{}

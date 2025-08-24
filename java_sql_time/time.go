@@ -21,6 +21,8 @@ import (
 	"time"
 )
 
+// No third-party imports
+// No internal imports
 type Time struct {
 	time.Time
 }

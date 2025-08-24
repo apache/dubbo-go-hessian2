@@ -21,6 +21,8 @@ import (
 	"fmt"
 )
 
+// No third-party imports
+// No internal imports
 // IllegalFormatCodePointException represents an exception of the same name in java
 type IllegalFormatCodePointException struct {
 	SerialVersionUID     int64

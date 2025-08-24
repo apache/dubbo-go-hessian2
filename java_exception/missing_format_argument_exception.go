@@ -21,6 +21,8 @@ import (
 	"fmt"
 )
 
+// No third-party imports
+// No internal imports
 // MissingFormatArgumentException represents an exception of the same name in java
 type MissingFormatArgumentException struct {
 	SerialVersionUID     int64

@@ -21,6 +21,8 @@ import (
 	"strconv"
 )
 
+// No third-party imports
+// No internal imports
 // IllegalFormatWidthException represents an exception of the same name in java
 type IllegalFormatWidthException struct {
 	SerialVersionUID     int64
