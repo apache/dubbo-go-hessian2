@@ -228,18 +228,4 @@ func verifyMapStructure(original map[string]interface{}, decoded map[interface{}
 	return true
 }
 
-// abs returns the absolute value of a float32
-func abs(x float32) float32 {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
-
-// abs64 returns the absolute value of a float64
-func abs64(x float64) float64 {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
+// Use math.Abs for absolute value calculations.
