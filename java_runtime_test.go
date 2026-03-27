@@ -117,9 +117,7 @@ func javaMajorVersion(javaPath string) (int, error) {
 		return 0, err
 	}
 
-	if strings.HasPrefix(version, "1.") {
-		version = strings.TrimPrefix(version, "1.")
-	}
+	version = strings.TrimPrefix(version, "1.")
 	majorPart := version
 	if idx := strings.IndexByte(version, '.'); idx >= 0 {
 		majorPart = version[:idx]

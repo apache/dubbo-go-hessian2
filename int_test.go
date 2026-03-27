@@ -156,7 +156,7 @@ func TestIntEncode(t *testing.T) {
 
 func TestIntPrtEncode(t *testing.T) {
 	var (
-		i0  int      = 0
+		i0           = 0
 		i1  int8     = 1
 		i2  int16    = 2
 		i3  int32    = 3

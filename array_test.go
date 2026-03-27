@@ -128,7 +128,7 @@ func TestFloatArray(t *testing.T) {
 }
 
 func TestDoubleArray(t *testing.T) {
-	var a, b, c, d float64 = 1, 2, 3, 4
+	var a, b, c, d = 1.0, 2.0, 3.0, 4.0
 	da := []*float64{&a, &b, &c, &d}
 	tt := assert.New(t)
 

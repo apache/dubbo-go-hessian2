@@ -22,7 +22,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"reflect"
 	"strconv"
 	"unicode/utf8"
 	"unsafe"
@@ -38,13 +37,11 @@ import (
 // String
 // ///////////////////////////////////////
 // Slice convert string to byte slice
-func Slice(s string) (b []byte) {
-	pbytes := (*reflect.SliceHeader)(unsafe.Pointer(&b))
-	pstring := (*reflect.StringHeader)(unsafe.Pointer(&s))
-	pbytes.Data = pstring.Data
-	pbytes.Len = pstring.Len
-	pbytes.Cap = pstring.Len
-	return
+func Slice(s string) []byte {
+	if len(s) == 0 {
+		return nil
+	}
+	return unsafe.Slice(unsafe.StringData(s), len(s))
 }
 
 // NOTE: The length of hessian string is the number of 16-bit characters,

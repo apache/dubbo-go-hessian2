@@ -1035,7 +1035,7 @@ func TestWrapperClassArray(t *testing.T) {
 	got, err = decodeJavaResponse(`booleanArray`, `test.TestWrapperClassArray`, false)
 	assert.NoError(t, err)
 	t.Logf("%T %+v", got, got)
-	var bl1, bl2, bl3 bool = true, false, true
+	var bl1, bl2, bl3 = true, false, true
 	bla := []*bool{&bl1, &bl2, &bl3}
 	assert.True(t, reflect.DeepEqual(got, bla))
 
@@ -1049,7 +1049,7 @@ func TestWrapperClassArray(t *testing.T) {
 	got, err = decodeJavaResponse(`doubleArray`, `test.TestWrapperClassArray`, false)
 	assert.NoError(t, err)
 	t.Logf("%T %+v", got, got)
-	var fl1, fl2, fl3 float64 = 1.0, 100.0, 10000.1
+	var fl1, fl2, fl3 = 1.0, 100.0, 10000.1
 	da := []*float64{&fl1, &fl2, &fl3}
 	assert.True(t, reflect.DeepEqual(got, da))
 }
