@@ -20,7 +20,6 @@ package hessian
 import (
 	"bytes"
 	"fmt"
-	"os/exec"
 	"testing"
 )
 
@@ -50,7 +49,11 @@ func javaDecodeValidate(t *testing.T, method string, target interface{}) (string
 	}
 
 	genHessianJar()
-	cmd := exec.Command("java", "-jar", hessianJar, method)
+	cmd, err := newJavaCommand("-jar", hessianJar, method)
+	if err != nil {
+		t.Logf("resolve java error: %v", err)
+		return "", err
+	}
 
 	stdin, err := cmd.StdinPipe()
 	if err != nil {

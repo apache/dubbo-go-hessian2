@@ -78,7 +78,10 @@ func getJavaReply(method, className string) []byte {
 	if className != "" {
 		cmdArgs = append(cmdArgs, className)
 	}
-	cmd := exec.Command("java", cmdArgs...)
+	cmd, err := newJavaCommand(cmdArgs...)
+	if err != nil {
+		log.Fatal(err)
+	}
 	out, err := cmd.Output()
 	if err != nil {
 		log.Fatal(cmd.Args, err)

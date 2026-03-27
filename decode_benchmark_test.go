@@ -26,8 +26,7 @@ import (
 )
 
 // TestMultipleLevelRecursiveDep verifies that encode followed by decode
-// produces a structurally identical nested map. It uses structured comparison
-// rather than fmt.Sprintf to avoid flakiness from map iteration order.
+// produces a value-equivalent nested map without relying on map iteration order.
 func TestMultipleLevelRecursiveDep(t *testing.T) {
 	data := generateLargeMap(2, 8) // ~500KB nested map
 
@@ -44,15 +43,8 @@ func TestMultipleLevelRecursiveDep(t *testing.T) {
 		t.Fatalf("Failed to decode data: %v", err)
 	}
 
-	// Use structured comparison instead of string comparison
-	decodedMap, ok := obj.(map[interface{}]interface{})
-	if !ok {
-		t.Fatal("Decoded object is not a map")
-	}
-
-	// Verify basic structure and some key elements
-	if !verifyMapStructure(data, decodedMap, t) {
-		t.Error("Decoded map structure does not match original")
+	if err := compareDecodedValue("root", data, obj); err != nil {
+		t.Fatal(err)
 	}
 }
 
@@ -82,13 +74,12 @@ func BenchmarkMultipleLevelRecursiveDepLarge(b *testing.B) {
 	decodeTime := time.Since(startDecode)
 	b.Logf("deserialize %s", decodeTime)
 
-	// Basic validation - ensure decode succeeded and returned correct type
 	if obj == nil {
-		b.Error("deserialize result is nil")
+		b.Fatal("deserialize result is nil")
 	}
 
 	if _, ok := obj.(map[interface{}]interface{}); !ok {
-		b.Error("deserialize result type mismatch, expected map")
+		b.Fatalf("deserialize result type mismatch, expected map, got %T", obj)
 	}
 
 	// Log performance metrics for analysis
@@ -169,66 +160,109 @@ func generateRandomString() string {
 	return "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[rand.Int31n(20):]
 }
 
-// verifyMapStructure walks original and decoded maps in parallel, checking that
-// every key exists and nested structures match. It compares floats with a 1e-6
-// tolerance because hessian may widen float32 to float64 during deserialization.
-// String and int values are only checked for key presence (structure-level check).
-func verifyMapStructure(original map[string]interface{}, decoded map[interface{}]interface{}, t *testing.T) bool {
-	for key, originalValue := range original {
-		decodedValue, exists := decoded[key]
-		if !exists {
-			t.Logf("Key %s missing in decoded map", key)
-			return false
+func compareDecodedValue(path string, original interface{}, decoded interface{}) error {
+	switch originalValue := original.(type) {
+	case map[string]interface{}:
+		return compareDecodedMap(path, originalValue, decoded)
+	case []interface{}:
+		return compareDecodedSlice(path, originalValue, decoded)
+	case float32:
+		decodedFloat, err := decodedFloat64(path, decoded)
+		if err != nil {
+			return err
 		}
-
-		// For nested maps, recursively verify
-		if originalMap, ok := originalValue.(map[string]interface{}); ok {
-			if decodedMap, ok := decodedValue.(map[interface{}]interface{}); ok {
-				if !verifyMapStructure(originalMap, decodedMap, t) {
-					return false
-				}
-			} else {
-				t.Logf("Value type mismatch for key %s: expected map, got %T", key, decodedValue)
-				return false
-			}
-			continue
+		if math.Abs(float64(originalValue)-decodedFloat) > 1e-6 {
+			return fmt.Errorf("%s: float mismatch, expected %f, got %f", path, originalValue, decodedFloat)
 		}
-
-		// For slices, verify basic structure
-		if originalSlice, ok := originalValue.([]interface{}); ok {
-			if decodedSlice, ok := decodedValue.([]interface{}); ok {
-				if len(originalSlice) != len(decodedSlice) {
-					t.Logf("Slice length mismatch for key %s: expected %d, got %d", key, len(originalSlice), len(decodedSlice))
-					return false
-				}
-			} else {
-				t.Logf("Value type mismatch for key %s: expected slice, got %T", key, decodedValue)
-				return false
-			}
-			continue
+	case string:
+		decodedString, ok := decoded.(string)
+		if !ok {
+			return fmt.Errorf("%s: type mismatch, expected string, got %T", path, decoded)
 		}
-
-		// For basic types, we can do direct comparison
-		// but be tolerant of floating point precision differences and type conversions
-		if originalFloat, ok := originalValue.(float32); ok {
-			// Hessian may convert float32 to float64
-			var decodedFloat float64
-			if f32, ok := decodedValue.(float32); ok {
-				decodedFloat = float64(f32)
-			} else if f64, ok := decodedValue.(float64); ok {
-				decodedFloat = f64
-			} else {
-				t.Logf("Value type mismatch for key %s: expected float, got %T", key, decodedValue)
-				return false
-			}
-			// Allow small floating point differences
-			if math.Abs(float64(originalFloat)-decodedFloat) > 1e-6 {
-				t.Logf("Float value mismatch for key %s: expected %f, got %f", key, originalFloat, decodedFloat)
-				return false
-			}
-			continue
+		if originalValue != decodedString {
+			return fmt.Errorf("%s: string mismatch, expected %q, got %q", path, originalValue, decodedString)
+		}
+	case int32:
+		decodedInt, err := decodedInt64(path, decoded)
+		if err != nil {
+			return err
+		}
+		if int64(originalValue) != decodedInt {
+			return fmt.Errorf("%s: int mismatch, expected %d, got %d", path, originalValue, decodedInt)
+		}
+	default:
+		if original != decoded {
+			return fmt.Errorf("%s: value mismatch, expected %v, got %v", path, original, decoded)
 		}
 	}
 
-	return true
+	return nil
+}
+
+func compareDecodedMap(path string, original map[string]interface{}, decoded interface{}) error {
+	decodedMap, ok := decoded.(map[interface{}]interface{})
+	if !ok {
+		return fmt.Errorf("%s: type mismatch, expected map, got %T", path, decoded)
+	}
+	if len(original) != len(decodedMap) {
+		return fmt.Errorf("%s: map size mismatch, expected %d, got %d", path, len(original), len(decodedMap))
+	}
+
+	for key, originalValue := range original {
+		decodedValue, exists := decodedMap[key]
+		if !exists {
+			return fmt.Errorf("%s.%s: key missing in decoded map", path, key)
+		}
+		if err := compareDecodedValue(path+"."+key, originalValue, decodedValue); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func compareDecodedSlice(path string, original []interface{}, decoded interface{}) error {
+	decodedSlice, ok := decoded.([]interface{})
+	if !ok {
+		return fmt.Errorf("%s: type mismatch, expected slice, got %T", path, decoded)
+	}
+	if len(original) != len(decodedSlice) {
+		return fmt.Errorf("%s: slice length mismatch, expected %d, got %d", path, len(original), len(decodedSlice))
+	}
+
+	for i, originalValue := range original {
+		if err := compareDecodedValue(fmt.Sprintf("%s[%d]", path, i), originalValue, decodedSlice[i]); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func decodedFloat64(path string, value interface{}) (float64, error) {
+	switch decodedValue := value.(type) {
+	case float32:
+		return float64(decodedValue), nil
+	case float64:
+		return decodedValue, nil
+	default:
+		return 0, fmt.Errorf("%s: type mismatch, expected float, got %T", path, value)
+	}
+}
+
+func decodedInt64(path string, value interface{}) (int64, error) {
+	switch decodedValue := value.(type) {
+	case int:
+		return int64(decodedValue), nil
+	case int8:
+		return int64(decodedValue), nil
+	case int16:
+		return int64(decodedValue), nil
+	case int32:
+		return int64(decodedValue), nil
+	case int64:
+		return decodedValue, nil
+	default:
+		return 0, fmt.Errorf("%s: type mismatch, expected int, got %T", path, value)
+	}
 }
