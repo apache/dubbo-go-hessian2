@@ -5,8 +5,6 @@ on:
     branches: [ master ]
   pull_request:
     branches: "*"
-  pull_request_target:
-    branches: "*"
 
 jobs:
   build:
@@ -52,7 +50,7 @@ jobs:
         echo "Go version: $(go version)"
 
     - name: Cache Go Dependence
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go${{ matrix.go_version }}-${{ hashFiles('**/go.sum') }}
@@ -61,7 +59,7 @@ jobs:
           ${{ runner.os }}-go-
 
     - name: Cache local Maven repository
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -98,8 +96,9 @@ jobs:
       run: |
         export GO111MODULE=on
         go mod vendor
-        go test ./... -race -v
-        go test -bench . -race -coverprofile=coverage.txt
+        go test ./... -race
+        go test . -race -coverprofile=coverage.txt
+        go test . -run '^$' -bench . -race
 
     - name: Coverage
       run: bash <(curl -s https://codecov.io/bash)
