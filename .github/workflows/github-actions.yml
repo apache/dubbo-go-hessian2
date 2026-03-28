@@ -5,8 +5,6 @@ on:
     branches: [ master ]
   pull_request:
     branches: "*"
-  pull_request_target:
-    branches: "*"
 
 jobs:
   build:
@@ -21,7 +19,7 @@ jobs:
         go_version:
           - 1.25
         jdk_version:
-          - 1.8
+          - 8
     env:
       # DING_TOKEN: 049ae645b5dfb16e3240f81c1757333549ca46b30a5d6b40df562c63c36cf166
       # DING_SIGN: SEC128fb97348610e9d4529bfb59ad7f3fd716b972785a0d04f1cee2c83ec160e59
@@ -29,28 +27,39 @@ jobs:
       DING_SIGN: ${{ secrets.DING_SIGN }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
 
     - name: Set up JDK ${{ matrix.jdk_version }}
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v5
       with:
         java-version: ${{ matrix.jdk_version }}
+        distribution: 'temurin'
 
     - name: Set up Go ${{ matrix.go_version }}
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v6
       with:
         go-version: ${{ matrix.go_version }}
+        check-latest: true
+        cache: false
       id: go
 
+    - name: Verify Go version
+      run: |
+        go version
+        echo "Go root: $(go env GOROOT)"
+        echo "Go version: $(go version)"
+
     - name: Cache Go Dependence
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: ${{ runner.os }}-go-
+        key: ${{ runner.os }}-go${{ matrix.go_version }}-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go${{ matrix.go_version }}-
+          ${{ runner.os }}-go-
 
     - name: Cache local Maven repository
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -67,21 +76,29 @@ jobs:
       run: |
         sh before_validate_license.sh
         chmod u+x /tmp/tools/license/license-header-checker
-        /tmp/tools/license/license-header-checker -v -a -r -i vendor  /tmp/tools/license/license.txt . go  && [[ -z `git status -s` ]]
+        /tmp/tools/license/license-header-checker -v -a -r -i vendor /tmp/tools/license/license.txt . go && [[ -z "$(git status -s)" ]]
 
     - name: format
       run: |
         go install github.com/dubbogo/tools/cmd/imports-formatter@latest
-        go fmt ./... && GOROOT=$(go env GOROOT) imports-formatter && git status && [[ -z `git status -s` ]]
+        go fmt ./...
+        GOROOT="$(go env GOROOT)" imports-formatter
+        git status
+        [[ -z "$(git status -s)" ]]
         
     - name: Install go ci lint
-      run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.4.0
+      run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$(go env GOPATH)/bin" v2.4.0
 
     - name: Run Linter
       run: golangci-lint run --timeout=10m -v
 
     - name: Go Test
-      run: GO111MODULE=on && go mod vendor && go test ./... -race -v && go test -bench . -race -coverprofile=coverage.txt
+      run: |
+        export GO111MODULE=on
+        go mod vendor
+        go test ./... -race
+        go test . -race -coverprofile=coverage.txt
+        go test . -run '^$' -bench . -race
 
     - name: Coverage
       run: bash <(curl -s https://codecov.io/bash)

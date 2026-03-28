@@ -102,8 +102,10 @@ func TestDoubleEncode(t *testing.T) {
 }
 
 func TestDoublePrtEncode(t *testing.T) {
-	f0 := float32(3.14)
-	f1 := 1024.1024102410241024
+	var (
+		f0 float32 = 3.14
+		f1         = 1024.1024102410241024
+	)
 	testSimpleEncode(t, &f0)
 	testSimpleEncode(t, &f1)
 }
