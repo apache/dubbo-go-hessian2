@@ -1,5 +1,20 @@
 # Release Notes
 
+## v1.13.0
+
+### Breaking Changes
+- remove dubbo protocol impl which replaced by the impl in dubbo-go project. [#364](https://github.com/apache/dubbo-go-hessian2/pull/364)
+
+### Enhancement
+- upgrade go version from 1.17 to 1.25. [#381](https://github.com/apache/dubbo-go-hessian2/pull/381)
+- upgrade golangci-lint and add import-formatter check CI. [#380](https://github.com/apache/dubbo-go-hessian2/pull/380)
+- add benchmark test. [#375](https://github.com/apache/dubbo-go-hessian2/pull/375)
+- bump gopkg.in/yaml.v3 to 3.0.1. [#390](https://github.com/apache/dubbo-go-hessian2/pull/390)
+
+### Bugfixes
+- fix decode performance issue, run refHolders.notify() only at the outermost level. [#375](https://github.com/apache/dubbo-go-hessian2/pull/375)
+- fix CI failures and improve code quality. [#389](https://github.com/apache/dubbo-go-hessian2/pull/389)
+
 ## v1.12.5
 
 ### Bugfixes
