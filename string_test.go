@@ -233,6 +233,29 @@ func TestStringComplex(t *testing.T) {
 	testJavaDecode(t, "customArgComplexString", s0)
 }
 
+// TestDecodeStringLoneHighSurrogateRealWorld reproduces the real-world string
+// "test_go_hessian2\ud83d..." sent by a Java hessian2 encoder.
+//
+// Java encodes lone surrogates as 3-byte CESU-8: U+D83D → 0xED 0xA0 0xBD.
+// The following "..." bytes (0x2E 0x2E 0x2E) decode to c2 = 0x002E, which is
+// outside [0xDC00, 0xDFFF].  Before the fix decode2utf8 combined them
+// unconditionally, corrupting the suffix; the fix skips the combination.
+func TestDecodeStringLoneHighSurrogateRealWorld(t *testing.T) {
+	// Byte stream produced by Java hessian2 for "test_go_hessian2\ud83d..."
+	serialized := []byte{
+		0x14,                                     // BC_STRING_DIRECT, 20 chars
+		0x74, 0x65, 0x73, 0x74, 0x5F, 0x67, 0x6F, // test_go
+		0x5F, 0x68, 0x65, 0x73, 0x73, 0x69, 0x61, 0x6E, 0x32, // _hessian2
+		0xED, 0xA0, 0xBD, // lone high surrogate U+D83D (CESU-8)
+		0x2E, 0x2E, 0x2E, // ...
+	}
+
+	d := NewDecoder(serialized)
+	got, err := d.Decode()
+	assert.Nil(t, err)
+	assert.Equal(t, "test_go_hessian2\xed\xa0\xbd...", got)
+}
+
 func BenchmarkDecodeStringAscii(b *testing.B) {
 	runBenchmarkDecodeString(b, "hello world, hello hessian")
 }
