@@ -384,14 +384,16 @@ func decode2utf8(r *bufio.Reader, data []byte, start, end int) (int, int, int, e
 				}
 
 				c2 := ((uint32(data[start+3]) & 0x0f) << 12) + ((uint32(data[start+4]) & 0x3f) << 6) + (uint32(data[start+5]) & 0x3f)
-				c := (c1-0xD800)<<10 + (c2 - 0xDC00) + 0x10000
+				if c2 >= 0xDC00 && c2 <= 0xDFFF {
+					c := (c1-0xD800)<<10 + (c2 - 0xDC00) + 0x10000
 
-				n := utf8.EncodeRune(data[start:], rune(c))
-				copy(data[start+n:], data[start+6:end])
-				start, end = start+n, end-6+n
+					n := utf8.EncodeRune(data[start:], rune(c))
+					copy(data[start+n:], data[start+6:end])
+					start, end = start+n, end-6+n
 
-				charCount += 2
-				continue
+					charCount += 2
+					continue
+				}
 			}
 
 			start += 3
