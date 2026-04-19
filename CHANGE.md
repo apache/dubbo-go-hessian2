@@ -1,5 +1,10 @@
 # Release Notes
 
+## v1.13.1
+
+### Bugfixes
+- fix: validate low surrogate before combining surrogate pair in decode2utf8. [#393](https://github.com/apache/dubbo-go-hessian2/pull/393)
+
 ## v1.13.0
 
 ### Breaking Changes
