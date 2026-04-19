@@ -17,8 +17,8 @@
 
 package test;
 
-public class UserDefindException extends RuntimeException{
-    public UserDefindException(String dd){
+public class UserDefinedException extends RuntimeException{
+    public UserDefinedException(String dd){
         super(dd);
     }
 }
