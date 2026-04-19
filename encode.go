@@ -98,6 +98,13 @@ func (e *Encoder) Encode(v interface{}) error {
 		return nil
 	}
 
+	// handle typed nil pointers such as (*int32)(nil) by encoding them as hessian null
+	vVal := reflect.ValueOf(v)
+	if vVal.Kind() == reflect.Pointer && vVal.IsNil() {
+		e.buffer = EncNull(e.buffer)
+		return nil
+	}
+
 	switch val := v.(type) {
 	case nil:
 		e.buffer = EncNull(e.buffer)

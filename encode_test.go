@@ -95,6 +95,37 @@ func testSimpleEncode(t *testing.T, v interface{}) {
 	assert.Nil(t, err)
 }
 
+func TestTypedNilPointerEncode(t *testing.T) {
+	t.Run("nilInt32", func(t *testing.T) {
+		var nilInt32 *int32
+		data, err := encodeTarget(nilInt32)
+		assert.Nil(t, err)
+		// Hessian null is represented as byte 'N'
+		assert.Equal(t, []byte{'N'}, data)
+	})
+
+	t.Run("nilString", func(t *testing.T) {
+		var nilString *string
+		data, err := encodeTarget(nilString)
+		assert.Nil(t, err)
+		assert.Equal(t, []byte{'N'}, data)
+	})
+
+	t.Run("nilBool", func(t *testing.T) {
+		var nilBool *bool
+		data, err := encodeTarget(nilBool)
+		assert.Nil(t, err)
+		assert.Equal(t, []byte{'N'}, data)
+	})
+
+	t.Run("nilFloat64", func(t *testing.T) {
+		var nilFloat64 *float64
+		data, err := encodeTarget(nilFloat64)
+		assert.Nil(t, err)
+		assert.Equal(t, []byte{'N'}, data)
+	})
+}
+
 type BenchData struct {
 	name string
 }
