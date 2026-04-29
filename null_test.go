@@ -68,6 +68,31 @@ func TestNullInt32Ptr(t *testing.T) {
 	assertEqual([]byte("N"), e.buffer, t)
 }
 
+func TestNullTypedScalarPointers(t *testing.T) {
+	tests := []struct {
+		name  string
+		value interface{}
+	}{
+		{name: "int32", value: (*int32)(nil)},
+		{name: "bool", value: (*bool)(nil)},
+		{name: "string", value: (*string)(nil)},
+		{name: "float64", value: (*float64)(nil)},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := NewEncoder()
+			if err := e.Encode(tt.value); err != nil {
+				t.Fatalf("encode typed nil %s pointer: %v", tt.name, err)
+			}
+			if e.Buffer() == nil {
+				t.Fatal("expected encoder buffer")
+			}
+			assertEqual([]byte("N"), e.buffer, t)
+		})
+	}
+}
+
 func TestNullSlice(t *testing.T) {
 	e := NewEncoder()
 	var null []int32 = nil
