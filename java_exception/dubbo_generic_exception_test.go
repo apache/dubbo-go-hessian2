@@ -54,6 +54,8 @@ func TestNewDubboGenericExceptionErrorMessage(t *testing.T) {
 			assert.Equal(t, test.exceptionClass, exception.ExceptionClass)
 			assert.Equal(t, test.exceptionMessage, exception.ExceptionMessage)
 			assert.Equal(t, test.wantError, exception.DetailMessage)
+			assert.NotNil(t, exception.StackTrace)
+			assert.Empty(t, exception.StackTrace)
 			assert.Equal(t, test.wantError, exception.Error())
 		})
 	}

@@ -32,6 +32,7 @@ type DubboGenericException struct {
 func NewDubboGenericException(exceptionClass, exceptionMessage string) *DubboGenericException {
 	return &DubboGenericException{
 		DetailMessage:    formatDubboGenericExceptionMessage(exceptionClass, exceptionMessage),
+		StackTrace:       []StackTraceElement{},
 		ExceptionClass:   exceptionClass,
 		ExceptionMessage: exceptionMessage,
 	}
