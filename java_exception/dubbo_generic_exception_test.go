@@ -19,7 +19,9 @@ package java_exception
 
 import (
 	"testing"
+)
 
+import (
 	"github.com/stretchr/testify/assert"
 )
 
