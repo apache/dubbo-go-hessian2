@@ -30,12 +30,30 @@ type DubboGenericException struct {
 
 // NewDubboGenericException is the constructor
 func NewDubboGenericException(exceptionClass, exceptionMessage string) *DubboGenericException {
-	return &DubboGenericException{ExceptionClass: exceptionClass, ExceptionMessage: exceptionMessage}
+	return &DubboGenericException{
+		DetailMessage:    formatDubboGenericExceptionMessage(exceptionClass, exceptionMessage),
+		StackTrace:       []StackTraceElement{},
+		ExceptionClass:   exceptionClass,
+		ExceptionMessage: exceptionMessage,
+	}
 }
 
 // Error output error message
 func (e DubboGenericException) Error() string {
-	return e.DetailMessage
+	if e.DetailMessage != "" {
+		return e.DetailMessage
+	}
+	return formatDubboGenericExceptionMessage(e.ExceptionClass, e.ExceptionMessage)
+}
+
+func formatDubboGenericExceptionMessage(exceptionClass, exceptionMessage string) string {
+	if exceptionClass == "" {
+		return exceptionMessage
+	}
+	if exceptionMessage == "" {
+		return exceptionClass
+	}
+	return "java exception: " + exceptionClass + " - " + exceptionMessage
 }
 
 // JavaClassName  java fully qualified path
