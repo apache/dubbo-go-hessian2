@@ -66,6 +66,12 @@ func parseLegacyException(exStr string) *GenericException {
 	msg := strings.TrimSpace(exStr)
 	if strings.HasPrefix(msg, prefix) {
 		msg = strings.TrimSpace(strings.TrimPrefix(msg, prefix))
+		if class, message, ok := strings.Cut(msg, " - "); ok {
+			return &GenericException{
+				ExceptionClass:   strings.TrimSpace(class),
+				ExceptionMessage: strings.TrimSpace(message),
+			}
+		}
 	}
 	return &GenericException{ExceptionClass: "java.lang.Exception", ExceptionMessage: msg}
 }
