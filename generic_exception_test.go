@@ -22,8 +22,11 @@ import (
 )
 
 import (
-	"github.com/apache/dubbo-go-hessian2/java_exception"
 	"github.com/stretchr/testify/assert"
+)
+
+import (
+	"github.com/apache/dubbo-go-hessian2/java_exception"
 )
 
 func TestParseLegacyException(t *testing.T) {
