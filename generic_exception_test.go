@@ -179,4 +179,23 @@ func TestToGenericException(t *testing.T) {
 		assert.False(t, ok)
 		assert.Nil(t, got)
 	})
+
+	t.Run("typed nil *GenericException", func(t *testing.T) {
+		got, ok := ToGenericException((*GenericException)(nil))
+		assert.False(t, ok)
+		assert.Nil(t, got)
+	})
+
+	t.Run("typed nil *DubboGenericException", func(t *testing.T) {
+		got, ok := ToGenericException((*java_exception.DubboGenericException)(nil))
+		assert.False(t, ok)
+		assert.Nil(t, got)
+	})
+
+	t.Run("typed nil Throwabler", func(t *testing.T) {
+		var thr java_exception.Throwabler = (*java_exception.Throwable)(nil)
+		got, ok := ToGenericException(thr)
+		assert.False(t, ok)
+		assert.Nil(t, got)
+	})
 }

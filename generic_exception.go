@@ -18,6 +18,7 @@
 package hessian
 
 import (
+	"reflect"
 	"strings"
 )
 
@@ -46,14 +47,23 @@ func (e GenericException) Error() string {
 func ToGenericException(expt any) (*GenericException, bool) {
 	switch v := expt.(type) {
 	case *GenericException:
+		if v == nil {
+			return nil, false
+		}
 		return v, true
 	case GenericException:
 		return &v, true
 	case *java_exception.DubboGenericException:
+		if v == nil {
+			return nil, false
+		}
 		return &GenericException{ExceptionClass: v.ExceptionClass, ExceptionMessage: v.ExceptionMessage}, true
 	case java_exception.DubboGenericException:
 		return &GenericException{ExceptionClass: v.ExceptionClass, ExceptionMessage: v.ExceptionMessage}, true
 	case java_exception.Throwabler:
+		if rv := reflect.ValueOf(v); rv.Kind() == reflect.Ptr && rv.IsNil() {
+			return nil, false
+		}
 		return &GenericException{ExceptionClass: v.JavaClassName(), ExceptionMessage: v.Error()}, true
 	case string:
 		return parseLegacyException(v), true
