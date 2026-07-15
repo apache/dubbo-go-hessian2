@@ -26,7 +26,20 @@ import (
 	"github.com/apache/dubbo-go-hessian2/java_exception"
 )
 
-// GenericException keeps Java exception class and message.
+// GenericException represents a Java exception with its class name and message.
+//
+// Previously, when dubbo-go invoked a Java service and the Java side threw
+// a business exception (e.g. UserNotFoundException), the original exception
+// type was lost — the Go caller only received a plain string error message
+// and could not determine which specific exception was thrown.
+//
+// This type preserves the full exception information:
+//   - ExceptionClass:  the fully qualified Java class name, e.g. "com.example.UserNotFoundException"
+//   - ExceptionMessage: the exception detail message, e.g. "user not found"
+//
+// See also:
+//   - Java dubbo's GenericException.java (dubbo-common/src/main/java/org/apache/dubbo/rpc/service/GenericException.java)
+//   - GitHub issue: https://github.com/apache/dubbo-go/issues/3167
 type GenericException struct {
 	ExceptionClass   string
 	ExceptionMessage string
