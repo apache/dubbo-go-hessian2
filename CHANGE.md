@@ -1,5 +1,13 @@
 # Release Notes
 
+## v1.13.2
+
+### New Features
+- add GenericException struct and ToGenericException converter. [#397](https://github.com/apache/dubbo-go-hessian2/pull/397)
+
+### Enhancement
+- test: verify typed nil scalar pointers encode as null. [#394](https://github.com/apache/dubbo-go-hessian2/pull/394)
+
 ## v1.13.1
 
 ### Bugfixes
