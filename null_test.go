@@ -74,6 +74,7 @@ func TestNullTypedScalarPointers(t *testing.T) {
 		value interface{}
 	}{
 		{name: "int32", value: (*int32)(nil)},
+		{name: "int64", value: (*int64)(nil)},
 		{name: "bool", value: (*bool)(nil)},
 		{name: "string", value: (*string)(nil)},
 		{name: "float64", value: (*float64)(nil)},
@@ -115,6 +116,7 @@ func TestNullMap(t *testing.T) {
 
 type NullFieldStruct struct {
 	Int   *int
+	Int64 *int64
 	Bool  *bool
 	Int32 *int32
 	Slice []int32
@@ -132,5 +134,39 @@ func TestNullFieldStruct(t *testing.T) {
 	if e.Buffer() == nil {
 		t.Fail()
 	}
-	assertEqual([]byte("NNNNN"), e.buffer[len(e.buffer)-5:], t)
+	assertEqual([]byte("NNNNNN"), e.buffer[len(e.buffer)-6:], t)
+}
+
+// Int64PtrFieldStruct verifies that a *int64 struct field is encoded as a
+// hessian long, so that a java consumer can deserialize it into a
+// java.lang.Long field, see apache/dubbo-go#2410.
+type Int64PtrFieldStruct struct {
+	Total *int64
+}
+
+func (*Int64PtrFieldStruct) JavaClassName() string {
+	return "Int64PtrFieldStruct"
+}
+
+func TestInt64PtrFieldStructEncode(t *testing.T) {
+	total := int64(12345)
+	e := NewEncoder()
+	if err := e.Encode(&Int64PtrFieldStruct{Total: &total}); err != nil {
+		t.Fatalf("encode Int64PtrFieldStruct: %v", err)
+	}
+	// 0x3c 0x30 0x39 is the hessian short-form long encoding of 12345
+	assertEqual([]byte{0x3c, 0x30, 0x39}, e.buffer[len(e.buffer)-3:], t)
+
+	d := NewDecoder(e.Buffer())
+	v, err := d.Decode()
+	if err != nil {
+		t.Fatalf("decode Int64PtrFieldStruct: %v", err)
+	}
+	got, ok := v.(*Int64PtrFieldStruct)
+	if !ok {
+		t.Fatalf("decode Int64PtrFieldStruct: unexpected type %T", v)
+	}
+	if got.Total == nil || *got.Total != total {
+		t.Fatalf("decode Int64PtrFieldStruct: unexpected Total: %+v", got.Total)
+	}
 }
