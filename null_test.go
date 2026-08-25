@@ -170,3 +170,30 @@ func TestInt64PtrFieldStructEncode(t *testing.T) {
 		t.Fatalf("decode Int64PtrFieldStruct: unexpected Total: %+v", got.Total)
 	}
 }
+
+// Int64ThenStringStruct mirrors the Java POJO test.model.Int64ThenString: a
+// *int64 field followed by a string field. Encoding the nil or non-nil Total
+// must not shift Note, otherwise an independent java consumer (hessian-lite)
+// fails with "HessianFieldException ... unexpected object java.lang.String",
+// the exact scenario reported in apache/dubbo-go#2410.
+type Int64ThenStringStruct struct {
+	Total *int64
+	Note  string
+}
+
+func (Int64ThenStringStruct) JavaClassName() string {
+	return "test.model.Int64ThenString"
+}
+
+func TestInt64ThenStringJavaDecode(t *testing.T) {
+	total := int64(12345)
+	RegisterPOJO(&Int64ThenStringStruct{})
+
+	testJavaDecode(t, "customArgInt64ThenString_nonNull", &Int64ThenStringStruct{
+		Total: &total,
+		Note:  "ok",
+	})
+	testJavaDecode(t, "customArgInt64ThenString_nil", &Int64ThenStringStruct{
+		Note: "ok",
+	})
+}
