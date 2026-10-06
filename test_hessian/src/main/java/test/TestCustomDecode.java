@@ -28,6 +28,7 @@ import java.util.*;
 
 import test.model.CustomMap;
 import test.model.DateDemo;
+import test.model.Int64ThenString;
 
 
 public class TestCustomDecode {
@@ -221,6 +222,18 @@ public class TestCustomDecode {
         CustomMap o = (CustomMap) input.readObject();
         String value = (String) o.get("Name");
         return "Test".equals(value);
+    }
+
+    public Object customArgInt64ThenString_nonNull() throws Exception {
+        Int64ThenString o = (Int64ThenString) input.readObject();
+        return Long.valueOf(12345L).equals(o.getTotal())
+                && "ok".equals(o.getNote());
+    }
+
+    public Object customArgInt64ThenString_nil() throws Exception {
+        Int64ThenString o = (Int64ThenString) input.readObject();
+        return o.getTotal() == null
+                && "ok".equals(o.getNote());
     }
 
 }
