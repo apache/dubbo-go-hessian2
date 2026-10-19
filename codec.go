@@ -518,13 +518,29 @@ func ConvertSliceValueType(destTyp reflect.Type, v reflect.Value) (reflect.Value
 			itemValue = UnpackPtrValue(itemValue)
 		}
 
+		itemKind := itemValue.Kind()
+
 		switch {
 		case elemFloatType:
+			if !validateFloatKind(itemKind) {
+				return _zeroValue, perrors.Errorf("expect float element, but get %v, objects: %v", itemKind, v)
+			}
 			sl.Index(i).SetFloat(itemValue.Float())
 		case elemIntType:
+			if !validateIntKind(itemKind) {
+				return _zeroValue, perrors.Errorf("expect int element, but get %v, objects: %v", itemKind, v)
+			}
 			sl.Index(i).SetInt(itemValue.Int())
 		case elemUintType:
-			sl.Index(i).SetUint(itemValue.Uint())
+			switch {
+			case validateUintKind(itemKind):
+				sl.Index(i).SetUint(itemValue.Uint())
+			case validateIntKind(itemKind):
+				// hessian only support 64-bit signed long integer.
+				sl.Index(i).SetUint(uint64(itemValue.Int()))
+			default:
+				return _zeroValue, perrors.Errorf("expect uint element, but get %v, objects: %v", itemKind, v)
+			}
 		default:
 			SetValue(sl.Index(i), itemValue)
 		}
