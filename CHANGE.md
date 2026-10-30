@@ -1,5 +1,16 @@
 # Release Notes
 
+## v1.13.3
+
+### Enhancement
+
+- test: verify nil and non-nil `*int64` fields encode as Hessian null and long, with Java cross-validation to check subsequent field alignment. [#399](https://github.com/apache/dubbo-go-hessian2/pull/399)
+- configure default protection rulesets for default and release branches. [#395](https://github.com/apache/dubbo-go-hessian2/pull/395)
+
+### Bugfixes
+
+- fix panic in `ConvertSliceValueType` when source element kinds do not match the destination numeric type; return an error for incompatible kinds and support signed integer sources for unsigned integer slices. [#400](https://github.com/apache/dubbo-go-hessian2/pull/400)
+
 ## v1.13.2
 
 ### New Features
