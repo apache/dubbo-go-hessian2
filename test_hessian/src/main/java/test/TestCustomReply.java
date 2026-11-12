@@ -27,6 +27,7 @@ import test.generic.Response;
 import test.model.CustomMap;
 import test.model.DateDemo;
 import test.model.JavaLangObjectHolder;
+import test.model.LinkedHashMapHolder;
 import test.model.User;
 
 import java.io.OutputStream;
@@ -38,10 +39,12 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 
 
@@ -819,6 +822,37 @@ public class TestCustomReply {
         // all fields are default null.
         JavaLangObjectHolder holder = new JavaLangObjectHolder();
         output.writeObject(holder);
+        output.flush();
+    }
+
+    private LinkedHashMapHolder linkedHashMapHolder(Map<String, Object> serviceInfo) {
+        Map<String, Object> parkingService = new LinkedHashMap<>();
+        parkingService.put("charge", false);
+        parkingService.put("free", false);
+
+        Map<String, Object> storeService = new LinkedHashMap<>();
+        storeService.put("hasPaperInvoice", false);
+        storeService.put("hasWifi", true);
+
+        serviceInfo.put("parkingService", parkingService);
+        serviceInfo.put("storeService", storeService);
+
+        LinkedHashMapHolder holder = new LinkedHashMapHolder();
+        holder.setServiceInfo(serviceInfo);
+        return holder;
+    }
+
+    public void customReplyLinkedHashMapInLinkedHashMapField() throws Exception {
+        // a type name is written once and referred to by index afterwards:
+        // the field is "java.util.LinkedHashMap", both nested maps are type ref 0.
+        output.writeObject(linkedHashMapHolder(new LinkedHashMap<String, Object>()));
+        output.flush();
+    }
+
+    public void customReplyLinkedHashMapInTreeMapField() throws Exception {
+        // the field is "java.util.TreeMap" (type ref 0), the first nested map is
+        // "java.util.LinkedHashMap" (type ref 1), the second nested map is type ref 1.
+        output.writeObject(linkedHashMapHolder(new TreeMap<String, Object>()));
         output.flush();
     }
 }

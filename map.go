@@ -188,7 +188,11 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 		SetValue(value, EnsurePackValue(refObj))
 		return nil
 	case BC_MAP:
-		d.decString(TAG_READ) // read map type , ignored
+		// the map type is not used here, but it must be added to the type refs,
+		// because later typed maps or lists may refer to it by index.
+		if _, err = d.decMapType(); err != nil {
+			return perrors.WithStack(err)
+		}
 	case BC_MAP_UNTYPED:
 		// do nothing
 	default:

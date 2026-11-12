@@ -227,3 +227,33 @@ func TestMapInObject(t *testing.T) {
 		t.Fatalf("req: %#v != res: %#v", req, res)
 	}
 }
+
+type linkedHashMapHolder struct {
+	ServiceInfo map[string]interface{} `hessian:"serviceInfo"`
+}
+
+func (linkedHashMapHolder) JavaClassName() string {
+	return "test.model.LinkedHashMapHolder"
+}
+
+// The type of a map decoded into a struct field must be added to the type
+// refs, otherwise a later map that refers to a type by index fails.
+func TestDecodeLinkedHashMapInMapField(t *testing.T) {
+	RegisterPOJO(&linkedHashMapHolder{})
+
+	expected := &linkedHashMapHolder{
+		ServiceInfo: map[string]interface{}{
+			"parkingService": map[interface{}]interface{}{"charge": false, "free": false},
+			"storeService":   map[interface{}]interface{}{"hasPaperInvoice": false, "hasWifi": true},
+		},
+	}
+
+	for _, method := range []string{
+		"customReplyLinkedHashMapInLinkedHashMapField",
+		"customReplyLinkedHashMapInTreeMapField",
+	} {
+		got, err := decodeJavaResponse(method, "", false)
+		assert.NoError(t, err, method)
+		assert.Equal(t, expected, got, method)
+	}
+}
