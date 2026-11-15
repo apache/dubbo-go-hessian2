@@ -256,6 +256,73 @@ func TestDecodeStringLoneHighSurrogateRealWorld(t *testing.T) {
 	assert.Equal(t, "test_go_hessian2\xed\xa0\xbd...", got)
 }
 
+// TestDecodeStringLoneHighSurrogateAtChunkEnd checks that a lone high surrogate
+// near the end of a string chunk does not make the decoder read past the chunk,
+// which used to panic or swallow the first bytes of the next value.
+func TestDecodeStringLoneHighSurrogateAtChunkEnd(t *testing.T) {
+	cases := []struct {
+		name       string
+		serialized []byte
+		expected   interface{}
+	}{
+		{
+			name:       "lone high surrogate is the last char",
+			serialized: []byte{0x02, 'a', 0xED, 0xA0, 0xBD},
+			expected:   "a\xed\xa0\xbd",
+		},
+		{
+			name: "lone high surrogate is the last char, followed by another value",
+			serialized: []byte{
+				0x7a,                                     // fixed untyped list, 2 elements
+				0x02, 0xE4, 0xB8, 0xAD, 0xED, 0xA0, 0xBD, // "中\ud83d"
+				0x02, 'c', 'd', // "cd"
+			},
+			expected: []interface{}{"中\xed\xa0\xbd", "cd"},
+		},
+		{
+			name: "lone high surrogate followed by two ascii chars and another value",
+			serialized: []byte{
+				0x7a,
+				0x03, 0xED, 0xA0, 0xBD, 'a', 'b', // "\ud83dab"
+				0x02, 'c', 'd', // "cd"
+			},
+			expected: []interface{}{"\xed\xa0\xbdab", "cd"},
+		},
+		{
+			name: "lone high surrogate followed by one ascii char and an int",
+			serialized: []byte{
+				0x7a,
+				0x02, 0xED, 0xA0, 0xBD, 'a', // "\ud83da"
+				0x91, // int 1
+			},
+			expected: []interface{}{"\xed\xa0\xbda", int32(1)},
+		},
+		{
+			name: "valid surrogate pair followed by another value",
+			serialized: []byte{
+				0x7a,
+				0x03, 'a', 0xED, 0xA0, 0xBD, 0xED, 0xB8, 0x80, // "a😀"
+				0x02, 'c', 'd', // "cd"
+			},
+			expected: []interface{}{"a\U0001F600", "cd"},
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			var (
+				got interface{}
+				err error
+			)
+			assert.NotPanics(t, func() {
+				got, err = NewDecoder(c.serialized).Decode()
+			})
+			assert.Nil(t, err)
+			assert.Equal(t, c.expected, got)
+		})
+	}
+}
+
 func BenchmarkDecodeStringAscii(b *testing.B) {
 	runBenchmarkDecodeString(b, "hello world, hello hessian")
 }
