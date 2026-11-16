@@ -318,7 +318,7 @@ func (d *Decoder) readStringChunkData(tag byte) ([]byte, error) {
 
 		end += charTotal - charCount
 
-		start, end, charRead, err = decode2utf8(d.reader, data, start, end)
+		start, end, charRead, err = decode2utf8(d.reader, data, start, end, charTotal-charCount)
 		if err != nil {
 			return nil, err
 		}
@@ -335,8 +335,9 @@ func (d *Decoder) readStringChunkData(tag byte) ([]byte, error) {
 // - data: the buffer already read
 // - start: the decoding index
 // - end: the already read buffer index
+// - charLeft: the char count left in the current chunk
 // response: updated start, updated end, read char count, error.
-func decode2utf8(r *bufio.Reader, data []byte, start, end int) (int, int, int, error) {
+func decode2utf8(r *bufio.Reader, data []byte, start, end, charLeft int) (int, int, int, error) {
 	var err error
 
 	charCount := 0
@@ -374,7 +375,19 @@ func decode2utf8(r *bufio.Reader, data []byte, start, end int) (int, int, int, e
 		if (ch & 0xf0) == 0xe0 {
 			c1 := ((uint32(ch) & 0x0f) << 12) + ((uint32(data[start+1]) & 0x3f) << 6) + (uint32(data[start+2]) & 0x3f)
 
-			if c1 >= 0xD800 && c1 <= 0xDBFF {
+			// A low surrogate can only follow a high surrogate when the chunk
+			// still has another char and that char is a 3-byte sequence,
+			// otherwise the high surrogate is a lone char.
+			maybePair := c1 >= 0xD800 && c1 <= 0xDBFF && charCount+2 <= charLeft
+			if maybePair && start+3 == end {
+				data[end], err = r.ReadByte()
+				if err != nil {
+					return start, end, 0, err
+				}
+				end++
+			}
+
+			if maybePair && (data[start+3]&0xf0) == 0xe0 {
 				if start+6 >= end {
 					_, err = io.ReadFull(r, data[end:start+6])
 					if err != nil {
