@@ -26,6 +26,7 @@ import test.generic.BusinessData;
 import test.generic.Response;
 import test.model.CustomMap;
 import test.model.DateDemo;
+import test.model.DoubleHolder;
 import test.model.JavaLangObjectHolder;
 import test.model.LinkedHashMapHolder;
 import test.model.User;
@@ -101,6 +102,14 @@ public class TestCustomReply {
         User user = new User();
         user.setId(null);
         output.writeObject(user);
+        output.flush();
+    }
+
+    public void customReplyTypedDoubleHasNull() throws Exception {
+        DoubleHolder holder = new DoubleHolder();
+        holder.setValue(null);
+        holder.setPtrValue(null);
+        output.writeObject(holder);
         output.flush();
     }
 
