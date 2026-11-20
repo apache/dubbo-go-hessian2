@@ -109,6 +109,7 @@ public class TestCustomReply {
         DoubleHolder holder = new DoubleHolder();
         holder.setValue(null);
         holder.setPtrValue(null);
+        holder.setName("DoubleWithNull");
         output.writeObject(holder);
         output.flush();
     }

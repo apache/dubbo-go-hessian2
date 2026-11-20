@@ -1072,6 +1072,7 @@ func TestDecodeIntegerHasNull(t *testing.T) {
 type DoubleHolder struct {
 	Value    float64
 	PtrValue *float64
+	Name     string
 }
 
 func (h *DoubleHolder) JavaClassName() string {
@@ -1082,7 +1083,7 @@ func (h *DoubleHolder) JavaClassName() string {
 func TestDecodeDoubleHasNull(t *testing.T) {
 	RegisterPOJO(&DoubleHolder{})
 
-	testDecodeFramework(t, "customReplyTypedDoubleHasNull", &DoubleHolder{Value: 0, PtrValue: nil})
+	testDecodeFramework(t, "customReplyTypedDoubleHasNull", &DoubleHolder{Value: 0, PtrValue: nil, Name: "DoubleWithNull"})
 }
 
 func TestDecodeSliceIntegerHasNull(t *testing.T) {

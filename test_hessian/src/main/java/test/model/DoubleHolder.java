@@ -23,6 +23,8 @@ public class DoubleHolder implements Serializable {
 
     private Double ptrValue;
 
+    private String name;
+
     public Double getValue() {
         return value;
     }
@@ -37,5 +39,13 @@ public class DoubleHolder implements Serializable {
 
     public void setPtrValue(Double ptrValue) {
         this.ptrValue = ptrValue;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
