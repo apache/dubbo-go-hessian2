@@ -1069,6 +1069,23 @@ func TestDecodeIntegerHasNull(t *testing.T) {
 	testDecodeFramework(t, "customReplyTypedIntegerHasNull", &User{Id: nil})
 }
 
+type DoubleHolder struct {
+	Value    float64
+	PtrValue *float64
+	Name     string
+}
+
+func (h *DoubleHolder) JavaClassName() string {
+	return "test.model.DoubleHolder"
+}
+
+// https://github.com/apache/dubbo-go-hessian2/issues/305
+func TestDecodeDoubleHasNull(t *testing.T) {
+	RegisterPOJO(&DoubleHolder{})
+
+	testDecodeFramework(t, "customReplyTypedDoubleHasNull", &DoubleHolder{Value: 0, PtrValue: nil, Name: "DoubleWithNull"})
+}
+
 func TestDecodeSliceIntegerHasNull(t *testing.T) {
 	RegisterPOJO(&User{})
 	testDecodeFramework(t, "customReplyTypedListIntegerHasNull", &User{Id: nil, List: []int32{1, 0}})
