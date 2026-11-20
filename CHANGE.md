@@ -1,5 +1,16 @@
 # Release Notes
 
+## v1.13.4
+
+### Enhancement
+
+- test: verify null Java `Double` fields decode into `float64` as zero and `*float64` as nil, with a subsequent non-null field decoded correctly. [#403](https://github.com/apache/dubbo-go-hessian2/pull/403)
+
+### Bugfixes
+
+- fix type reference tracking when decoding typed maps into struct fields, preventing out-of-range type reference errors for nested typed maps. [#401](https://github.com/apache/dubbo-go-hessian2/pull/401)
+- fix a panic or incorrect decoding of subsequent values when a lone high surrogate near the end of a string chunk causes the decoder to read past the chunk. [#402](https://github.com/apache/dubbo-go-hessian2/pull/402)
+
 ## v1.13.3
 
 ### Enhancement
