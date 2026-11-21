@@ -333,6 +333,14 @@ func SetValue(dest, v reflect.Value) {
 		// hessian only support 64-bit signed long integer.
 		dest.SetUint(uint64(v.Int()))
 		return
+	case reflect.String, reflect.Bool:
+		// named string or bool type, e.g. `type Status string`
+		if v.Kind() == destType.Kind() {
+			dest.Set(v.Convert(destType))
+			return
+		}
+		dest.Set(v)
+		return
 	case reflect.Ptr:
 		SetValueToPtrDest(dest, v)
 		return
@@ -411,6 +419,13 @@ func SetValueToPtrDest(dest reflect.Value, v reflect.Value) {
 		dest.Set(reflect.ValueOf(&vv))
 		return
 	default:
+		// pointer to a named basic type, e.g. *Status
+		if k := dest.Type().Elem().Kind(); v.Kind() != reflect.Ptr && (k >= reflect.Bool && k <= reflect.Float64 || k == reflect.String) {
+			vv := reflect.New(dest.Type().Elem())
+			SetValue(vv.Elem(), v)
+			dest.Set(vv)
+			return
+		}
 		dest.Set(v)
 	}
 }

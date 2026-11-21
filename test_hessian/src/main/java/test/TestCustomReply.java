@@ -29,6 +29,7 @@ import test.model.DateDemo;
 import test.model.DoubleHolder;
 import test.model.JavaLangObjectHolder;
 import test.model.LinkedHashMapHolder;
+import test.model.NamedTypes;
 import test.model.User;
 
 import java.io.OutputStream;
@@ -111,6 +112,20 @@ public class TestCustomReply {
         holder.setPtrValue(null);
         holder.setName("DoubleWithNull");
         output.writeObject(holder);
+        output.flush();
+    }
+
+    public void customReplyNamedTypes() throws Exception {
+        NamedTypes o = new NamedTypes();
+        o.setStatus("ACTIVE");
+        o.setCode(42L);
+        o.setFlag(true);
+        o.setRatio(1.5);
+        o.setPtrStatus("PENDING");
+        o.setPtrCode(7L);
+        o.setPtrFlag(false);
+        o.setName("bob");
+        output.writeObject(o);
         output.flush();
     }
 

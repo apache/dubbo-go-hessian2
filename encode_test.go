@@ -144,3 +144,95 @@ func Benchmark_Pointer_Encode_8(b *testing.B) {
 		}
 	})
 }
+
+type (
+	namedString  string
+	namedInt     int
+	namedInt8    int8
+	namedInt16   int16
+	namedInt64   int64
+	namedUint    uint
+	namedUint8   uint8
+	namedUint16  uint16
+	namedUint32  uint32
+	namedUint64  uint64
+	namedFloat32 float32
+	namedFloat64 float64
+	namedBool    bool
+)
+
+// https://github.com/apache/dubbo-go-hessian2/issues/404
+func TestEncodeNamedBasicTypes(t *testing.T) {
+	s := namedString("ok")
+	f := namedBool(true)
+	b := true
+	pb := &b
+
+	cases := []struct {
+		named interface{}
+		plain interface{}
+	}{
+		{namedString("ok"), "ok"},
+		{&s, "ok"},
+		{(*namedString)(nil), nil},
+		{namedInt(-7), -7},
+		{namedInt8(-8), int8(-8)},
+		{namedInt16(300), int16(300)},
+		{namedInt64(1 << 40), int64(1 << 40)},
+		{namedUint(7), uint(7)},
+		{namedUint8(200), uint8(200)},
+		{namedUint16(60000), uint16(60000)},
+		{namedUint32(1 << 31), uint32(1 << 31)},
+		{namedUint64(1 << 40), uint64(1 << 40)},
+		{namedFloat32(1.5), float32(1.5)},
+		{namedFloat64(2.25), 2.25},
+		{namedBool(true), true},
+		{&f, true},
+		{(*namedBool)(nil), nil},
+		{&pb, true},
+	}
+	for _, c := range cases {
+		want, err := encodeTarget(c.plain)
+		assert.Nil(t, err)
+		got, err := encodeTarget(c.named)
+		assert.Nil(t, err)
+		assert.Equal(t, want, got, "%T", c.named)
+	}
+}
+
+type NamedTypes struct {
+	Status    namedString
+	Code      namedInt64
+	Flag      namedBool
+	Ratio     namedFloat64
+	PtrStatus *namedString
+	PtrCode   *namedInt64
+	PtrFlag   *namedBool
+	Name      string
+}
+
+func (*NamedTypes) JavaClassName() string {
+	return "test.model.NamedTypes"
+}
+
+func TestNamedTypesStruct(t *testing.T) {
+	RegisterPOJO(&NamedTypes{})
+	status, code, flag := namedString("PENDING"), namedInt64(7), namedBool(false)
+	want := &NamedTypes{
+		Status:    "ACTIVE",
+		Code:      42,
+		Flag:      true,
+		Ratio:     1.5,
+		PtrStatus: &status,
+		PtrCode:   &code,
+		PtrFlag:   &flag,
+		Name:      "bob",
+	}
+
+	b, err := encodeTarget(want)
+	assert.Nil(t, err)
+	assert.Equal(t, want, mustDecodeObject(t, b))
+
+	testJavaDecode(t, "customArgNamedTypes", want)
+	testDecodeFramework(t, "customReplyNamedTypes", want)
+}

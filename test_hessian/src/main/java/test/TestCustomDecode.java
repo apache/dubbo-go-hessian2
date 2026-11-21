@@ -29,6 +29,7 @@ import java.util.*;
 import test.model.CustomMap;
 import test.model.DateDemo;
 import test.model.Int64ThenString;
+import test.model.NamedTypes;
 
 
 public class TestCustomDecode {
@@ -234,6 +235,18 @@ public class TestCustomDecode {
         Int64ThenString o = (Int64ThenString) input.readObject();
         return o.getTotal() == null
                 && "ok".equals(o.getNote());
+    }
+
+    public Object customArgNamedTypes() throws Exception {
+        NamedTypes o = (NamedTypes) input.readObject();
+        return "ACTIVE".equals(o.getStatus())
+                && Long.valueOf(42L).equals(o.getCode())
+                && Boolean.TRUE.equals(o.getFlag())
+                && Double.valueOf(1.5).equals(o.getRatio())
+                && "PENDING".equals(o.getPtrStatus())
+                && Long.valueOf(7L).equals(o.getPtrCode())
+                && Boolean.FALSE.equals(o.getPtrFlag())
+                && "bob".equals(o.getName());
     }
 
 }
