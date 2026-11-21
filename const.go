@@ -286,3 +286,19 @@ var (
 	_typeOfFloat32Ptr = reflect.TypeOf(&_varFloat32)
 	_typeOfFloat64Ptr = reflect.TypeOf(&_varFloat64)
 )
+
+// _basicTypes maps a kind to its unnamed type, used to encode named basic types like `type Status string`.
+var _basicTypes = map[reflect.Kind]reflect.Type{
+	reflect.String:  reflect.TypeOf(""),
+	reflect.Int:     _typeOfInt,
+	reflect.Int8:    _typeOfInt8,
+	reflect.Int16:   _typeOfInt16,
+	reflect.Int64:   _typeOfInt64,
+	reflect.Uint:    _typeOfUint,
+	reflect.Uint8:   _typeOfUint8,
+	reflect.Uint16:  _typeOfUint16,
+	reflect.Uint32:  _typeOfUint32,
+	reflect.Uint64:  _typeOfUint64,
+	reflect.Float32: _typeOfFloat32,
+	reflect.Float64: _typeOfFloat64,
+}

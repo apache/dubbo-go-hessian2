@@ -195,11 +195,11 @@ func (e *Encoder) Encode(v interface{}) error {
 		case reflect.Map: // the type must be map[string]int
 			return e.encMap(v)
 		case reflect.Bool:
-			vv := v.(*bool)
-			if vv != nil {
-				e.buffer = encBool(e.buffer, *vv)
-			} else {
+			vv := UnpackPtrValue(reflect.ValueOf(v))
+			if vv.Kind() == reflect.Ptr {
 				e.buffer = EncNull(e.buffer)
+			} else {
+				e.buffer = encBool(e.buffer, vv.Bool())
 			}
 		case reflect.Int32:
 			if t == _typeOfRune {
@@ -225,6 +225,9 @@ func (e *Encoder) Encode(v interface{}) error {
 
 				return e.Encode(vVal.Elem().Interface())
 			}
+
+			// named basic type, e.g. `type Status string`, encode it as its underlying type
+			return e.Encode(vVal.Convert(_basicTypes[t.Kind()]).Interface())
 		default:
 			return perrors.Errorf("type not supported! %s", t.Kind().String())
 		}
